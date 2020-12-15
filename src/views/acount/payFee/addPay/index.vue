@@ -17,13 +17,45 @@
         :list-query="formData"
         :form-item="formItem"
         :rules="addRules"
-        label-width="120px"
+        label-width="200px"
         label-position="right"
         @onPass="handlePassClick"
-      />
+      >
+        <template
+          slot="driverId"
+        >
+          <div>
+            <el-select
+              v-model="driverInfo"
+              v-loadmore="loadmore"
+              filterable
+              clearable
+              remote
+              reserve-keyword
+              :default-first-option="true"
+              :remote-method="remoteMethod"
+              :loading="driverLoading"
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="(item,index) in driverOptions"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </div>
+        </template>
+      </self-form>
     </SectionContainer>
     <SectionContainer
-      title="支付信息"
+      title="账户信息"
+      :md="true"
+    >
+      12
+    </SectionContainer>
+    <SectionContainer
+      title="缴费信息"
       :md="true"
       class="payInfo"
     >
@@ -213,6 +245,8 @@ import SectionContainer from '@/components/SectionContainer/index.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { deleteUser } from '@/api/users'
+import { getDriverNoAndNameList } from '@/api/driver'
+import { orderCanExtractMoney } from '@/api/driver-account'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
  @Component({
    name: 'addPay',
@@ -223,22 +257,17 @@ import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
    }
  })
 export default class extends Vue {
+  private driverLoading:Boolean = false
+  private keyWord:String = ''
+  private driverOver:Boolean = false
   private showViewer:boolean = false
   private imageUrl:string = ''
   private formStatus:boolean = false
   private tableStatus:boolean = false
-  private ReceiptOptions:any = [
-    { label: '否', value: 0 },
-    { label: '是', value: 1 }
-  ]
-  private orderOptions:any[] = [
-    { label: '否', value: 0 },
-    { label: '是', value: 1 }
-  ]
-  private driverInfoOptions:any[] = [
-    { label: '否', value: 0 },
-    { label: '是', value: 1 }
-  ]
+  private ReceiptOptions:any = []
+  private orderOptions:any[] = []
+  private driverOptions:any[] = []
+  private driverInfo:any = ''
   private addRules:any = {
     driverId: [
       { required: true, message: '请选择司机', trigger: 'change' }
@@ -255,22 +284,22 @@ export default class extends Vue {
     canExtractMoney: '',
     orderId: '',
     phone: '',
-    workCity: '',
-    gmId: '',
+    workCityName: '',
+    gmName: '',
     isReceipt: '',
     remarks: ''
   }
+  private driverPage:any = {
+    page: 1,
+    limit: 20
+  }
   private formItem: any[] = [
     {
-      type: 2,
+      type: 'driverId',
+      label: '司机姓名(司机编号/手机号)',
       key: 'driverId',
-      label: '选择司机：',
-      col: 24,
-      tagAttrs: {
-        placeholder: '选择司机',
-        filterable: true
-      },
-      options: this.driverInfoOptions
+      col: 8,
+      slot: true
     }
   ]
   private otherFormItem:any[] = [
@@ -305,13 +334,13 @@ export default class extends Vue {
     },
     {
       type: 7,
-      key: 'workCity',
+      key: 'workCityName',
       label: '所属城市：',
       col: 24
     },
     {
       type: 7,
-      key: 'gmId',
+      key: 'gmName',
       label: '加盟经理：',
       col: 24
     },
@@ -387,13 +416,89 @@ export default class extends Vue {
     return formArray.concat(tableArray)
   }
 
+  @Watch('driverInfo', { deep: true })
+  private selectChange(val:any) {
+    if (Object.keys(val).length > 0) {
+      this.formData = { ...JSON.parse(val) }
+    }
+  }
+
   @Watch('formData.driverId', { deep: true })
   private formChange(val:any) {
     if (val) {
       this.formItem.push(...this.otherFormItem)
+      this.getCanExtractMoney(val)
     } else {
       this.formItem.splice(1, this.formItem.length - 1)
     }
+  }
+
+  mounted() {
+    this.getDriverInfoOptions()
+  }
+
+  // 查询对应订单的可提现金额
+  private async getCanExtractMoney(driverId:string) {
+    try {
+      let params = { driverId: driverId }
+      let { data: res } = await orderCanExtractMoney(params)
+      if (res.success) {
+        this.formData.canExtractMoney = res.data
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`fail:${err}`)
+    }
+  }
+
+  private loadmore() {
+    this.getDriverInfoOptions(this.keyWord)
+  }
+
+  private async getDriverInfoOptions(keyWord:any = '') {
+    try {
+      this.keyWord = keyWord
+      let params = {
+        key: ''
+      }
+      keyWord !== '' && (params.key = keyWord)
+      params = { ...params, ...this.driverPage }
+      if (this.driverOver) {
+        return
+      }
+      let { data: res } = await getDriverNoAndNameList(params, {
+        url: '/v2/wt-driver-account/management/queryDriverList'
+      })
+      if (res.success) {
+        if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
+          this.driverPage.page++
+        } else {
+          this.driverOver = true
+        }
+        let driverInfos = res.data.map(function(item: any) {
+          return {
+            label: `${item.name}(${item.driverId})`,
+            value: JSON.stringify(item)
+          }
+        })
+        this.driverOptions.push(...driverInfos)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  private async remoteMethod(query:any) {
+    this.keyWord = query
+    this.driverLoading = true
+    this.driverPage.page = 1
+    this.driverOver = false
+    this.driverOptions.splice(0, this.driverOptions.length)
+    await this.getDriverInfoOptions(this.keyWord)
+    this.driverLoading = false
   }
 
   private getSummaries(param:any) {
