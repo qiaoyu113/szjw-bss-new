@@ -27,7 +27,7 @@ const driverCloud: RouteConfig = {
       component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/MarketClue.vue'),
       name: 'MarketClue',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v2/clueH5/waitAllocate/list',
         title: 'marketClue',
         noCache: false
       }
