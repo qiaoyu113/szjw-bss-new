@@ -78,6 +78,7 @@
               <el-tooltip
                 class="item"
                 effect="dark"
+                :disabled="scope.row.remark ? false :true"
                 :content="scope.row.remark"
                 placement="top-start"
               >
@@ -90,7 +91,12 @@
               </el-tooltip>
             </template>
             <template v-slot:interviewDate="scope">
-              {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+              <template v-if="scope.row.interviewDate">
+                {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+              </template>
+              <template v-else>
+                暂无数据
+              </template>
             </template>
           </self-form>
         </SectionContainer>
@@ -710,8 +716,10 @@ export default class extends Vue {
   .overflow {
     color:#1d1d1d;
     width: 100%;
+    font-size:14px;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
   }
   .btnInline {
     display: flex;
