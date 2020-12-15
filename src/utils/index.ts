@@ -425,7 +425,7 @@ async function cityDetail(params: any, node: any) {
   if (city.success) {
     const nodes = city.data.map((item: any) => {
       return {
-        value: item.id,
+        value: item.areaCode,
         label: item.name,
         leaf: true
       }

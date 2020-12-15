@@ -21,8 +21,8 @@
         slot="mulBtn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
-        <!-- v-permission="['/api/carrier_center/v2/clueH5/updateFollowerByMarketClueId']" -->
         <el-button
+          v-permission="['/v2/clueH5/updateFollowerByMarketClueId']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="multipleSelection.length > 0 ? false :true"
@@ -68,9 +68,9 @@
           {{ scope.row.createDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
         </template>
         <template v-slot:op="scope">
-          <!-- v-permission="['/api/carrier_center/v2/clueH5/updateFollowerByMarketClueId']" -->
           <el-button
             type="text"
+            :disabled="isCanallocation"
             @click="handleAllotClick(scope.row)"
           >
             分配
@@ -109,6 +109,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { HandlePages, lock } from '@/utils/index'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfDialog from '@/components/SelfDialog/index.vue'
+import { UserModule } from '@/store/modules/user'
 import {
   today,
   yesterday,
@@ -327,6 +328,10 @@ export default class extends Vue {
       document.body.offsetHeight - otherHeight ||
       document.documentElement.offsetHeight - otherHeight
     )
+  }
+
+  get isCanallocation() {
+    return UserModule.roles.includes('/v2/clueH5/updateFollowerByMarketClueId0')
   }
 
   private validateFollow(rule:any, value:any, callback:Function) {

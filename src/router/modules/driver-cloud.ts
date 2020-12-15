@@ -10,7 +10,6 @@ const driverCloud: RouteConfig = {
     title: 'driverClond',
     icon: 'driver-cloud',
     apiUrl: '/v2/driver/label-sync/list'
-    // alwaysShow: true
   },
   children: [
     {
@@ -28,8 +27,7 @@ const driverCloud: RouteConfig = {
       component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/MarketClue.vue'),
       name: 'MarketClue',
       meta: {
-        // apiUrl: '/api/carrier_center/v2/clueH5/waitAllocate/list',
-        apiUrl: 'root',
+        apiUrl: '/v2/clueH5/waitAllocate/list',
         title: 'marketClue',
         noCache: false
       }
