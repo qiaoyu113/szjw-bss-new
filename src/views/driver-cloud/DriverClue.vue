@@ -20,6 +20,7 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
+          v-permission="['/v2/clueH5/updateFollowerByMarketClueId1']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -29,6 +30,7 @@
           批量分配
         </el-button>
         <el-button
+          v-permission="['/v2/clueH5/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -127,6 +129,7 @@
         </template>
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/clueH5/detail']"
             type="text"
             size="small"
             @click="handleDetailClick(scope.row)"
@@ -135,6 +138,7 @@
           </el-button>
           <el-button
             v-if="[10,20,30,40].includes(scope.row.status)"
+            v-permission="['/v2/clueH5/updateFollowerByMarketClueId1']"
             type="text"
             size="small"
             @click="handleDistributionClick(scope.row)"
@@ -547,9 +551,9 @@ export default class extends Vue {
   // 表格是否禁用
   private disabledFunc(row:any) {
     if ([10, 20, 30, 40].includes(row.status)) {
-      return false
+      return true
     }
-    return true
+    return false
   }
   // 详情
   handleDetailClick(row:IState) {
@@ -584,6 +588,7 @@ export default class extends Vue {
         this.listQuery.onlyMe && (params.onlyMe = 1)
         this.listQuery.name && (params.name = this.listQuery.name)
         this.listQuery.phone && (params.phone = this.listQuery.phone)
+        this.listQuery.workCity && this.listQuery.workCity.length !== 0 && (params.workCity = this.listQuery.workCity[1])
         this.listQuery.carTypes && this.listQuery.carTypes.length !== 0 && (params.carTypes = this.listQuery.carTypes)
         this.listQuery.contactSituations && this.listQuery.contactSituations.length !== 0 && (params.contactSituations = this.listQuery.contactSituations)
         this.listQuery.followerId !== '' && (params.followerId = this.listQuery.followerId)
@@ -601,7 +606,7 @@ export default class extends Vue {
         if (res.success) {
           this.$message.success('操作成功')
         } else {
-          this.$message.warning(res.message)
+          this.$message.error(res.message)
         }
       } catch (err) {
         console.log(`get list fail:${err}`)
@@ -633,6 +638,7 @@ export default class extends Vue {
       this.listQuery.onlyMe && (params.onlyMe = 1)
       this.listQuery.name && (params.name = this.listQuery.name)
       this.listQuery.phone && (params.phone = this.listQuery.phone)
+      this.listQuery.workCity && this.listQuery.workCity.length !== 0 && (params.workCity = this.listQuery.workCity[1])
       this.listQuery.carTypes && this.listQuery.carTypes.length !== 0 && (params.carTypes = this.listQuery.carTypes)
       this.listQuery.contactSituations && this.listQuery.contactSituations.length !== 0 && (params.contactSituations = this.listQuery.contactSituations)
       this.listQuery.followerId !== '' && (params.followerId = this.listQuery.followerId)
@@ -735,8 +741,8 @@ export default class extends Vue {
   async getGmOptions() {
     try {
       let params:any = {
-        roleTypes: [1],
-        uri: '/v2/driverBilling/shippingChange/queryGM'
+        roleTypes: [1, 9],
+        uri: '/v2/clueH5/list/queryFollowerList'
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {

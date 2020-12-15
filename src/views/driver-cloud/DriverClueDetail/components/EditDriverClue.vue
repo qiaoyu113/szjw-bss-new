@@ -195,10 +195,10 @@ export default class extends Vue {
     try {
       let params:IState = {
         ...this.listQuery,
-        expectAddressCity: this.listQuery.city[1],
-        expectAddressCounty: this.listQuery.city[2]
+        expectAddressCity: this.listQuery.city[0],
+        expectAddressCounty: this.listQuery.city[1]
       }
-      delete params.haveCar
+
       let { data: res } = await editClue(params)
       if (res.success) {
         this.showDialog = false
@@ -285,7 +285,7 @@ export default class extends Vue {
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         let cars = res.data.Intentional_compartment.map(function(item:any) {
-          return { label: item.dictLabel, value: item.dictValue }
+          return { label: item.dictLabel, value: +item.dictValue }
         })
 
         this.carOptions.push(...cars)

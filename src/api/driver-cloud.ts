@@ -1,7 +1,8 @@
 import request from '@/utils/request'
 // 司机运费账户
 
-let prefix = '/mock/147/api/carrier_center'
+// let prefix = '/mock/147/api/carrier_center'
+let prefix = '/carrier_center'
 const driverPrefix = '/driver'
 const carrierPrefix = '/carrier_center'
 // 获取自承运司机标签列表
@@ -50,7 +51,7 @@ export const GetDriverClueList = (data: any) =>
   // 导出司机线索
 export const ExportDriverClue = (data: any) =>
   request({
-    url: `${prefix}/v2/clueH5/amount/export`,
+    url: `${prefix}/v2/clueH5/export`,
     method: 'post',
     data
   })
@@ -111,6 +112,13 @@ export const marketClue = (data: any) =>
 export const allocationClue = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/updateFollowerByMarketClueId`,
+    method: 'post',
+    data
+  })
+// 线索分配
+export const allocationClue1 = (data: any) =>
+  request({
+    url: `${prefix}/v2/clueH5/updateFollowerByMarketClueId1`,
     method: 'post',
     data
   })
