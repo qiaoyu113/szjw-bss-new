@@ -496,7 +496,7 @@ async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
       cityCode,
       busiType,
       groupId,
-      uri: '/v2/driverBilling/shippingChange/queryGM'
+      uri: '/v2/clueH5/updateFollowerByMarketClueId/queryFollowerList'
     }
 
     let { data: res } = await GetSpecifiedRoleList(params)

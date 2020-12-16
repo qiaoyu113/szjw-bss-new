@@ -37,7 +37,7 @@ const driverCloud: RouteConfig = {
       component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/DriverClue.vue'),
       name: 'DriverClue',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v2/clueH5/list',
         title: 'DriverClueNew',
         noCache: false
       }

@@ -4,13 +4,16 @@
       <div class="top">
         <el-button
           v-if="[20,30,40].includes(listQuery.status)"
+          v-permission="['/v2/clueH5/edit']"
           type="text"
           @click="handleEditClick"
         >
           编辑
         </el-button>
+
         <el-button
           v-if="[20,30,40].includes(listQuery.status)"
+          v-permission="['/v2/clueH5/addFollow']"
           type="text"
           @click="() => {
             if (btns.length === 0) {
@@ -23,6 +26,7 @@
         </el-button>
         <el-button
           v-if="[20,30].includes(listQuery.status)"
+          v-permission="['/v2/clueH5/inviteInterview']"
           type="text"
           @click="() => {
             isInvite = true;
@@ -31,8 +35,10 @@
         >
           邀约面试
         </el-button>
+
         <el-button
           v-if="[40].includes(listQuery.status)"
+          v-permission="['/v2/clueH5/abolishInterview']"
           type="text"
           @click="() => {
             showDialog3 = true;
@@ -42,6 +48,7 @@
         </el-button>
         <el-button
           v-if="[40].includes(listQuery.status)"
+          v-permission="['/v2/clueH5/updateInterviewTime']"
           type="text"
           @click="() => {
             isInvite = false;
@@ -71,6 +78,7 @@
               <el-tooltip
                 class="item"
                 effect="dark"
+                :disabled="scope.row.remark ? false :true"
                 :content="scope.row.remark"
                 placement="top-start"
               >
@@ -83,7 +91,12 @@
               </el-tooltip>
             </template>
             <template v-slot:interviewDate="scope">
-              {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+              <template v-if="scope.row.interviewDate">
+                {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+              </template>
+              <template v-else>
+                暂无数据
+              </template>
             </template>
           </self-form>
         </SectionContainer>
@@ -102,7 +115,7 @@
           >
             <template v-slot:haveCar="scope">
               <span v-if="scope.row.haveCar ===1">
-                有；{{ scope.row.haveCarName | DataIsNull }}
+                有；{{ scope.row.carTypeName | DataIsNull }}
               </span>
               <span v-else>无</span>
             </template>
@@ -137,6 +150,11 @@
               <template v-else>
                 暂无数据
               </template>
+            </template>
+            <template v-slot:nowAddress="scope">
+              <div class="wordWrap">
+                {{ scope.row.nowAddress | DataIsNull }}
+              </div>
             </template>
           </self-form>
         </SectionContainer>
@@ -340,9 +358,9 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 7,
+      type: 'nowAddress',
       label: '现住址',
-      key: 'nowAddress'
+      slot: true
     },
     {
       type: 7,
@@ -482,7 +500,7 @@ export default class extends Vue {
   async getDriverClueDetail() {
     try {
       let params:IState = {
-        marketClueId: +this.$route.query.id
+        marketClueId: this.$route.query.id
       }
       let { data: res } = await GetDriverClueDetail(params)
       if (res.success) {
@@ -698,11 +716,16 @@ export default class extends Vue {
   .overflow {
     color:#1d1d1d;
     width: 100%;
+    font-size:14px;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
   }
   .btnInline {
     display: flex;
     overflow-x: auto;
+  }
+  .wordWrap {
+    word-break: break-all;
   }
 </style>

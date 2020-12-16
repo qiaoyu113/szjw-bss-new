@@ -20,6 +20,7 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
+          v-permission="['/v2/clueH5/updateFollowerByMarketClueId1']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -29,6 +30,7 @@
           批量分配
         </el-button>
         <el-button
+          v-permission="['/v2/clueH5/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -56,6 +58,8 @@
         <el-badge
           v-for="item in btns"
           :key="item.text"
+          :value="item.num"
+          :hidden="item.num === 0"
         >
           <el-button
             type="primary"
@@ -120,13 +124,34 @@
             {{ scope.row.cityName }}/{{ scope.row.busiTypeName }}
           </p>
         </template>
-        <template v-slot:allocatedDate="scope">
+        <template v-slot:statusName="scope">
           <p class="text">
+            {{ scope.row.statusName | DataIsNull }}
+          </p>
+          <p
+            v-if="scope.row.interviewDate"
+            class="text"
+          >
+            {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          </p>
+        </template>
+        <template v-slot:allocatedDate="scope">
+          <p
+            v-if="scope.row.allocatedDate"
+            class="text"
+          >
             {{ scope.row.allocatedDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          </p>
+          <p
+            v-if="scope.row.followerDate"
+            class="text"
+          >
+            {{ scope.row.followerDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
           </p>
         </template>
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/clueH5/detail']"
             type="text"
             size="small"
             @click="handleDetailClick(scope.row)"
@@ -135,6 +160,7 @@
           </el-button>
           <el-button
             v-if="[10,20,30,40].includes(scope.row.status)"
+            v-permission="['/v2/clueH5/updateFollowerByMarketClueId1']"
             type="text"
             size="small"
             @click="handleDistributionClick(scope.row)"
@@ -370,31 +396,38 @@ export default class extends Vue {
   private btns:any[] = [
     {
       name: '',
-      text: '全部'
+      text: '全部',
+      num: 0
     },
     {
       name: '10',
-      text: '待分配'
+      text: '待分配',
+      num: 0
     },
     {
       name: '20',
-      text: '待跟进'// 审核通过
+      text: '待跟进', // 审核通过
+      num: 0
     },
     {
       name: '30',
-      text: '跟进中'
+      text: '跟进中',
+      num: 0
     },
     {
       name: '40',
-      text: '待面试'
+      text: '待面试',
+      num: 0
     },
     {
       name: '50',
-      text: '已面试'
+      text: '已面试',
+      num: 0
     },
     {
       name: '60',
-      text: '已成交'
+      text: '已成交',
+      num: 0
     }
   ]
   private columns:IState[] = [
@@ -433,7 +466,8 @@ export default class extends Vue {
     {
       key: 'statusName',
       label: '状态',
-      'width': '100px'
+      'width': '150px',
+      slot: true
     },
     {
       key: 'followPerson',
@@ -547,9 +581,9 @@ export default class extends Vue {
   // 表格是否禁用
   private disabledFunc(row:any) {
     if ([10, 20, 30, 40].includes(row.status)) {
-      return false
+      return true
     }
-    return true
+    return false
   }
   // 详情
   handleDetailClick(row:IState) {
@@ -584,6 +618,7 @@ export default class extends Vue {
         this.listQuery.onlyMe && (params.onlyMe = 1)
         this.listQuery.name && (params.name = this.listQuery.name)
         this.listQuery.phone && (params.phone = this.listQuery.phone)
+        this.listQuery.workCity && this.listQuery.workCity.length !== 0 && (params.workCity = this.listQuery.workCity[1])
         this.listQuery.carTypes && this.listQuery.carTypes.length !== 0 && (params.carTypes = this.listQuery.carTypes)
         this.listQuery.contactSituations && this.listQuery.contactSituations.length !== 0 && (params.contactSituations = this.listQuery.contactSituations)
         this.listQuery.followerId !== '' && (params.followerId = this.listQuery.followerId)
@@ -601,7 +636,7 @@ export default class extends Vue {
         if (res.success) {
           this.$message.success('操作成功')
         } else {
-          this.$message.warning(res.message)
+          this.$message.error(res.message)
         }
       } catch (err) {
         console.log(`get list fail:${err}`)
@@ -633,6 +668,7 @@ export default class extends Vue {
       this.listQuery.onlyMe && (params.onlyMe = 1)
       this.listQuery.name && (params.name = this.listQuery.name)
       this.listQuery.phone && (params.phone = this.listQuery.phone)
+      this.listQuery.workCity && this.listQuery.workCity.length !== 0 && (params.workCity = this.listQuery.workCity[1])
       this.listQuery.carTypes && this.listQuery.carTypes.length !== 0 && (params.carTypes = this.listQuery.carTypes)
       this.listQuery.contactSituations && this.listQuery.contactSituations.length !== 0 && (params.contactSituations = this.listQuery.contactSituations)
       this.listQuery.followerId !== '' && (params.followerId = this.listQuery.followerId)
@@ -649,6 +685,15 @@ export default class extends Vue {
         this.tableData = res.data
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
+        this.btns.forEach(item => {
+          let key = item.name
+          if (key === '') {
+            key = 'all'
+          } else {
+            key = +key
+          }
+          item.num = res.title[key]
+        })
       } else {
         this.$message.warning(res.message)
       }
@@ -735,8 +780,8 @@ export default class extends Vue {
   async getGmOptions() {
     try {
       let params:any = {
-        roleTypes: [1],
-        uri: '/v2/driverBilling/shippingChange/queryGM'
+        roleTypes: [1, 9],
+        uri: '/v2/clueH5/list/queryFollowerList'
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
