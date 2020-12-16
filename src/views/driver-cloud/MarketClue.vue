@@ -22,7 +22,7 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          v-permission="['/v2/clueH5/updateFollowerByMarketClueId']"
+          v-permission="['/v2/clueH5/updateFollowerByMarketClueId0']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="multipleSelection.length > 0 ? false :true"
@@ -70,7 +70,7 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
-            :disabled="isCanallocation"
+            :disabled="!isCanallocation"
             @click="handleAllotClick(scope.row)"
           >
             分配
