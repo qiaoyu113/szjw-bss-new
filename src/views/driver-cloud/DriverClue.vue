@@ -120,7 +120,7 @@
               {{ scope.row.followerPhone | DataIsNull }}
             </p>
           </template>
-          <template>
+          <template v-else>
             暂无数据
           </template>
         </template>
