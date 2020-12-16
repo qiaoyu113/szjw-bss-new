@@ -22,11 +22,11 @@
         @onPass="handlePassClick"
       >
         <template
-          slot="driverId"
+          slot="driverCode"
         >
           <div>
             <el-select
-              v-model="driverInfo"
+              v-model="formData.driverCode"
               v-loadmore="loadmore"
               filterable
               clearable
@@ -35,7 +35,8 @@
               :default-first-option="true"
               :remote-method="remoteMethod"
               :loading="driverLoading"
-              placeholder="请选择"
+              placeholder="请选择司机"
+              @change="handleDriverChange"
             >
               <el-option
                 v-for="(item,index) in driverOptions"
@@ -48,17 +49,34 @@
         </template>
       </self-form>
     </SectionContainer>
+
     <SectionContainer
+      v-if="formData.driverCode"
       title="账户信息"
       :md="true"
     >
-      12
+      <self-form
+        :list-query="formData"
+        :form-item="accountItem"
+        label-position="right"
+      />
     </SectionContainer>
+
+    <!--  v-if="formData.driverCode" -->
     <SectionContainer
+
       title="缴费信息"
       :md="true"
       class="payInfo"
     >
+      <template v-slot:rightBox>
+        <el-button
+          :size="isPC ? 'small' : 'mini'"
+          @click="handleAddPay"
+        >
+          新增缴费
+        </el-button>
+      </template>
       <template>
         <el-form
           ref="payForm"
@@ -73,33 +91,143 @@
             :summary-method="getSummaries"
           >
             <el-table-column
-              label="序号"
-              type="index"
-              width="50"
-              align="center"
-              header-align="center"
-            />
-            <el-table-column
-              label="交易流水号"
-              align="center"
-              header-align="center"
+              label="缴费金额（元）"
+              width="200px"
             >
               <template slot-scope="scope">
                 <el-form-item
-                  :prop="'tableData.'+scope.$index+'.payNumber'"
-                  :rules="payForm.rules.payNumber"
+                  :prop="'tableData.'+scope.$index+'.payAmount'"
+                  :rules="payForm.rules.payAmount"
                 >
                   <el-input
-                    v-model="scope.row.payNumber"
-                    placeholder="请输入交易流水号"
+                    v-model="scope.row.payAmount"
+                    placeholder="请输入缴费金额"
                   />
                 </el-form-item>
               </template>
             </el-table-column>
+
             <el-table-column
-              label="交易时间"
-              align="center"
-              header-align="center"
+              label="支付方式"
+            >
+              <template slot-scope="scope">
+                <el-form-item
+                  :prop="'tableData.'+scope.$index+'.payModel'"
+                  :rules="payForm.rules.payModel"
+                >
+                  <el-select
+                    v-model="scope.row.payModel"
+                    clearable
+                    placeholder="请输入支付方式"
+                  >
+                    <el-option
+                      v-for="item in payModelOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="交易流水号"
+              width="200px"
+            >
+              <template slot-scope="scope">
+                <el-form-item
+                  :prop="'tableData.'+scope.$index+'.sno'"
+                  :rules="payForm.rules.sno"
+                >
+                  <el-input
+                    v-model="scope.row.sno"
+                    placeholder="请输入完整流水号"
+                  />
+                </el-form-item>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="缴费类型"
+            >
+              <template slot-scope="scope">
+                <el-form-item
+                  :prop="'tableData.'+scope.$index+'.sno'"
+                  :rules="payForm.rules.payType"
+                >
+                  <el-select
+                    v-model="scope.row.payType"
+                    clearable
+                    placeholder="请选择缴费类型"
+                  >
+                    <el-option
+                      v-for="item in billTypeOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="订单编号"
+            >
+              <template slot-scope="scope">
+                <el-form-item
+                  v-if="scope.row.payType === 1 || scope.row.payType === ''"
+                  :prop="'tableData.'+scope.$index+'.orderCode'"
+                  :rules="payForm.rules.orderCode"
+                >
+                  <el-select
+                    v-model="scope.row.orderCode"
+                    clearable
+                    placeholder="请选择订单编号"
+                  >
+                    <el-option
+                      v-for="item in orderOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+                <div v-else-if="scope.row.payType === 0">
+                  无
+                </div>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="是否开收据"
+              width="180px"
+            >
+              <template slot-scope="scope">
+                <el-form-item
+                  :prop="'tableData.'+scope.$index+'.existReceipt'"
+                  :rules="payForm.rules.existReceipt"
+                >
+                  <el-select
+                    v-model="scope.row.existReceipt"
+                    clearable
+                    placeholder="请确认是否开收据"
+                  >
+                    <el-option
+                      v-for="item in isReceiptOptions"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </el-form-item>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+              label="打款日期"
+              width="240px"
             >
               <template slot-scope="scope">
                 <el-form-item
@@ -109,59 +237,26 @@
                   <el-date-picker
                     v-model="scope.row.payDate"
                     type="date"
-                    placeholder="选择日期"
+                    placeholder="请填写打款日期"
                     value-format="timestamp"
                   />
                 </el-form-item>
               </template>
             </el-table-column>
+
             <el-table-column
-              label="交易金额（元）"
-              align="center"
-              header-align="center"
-            >
-              <template slot-scope="scope">
-                <el-form-item
-                  :prop="'tableData.'+scope.$index+'.payMoney'"
-                  :rules="payForm.rules.payMoney"
-                >
-                  <el-input
-                    v-model="scope.row.payMoney"
-                    placeholder="请输入交易金额"
-                  />
-                </el-form-item>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="支付方式"
-              align="center"
-              header-align="center"
-            >
-              <template slot-scope="scope">
-                <el-form-item
-                  :prop="'tableData.'+scope.$index+'.payType'"
-                  :rules="payForm.rules.payType"
-                >
-                  <el-input
-                    v-model="scope.row.payType"
-                    placeholder="请输入支付方式"
-                  />
-                </el-form-item>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="交易凭证"
+              label="上传交易凭证"
               align="center"
               header-align="center"
             >
               <template slot-scope="scope">
                 <el-form-item
                   class="uploadItem"
-                  :prop="'tableData.'+scope.$index+'.payPic'"
-                  :rules="payForm.rules.payPic"
+                  :prop="'tableData.'+scope.$index+'.payProof'"
+                  :rules="payForm.rules.payProof"
                 >
                   <el-upload
-                    v-if="!scope.row.payPic"
+                    v-if="!scope.row.payProof"
                     :ref="'upload'+scope.$index"
                     class="upload-demo"
                     action="https://httpbin.org/post"
@@ -190,7 +285,7 @@
                     v-else
                     size="small"
                     type="text"
-                    @click="seePic(scope.row.payPic)"
+                    @click="seePic(scope.row.payProof)"
                   >
                     查看
                   </el-button>
@@ -203,17 +298,18 @@
               header-align="center"
             >
               <template slot-scope="scope">
-                <el-button
+                <!-- <el-button
                   size="mini"
                   icon="el-icon-plus"
                   @click="handleAdd(scope.$index, scope.row)"
-                />
+                /> -->
                 <el-button
                   size="mini"
                   type="danger"
-                  icon="el-icon-minus"
                   @click="handleDelete(scope.$index, scope.row)"
-                />
+                >
+                  删除
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -268,36 +364,29 @@ export default class extends Vue {
   private orderOptions:any[] = []
   private driverOptions:any[] = []
   private driverInfo:any = ''
-  private addRules:any = {
-    driverId: [
-      { required: true, message: '请选择司机', trigger: 'change' }
-    ],
-    orderId: [
-      { required: true, message: '请选择订单', trigger: 'change' }
-    ],
-    isReceipt: [
-      { required: true, message: '请选择是否开收据', trigger: 'change' }
-    ]
-  }
-  private formData:any = {
-    driverId: '',
-    canExtractMoney: '',
-    orderId: '',
-    phone: '',
-    workCityName: '',
-    gmName: '',
-    isReceipt: '',
-    remarks: ''
-  }
   private driverPage:any = {
     page: 1,
     limit: 20
   }
+  private addRules:any = {
+    driverCode: [
+      { required: true, message: '请选择司机!', trigger: 'change' }
+    ]
+  }
+  private formData:any = {
+    driverCode: '',
+    canExtract: '',
+    balance: '',
+    workCityName: '',
+    gmName: '',
+    busiType: '',
+    busiTypeName: ''
+  }
   private formItem: any[] = [
     {
-      type: 'driverId',
+      type: 'driverCode',
       label: '司机姓名(司机编号/手机号)',
-      key: 'driverId',
+      key: 'driverCode',
       col: 8,
       slot: true
     }
@@ -305,96 +394,86 @@ export default class extends Vue {
   private otherFormItem:any[] = [
     {
       type: 7,
-      key: 'canExtractMoney',
-      label: '可提现金额：',
-      col: 24
-    },
-    {
-      type: 2,
-      key: 'orderId',
-      label: '订单编号：',
-      col: 24,
-      tagAttrs: {
-        placeholder: '选择司机',
-        filterable: true
-      },
-      options: this.orderOptions
-    },
-    {
-      type: 7,
-      key: 'driverId',
-      label: '司机编号：',
-      col: 24
-    },
-    {
-      type: 7,
-      key: 'phone',
-      label: '联系电话：',
-      col: 24
-    },
-    {
-      type: 7,
       key: 'workCityName',
-      label: '所属城市：',
+      label: '所在城市：',
       col: 24
     },
     {
       type: 7,
       key: 'gmName',
-      label: '加盟经理：',
+      label: '所属加盟经理：',
       col: 24
     },
     {
-      type: 4,
-      key: 'isReceipt',
-      label: '是否开收据：',
-      col: 24,
-      options: this.ReceiptOptions
+      type: 7,
+      key: 'busiTypeName',
+      label: '业务线',
+      col: 24
+    }
+  ]
+  private accountItem:any[] = [
+    {
+      type: 7,
+      key: 'balance',
+      label: '账户总金额',
+      col: 24
     },
     {
-      type: 1,
-      key: 'remarks',
-      label: '备注：',
-      tagAttrs: {
-        placeholder: '请填写最多100个字',
-        type: 'textarea',
-        maxlength: 100,
-        'show-word-limit': true,
-        clearable: true,
-        rows: '4',
-        name: 'interview_chooseRemarks_input'
-      }
+      type: 7,
+      key: 'canExtract',
+      label: '可提现金额：',
+      col: 24
     }
   ]
   private columnIndex:number = 0
   private payForm:any = {
     rules: {
-      payNumber: [
+      sno: [
         { required: true, message: '请输入交易流水号', trigger: 'blur' }
       ],
       payDate: [
         { required: true, message: '请选择日期', trigger: 'blur' }
       ],
-      payMoney: [
+      payAmount: [
         { required: true, message: '请输入交易金额', trigger: 'blur' }
       ],
-      payType: [
+      payModel: [
         { required: true, message: '请输入支付方式', trigger: 'blur' }
       ],
-      payPic: [
+      payType: [
+        { required: true, message: '请输入缴费类型', trigger: 'blur' }
+      ],
+      payProof: [
         { required: true, message: '请上传交易凭证', trigger: 'change' }
+      ],
+      orderCode: [
+        { required: true, message: '请选择订单编号', trigger: 'change' }
+      ],
+      existReceipt: [
+        { required: true, message: '请确认是否开收据', trigger: 'change' }
       ]
     },
     tableData: [{
-      payNumber: '',
-      payMoney: '',
+      sno: '',
+      payAmount: '',
       payType: '',
-      payPic: '',
       payDate: '',
       name: '',
-      canUpload: true
+      payModel: '',
+      canUpload: true,
+      existReceipt: 0,
+      orderCode: '',
+      payProof: ''
     }]
   }
+  private isReceiptOptions:any[] = [
+    { label: '否', value: 0 },
+    { label: '是', value: 1 }
+  ] // 请确认是否开收据数组
+  private payModelOptions:any = [] // 支付数组
+  private billTypeOptions:any = [
+    { label: '订单续费', value: 1 }
+  ] // 缴费数组
   private picShow:Boolean = false
   // 判断是否是PC
   get isPC() {
@@ -416,25 +495,43 @@ export default class extends Vue {
     return formArray.concat(tableArray)
   }
 
-  @Watch('driverInfo', { deep: true })
-  private selectChange(val:any) {
-    if (Object.keys(val).length > 0) {
-      this.formData = { ...JSON.parse(val) }
+  mounted() {
+    this.getDriverInfoOptions()
+    // this.getPayTypeOptions()
+    if (this.formData.busiType === 1) {
+      const item = { label: '无订单充值', value: 0 }
+      this.billTypeOptions.push(item)
     }
   }
 
-  @Watch('formData.driverId', { deep: true })
-  private formChange(val:any) {
+  private async getPayTypeOptions() {
+    try {
+      const { data: res } = await lll()
+      if (res.success) {
+        this.payModelOptions = res.data
+      } else {
+        this.$message.warning(res.errMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
+  }
+
+  private handleDriverChange(val:any) {
+    this.formItem.splice(1, this.formItem.length - 1)
     if (val) {
       this.formItem.push(...this.otherFormItem)
       this.getCanExtractMoney(val)
-    } else {
-      this.formItem.splice(1, this.formItem.length - 1)
+      this.computedInfo(val)
     }
   }
 
-  mounted() {
-    this.getDriverInfoOptions()
+  private computedInfo(id:string) {
+    this.driverOptions.forEach((ele:any) => {
+      if (ele.value === id) {
+        this.formData = { ...ele.data }
+      }
+    })
   }
 
   // 查询对应订单的可提现金额
@@ -443,7 +540,12 @@ export default class extends Vue {
       let params = { driverId: driverId }
       let { data: res } = await orderCanExtractMoney(params)
       if (res.success) {
-        this.formData.canExtractMoney = res.data
+        this.formData = {
+          ...this.formData,
+          ...{
+            canExtract: res.data
+          }
+        }
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -477,9 +579,17 @@ export default class extends Vue {
           this.driverOver = true
         }
         let driverInfos = res.data.map(function(item: any) {
+          let info = {
+            driverCode: item.driverId,
+            workCityName: item.workCityName,
+            gmName: item.gmName,
+            busiType: item.busiType,
+            busiTypeName: item.busiTypeName
+          }
           return {
             label: `${item.name}(${item.driverId})`,
-            value: JSON.stringify(item)
+            value: item.driverId,
+            data: info
           }
         })
         this.driverOptions.push(...driverInfos)
@@ -509,7 +619,7 @@ export default class extends Vue {
         sums[index] = '总价'
       } else if (index === 3) {
         sums[index] = data.reduce((prev:any, curr:any) => {
-          const value = Number(curr.payMoney)
+          const value = Number(curr.payAmount)
           if (!isNaN(value)) {
             return Number(prev) + value
           } else {
@@ -529,17 +639,37 @@ export default class extends Vue {
     return sums
   }
 
-  private handleAdd(index:number, row:any) {
-    const column = {
-      payNumber: '',
-      payMoney: '',
-      payType: '',
-      payPic: '',
-      payDate: '',
-      canUpload: true
+  private handleAddPay() {
+    if (this.payForm.tableData.length >= 10) {
+      this.$message.warning('最多填写10条缴费数据')
+      return
     }
-    this.payForm.tableData.splice(index + 1, 0, column)
+    const column = {
+      sno: '',
+      payAmount: '',
+      payType: '',
+      payDate: '',
+      name: '',
+      payModel: '',
+      canUpload: true,
+      existReceipt: 0,
+      orderCode: '',
+      payProof: ''
+    }
+    this.payForm.tableData.push(column)
   }
+
+  // private handleAdd(index:number, row:any) {
+  //   const column = {
+  //     sno: '',
+  //     payAmount: '',
+  //     payType: '',
+  //     payProof: '',
+  //     payDate: '',
+  //     canUpload: true
+  //   }
+  //   this.payForm.tableData.splice(index + 1, 0, column)
+  // }
   private async handleDelete(index:number, row:any) {
     if (this.payForm.tableData.length === 1) {
       this.$message({
@@ -550,7 +680,7 @@ export default class extends Vue {
     }
     await ((this.$refs.payForm) as any).clearValidate()
     // await ((this.$refs['upload' + index]) as any).clearFiles()
-    // if (this.payForm.tableData[index].payPic) {
+    // if (this.payForm.tableData[index].payProof) {
     //   setTimeout(() => {
     //     this.payForm.tableData.splice(index, 1)
     //   }, 1000)
@@ -562,7 +692,7 @@ export default class extends Vue {
     this.columnIndex = value.$index
   }
   private handleAvatarSuccess(res:any, file:any) {
-    this.payForm.tableData[this.columnIndex].payPic = URL.createObjectURL(file.raw)
+    this.payForm.tableData[this.columnIndex].payProof = URL.createObjectURL(file.raw)
   }
   private progressUpload(file:any) {
     this.payForm.tableData[this.columnIndex].canUpload = false
@@ -682,12 +812,12 @@ export default class extends Vue {
 <style scoped>
 .addPay >>> .el-select,
 .addPay >>> .el-textarea {
-  width: 500px;
+  width: 100%;
   flex: none;
 }
-.addPay .payInfo >>> .el-input__inner {
+/* .addPay .payInfo >>> .el-input__inner {
   border: none;
-}
+} */
 .addPay .btnBox{
   width: 100%;
  margin: 30px auto;
