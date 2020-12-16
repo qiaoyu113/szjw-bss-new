@@ -15,64 +15,47 @@
         </el-button>
       </template>
       <el-row>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="订单编号："
-            :value="formData.orderId"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="司机姓名："
-            :value="formData.driverName"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="司机编号："
+            name="司机姓名（司机编号/手机号）："
             :value="formData.driverId"
           />
         </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="可提现金额："
-            :value="formData.canExtractMoney"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="联系电话："
-            :value="formData.phone"
-          />
-        </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
             name="所属城市："
-            :value="formData.workCityName"
+            :value="formData.driverCity"
           />
         </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="订单编号："
-            :value="formData.orderId"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="加盟经理："
+            name="所属加盟经理："
             :value="formData.gmName"
           />
         </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="是否开收据："
-            :value="formData.isReceipt ? '是' : '否'"
+            name="业务线"
+            :value="formData.busiType"
           />
         </el-col>
-        <el-col span="6">
+      </el-row>
+    </SectionContainer>
+    <SectionContainer
+      title="账户信息"
+      :md="true"
+    >
+      <el-row>
+        <el-col :span="6">
           <DetailItem
-            name="备注："
-            :value="formData.remark"
+            name="账户总金额"
+            :value="formData.balance"
+          />
+        </el-col>
+        <el-col :span="6">
+          <DetailItem
+            name="可提现金额"
+            :value="formData.canExtract"
           />
         </el-col>
       </el-row>
@@ -88,49 +71,65 @@
           show-summary
         >
           <el-table-column
-            type="index"
-            label="序号"
-            width="100"
+            prop="payAmount"
+            label="缴费金额"
+            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
-            prop="payNumber"
+            prop="payModel"
+            label="支付方式"
+            width="140"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="sno"
             label="交易流水号"
-            width="180"
+            width="140"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="payModel"
+            label="缴费类型"
+            width="140"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="orderCode"
+            label="订单编号"
+            width="140"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="existReceipt"
+            label="是否开收据"
+            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="payDate"
-            label="交易时间"
-            width="180"
+            label="打款时间"
+            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
-            prop="payMoney"
-            label="交易金额"
-            width="180"
-            align="center"
-            header-align="center"
-          />
-          <el-table-column
-            prop="payTypeName"
-            label="支付方式"
-            align="center"
-            header-align="center"
-          />
-          <el-table-column
-            prop="payPic"
-            label="交易凭证"
+            prop="payProof"
+            label="查看交易凭证"
+            width="140"
             align="center"
             header-align="center"
           >
             <template slot-scope="scope">
               <el-button
                 type="text"
-                @click="seePic(scope.row.payPic)"
+                @click="seePic(scope.row.payProof)"
               >
                 查看
               </el-button>
@@ -145,7 +144,7 @@
       class="checkStatus"
     >
       <span>审核状态：</span>
-      <span>{{ formData.statusName }}</span>
+      <span>{{ formData.payStatus }}</span>
     </div>
 
     <div
@@ -230,9 +229,9 @@ export default class extends Vue {
   private audit(type:string) {
     let text:string = ''
     if (type === 'resolve') {
-      text = '确定要审核通过此退款信息?'
+      text = '确认要审核通过此退款信息吗?'
     } else {
-      text = '确定要审核未通过并驳回此退款信息?'
+      text = '确认要审核不通过并驳回此退款信息吗  ?'
     }
     this.$confirm(text, '提示', {
       confirmButtonText: '确定',
