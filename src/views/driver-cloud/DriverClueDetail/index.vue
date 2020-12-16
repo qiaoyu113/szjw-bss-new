@@ -61,7 +61,7 @@
       </div>
       <div class="table-box">
         <SectionContainer
-          v-if="[10,50,60].includes(listQuery.status)"
+          v-if="[20,30].includes(listQuery.status)"
           title="最近跟进信息"
           :md="true"
         >
