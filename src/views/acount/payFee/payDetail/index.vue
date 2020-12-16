@@ -73,56 +73,48 @@
           <el-table-column
             prop="payAmount"
             label="缴费金额"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="payModel"
             label="支付方式"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="sno"
             label="交易流水号"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="payModel"
             label="缴费类型"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="orderCode"
             label="订单编号"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="existReceipt"
             label="是否开收据"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="payDate"
             label="打款时间"
-            width="140"
             align="center"
             header-align="center"
           />
           <el-table-column
             prop="payProof"
             label="查看交易凭证"
-            width="140"
             align="center"
             header-align="center"
           >
@@ -231,7 +223,7 @@ export default class extends Vue {
     if (type === 'resolve') {
       text = '确认要审核通过此退款信息吗?'
     } else {
-      text = '确认要审核不通过并驳回此退款信息吗  ?'
+      text = '确认要审核不通过并驳回此退款信息吗?'
     }
     this.$confirm(text, '提示', {
       confirmButtonText: '确定',

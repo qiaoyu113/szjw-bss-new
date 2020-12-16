@@ -11,8 +11,9 @@
       :list-query="listQuery"
       :form-item="formItem"
       :rules="searchRules"
-      label-width="80px"
+      label-width="100px"
       class="p15"
+      size="small"
     >
       <template slot="driverId">
         <el-select
@@ -63,7 +64,7 @@
         </el-button>
         <el-button
           :class="isPC ? '' : 'btnMobile'"
-          name="driverlist_Export_btn"
+          name="driverlist_export_btn"
           size="small"
           @click="handleExportClick"
         >
@@ -130,12 +131,12 @@
               @click="goRoute('payDetail',scope.row.payNo)"
             >详情</span>
             <span
-              v-if="listQuery.payStatus===0"
+              v-if="+scope.row.payStatus === 0 ? false:true"
               class="doItem"
               @click="goRoute('payAudit',scope.row.payNo)"
             >审核</span>
             <span
-              v-if="listQuery.payStatus===2"
+              v-if="+scope.row.status === 2 ? false :true"
               class="doItem"
               @click="goRoute('payEdit',scope.row.payNo)"
             >编辑</span>
@@ -229,7 +230,6 @@ export default class extends Vue {
       type: 8,
       key: 'driverCity',
       col: 8,
-      w: '100',
       label: '所属城市',
       tagAttrs: {
         placeholder: '请选择',
@@ -262,7 +262,6 @@ export default class extends Vue {
       label: '业务线',
       key: 'busiType',
       col: 8,
-      w: '100',
       options: this.dutyListOptions,
       listeners: {
         'change': () => {
@@ -276,7 +275,6 @@ export default class extends Vue {
       type: 2,
       key: 'gmName',
       col: 8,
-      w: '100',
       label: '加盟经理',
       tagAttrs: {
         placeholder: '请选择',
@@ -293,7 +291,6 @@ export default class extends Vue {
       key: 'payModel',
       label: '缴费类型',
       col: 8,
-      w: '100',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -319,7 +316,6 @@ export default class extends Vue {
       key: 'payNo',
       label: '缴费编号',
       col: 8,
-      w: '100',
       tagAttrs: {
         placeholder: '请输入',
         // maxlength: 20,
@@ -334,7 +330,6 @@ export default class extends Vue {
         clearable: true,
         filterable: true
       },
-      w: '100',
       label: '缴费申请日期',
       col: 8,
       key: 'applayDate'
@@ -343,7 +338,6 @@ export default class extends Vue {
       type: 1,
       key: 'sno',
       label: '交易流水号',
-      w: '100',
       col: 8,
       tagAttrs: {
         placeholder: '请输入',
@@ -367,7 +361,6 @@ export default class extends Vue {
     {
       type: 2,
       col: 8,
-      w: '100',
       key: 'driverStatus',
       label: '司机状态',
       tagAttrs: {
