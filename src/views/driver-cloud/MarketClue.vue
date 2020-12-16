@@ -304,7 +304,7 @@ export default class extends Vue {
   private rules:IState = {
     follow: [
       { required: true, message: '请选择跟进人', trigger: 'blur' },
-      { validator: this.validateFollow, trigger: 'blur' }
+      { validator: this.validateFollow, trigger: 'change' }
     ]
   };
 
