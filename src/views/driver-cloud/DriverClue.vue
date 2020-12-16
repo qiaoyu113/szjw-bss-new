@@ -203,7 +203,7 @@ import { GetDutyListByLevel, getOfficeByTypeAndOfficeId, getOfficeByType, GetDic
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDriverClueList, ExportDriverClue, allocationClue } from '@/api/driver-cloud'
+import { GetDriverClueList, ExportDriverClue, allocationClue1 } from '@/api/driver-cloud'
 import { delayTime } from '@/settings'
 import { HandlePages, lock, parseTime, showCityGroupPerson, showWork, DataIsNull } from '@/utils/index'
 interface PageObj {
@@ -738,11 +738,11 @@ export default class extends Vue {
   }
   // 表单验证通过
   handlePassClick(val:boolean) {
-    this.allocationClue()
+    this.allocationClue1()
   }
   // 分配、批量分配
   @lock
-  async allocationClue() {
+  async allocationClue1() {
     try {
       if (this.dialogListQuery.follow.length !== 3) {
         this.$message.warning('请选择跟进人')
@@ -752,7 +752,7 @@ export default class extends Vue {
         marketClueId: this.rows.map((item:any) => item.marketClueId + ''),
         followerId: +this.dialogListQuery.follow[2]
       }
-      let { data: res } = await allocationClue(params)
+      let { data: res } = await allocationClue1(params)
       if (res.success) {
         this.$message.success('操作成功')
         this.showDialog = false
