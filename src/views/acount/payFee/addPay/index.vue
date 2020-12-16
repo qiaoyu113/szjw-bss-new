@@ -33,12 +33,12 @@
               filterable
               clearable
               remote
+              :disabled="isEdit"
               reserve-keyword
               :default-first-option="true"
               :remote-method="remoteMethod"
               :loading="driverLoading"
               placeholder="请选择司机"
-              @change="handleDriverChange"
             >
               <el-option
                 v-for="(item,index) in driverOptions"
@@ -273,6 +273,7 @@
                     :limit="1"
                     :on-success="handleAvatarSuccess"
                     :on-progress="progressUpload"
+                    :before-upload="beforeUpload"
                     :on-error="errorUpload"
                     :on-remove="errorUpload"
                     @click.native="upload(scope)"
@@ -352,7 +353,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { deleteUser } from '@/api/users'
 import { getDriverNoAndNameList } from '@/api/driver'
-import { orderCanExtractMoney } from '@/api/driver-account'
+import { orderCanExtractMoney, payCostBillsCreate, payDetail } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
 import { GetDictionaryList } from '@/api/common'
@@ -365,6 +366,8 @@ import { GetDictionaryList } from '@/api/common'
    }
  })
 export default class extends Vue {
+  private isEdit:Boolean = false
+  private id:string = ''
   private driverLoading:Boolean = false
   private keyWord:String = ''
   private driverOver:Boolean = false
@@ -511,9 +514,42 @@ export default class extends Vue {
     return formArray.concat(tableArray)
   }
 
-  mounted() {
-    this.getDriverInfoOptions()
+  async mounted() {
     this.getPayTypeOptions()
+    if (this.$route.name === 'payEdit') {
+      this.isEdit = true
+      this.id = (this.$route.query.id) as string
+      await this.getDetail(this.id)
+      await this.showDriverEdit()
+    } else {
+      this.getDriverInfoOptions()
+    }
+  }
+
+  private async getDetail(id:string) {
+    try {
+      const { data: res } = await payDetail({ id: id })
+      if (res.success) {
+        console.log(res.data, 'success')
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
+  }
+
+  // 编辑时根据id查询司机回显
+  private async showDriverEdit() {
+    this.formData = {
+      driverCode: '',
+      canExtract: '',
+      balance: '',
+      workCityName: '',
+      gmName: '',
+      busiType: '',
+      busiTypeName: ''
+    }
   }
 
   private async getPayTypeOptions() {
@@ -573,6 +609,7 @@ export default class extends Vue {
     }
   }
 
+  @Watch('formData.driverCode')
   private handleDriverChange(val:any) {
     this.formItem.splice(1, this.formItem.length - 1)
     this.formItem.push(...this.otherFormItem)
@@ -757,17 +794,17 @@ export default class extends Vue {
     this.payForm.tableData[this.columnIndex].canUpload = false
   }
 
-  // private beforeUpload(file:any) {
-  //   const isJPG = file.type === 'image/jpeg'
-  //   const isLt2M = file.size / 1024 / 1024 < 2
-  //   if (!isJPG) {
-  //     this.$message.error('上传头像图片只能是 JPG 格式!')
-  //   }
-  //   if (!isLt2M) {
-  //     this.$message.error('上传头像图片大小不能超过 2MB!')
-  //   }
-  //   return isJPG && isLt2M
-  // }
+  private beforeUpload(file:any) {
+    const isJPG = file.type === 'image/*'
+    const isLt2M = file.size / 1024 / 1024 < 5
+    if (!isJPG) {
+      this.$message.error('上传头像图片只能是图片格式!')
+    }
+    if (!isLt2M) {
+      this.$message.error('上传头像图片大小不能超过 5MB!')
+    }
+    return isJPG && isLt2M
+  }
 
   private errorUpload(file:any) {
     this.payForm.tableData[this.columnIndex].canUpload = true
@@ -820,14 +857,32 @@ export default class extends Vue {
    * 提交表单
    */
   private saveData() {
-    let params:any = { }
+    let params:any = {}
     let tableData = this.payForm.tableData
     tableData.map((ele:any) => {
       delete ele.canUpload
+      if (ele.payType === 0) {
+        ele.orderCode = ''
+      }
     })
     params.payInfos = [...tableData]
     params.driverCode = this.formData.driverCode
-    console.log(JSON.stringify(params))
+    this.sendCreate(params)
+  }
+  private async sendCreate(params:any) {
+    try {
+      const { data: res } = await payCostBillsCreate(params)
+      if (res.success) {
+        this.$message.warning('新建缴费成功')
+        this.$router.push({
+          path: '/driveraccount/payFee'
+        })
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
   }
   /**
    *校验表单
@@ -838,7 +893,6 @@ export default class extends Vue {
   handleValidateTableForm() {
     ((this.$refs['payForm']) as any).validate((valid:any) => {
       if (valid) {
-        console.log('handleValidateTableForm:', valid)
         this.tableStatus = valid
       } else {
         console.log('error submit!!')

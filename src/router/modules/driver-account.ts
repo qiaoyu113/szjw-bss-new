@@ -47,6 +47,17 @@ const driverAccountRouter: RouteConfig = {
       }
     },
     {
+      path: 'payEdit',
+      component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/addPay/index.vue'),
+      name: 'payEdit',
+      meta: {
+        apiUrl: 'root',
+        title: 'payEdit',
+        hidden: true,
+        noCache: true
+      }
+    },
+    {
       path: 'addPay',
       component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/addPay/index.vue'),
       name: 'addPay',

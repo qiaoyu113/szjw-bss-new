@@ -188,7 +188,7 @@ export const getPayList = (data: any) =>
 // 缴费详情
 export const payDetail = (params: any) =>
   request({
-    url: `${payFix}/billing/paydetail`,
+    url: `${billFix}/v2.4/wt-driver-account/pay/getPayCostInfoById`,
     method: 'get',
     params
   })
@@ -249,6 +249,14 @@ export const AddCharging = (data:any) =>
 export const EditCharging = (data:any) =>
   request({
     url: `${payFix}/editCharging`,
+    method: 'post',
+    data
+  })
+
+// 缴费管理-新增缴费
+export const payCostBillsCreate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/create`,
     method: 'post',
     data
   })
