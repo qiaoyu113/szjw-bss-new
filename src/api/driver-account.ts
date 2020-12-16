@@ -200,6 +200,13 @@ export const payAudit = (params: any) =>
     method: 'get',
     params
   })
+// 缴费导出
+export const payExport = (params: any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/export`,
+    method: 'get',
+    params
+  })
   // 获取计费管理列表
 export const GetChargingList = (params:any) =>
   request({

@@ -22,7 +22,7 @@ const driverAccountRouter: RouteConfig = {
         icon: '',
         apiUrl: 'root',
         noCache: true,
-        hidden: true
+        hidden: false
       }
     },
     {
