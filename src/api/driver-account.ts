@@ -260,3 +260,11 @@ export const payCostBillsCreate = (data:any) =>
     method: 'post',
     data
   })
+
+// 缴费管理-新增缴费
+export const payCostBillsUpdate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/update`,
+    method: 'post',
+    data
+  })
