@@ -115,7 +115,7 @@
           >
             <template v-slot:haveCar="scope">
               <span v-if="scope.row.haveCar ===1">
-                有；{{ scope.row.haveCarName | DataIsNull }}
+                有；{{ scope.row.carTypeName | DataIsNull }}
               </span>
               <span v-else>无</span>
             </template>

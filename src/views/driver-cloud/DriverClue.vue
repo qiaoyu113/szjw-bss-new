@@ -58,6 +58,8 @@
         <el-badge
           v-for="item in btns"
           :key="item.text"
+          :value="item.num"
+          :hidden="item.num === 0"
         >
           <el-button
             type="primary"
@@ -122,9 +124,29 @@
             {{ scope.row.cityName }}/{{ scope.row.busiTypeName }}
           </p>
         </template>
-        <template v-slot:allocatedDate="scope">
+        <template v-slot:statusName="scope">
           <p class="text">
+            {{ scope.row.statusName | DataIsNull }}
+          </p>
+          <p
+            v-if="scope.row.interviewDate"
+            class="text"
+          >
+            {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          </p>
+        </template>
+        <template v-slot:allocatedDate="scope">
+          <p
+            v-if="scope.row.allocatedDate"
+            class="text"
+          >
             {{ scope.row.allocatedDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          </p>
+          <p
+            v-if="scope.row.followerDate"
+            class="text"
+          >
+            {{ scope.row.followerDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
           </p>
         </template>
         <template v-slot:op="scope">
@@ -374,31 +396,38 @@ export default class extends Vue {
   private btns:any[] = [
     {
       name: '',
-      text: '全部'
+      text: '全部',
+      num: 0
     },
     {
       name: '10',
-      text: '待分配'
+      text: '待分配',
+      num: 0
     },
     {
       name: '20',
-      text: '待跟进'// 审核通过
+      text: '待跟进', // 审核通过
+      num: 0
     },
     {
       name: '30',
-      text: '跟进中'
+      text: '跟进中',
+      num: 0
     },
     {
       name: '40',
-      text: '待面试'
+      text: '待面试',
+      num: 0
     },
     {
       name: '50',
-      text: '已面试'
+      text: '已面试',
+      num: 0
     },
     {
       name: '60',
-      text: '已成交'
+      text: '已成交',
+      num: 0
     }
   ]
   private columns:IState[] = [
@@ -437,7 +466,8 @@ export default class extends Vue {
     {
       key: 'statusName',
       label: '状态',
-      'width': '100px'
+      'width': '150px',
+      slot: true
     },
     {
       key: 'followPerson',
@@ -655,6 +685,15 @@ export default class extends Vue {
         this.tableData = res.data
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
+        this.btns.forEach(item => {
+          let key = item.name
+          if (key === '') {
+            key = 'all'
+          } else {
+            key = +key
+          }
+          item.num = res.title[key]
+        })
       } else {
         this.$message.warning(res.message)
       }
