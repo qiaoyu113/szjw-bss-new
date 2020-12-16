@@ -67,6 +67,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { GetCityByCode, GetDictionaryList, GetOpenCityData } from '@/api/common'
 import { editClue } from '@/api/driver-cloud'
+import { lock } from '@/utils/index'
 interface IState {
   [key: string]: any;
 }
@@ -177,9 +178,17 @@ export default class extends Vue {
       }
     }
   ];
+   validateCity = (rule:any, value:any, callback:any) => {
+     if (value && value.length === 2) {
+       callback()
+     } else {
+       callback(new Error('请选择期望工作区域'))
+     }
+   };
   private rules = {
     city: [
-      { required: true, message: '请选择城市', trigger: 'blur' }
+      { required: true, message: '请选择期望工作区域', trigger: 'blur' },
+      { validator: this.validateCity, trigger: 'blur' }
     ]
   }
   // 编辑确认按钮
@@ -191,6 +200,7 @@ export default class extends Vue {
     this.editClue()
   }
   // 编辑线索
+  @lock
   async editClue() {
     try {
       let params:IState = {
@@ -231,6 +241,11 @@ export default class extends Vue {
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
       let nodes = await this.loadCityByCode(params)
+
+      if (this.listQuery.city[1] === '0') {
+        this.listQuery.city.pop()
+        this.listQuery.city.push(nodes[1].value + '')
+      }
       resolve(nodes)
     }
   }
