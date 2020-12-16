@@ -106,18 +106,23 @@
           </p>
         </template>
         <template v-slot:followPerson="scope">
-          <p
-            v-if="scope.row.followerName"
-            class="text"
-          >
-            {{ scope.row.followerName | DataIsNull }}
-          </p>
-          <p
-            v-if="scope.row.followerPhone"
-            class="text"
-          >
-            {{ scope.row.followerPhone | DataIsNull }}
-          </p>
+          <template v-if="scope.row.status !==10">
+            <p
+              v-if="scope.row.followerName"
+              class="text"
+            >
+              {{ scope.row.followerName | DataIsNull }}
+            </p>
+            <p
+              v-if="scope.row.followerPhone"
+              class="text"
+            >
+              {{ scope.row.followerPhone | DataIsNull }}
+            </p>
+          </template>
+          <template>
+            暂无数据
+          </template>
         </template>
         <template v-slot:city="scope">
           <p class="text">

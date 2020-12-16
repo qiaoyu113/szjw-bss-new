@@ -62,7 +62,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { GetCityByCode, GetDictionaryList, GetOpenCityData } from '@/api/common'
@@ -178,6 +178,7 @@ export default class extends Vue {
       }
     }
   ];
+  private countryValue = '' // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区
    validateCity = (rule:any, value:any, callback:any) => {
      if (value && value.length === 2) {
        callback()
@@ -190,6 +191,15 @@ export default class extends Vue {
       { required: true, message: '请选择期望工作区域', trigger: 'blur' },
       { validator: this.validateCity, trigger: 'blur' }
     ]
+  }
+  @Watch('showDialog')
+  onShowDialog(val:boolean) {
+    if (val) {
+      if (this.listQuery.city[1] === '0' && this.countryValue) {
+        this.listQuery.city.pop()
+        this.listQuery.city.push(this.countryValue)
+      }
+    }
   }
   // 编辑确认按钮
   confirm() {
@@ -241,11 +251,7 @@ export default class extends Vue {
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
       let nodes = await this.loadCityByCode(params)
-
-      if (this.listQuery.city[1] === '0') {
-        this.listQuery.city.pop()
-        this.listQuery.city.push(nodes[1].value + '')
-      }
+      this.countryValue = nodes[1].value
       resolve(nodes)
     }
   }
