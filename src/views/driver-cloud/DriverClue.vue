@@ -239,6 +239,7 @@ export default class extends Vue {
     contactSituations: [],
     followerId: '',
     time: [],
+    createTime: [],
     workCity: [],
     busiType: '',
     onlyMe: '',
@@ -372,6 +373,16 @@ export default class extends Vue {
       },
       label: '分配时间',
       key: 'time'
+    },
+    {
+      type: 3,
+      col: 8,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      },
+      label: '创建时间',
+      key: 'createTime'
     },
     {
       type: 5,
@@ -637,6 +648,12 @@ export default class extends Vue {
         } else {
           return this.$message.warning('请选择分配时间')
         }
+        if (this.listQuery.createTime && this.listQuery.createTime.length > 0) {
+          let createStartDate = new Date(this.listQuery.createTime[0]).setHours(0, 0, 0)
+          let createEndDate = new Date(this.listQuery.createTime[1]).setHours(23, 59, 59)
+          params.createStartDate = createStartDate
+          params.createEndDate = createEndDate
+        }
         let { data: res } = await ExportDriverClue(params)
         if (res.success) {
           this.$message.success('操作成功')
@@ -685,6 +702,13 @@ export default class extends Vue {
         params.startDate = startDate
         params.endDate = endDate
       }
+      if (this.listQuery.createTime && this.listQuery.createTime.length > 0) {
+        let createStartDate = new Date(this.listQuery.createTime[0]).setHours(0, 0, 0)
+        let createEndDate = new Date(this.listQuery.createTime[1]).setHours(23, 59, 59)
+        params.createStartDate = createStartDate
+        params.createEndDate = createEndDate
+      }
+
       let { data: res } = await GetDriverClueList(params)
       if (res.success) {
         this.tableData = res.data

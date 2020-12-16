@@ -282,7 +282,8 @@ export default class extends Vue {
     age: '',
     nowProfession: '',
     nowAddress: '',
-    city: []
+    city: [],
+    cityName: ''
   }; // 编辑
   private listQuery:IState = {
     marketClueId: '',
@@ -321,11 +322,6 @@ export default class extends Vue {
       type: 'remark',
       label: '备注',
       key: 'remark',
-      slot: true
-    },
-    {
-      type: 'interviewDate',
-      label: '已约面试',
       slot: true
     }
   ];
@@ -402,7 +398,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '所属城市',
-      key: 'expectAddressCityName'
+      key: 'cityName'
     },
     {
       type: 'sourceChannelName',
@@ -505,6 +501,13 @@ export default class extends Vue {
       let { data: res } = await GetDriverClueDetail(params)
       if (res.success) {
         this.listQuery = { ...this.listQuery, ...res.data }
+        if (this.listQuery.status === 40) {
+          this.formItem.push({
+            type: 'interviewDate',
+            label: '已约面试',
+            slot: true
+          })
+        }
       } else {
         this.$message.error(res.errorMsg)
       }
