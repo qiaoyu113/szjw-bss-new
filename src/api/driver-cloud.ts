@@ -111,14 +111,14 @@ export const marketClue = (data: any) =>
 // 分配带市场分配线索
 export const allocationClue = (data: any) =>
   request({
-    url: `${carrierPrefix}/v2/clueH5/updateFollowerByMarketClueId`,
+    url: `${carrierPrefix}/v2/clueH5/updateFollowerByMarketClueIdForFail`,
     method: 'post',
     data
   })
 // 线索分配
 export const allocationClue1 = (data: any) =>
   request({
-    url: `${prefix}/v2/clueH5/updateFollowerByMarketClueId1`,
+    url: `${prefix}/v2/clueH5/updateFollowerByMarketClueIdForSuccess`,
     method: 'post',
     data
   })
