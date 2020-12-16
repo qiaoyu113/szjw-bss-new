@@ -304,7 +304,7 @@ export default class extends Vue {
   private rules:IState = {
     follow: [
       { required: true, message: '请选择跟进人', trigger: 'blur' },
-      { validator: this.validateFollow, trigger: 'change' }
+      { validator: this.validateFollow, trigger: 'blur' }
     ]
   };
 
@@ -337,7 +337,7 @@ export default class extends Vue {
   private validateFollow(rule:any, value:any, callback:Function) {
     if (value === '') {
       callback(new Error('请选择跟进人!'))
-    } else if (value.length !== 3) {
+    } else if (value.length === 2) {
       callback(new Error('该组织下无跟进人!'))
     } else {
       callback()
