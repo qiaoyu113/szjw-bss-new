@@ -815,6 +815,9 @@ export default class extends Vue {
   // 获取跟进人列表
   async getGmOptions() {
     try {
+      if (this.followerListOptions.length > 0) {
+        return false
+      }
       let params:any = {
         roleTypes: [1, 4],
         uri: '/v2/clueH5/list/queryFollowerList'
