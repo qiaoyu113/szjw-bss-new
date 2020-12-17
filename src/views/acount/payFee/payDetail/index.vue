@@ -68,7 +68,6 @@
         <el-table
           :data="tableData"
           style="width: 100%"
-          show-summary
         >
           <el-table-column
             prop="payAmount"
