@@ -188,17 +188,17 @@ export const getPayList = (data: any) =>
 // 缴费详情
 export const payDetail = (params: any) =>
   request({
-    url: `${payFix}/billing/paydetail`,
+    url: `${billFix}/v2.4/wt-driver-account/pay/getPayCostInfoById`,
     method: 'get',
     params
   })
 
 // 缴费审核
-export const payAudit = (params: any) =>
+export const payAudit = (data: any) =>
   request({
-    url: `${payFix}/billing/payAudit`,
-    method: 'get',
-    params
+    url: `${billFix}/v2.4/wt-driver-account/pay/check`,
+    method: 'post',
+    data
   })
 // 缴费导出
 export const payExport = (params: any) =>

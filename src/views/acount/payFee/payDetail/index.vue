@@ -130,21 +130,24 @@
         </el-table>
       </template>
     </SectionContainer>
-
-    <div
+    <SectionContainer
       v-if="routePage === 'payDetail'"
-      class="checkStatus"
+      title="审核状态"
+      :md="true"
     >
-      <span>审核状态：</span>
-      <span>{{ formData.payStatus }}</span>
-    </div>
-
+      <div
+        class="checkStatus"
+      >
+        <span>审核状态：</span>
+        <span>{{ formData.payStatus | DataIsNull }}</span>
+      </div>
+    </SectionContainer>
     <div
       v-if="routePage === 'payAudit'"
       class="btnBox"
     >
       <el-button @click="audit('reject')">
-        审核未通过
+        审核不通过
       </el-button>
       <el-button
         type="primary"
@@ -208,7 +211,7 @@ export default class extends Vue {
   private async getDetail(id:string) {
     try {
       let params = {
-        payId: id
+        id: id
       }
       let { data: res } = await payDetail(params)
       this.tableData = res.data.payInfo
@@ -242,15 +245,16 @@ export default class extends Vue {
   private async doAudit(flag:string) {
     try {
       let param = {
-        payId: this.id,
+        id: this.id,
         flag: flag
       }
       let { data: res } = await payAudit(param)
       if (res.success) {
         if (flag === 'pass') {
+          console.log(123)
           this.$message.success('审核通过成功')
         } else {
-          this.$message.success('审核未通过成功')
+          this.$message.success('审核不通过成功')
         }
         this.$router.push({
           path: '/driveraccount/payFee'
@@ -271,15 +275,13 @@ export default class extends Vue {
     align-items: center;
     font-size: 14px;
     margin-left: 20px;
-    margin-top: 30px;
-    padding-bottom: 60px;
   }
   .btnBox{
-    padding: 30px 30%;
+    padding-top: 30px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-end;
   }
 }
 </style>

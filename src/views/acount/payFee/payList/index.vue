@@ -118,8 +118,8 @@
         :page="page"
         @onPageSize="handlePageSize"
       >
-        <template v-slot:applayDate="scope">
-          {{ scope.row.applayDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+        <template v-slot:applyDate="scope">
+          {{ scope.row.applyDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
         </template>
         <template v-slot:isReceipt="scope">
           {{ scope.row.isReceipt ? '是' : '否' }}
@@ -128,7 +128,7 @@
           <div>
             <span
               class="doItem"
-              @click="goRoute('payDetail',scope.row.payNo)"
+              @click="goRoute('payDetail',1)"
             >详情</span>
             <span
               v-if="+scope.row.payStatus === 0 ? false:true"
@@ -158,6 +158,7 @@ import { delayTime } from '@/settings.ts'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
 import { getSpecifiedUserListByCondition, GetOpenCityData, GetSpecifiedRoleList, getOfficeByTypeAndOfficeId, getOfficeByType, GetDutyListByLevel } from '@/api/common'
+import data from '@/views/pdf/content'
 interface IState {
   [key: string]: any;
 }
@@ -189,6 +190,7 @@ export default class extends Vue {
   private dutyListOptions:IState[] = [];// 业务线列表
   private driverOptions:IState[] = [];
   private searchKeyword:string = '';
+  private row:IState = {}
   private type: string = ''; // 修改加盟经理or分配加盟经理
   private queryPage:PageObj = {
     page: 0,
@@ -214,7 +216,7 @@ export default class extends Vue {
     gmName: '',
     payModel: '',
     payNo: '',
-    applayDate: [],
+    applyDate: [],
     sno: '',
     driverId: '',
     driverStatus: '',
@@ -332,10 +334,10 @@ export default class extends Vue {
       },
       label: '缴费申请日期',
       col: 8,
-      key: 'applayDate'
+      key: 'applyDate'
     },
     {
-      type: 1,
+      type: 2,
       key: 'sno',
       label: '交易流水号',
       col: 8,
@@ -720,9 +722,9 @@ export default class extends Vue {
       this.listQuery.sno && (params.sno = this.listQuery.sno)
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.driverStatus && (params.driverStatus = this.listQuery.driverStatus)
-      if (this.listQuery.applayDate.length > 1) {
-        params.startDate = new Date(this.listQuery.applayDate[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.applayDate[1]).setHours(23, 59, 59)
+      if (this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
       }
       let { data: res } = await getPayList(params)
       this.listLoading = false
@@ -773,7 +775,7 @@ export default class extends Vue {
       gmName: '',
       payModel: '',
       payNo: '',
-      applayDate: [],
+      applyDate: [],
       sno: '',
       driverId: '',
       driverStatus: '',
@@ -788,9 +790,9 @@ export default class extends Vue {
   private async handleExportClick() {
     try {
       let params:IState = {}
-      if (this.listQuery.applayDate && this.listQuery.applayDate.length > 1) {
-        params.startDate = new Date(this.listQuery.applayDate[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.applayDate[1]).setHours(23, 59, 59)
+      if (this.listQuery.applyDate && this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
       } else {
         return this.$message.error('需要按缴费申请日期进行导出')
       }
