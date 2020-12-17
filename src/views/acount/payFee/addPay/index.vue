@@ -601,11 +601,17 @@ export default class extends Vue {
   private handleDriverChange(val:any) {
     if (!this.isEdit) {
       this.formItem.splice(1, this.formItem.length - 1)
-      this.formItem.push(...this.otherFormItem)
-      this.getCanExtractMoney(val)
-      this.computedInfo(val)
-      this.resetTableData()
+      this.billTypeOptions.splice(1, this.billTypeOptions.length - 1)
+      if (val) {
+        this.formItem.push(...this.otherFormItem)
+        this.getCanExtractMoney(val)
+        this.computedInfo(val)
+        this.resetTableData()
+      } else {
+        this.remoteMethod('')
+      }
     }
+
     if (this.formData.busiType === 1) {
       const item = { label: '无订单充值', value: 0 }
       this.billTypeOptions.push(item)
