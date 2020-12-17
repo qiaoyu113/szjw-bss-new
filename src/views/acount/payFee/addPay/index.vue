@@ -260,7 +260,6 @@
             </el-table-column>
 
             <el-table-column
-              width="180"
               label="上传交易凭证"
 
               align="center"
@@ -515,10 +514,18 @@ export default class extends Vue {
 
   get canPay() {
     if (this.formData.driverCode) {
-      if (this.formData.busiType !== 0 && this.formData.canExtract <= 0) {
-        return true
+      if (!this.isEdit) {
+        if (this.formData.busiType !== 0 && this.formData.canExtract <= 0) {
+          return true
+        } else {
+          return false
+        }
       } else {
-        return false
+        if (this.formData.busiTypeValue !== 0 && this.formData.canExtract <= 0) {
+          return true
+        } else {
+          return false
+        }
       }
     } else {
       return false
@@ -564,7 +571,7 @@ export default class extends Vue {
           canUpload: true,
           existReceipt: res.data.existReceipt ? 1 : 0,
           orderCode: res.data.orderCode,
-          payProof: res.data.payProof
+          payProof: res.data.payImageUrl
         }]
         this.payForm.tableData = [...tableData]
       } else {
@@ -939,10 +946,10 @@ export default class extends Vue {
   /**
    *校验表单
    */
-  handleValidateForm() {
+  private handleValidateForm() {
     ((this.$refs.SelfForm) as any).submitForm()
   }
-  handleValidateTableForm() {
+  private handleValidateTableForm() {
     ((this.$refs['payForm']) as any).validate((valid:any) => {
       if (valid) {
         this.saveData()
