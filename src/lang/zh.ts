@@ -13,6 +13,7 @@ export default {
     refundAudit: '审核退费',
     payFee: '缴费管理',
     payDetail: '缴费详情',
+    payEdit: '缴费编辑',
     payAudit: '缴费审核',
     addPay: '新建缴费',
     wtAcountList: '梧桐账户列表',

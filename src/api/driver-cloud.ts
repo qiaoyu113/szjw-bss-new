@@ -4,6 +4,8 @@ import request from '@/utils/request'
 let prefix = '/mock/81'
 const driverPrefix = '/driver'
 const carrierPrefix = '/carrier_center'
+const businessPrefix = '/order'
+
 // 获取自承运司机标签列表
 export const GetDriverTagList = (data: any) =>
   request({
@@ -37,6 +39,14 @@ export const EditDriverTag = (data: any) =>
 export const GetDriverByDriverName = (data: any) =>
   request({
     url: `${carrierPrefix}/v2/driver/getDriverNoAndNameAndBusiTypeListFromESAndRedis`,
+    method: 'post',
+    data
+  })
+
+// 根据司机ID查询已成交订单
+export const getDealOrdersByDriverIds = (data: any) =>
+  request({
+    url: `${businessPrefix}/v2/order/getDealOrdersByDriverIds`,
     method: 'post',
     data
   })

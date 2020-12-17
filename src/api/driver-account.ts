@@ -252,3 +252,27 @@ export const EditCharging = (data:any) =>
     method: 'post',
     data
   })
+
+// 缴费管理-新增缴费
+export const payCostBillsCreate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/create`,
+    method: 'post',
+    data
+  })
+
+// 缴费管理-新增缴费
+export const payCostBillsUpdate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/update`,
+    method: 'post',
+    data
+  })
+
+// 根据司机编号查询梧桐账户详情
+export const detailByUserId = (params:any) =>
+  request({
+    url: `${prefix}/v2/wt-driver-account/management/detailByUserId`,
+    method: 'get',
+    params
+  })
