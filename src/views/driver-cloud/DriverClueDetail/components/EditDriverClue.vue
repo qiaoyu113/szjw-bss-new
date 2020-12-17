@@ -65,7 +65,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { GetCityByCode, GetDictionaryList, GetOpenCityData } from '@/api/common'
+import { GetCityByCode, GetDictionaryList, GetDictionaryCity } from '@/api/common'
 import { editClue } from '@/api/driver-cloud'
 import { lock } from '@/utils/index'
 interface IState {
@@ -258,7 +258,7 @@ export default class extends Vue {
   // 获取开通城市
   async getOpenCity() {
     try {
-      let { data: res } = await GetOpenCityData()
+      let { data: res } = await GetDictionaryCity()
       if (res.success) {
         let arr = res.data.map((item:any) => ({
           value: item.code,

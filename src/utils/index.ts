@@ -3,7 +3,7 @@ import Vue from 'vue'
 import {
   getOfficeByTypeAndOfficeId,
   getOfficeByType,
-  GetOpenCityData,
+  GetDictionaryCity,
   getGroupInfoByCityCodeAndProductLine,
   GetSpecifiedRoleList
 } from '@/api/common'
@@ -451,7 +451,7 @@ export async function showCityGroupPerson(node: any, resolve: any) {
 // 获取开通城市
 async function getOpenCitys() {
   try {
-    let { data: res } = await GetOpenCityData()
+    let { data: res } = await GetDictionaryCity()
     if (res.success) {
       return res.data.map((item:any) => ({
         value: item.code,
