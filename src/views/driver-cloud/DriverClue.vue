@@ -79,6 +79,7 @@
       class="table_box"
     >
       <self-table
+        ref="multipleTable"
         :index="true"
         :is-p30="false"
         :operation-list="[]"
@@ -645,8 +646,6 @@ export default class extends Vue {
           let endDate = new Date(this.listQuery.time[1]).setHours(23, 59, 59)
           params.startDate = startDate
           params.endDate = endDate
-        } else {
-          return this.$message.warning('请选择分配时间')
         }
         if (this.listQuery.createTime && this.listQuery.createTime.length > 0) {
           let createStartDate = new Date(this.listQuery.createTime[0]).setHours(0, 0, 0)
@@ -780,7 +779,9 @@ export default class extends Vue {
     this.dialogListQuery = {
       follow: []
     }
-    this.rows = []
+    let len = this.rows.length
+    this.rows.splice(0, len);
+    (this.$refs.multipleTable as any).toggleRowSelection()
   }
   // 获取车型
   async getBaseInfo() {
