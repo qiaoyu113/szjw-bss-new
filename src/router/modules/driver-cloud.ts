@@ -9,7 +9,7 @@ const driverCloud: RouteConfig = {
   meta: {
     title: 'driverClond',
     icon: 'driver-cloud',
-    apiUrl: '/v2/driver/label-sync/list'
+    apiUrl: 'root'
   },
   children: [
     {
