@@ -512,7 +512,7 @@ export default class extends Vue {
       fixed: 'right'
     }
   ];
-  private tableData:IState[] = [{}, {}];
+  private tableData:IState[] = [];
   // 表格分页
   private page :PageObj= {
     page: 1,
