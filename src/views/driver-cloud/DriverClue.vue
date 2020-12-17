@@ -816,7 +816,7 @@ export default class extends Vue {
   async getGmOptions() {
     try {
       let params:any = {
-        roleTypes: [1, 9],
+        roleTypes: [1, 4],
         uri: '/v2/clueH5/list/queryFollowerList'
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)

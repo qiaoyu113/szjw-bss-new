@@ -492,7 +492,7 @@ async function GroupInfoByCityCodeAndProductLine(cityCode:number) {
 async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
   try {
     let params:any = {
-      roleTypes: [1],
+      roleTypes: [1, 4],
       cityCode,
       busiType,
       groupId,
