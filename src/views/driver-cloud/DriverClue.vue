@@ -754,7 +754,11 @@ export default class extends Vue {
       }
       let { data: res } = await allocationClue1(params)
       if (res.success) {
-        this.$message.success(res.msg)
+        if (res.data.flag) {
+          this.$message.success(res.data.msg)
+        } else {
+          this.$message.warning(res.data.msg)
+        }
         this.showDialog = false
         setTimeout(() => {
           this.getLists()
