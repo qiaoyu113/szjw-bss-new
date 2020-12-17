@@ -128,7 +128,7 @@
           <div>
             <span
               class="doItem"
-              @click="goRoute('payDetail',1)"
+              @click="goRoute('payDetail',2)"
             >详情</span>
             <span
               v-if="+scope.row.payStatus === 0 ? false:true"
@@ -211,7 +211,7 @@ export default class extends Vue {
   };
   // 表单对象
   private listQuery: IState = {
-    driverCity: '',
+    workCity: '',
     busiType: '',
     gmName: '',
     payModel: '',
@@ -230,7 +230,7 @@ export default class extends Vue {
   private formItem: any[] = [
     {
       type: 8,
-      key: 'driverCity',
+      key: 'workCity',
       col: 8,
       label: '所属城市',
       tagAttrs: {
@@ -238,7 +238,7 @@ export default class extends Vue {
         clearable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'driverCity',
+        'node-key': 'workCity',
         props: {
           lazy: true,
           lazyLoad: this.showWork
@@ -559,7 +559,7 @@ export default class extends Vue {
         roleTypes: [1],
         uri: '/v2/wt-driver-account/refund/queryGM'
       }
-      this.listQuery.driverCity[1] !== '' && (params.cityCode = this.listQuery.driverCity[1])
+      this.listQuery.workCity[1] !== '' && (params.cityCode = this.listQuery.workCity[1])
       this.listQuery.busiType !== '' && (params.productLine = this.listQuery.busiType)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
@@ -639,8 +639,8 @@ export default class extends Vue {
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      if (this.listQuery.driverCity && this.listQuery.driverCity.length > 0) {
-        params.driverCity = this.listQuery.driverCity[1]
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
+        params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
@@ -714,7 +714,7 @@ export default class extends Vue {
 
       this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.payStatus && (params.payStatus = +this.listQuery.payStatus)
-      this.listQuery.driverCity && (params.driverCity = this.listQuery.driverCity)
+      this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
       this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
@@ -770,7 +770,7 @@ export default class extends Vue {
    */
   private handleResetClick() {
     this.listQuery = {
-      driverCity: '',
+      workCity: '',
       busiType: '',
       gmName: '',
       payModel: '',
@@ -796,8 +796,8 @@ export default class extends Vue {
       } else {
         return this.$message.error('需要按缴费申请日期进行导出')
       }
-      if (this.listQuery.driverCity && this.listQuery.driverCity.length > 1) {
-        params.driverCity = this.listQuery.driverCity[1]
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+        params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
       this.listQuery.payModel && (params.payModel = this.listQuery.payModel)

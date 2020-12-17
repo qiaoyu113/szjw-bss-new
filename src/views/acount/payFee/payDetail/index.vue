@@ -17,19 +17,19 @@
       <el-row>
         <el-col :span="6">
           <DetailItem
-            name="司机姓名（司机编号/手机号）："
-            :value="formData.driverId"
+            name="司机姓名（司机编号/手机号）"
+            :value="formData.driverName"
           />
         </el-col>
         <el-col :span="6">
           <DetailItem
-            name="所属城市："
+            name="所属城市"
             :value="formData.driverCity"
           />
         </el-col>
         <el-col :span="6">
           <DetailItem
-            name="所属加盟经理："
+            name="所属加盟经理"
             :value="formData.gmName"
           />
         </el-col>
@@ -127,6 +127,12 @@
               </el-button>
             </template>
           </el-table-column>
+          <el-table-column
+            prop="payResult"
+            label="缴费结果"
+            align="center"
+            header-align="center"
+          />
         </el-table>
       </template>
     </SectionContainer>
@@ -146,12 +152,12 @@
       v-if="routePage === 'payAudit'"
       class="btnBox"
     >
-      <el-button @click="audit('reject')">
+      <el-button @click="audit(2)">
         审核不通过
       </el-button>
       <el-button
         type="primary"
-        @click="audit('resolve')"
+        @click="audit(1)"
       >
         审核通过
       </el-button>
@@ -214,16 +220,27 @@ export default class extends Vue {
         id: id
       }
       let { data: res } = await payDetail(params)
-      this.tableData = res.data.payInfo
-      this.formData = res.data.baseInfo
+      this.formData = res.data
+      const tableData = [{
+        sno: res.data.sno,
+        payAmount: res.data.payAmount,
+        payType: res.data.payStatus,
+        payDate: res.data.payDate,
+        payModel: res.data.payModel,
+        canUpload: true,
+        existReceipt: res.data.existReceipt,
+        orderCode: res.data.orderCode,
+        payProof: res.data.payProof
+      }]
+      this.tableData = tableData
     } catch (err) {
       console.log(err)
     }
   }
 
-  private audit(type:string) {
+  private audit(type:number) {
     let text:string = ''
-    if (type === 'resolve') {
+    if (type === 1) {
       text = '确认要审核通过此退款信息吗?'
     } else {
       text = '确认要审核不通过并驳回此退款信息吗?'
@@ -242,16 +259,15 @@ export default class extends Vue {
     })
   }
 
-  private async doAudit(flag:string) {
+  private async doAudit(flag:number) {
     try {
       let param = {
         id: this.id,
-        flag: flag
+        checkStatus: flag
       }
       let { data: res } = await payAudit(param)
       if (res.success) {
-        if (flag === 'pass') {
-          console.log(123)
+        if (flag === 1) {
           this.$message.success('审核通过成功')
         } else {
           this.$message.success('审核不通过成功')

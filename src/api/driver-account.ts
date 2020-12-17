@@ -178,11 +178,11 @@ export const GetChargeAmountByChargeId = (params:any) =>
   })
 
 // 缴费管理列表
-export const getPayList = (data: any) =>
+export const getPayList = (params: any) =>
   request({
-    url: `${payFix}/v2/wt-driver-account/pay/list`,
-    method: 'post',
-    data
+    url: `${billFix}/v2.4/wt-driver-account/pay/list`,
+    method: 'get',
+    params
   })
 
 // 缴费详情
