@@ -36,6 +36,27 @@
           />
         </el-select>
       </template>
+      <template slot="sno">
+        <el-select
+          v-model.trim="listQuery.sno"
+          v-loadmore="loadQuerySnoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchBySno"
+          @clear="handleClearQuerySno"
+        >
+          <el-option
+            v-for="item in snoOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
       <div
         slot="btn1"
         :class="isPC ? 'btnPc' : 'mobile'"
@@ -337,16 +358,11 @@ export default class extends Vue {
       key: 'applyDate'
     },
     {
-      type: 2,
+      type: 'sno',
       key: 'sno',
       label: '交易流水号',
-      col: 8,
-      tagAttrs: {
-        placeholder: '请输入',
-        // maxlength: 20,
-        // 'show-word-limit': true,
-        clearable: true
-      }
+      slot: true,
+      col: 8
     },
     {
       type: 'driverId',
@@ -635,7 +651,20 @@ export default class extends Vue {
       return nodes
     }
   }
-
+  // 获取交易流水号
+  private searchOfSno:string=''
+  private queryPageOfSno = {
+    page: 1,
+    limit: 30
+  }
+  private snoOption = []
+  private loadQuerySnoweyword() {}
+  private querySearchBySno(val:string) {
+    console.log(val)
+    // if ()
+    val = this.searchOfSno
+  }
+  private handleClearQuerySno() {}
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
