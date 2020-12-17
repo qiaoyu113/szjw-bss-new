@@ -268,3 +268,11 @@ export const payCostBillsUpdate = (data:any) =>
     method: 'post',
     data
   })
+
+// 根据司机编号查询梧桐账户详情
+export const detailByUserId = (params:any) =>
+  request({
+    url: `${prefix}/v2/wt-driver-account/management/detailByUserId`,
+    method: 'get',
+    params
+  })

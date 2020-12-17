@@ -70,7 +70,7 @@
     </SectionContainer>
 
     <SectionContainer
-      v-if="formData.driverCode"
+      v-if="canPay"
       title="缴费信息"
       :md="true"
       class="payInfo"
@@ -93,10 +93,14 @@
           <el-table
             :data="payForm.tableData"
             class="tableStyle"
+            :row-style="{height: '20px'}"
+            :cell-style="{padding: '5px 0'}"
             style="width: 100%"
+            size="mini"
           >
             <!--show-summary :summary-method="getSummaries" -->
             <el-table-column
+              width="180"
               label="缴费金额（元）"
             >
               <template slot-scope="scope">
@@ -114,6 +118,7 @@
             </el-table-column>
 
             <el-table-column
+              width="180"
               label="支付方式"
             >
               <template slot-scope="scope">
@@ -139,6 +144,7 @@
 
             <el-table-column
               label="交易流水号"
+              width="200px"
             >
               <template slot-scope="scope">
                 <el-form-item
@@ -156,11 +162,12 @@
             </el-table-column>
 
             <el-table-column
+              width="180"
               label="缴费类型"
             >
               <template slot-scope="scope">
                 <el-form-item
-                  :prop="'tableData.'+scope.$index+'.sno'"
+                  :prop="'tableData.'+scope.$index+'.payType'"
                   :rules="payForm.rules.payType"
                 >
                   <el-select
@@ -180,6 +187,7 @@
             </el-table-column>
 
             <el-table-column
+              width="180"
               label="订单编号"
             >
               <template slot-scope="scope">
@@ -208,6 +216,7 @@
             </el-table-column>
 
             <el-table-column
+              width="180"
               label="是否开收据"
             >
               <template slot-scope="scope">
@@ -251,6 +260,7 @@
             </el-table-column>
 
             <el-table-column
+              width="180"
               label="上传交易凭证"
 
               align="center"
@@ -302,9 +312,11 @@
             </el-table-column>
             <el-table-column
               v-if="!isEdit"
+              width="180"
               label="操作"
               align="center"
               header-align="center"
+              fixed="right"
             >
               <template slot-scope="scope">
                 <!-- <el-button
@@ -322,21 +334,20 @@
               </template>
             </el-table-column>
           </el-table>
-
-          <div class="btnBox">
-            <el-button @click="handleBackClick">
-              取消
-            </el-button>
-            <el-button
-              type="primary"
-              @click="handleSaveClick"
-            >
-              提交
-            </el-button>
-          </div>
         </el-form>
       </template>
     </SectionContainer>
+    <div class="btnBox">
+      <el-button @click="handleBackClick">
+        取消
+      </el-button>
+      <el-button
+        type="primary"
+        @click="handleSaveClick"
+      >
+        提交
+      </el-button>
+    </div>
     <el-image-viewer
       v-if="showViewer"
       :on-close="closePic"
@@ -351,7 +362,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { deleteUser } from '@/api/users'
 import { getDriverNoAndNameList } from '@/api/driver'
-import { orderCanExtractMoney, payCostBillsCreate, payDetail, payCostBillsUpdate } from '@/api/driver-account'
+import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
 import { GetDictionaryList } from '@/api/common'
@@ -372,8 +383,6 @@ export default class extends Vue {
   private driverOver:Boolean = false
   private showViewer:boolean = false
   private imageUrl:string = ''
-  private formStatus:boolean = false
-  private tableStatus:boolean = false
   private ReceiptOptions:any = []
   private orderOptions:any[] = []
   private driverOptions:any[] = []
@@ -384,14 +393,14 @@ export default class extends Vue {
   }
   private addRules:any = {
     driverCode: [
-      { required: true, message: '请选择司机!', trigger: 'blur' }
+      { required: true, message: '请选择司机!', trigger: 'change' }
     ]
   }
   private formData:any = {
     driverCode: '',
     canExtract: '',
     balance: '',
-    workCityName: '',
+    driverCity: '',
     gmName: '',
     busiType: '',
     busiTypeName: ''
@@ -408,13 +417,13 @@ export default class extends Vue {
   private otherFormItem:any[] = [
     {
       type: 7,
-      key: 'workCityName',
-      label: '所在城市：'
+      key: 'driverCity',
+      label: '所在城市'
     },
     {
       type: 7,
       key: 'gmName',
-      label: '所属加盟经理：'
+      label: '所属加盟经理'
     },
     {
       type: 7,
@@ -431,7 +440,7 @@ export default class extends Vue {
     {
       type: 7,
       key: 'canExtract',
-      label: '可提现金额：'
+      label: '可提现金额'
     }
   ]
   private columnIndex:number = 0
@@ -475,15 +484,6 @@ export default class extends Vue {
       payProof: ''
     }]
   }
-  private validatepayAmount(rule:any, value:any, callback:any) {
-    if (Number(value) <= 0) {
-      callback(new Error('缴费金额必须大于0'))
-    } else if (Number(value) > 99999.99) {
-      callback(new Error('缴费金额必须小于六位数'))
-    } else {
-      callback()
-    }
-  }
   private isReceiptOptions:any[] = [
     { label: '否', value: 0 },
     { label: '是', value: 1 }
@@ -513,6 +513,18 @@ export default class extends Vue {
     return formArray.concat(tableArray)
   }
 
+  get canPay() {
+    if (this.formData.driverCode) {
+      if (this.formData.busiType !== 0 && this.formData.canExtract <= 0) {
+        return true
+      } else {
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+
   async mounted() {
     this.getPayTypeOptions()
     if (this.$route.name === 'payEdit') {
@@ -524,12 +536,37 @@ export default class extends Vue {
     }
   }
 
+  private validatepayAmount(rule:any, value:any, callback:any) {
+    if (Number(value) <= 0) {
+      callback(new Error('缴费金额必须大于0'))
+    } else if (Number(value) > 99999.99) {
+      callback(new Error('缴费金额必须小于六位数'))
+    } else {
+      callback()
+    }
+  }
+
   private async getDetail(id:string) {
     try {
       const { data: res } = await payDetail({ id: id })
       if (res.success) {
         this.loading = false
         this.formData = { ...res.data }
+        this.formItem.push(...this.otherFormItem)
+        this.formData.driverCode = res.data.driverName
+        this.formData.busiTypeName = res.data.busiType
+        const tableData = [{
+          sno: res.data.sno,
+          payAmount: res.data.payAmount,
+          payType: res.data.payStatusValue,
+          payDate: new Date(res.data.payDate),
+          payModel: String(res.data.payModelValue),
+          canUpload: true,
+          existReceipt: res.data.existReceipt ? 1 : 0,
+          orderCode: res.data.orderCode,
+          payProof: res.data.payProof
+        }]
+        this.payForm.tableData = [...tableData]
       } else {
         this.$message.warning(res.errorMsg)
       }
@@ -563,7 +600,7 @@ export default class extends Vue {
         })
         this.setOrderId()
       } else {
-        this.$message.warning(res.errMsg)
+        this.$message.warning(res.errorMsg)
       }
     } catch (err) {
       console.log('err:', err)
@@ -607,15 +644,19 @@ export default class extends Vue {
         this.getCanExtractMoney(val)
         this.computedInfo(val)
         this.resetTableData()
+        this.dealOrder()
       } else {
         this.remoteMethod('')
       }
-    }
-
-    if (this.formData.busiType === 1) {
-      const item = { label: '无订单充值', value: 0 }
-      this.billTypeOptions.push(item)
-      this.dealOrder()
+      if (this.formData.busiType === 1) {
+        const item = { label: '无订单充值', value: 0 }
+        this.billTypeOptions.push(item)
+      }
+    } else {
+      if (this.formData.busiTypeValue === 1) {
+        const item = { label: '无订单充值', value: 0 }
+        this.billTypeOptions.push(item)
+      }
     }
   }
 
@@ -631,12 +672,14 @@ export default class extends Vue {
   private async getCanExtractMoney(driverId:string) {
     try {
       let params = { driverId: driverId }
-      let { data: res } = await orderCanExtractMoney(params)
+      let { data: res } = await detailByUserId(params)
       if (res.success) {
+        const { balance, canExtract } = res.data
         this.formData = {
           ...this.formData,
           ...{
-            canExtract: res.data
+            balance: balance,
+            canExtract: canExtract
           }
         }
       } else {
@@ -664,7 +707,7 @@ export default class extends Vue {
         return
       }
       let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/v2/wt-driver-account/management/queryDriverList'
+        url: ''
       })
       if (res.success) {
         if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
@@ -675,7 +718,7 @@ export default class extends Vue {
         let driverInfos = res.data.map(function(item: any) {
           let info = {
             driverCode: item.driverId,
-            workCityName: item.workCityName,
+            driverCity: item.workCityName,
             gmName: item.gmName,
             busiType: item.busiType,
             busiTypeName: item.busiTypeName
@@ -787,10 +830,10 @@ export default class extends Vue {
   }
 
   private beforeUpload(file:any) {
-    const isJPG = file.type === 'image/*'
+    const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')
     const isLt2M = file.size / 1024 / 1024 < 5
     if (!isJPG) {
-      this.$message.error('上传头像图片只能是图片格式!')
+      this.$message.error('上传头像图片支持JPEG/PNG/JPG!')
     }
     if (!isLt2M) {
       this.$message.error('上传头像图片大小不能超过 5MB!')
@@ -811,15 +854,14 @@ export default class extends Vue {
     this.showViewer = false
   }
 
-  private handlePassClick(valid:boolean) {
-    this.formStatus = valid
+  private async handlePassClick(valid:boolean) {
+    if (!this.canPay) {
+      return this.$message.warning('不可以充值')
+    }
+    await this.handleValidateTableForm()
   }
   private async handleSaveClick() {
     await this.handleValidateForm()
-    await this.handleValidateTableForm()
-    if (this.formStatus && this.tableStatus) {
-      this.saveData()
-    }
   }
 
   private handleBackClick() {
@@ -903,7 +945,7 @@ export default class extends Vue {
   handleValidateTableForm() {
     ((this.$refs['payForm']) as any).validate((valid:any) => {
       if (valid) {
-        this.tableStatus = valid
+        this.saveData()
       } else {
         console.log('error submit!!')
         return false
