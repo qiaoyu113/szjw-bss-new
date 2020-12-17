@@ -384,7 +384,7 @@ export default class extends Vue {
   }
   private addRules:any = {
     driverCode: [
-      { required: true, message: '请选择司机!' }
+      { required: true, message: '请选择司机!', trigger: 'blur' }
     ]
   }
   private formData:any = {
