@@ -653,6 +653,8 @@ export default class extends Vue {
           let createEndDate = new Date(this.listQuery.createTime[1]).setHours(23, 59, 59)
           params.createStartDate = createStartDate
           params.createEndDate = createEndDate
+        } else {
+          return this.$message.warning('请选择创建时间')
         }
         let { data: res } = await ExportDriverClue(params)
         if (res.success) {
