@@ -691,7 +691,7 @@ export default class extends Vue {
       }))
       return result
     } catch (err) {
-      console.log(1)
+      console.log(err)
       return []
     }
   }
@@ -714,7 +714,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     } finally {
-      console.log('finally')
+      // console.log('finally')
     }
   }
   // 搜索交易流水号
@@ -774,7 +774,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     } finally {
-      console.log('finally')
+      // console.log('finally')
     }
   }
   // 搜索缴费编号
@@ -836,7 +836,7 @@ export default class extends Vue {
       let result:IState[] = await this.loadDriverByKeyword(params)
       this.driverOptions.push(...result)
     } finally {
-      console.log('finally')
+      // console.log('finally')
     }
   }
   // 搜索司机

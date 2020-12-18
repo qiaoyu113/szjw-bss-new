@@ -131,7 +131,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-if="routePage === 'payDetail'"
+            v-if="routePage === 'payDetail' && formData.payStatus === 1"
             prop="payResult"
             label="缴费结果"
             align="center"
