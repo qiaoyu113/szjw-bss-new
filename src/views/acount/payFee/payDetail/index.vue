@@ -124,7 +124,7 @@
             <template slot-scope="scope">
               <el-button
                 type="text"
-                @click="seePic(scope.row.payProof)"
+                @click="seePic(scope.row.payImageUrl)"
               >
                 查看
               </el-button>
@@ -234,7 +234,7 @@ export default class extends Vue {
         canUpload: true,
         existReceipt: res.data.existReceipt,
         orderCode: res.data.orderCode,
-        payProof: res.data.payProof,
+        payImageUrl: res.data.payImageUrl,
         payResult: res.data.payResult
       }]
       this.tableData = tableData
