@@ -279,7 +279,6 @@
                     class="upload-demo"
                     accept="image/png,image/jpg,image/jpeg"
                     :on-success="handleAvatarSuccess"
-                    :on-preview="handlePreview"
                     :before-upload="beforeUpload"
                     :on-change="onExceed"
                     @click.native="upload(scope,scope.$index)"
@@ -367,6 +366,7 @@ import { getDriverNoAndNameList } from '@/api/driver'
 import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
+import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
 import { GetDictionaryList } from '@/api/common'
  @Component({
@@ -840,10 +840,6 @@ export default class extends Vue {
     this.payForm.tableData[this.columnIndex].payProof = res.data.url
   }
 
-  private handlePreview(file:any) {
-    console.log(file)
-  }
-
   private beforeUpload(file:any) {
     const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')
     const isLt2M = file.size / 1024 / 1024 < 4
@@ -946,9 +942,11 @@ export default class extends Vue {
           this.$message.warning(res.errorMsg)
         }
       }
-      this.$router.push({
-        path: '/driveraccount/payFee'
-      })
+      setTimeout(() => {
+        this.$router.push({
+          path: '/driveraccount/payFee'
+        })
+      }, delayTime)
     } catch (err) {
       console.log('err:', err)
     }
