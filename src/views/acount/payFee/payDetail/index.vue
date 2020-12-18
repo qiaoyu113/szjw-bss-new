@@ -17,19 +17,19 @@
       <el-row>
         <el-col :span="6">
           <DetailItem
-            name="司机姓名（司机编号/手机号）："
-            :value="formData.driverId"
+            name="司机姓名（司机编号/手机号）"
+            :value="formData.driverName"
           />
         </el-col>
         <el-col :span="6">
           <DetailItem
-            name="所属城市："
+            name="所属城市"
             :value="formData.driverCity"
           />
         </el-col>
         <el-col :span="6">
           <DetailItem
-            name="所属加盟经理："
+            name="所属加盟经理"
             :value="formData.gmName"
           />
         </el-col>
@@ -68,7 +68,6 @@
         <el-table
           :data="tableData"
           style="width: 100%"
-          show-summary
         >
           <el-table-column
             prop="payAmount"
@@ -105,7 +104,11 @@
             label="是否开收据"
             align="center"
             header-align="center"
-          />
+          >
+            <template slot-scope="row">
+              {{ row.existReceipt?'是':'否' }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="payDate"
             label="打款时间"
@@ -127,28 +130,38 @@
               </el-button>
             </template>
           </el-table-column>
+          <el-table-column
+            v-if="routePage === 'payDetail'"
+            prop="payResult"
+            label="缴费结果"
+            align="center"
+            header-align="center"
+          />
         </el-table>
       </template>
     </SectionContainer>
-
-    <div
+    <SectionContainer
       v-if="routePage === 'payDetail'"
-      class="checkStatus"
+      title="审核状态"
+      :md="true"
     >
-      <span>审核状态：</span>
-      <span>{{ formData.payStatus }}</span>
-    </div>
-
+      <div
+        class="checkStatus"
+      >
+        <span>审核状态：</span>
+        <span>{{ formData.payStatus | DataIsNull }}</span>
+      </div>
+    </SectionContainer>
     <div
       v-if="routePage === 'payAudit'"
       class="btnBox"
     >
-      <el-button @click="audit('reject')">
-        审核未通过
+      <el-button @click="audit(2)">
+        审核不通过
       </el-button>
       <el-button
         type="primary"
-        @click="audit('resolve')"
+        @click="audit(1)"
       >
         审核通过
       </el-button>
@@ -208,19 +221,30 @@ export default class extends Vue {
   private async getDetail(id:string) {
     try {
       let params = {
-        payId: id
+        id: id
       }
       let { data: res } = await payDetail(params)
-      this.tableData = res.data.payInfo
-      this.formData = res.data.baseInfo
+      this.formData = res.data
+      const tableData = [{
+        sno: res.data.sno,
+        payAmount: res.data.payAmount,
+        payType: res.data.payStatus,
+        payDate: res.data.payDate,
+        payModel: res.data.payModel,
+        canUpload: true,
+        existReceipt: res.data.existReceipt,
+        orderCode: res.data.orderCode,
+        payProof: res.data.payProof
+      }]
+      this.tableData = tableData
     } catch (err) {
       console.log(err)
     }
   }
 
-  private audit(type:string) {
+  private audit(type:number) {
     let text:string = ''
-    if (type === 'resolve') {
+    if (type === 1) {
       text = '确认要审核通过此退款信息吗?'
     } else {
       text = '确认要审核不通过并驳回此退款信息吗?'
@@ -239,18 +263,18 @@ export default class extends Vue {
     })
   }
 
-  private async doAudit(flag:string) {
+  private async doAudit(flag:number) {
     try {
       let param = {
-        payId: this.id,
-        flag: flag
+        id: this.id,
+        checkStatus: flag
       }
       let { data: res } = await payAudit(param)
       if (res.success) {
-        if (flag === 'pass') {
+        if (flag === 1) {
           this.$message.success('审核通过成功')
         } else {
-          this.$message.success('审核未通过成功')
+          this.$message.success('审核不通过成功')
         }
         this.$router.push({
           path: '/driveraccount/payFee'
@@ -271,15 +295,13 @@ export default class extends Vue {
     align-items: center;
     font-size: 14px;
     margin-left: 20px;
-    margin-top: 30px;
-    padding-bottom: 60px;
   }
   .btnBox{
-    padding: 30px 30%;
+    padding-top: 30px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-end;
   }
 }
 </style>

@@ -36,6 +36,48 @@
           />
         </el-select>
       </template>
+      <template slot="sno">
+        <el-select
+          v-model.trim="listQuery.sno"
+          v-loadmore="loadQuerySnoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchBySno"
+          @clear="handleClearQuerySno"
+        >
+          <el-option
+            v-for="item in snoOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+      <template slot="payNo">
+        <el-select
+          v-model.trim="listQuery.payNo"
+          v-loadmore="loadQueryPayNoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchByPayNo"
+          @clear="handleClearQueryPayNo"
+        >
+          <el-option
+            v-for="item in payNoOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
       <div
         slot="btn1"
         :class="isPC ? 'btnPc' : 'mobile'"
@@ -118,8 +160,8 @@
         :page="page"
         @onPageSize="handlePageSize"
       >
-        <template v-slot:applayDate="scope">
-          {{ scope.row.applayDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+        <template v-slot:applyDate="scope">
+          {{ scope.row.applyDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
         </template>
         <template v-slot:isReceipt="scope">
           {{ scope.row.isReceipt ? '是' : '否' }}
@@ -128,17 +170,17 @@
           <div>
             <span
               class="doItem"
-              @click="goRoute('payDetail',scope.row.payNo)"
+              @click="goRoute('payDetail',scope.row.id)"
             >详情</span>
             <span
-              v-if="+scope.row.payStatus === 0 ? false:true"
+              v-if="scope.row.payStatusValue === 0 "
               class="doItem"
-              @click="goRoute('payAudit',scope.row.payNo)"
+              @click="goRoute('payAudit',scope.row.id)"
             >审核</span>
             <span
-              v-if="+scope.row.status === 2 ? false :true"
+              v-if="scope.row.payStatusValue === 2"
               class="doItem"
-              @click="goRoute('payEdit',scope.row.payNo)"
+              @click="goRoute('payEdit',scope.row.id)"
             >编辑</span>
           </div>
         </template>
@@ -153,11 +195,12 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
 import { getLabel, phoneRegExp, IdRegExp } from '@/utils/index.ts'
-import { getPayList, payExport } from '@/api/driver-account'
+import { getPayList, payExport, getSnoList, getPayNoList } from '@/api/driver-account'
 import { delayTime } from '@/settings.ts'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
 import { getSpecifiedUserListByCondition, GetOpenCityData, GetSpecifiedRoleList, getOfficeByTypeAndOfficeId, getOfficeByType, GetDutyListByLevel } from '@/api/common'
+import data from '@/views/pdf/content'
 interface IState {
   [key: string]: any;
 }
@@ -189,10 +232,19 @@ export default class extends Vue {
   private dutyListOptions:IState[] = [];// 业务线列表
   private driverOptions:IState[] = [];
   private searchKeyword:string = '';
+  private row:IState = {}
   private type: string = ''; // 修改加盟经理or分配加盟经理
   private queryPage:PageObj = {
     page: 0,
     limit: 10
+  }
+  private queryPageOfSno = {
+    page: 0,
+    limit: 30
+  }
+  private queryPageOfPayNo = {
+    page: 0,
+    limit: 30
   }
   private status: any[] = [
     { label: '全部', value: '', num: '' },
@@ -209,12 +261,12 @@ export default class extends Vue {
   };
   // 表单对象
   private listQuery: IState = {
-    driverCity: '',
+    workCity: '',
     busiType: '',
     gmName: '',
     payModel: '',
     payNo: '',
-    applayDate: [],
+    applyDate: [],
     sno: '',
     driverId: '',
     driverStatus: '',
@@ -228,7 +280,7 @@ export default class extends Vue {
   private formItem: any[] = [
     {
       type: 8,
-      key: 'driverCity',
+      key: 'workCity',
       col: 8,
       label: '所属城市',
       tagAttrs: {
@@ -236,7 +288,7 @@ export default class extends Vue {
         clearable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'driverCity',
+        'node-key': 'workCity',
         props: {
           lazy: true,
           lazyLoad: this.showWork
@@ -312,8 +364,9 @@ export default class extends Vue {
       ]
     },
     {
-      type: 1,
+      type: 'payNo',
       key: 'payNo',
+      slot: true,
       label: '缴费编号',
       col: 8,
       tagAttrs: {
@@ -332,19 +385,14 @@ export default class extends Vue {
       },
       label: '缴费申请日期',
       col: 8,
-      key: 'applayDate'
+      key: 'applyDate'
     },
     {
-      type: 1,
+      type: 'sno',
       key: 'sno',
       label: '交易流水号',
-      col: 8,
-      tagAttrs: {
-        placeholder: '请输入',
-        // maxlength: 20,
-        // 'show-word-limit': true,
-        clearable: true
-      }
+      slot: true,
+      col: 8
     },
     {
       type: 'driverId',
@@ -557,7 +605,7 @@ export default class extends Vue {
         roleTypes: [1],
         uri: '/v2/wt-driver-account/refund/queryGM'
       }
-      this.listQuery.driverCity[1] !== '' && (params.cityCode = this.listQuery.driverCity[1])
+      this.listQuery.workCity[1] !== '' && (params.cityCode = this.listQuery.workCity[1])
       this.listQuery.busiType !== '' && (params.productLine = this.listQuery.busiType)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
@@ -633,12 +681,131 @@ export default class extends Vue {
       return nodes
     }
   }
+  // 获取交易流水号接口
+  async loadQuerySnoweywords(params:IState) {
+    try {
+      let { data: res } = await getSnoList(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item,
+        value: item
+      }))
+      return result
+    } catch (err) {
+      console.log(1)
+      return []
+    }
+  }
+  // 获取交易流水号
+  private searchOfSno:string=''
+
+  private snoOption:IState[] = []
+  // 获取跟多交易流水号
+  private async loadQuerySnoweyword(val?:String) {
+    val = this.searchOfSno
+    this.queryPageOfSno.page = (this.queryPageOfSno.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfSno.page,
+      limit: this.queryPageOfSno.limit
+    }
+    val !== '' && (params.key = val)
+    try {
+      let result:IState[] = await this.loadQuerySnoweywords(params)
+      this.snoOption.push(...result)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      console.log('finally')
+    }
+  }
+  // 搜索交易流水号
+  private querySearchBySno(val:string) {
+    this.queryPageOfSno.page = 0
+    this.resetSno()
+    this.searchOfSno = val
+    this.loadQuerySnoweyword(val)
+  }
+  // 清除交易流水号
+  private handleClearQuerySno() {
+    this.searchOfSno = ''
+    this.resetSno()
+    this.loadQuerySnoweyword()
+  }
+  // 重置交易流水号
+  private resetSno() {
+    this.listQuery.sno = ''
+    this.searchOfSno = ''
+    let len:number = this.snoOption.length
+    if (len > 0) {
+      this.queryPageOfSno.page = 0
+      this.snoOption.splice(0, len)
+    }
+  }
+
+  // 获取缴费编号接口
+  async loadQueryPayNoweywords(params:IState) {
+    try {
+      let { data: res } = await getPayNoList(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item,
+        value: item
+      }))
+      return result
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+  // 获取缴费编号
+  private searchOfPayNo:string=''
+
+  private payNoOption:IState[] = []
+  // 获取更多缴费编号
+  private async loadQueryPayNoweyword(val?:String) {
+    val = this.searchOfPayNo
+    this.queryPageOfPayNo.page = (this.queryPageOfPayNo.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfPayNo.page,
+      limit: this.queryPageOfPayNo.limit
+    }
+    val !== '' && (params.key = val)
+    try {
+      let result:IState[] = await this.loadQueryPayNoweywords(params)
+      this.payNoOption.push(...result)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      console.log('finally')
+    }
+  }
+  // 搜索缴费编号
+  private querySearchByPayNo(val:string) {
+    this.queryPageOfPayNo.page = 0
+    this.resetPayNo()
+    this.searchOfPayNo = val
+    this.loadQueryPayNoweyword(val)
+  }
+  // 清除缴费编号
+  private handleClearQueryPayNo() {
+    this.searchOfPayNo = ''
+    this.resetPayNo()
+    this.loadQueryPayNoweyword()
+  }
+  // 重置缴费编号
+  private resetPayNo() {
+    this.listQuery.payNo = ''
+    this.searchOfPayNo = ''
+    let len:number = this.payNoOption.length
+    if (len > 0) {
+      this.queryPageOfPayNo.page = 0
+      this.payNoOption.splice(0, len)
+    }
+  }
 
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      if (this.listQuery.driverCity && this.listQuery.driverCity.length > 0) {
-        params.driverCity = this.listQuery.driverCity[1]
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
+        params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
@@ -712,7 +879,7 @@ export default class extends Vue {
 
       this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.payStatus && (params.payStatus = +this.listQuery.payStatus)
-      this.listQuery.driverCity && (params.driverCity = this.listQuery.driverCity)
+      this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
       this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
@@ -720,9 +887,9 @@ export default class extends Vue {
       this.listQuery.sno && (params.sno = this.listQuery.sno)
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.driverStatus && (params.driverStatus = this.listQuery.driverStatus)
-      if (this.listQuery.applayDate.length > 1) {
-        params.startDate = new Date(this.listQuery.applayDate[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.applayDate[1]).setHours(23, 59, 59)
+      if (this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
       }
       let { data: res } = await getPayList(params)
       this.listLoading = false
@@ -768,12 +935,12 @@ export default class extends Vue {
    */
   private handleResetClick() {
     this.listQuery = {
-      driverCity: '',
+      workCity: '',
       busiType: '',
       gmName: '',
       payModel: '',
       payNo: '',
-      applayDate: [],
+      applyDate: [],
       sno: '',
       driverId: '',
       driverStatus: '',
@@ -788,14 +955,14 @@ export default class extends Vue {
   private async handleExportClick() {
     try {
       let params:IState = {}
-      if (this.listQuery.applayDate && this.listQuery.applayDate.length > 1) {
-        params.startDate = new Date(this.listQuery.applayDate[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.applayDate[1]).setHours(23, 59, 59)
+      if (this.listQuery.applyDate && this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
       } else {
         return this.$message.error('需要按缴费申请日期进行导出')
       }
-      if (this.listQuery.driverCity && this.listQuery.driverCity.length > 1) {
-        params.driverCity = this.listQuery.driverCity[1]
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+        params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
       this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
@@ -834,6 +1001,8 @@ export default class extends Vue {
     this.getGmOptions()
     this.getDutyListByLevel()
     this.loadQueryDriverByKeyword()
+    this.querySearchByPayNo('')
+    this.querySearchBySno('')
   }
 }
 </script>
