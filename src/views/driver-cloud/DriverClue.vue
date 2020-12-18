@@ -59,6 +59,7 @@
           v-for="item in btns"
           :key="item.text"
           :value="item.num"
+          :max="9999"
           :hidden="item.num === 0"
         >
           <el-button
@@ -898,5 +899,8 @@ export default class extends Vue {
    }
    .SuggestForm >>> .el-checkbox__inner {
      border-radius: 50%;
+   }
+   .driverClueContainer >>> .el-badge__content {
+     z-index:1;
    }
 </style>
