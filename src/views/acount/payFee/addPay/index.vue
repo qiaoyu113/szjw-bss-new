@@ -905,7 +905,8 @@ export default class extends Vue {
       }
     })
     if (this.isEdit) {
-      params.payInfos = [...tableData]
+      params = [...tableData][0]
+      params.id = this.id
       let type = 'edit'
       this.sendData(params, type)
     } else {
