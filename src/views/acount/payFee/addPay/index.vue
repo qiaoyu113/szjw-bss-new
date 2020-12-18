@@ -290,16 +290,24 @@
                       上传
                     </el-button>
                   </el-upload>
-
-                  <!-- <el-button
-                    v-else
-                    size="small"
-                    type="text"
-                    @click="seePic(scope.row.payProof)"
-                  >
-                    查看
-                  </el-button> -->
                 </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-if="isEdit"
+              width="180"
+              label="查看交易凭证"
+              align="center"
+              header-align="center"
+            >
+              <template slot-scope="scope">
+                <el-button
+                  size="small"
+                  type="text"
+                  @click="seePic(scope.row.payProof)"
+                >
+                  查看
+                </el-button>
               </template>
             </el-table-column>
             <el-table-column
