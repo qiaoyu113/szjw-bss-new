@@ -272,8 +272,8 @@
                   :prop="'tableData.'+scope.$index+'.payProof'"
                   :rules="payForm.rules.payProof"
                 >
+                  <!--  v-if="!isEdit" -->
                   <el-upload
-                    v-if="!isEdit"
                     :ref="'upload'+scope.$index"
                     class="upload-demo"
                     action="https://httpbin.org/post"
@@ -291,14 +291,14 @@
                     </el-button>
                   </el-upload>
 
-                  <el-button
+                  <!-- <el-button
                     v-else
                     size="small"
                     type="text"
                     @click="seePic(scope.row.payProof)"
                   >
                     查看
-                  </el-button>
+                  </el-button> -->
                 </el-form-item>
               </template>
             </el-table-column>
@@ -586,7 +586,7 @@ export default class extends Vue {
         const tableData = [{
           sno: res.data.sno,
           payAmount: res.data.payAmount,
-          payType: res.data.payStatusValue,
+          payType: res.data.payType,
           payDate: new Date(res.data.payDate),
           payModel: String(res.data.payModelValue),
           existReceipt: res.data.existReceipt ? 1 : 0,
@@ -594,6 +594,9 @@ export default class extends Vue {
           payProof: res.data.payImageUrl
         }]
         this.payForm.tableData = [...tableData]
+        this.payForm.tableData.map((ele:any, index:number) => {
+          (this.$refs[`upload${index}`] as any).submit()
+        })
       } else {
         this.$message.warning(res.errorMsg)
       }
