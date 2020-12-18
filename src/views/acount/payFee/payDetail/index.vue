@@ -131,7 +131,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-if="routePage === 'payDetail' && formData.payStatus === 1"
+            v-if="routePage === 'payDetail' && formData.payStatusValue === 1"
             prop="payResult"
             label="缴费结果"
             align="center"
@@ -234,7 +234,8 @@ export default class extends Vue {
         canUpload: true,
         existReceipt: res.data.existReceipt,
         orderCode: res.data.orderCode,
-        payProof: res.data.payProof
+        payProof: res.data.payProof,
+        payResult: res.data.payResult
       }]
       this.tableData = tableData
     } catch (err) {
