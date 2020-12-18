@@ -272,16 +272,16 @@
                   :prop="'tableData.'+scope.$index+'.payProof'"
                   :rules="payForm.rules.payProof"
                 >
-                  <!--  v-if="!isEdit" -->
                   <el-upload
                     :ref="'upload'+scope.$index"
+                    action="/api/core/v1/upload/uploadOSS/img/true/-1"
+                    :headers="myHeaders"
                     class="upload-demo"
-                    action="https://httpbin.org/post"
-                    accept="image/*"
+                    accept="image/png,image/jpg,image/jpeg"
                     :on-success="handleAvatarSuccess"
+                    :on-preview="handlePreview"
                     :before-upload="beforeUpload"
                     :on-change="onExceed"
-                    :file-list="obj[`upload${scope.$index}`]"
                     @click.native="upload(scope,scope.$index)"
                   >
                     <el-button
@@ -367,6 +367,7 @@ import { getDriverNoAndNameList } from '@/api/driver'
 import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
+import { UserModule } from '@/store/modules/user'
 import { GetDictionaryList } from '@/api/common'
  @Component({
    name: 'addPay',
@@ -377,7 +378,7 @@ import { GetDictionaryList } from '@/api/common'
    }
  })
 export default class extends Vue {
-  private obj = {};
+  private myHeaders: any = { Authorization: UserModule.token };
   private loading:Boolean = true
   private isEdit:Boolean = false
   private id:string = ''
@@ -830,7 +831,17 @@ export default class extends Vue {
     this.columnIndex = value.$index
   }
   private handleAvatarSuccess(res:any, file:any) {
-    this.payForm.tableData[this.columnIndex].payProof = file.response.files.file
+    if (res.success) {
+      this.payForm.tableData[this.columnIndex].payProof = res.data.url
+    } else {
+      this.$message.error('上传图片错误：' + res)
+      this.payForm.tableData[this.columnIndex].payProof = ''
+    }
+    this.payForm.tableData[this.columnIndex].payProof = res.data.url
+  }
+
+  private handlePreview(file:any) {
+    console.log(file)
   }
 
   private beforeUpload(file:any) {
@@ -906,7 +917,8 @@ export default class extends Vue {
     })
     if (this.isEdit) {
       params = [...tableData][0]
-      params.id = this.id
+      params.id = Number(this.id)
+      params.payDate = new Date(params.payDate).getTime()
       let type = 'edit'
       this.sendData(params, type)
     } else {
