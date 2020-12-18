@@ -602,9 +602,6 @@ export default class extends Vue {
           payProof: res.data.payImageUrl
         }]
         this.payForm.tableData = [...tableData]
-        this.payForm.tableData.map((ele:any, index:number) => {
-          (this.$refs[`upload${index}`] as any).submit()
-        })
       } else {
         this.$message.warning(res.errorMsg)
       }
