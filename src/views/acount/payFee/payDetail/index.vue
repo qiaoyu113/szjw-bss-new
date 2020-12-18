@@ -1,5 +1,8 @@
 <template>
-  <div class="payDetail">
+  <div
+    v-loading="loadingStatus"
+    class="payDetail"
+  >
     <SectionContainer
       title="基础信息"
       :md="true"
@@ -88,7 +91,7 @@
             header-align="center"
           />
           <el-table-column
-            prop="payModel"
+            prop="payTypeName"
             label="缴费类型"
             align="center"
             header-align="center"
@@ -201,7 +204,7 @@ export default class extends Vue {
     this.id = (this.$route.query.id) as string
     this.getDetail(this.id)
   }
-
+  private loadingStatus:boolean = true
   private showViewer:boolean = false
   private imageUrl:string = ''
   private routePage:string = ''
@@ -224,11 +227,12 @@ export default class extends Vue {
         id: id
       }
       let { data: res } = await payDetail(params)
+      this.loadingStatus = false
       this.formData = res.data
       const tableData = [{
         sno: res.data.sno,
         payAmount: res.data.payAmount,
-        payType: res.data.payStatus,
+        payTypeName: res.data.payTypeName,
         payDate: res.data.payDate,
         payModel: res.data.payModel,
         canUpload: true,
@@ -239,6 +243,7 @@ export default class extends Vue {
       }]
       this.tableData = tableData
     } catch (err) {
+      this.loadingStatus = false
       console.log(err)
     }
   }
