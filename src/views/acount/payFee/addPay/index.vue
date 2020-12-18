@@ -261,43 +261,40 @@
 
             <el-table-column
               label="上传交易凭证"
-
+              width="200px"
               align="center"
               header-align="center"
             >
               <template slot-scope="scope">
                 <el-form-item
+                  :ref="'uploadItem'+scope.$index"
                   class="uploadItem"
                   :prop="'tableData.'+scope.$index+'.payProof'"
                   :rules="payForm.rules.payProof"
                 >
                   <el-upload
-                    v-if="!scope.row.payProof"
+                    v-if="!isEdit"
                     :ref="'upload'+scope.$index"
                     class="upload-demo"
                     action="https://httpbin.org/post"
                     :limit="1"
+                    accept="image/*"
                     :on-success="handleAvatarSuccess"
                     :on-progress="progressUpload"
                     :before-upload="beforeUpload"
                     :on-error="errorUpload"
                     :on-remove="errorUpload"
-                    @click.native="upload(scope)"
+                    :file-list="obj[`upload${scope.$index}`]"
+                    @click.native="upload(scope,scope.$index)"
                   >
+                    <!-- v-if="scope.row.canUpload" -->
                     <el-button
-                      v-if="scope.row.canUpload"
                       size="small"
-                      type="text"
                     >
                       上传
                     </el-button>
-                    <!-- <div
-                      slot="tip"
-                      class="el-upload__tip"
-                    >
-                      只能上传jpg/png文件，且不超过500kb
-                    </div> -->
                   </el-upload>
+
                   <el-button
                     v-else
                     size="small"
@@ -323,13 +320,15 @@
                   icon="el-icon-plus"
                   @click="handleAdd(scope.$index, scope.row)"
                 /> -->
-                <el-button
-                  size="mini"
-                  type="danger"
-                  @click="handleDelete(scope.$index, scope.row)"
-                >
-                  删除
-                </el-button>
+                <div style="line-height:114px">
+                  <el-button
+                    size="mini"
+                    type="danger"
+                    @click="handleDelete(scope.$index, scope.row)"
+                  >
+                    删除
+                  </el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -374,6 +373,7 @@ import { GetDictionaryList } from '@/api/common'
    }
  })
 export default class extends Vue {
+  private obj = {};
   private loading:Boolean = true
   private isEdit:Boolean = false
   private id:string = ''
@@ -515,16 +515,16 @@ export default class extends Vue {
   get canPay() {
     if (this.formData.driverCode) {
       if (!this.isEdit) {
-        if (this.formData.busiType !== 0 && this.formData.canExtract <= 0) {
-          return true
-        } else {
+        if (this.formData.busiType === 0 && this.formData.canExtract >= 0) {
           return false
+        } else {
+          return true
         }
       } else {
-        if (this.formData.busiTypeValue !== 0 && this.formData.canExtract <= 0) {
-          return true
-        } else {
+        if (this.formData.busiTypeValue === 0 && this.formData.canExtract >= 0) {
           return false
+        } else {
+          return true
         }
       }
     } else {
@@ -617,7 +617,7 @@ export default class extends Vue {
   private setOrderId() {
     if (this.orderOptions.length === 1) {
       this.payForm.tableData.forEach((ele:any) => {
-        ele.orderId = this.orderOptions[0].value
+        ele.orderCode = this.orderOptions[0].value
       })
     }
   }
@@ -826,11 +826,18 @@ export default class extends Vue {
     await ((this.$refs.payForm) as any).clearValidate()
     this.payForm.tableData.splice(index, 1)
   }
-  private upload(value:any) {
+  private upload(value:any, num:number) {
     this.columnIndex = value.$index
   }
   private handleAvatarSuccess(res:any, file:any) {
     this.payForm.tableData[this.columnIndex].payProof = URL.createObjectURL(file.raw)
+    // console.log(`uploadItem${this.columnIndex}`, `upload${this.columnIndex}`, this.$refs[`upload${this.columnIndex}`])
+    setTimeout(() => {
+      // console.log('uploadItem', this.$refs[`uploadItem${this.columnIndex}`][1].$children);
+      // (this.$refs[`uploadItem${this.columnIndex}`] as any).$children[1].clearFiles()
+
+      // (this.$refs[`upload${this.columnIndex}`] as any).clearFiles()
+    }, 1000)
   }
   private progressUpload(file:any) {
     this.payForm.tableData[this.columnIndex].canUpload = false
@@ -838,12 +845,12 @@ export default class extends Vue {
 
   private beforeUpload(file:any) {
     const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')
-    const isLt2M = file.size / 1024 / 1024 < 5
+    const isLt2M = file.size / 1024 / 1024 < 4
     if (!isJPG) {
       this.$message.error('上传头像图片支持JPEG/PNG/JPG!')
     }
     if (!isLt2M) {
-      this.$message.error('上传头像图片大小不能超过 5MB!')
+      this.$message.error('上传头像图片大小不能超过 4MB!')
     }
     return isJPG && isLt2M
   }
@@ -999,9 +1006,9 @@ export default class extends Vue {
 .hide >>> .el-upload--picture-card {
   display: none;
 }
-.uploadItem >>> .el-upload{
+/* .uploadItem >>> .el-upload{
   display: block;
-}
+} */
 .baseInfo >>> .el-form-item__content div{
   width: 100%;
 }
