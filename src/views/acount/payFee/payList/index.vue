@@ -57,6 +57,27 @@
           />
         </el-select>
       </template>
+      <template slot="payNo">
+        <el-select
+          v-model.trim="listQuery.payNo"
+          v-loadmore="loadQueryPayNoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchByPayNo"
+          @clear="handleClearQueryPayNo"
+        >
+          <el-option
+            v-for="item in payNoOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
       <div
         slot="btn1"
         :class="isPC ? 'btnPc' : 'mobile'"
@@ -149,17 +170,17 @@
           <div>
             <span
               class="doItem"
-              @click="goRoute('payDetail',2)"
+              @click="goRoute('payDetail',scope.row.id)"
             >详情</span>
             <span
-              v-if="+scope.row.payStatus === 0 ? false:true"
+              v-if="scope.row.payStatusValue === 0 "
               class="doItem"
-              @click="goRoute('payAudit',scope.row.payNo)"
+              @click="goRoute('payAudit',scope.row.id)"
             >审核</span>
             <span
-              v-if="+scope.row.status === 2 ? false :true"
+              v-if="scope.row.payStatusValue === 2"
               class="doItem"
-              @click="goRoute('payEdit',scope.row.payNo)"
+              @click="goRoute('payEdit',scope.row.id)"
             >编辑</span>
           </div>
         </template>
@@ -174,7 +195,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
 import { getLabel, phoneRegExp, IdRegExp } from '@/utils/index.ts'
-import { getPayList, payExport } from '@/api/driver-account'
+import { getPayList, payExport, getSnoList, getPayNoList } from '@/api/driver-account'
 import { delayTime } from '@/settings.ts'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
@@ -335,8 +356,9 @@ export default class extends Vue {
       ]
     },
     {
-      type: 1,
+      type: 'payNo',
       key: 'payNo',
+      slot: true,
       label: '缴费编号',
       col: 8,
       tagAttrs: {
@@ -651,6 +673,20 @@ export default class extends Vue {
       return nodes
     }
   }
+  // 获取交易流水号接口
+  async loadQuerySnoweywords(params:IState) {
+    try {
+      let { data: res } = await getSnoList(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item.sno,
+        value: item.sno
+      }))
+      return result
+    } catch (err) {
+      console.log(1)
+      return []
+    }
+  }
   // 获取交易流水号
   private searchOfSno:string=''
   private queryPageOfSno = {
@@ -658,13 +694,111 @@ export default class extends Vue {
     limit: 30
   }
   private snoOption = []
-  private loadQuerySnoweyword() {}
-  private querySearchBySno(val:string) {
-    console.log(val)
-    // if ()
+  // 获取跟多交易流水号
+  private async loadQuerySnoweyword(val?:String) {
     val = this.searchOfSno
+    this.queryPageOfSno.page = (this.queryPageOfSno.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfSno.page,
+      limit: this.queryPageOfSno.limit
+    }
+    val !== '' && (params.key = val)
+    try {
+      let result:IState[] = await this.loadQuerySnoweywords(params)
+      this.snoOption.push()
+    } catch (err) {
+      console.log(11)
+    } finally {
+      console.log('finally')
+    }
   }
-  private handleClearQuerySno() {}
+  // 搜索交易流水号
+  private querySearchBySno(val:string) {
+    this.queryPageOfSno.page = 1
+    this.resetSno()
+    this.searchOfSno = val
+    this.loadQuerySnoweyword(val)
+  }
+  // 清除交易流水号
+  private handleClearQuerySno() {
+    this.searchOfSno = ''
+    this.resetSno()
+    this.loadQuerySnoweyword()
+  }
+  // 重置交易流水号
+  private resetSno() {
+    this.listQuery.sno = ''
+    this.searchOfSno = ''
+    let len:number = this.snoOption.length
+    if (len > 0) {
+      this.queryPageOfSno.page = 0
+      this.snoOption.splice(0, len)
+    }
+  }
+
+  // 获取缴费编号接口
+  async loadQueryPayNoweywords(params:IState) {
+    try {
+      let { data: res } = await getPayNoList(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item.payNo,
+        value: item.payNo
+      }))
+      return result
+    } catch (err) {
+      console.log(1)
+      return []
+    }
+  }
+  // 获取缴费编号
+  private searchOfPayNo:string=''
+  private queryPageOfPayNo = {
+    page: 1,
+    limit: 30
+  }
+  private payNoOption = []
+  // 获取更多缴费编号
+  private async loadQueryPayNoweyword(val?:String) {
+    val = this.searchOfPayNo
+    this.queryPageOfPayNo.page = (this.queryPageOfPayNo.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfPayNo.page,
+      limit: this.queryPageOfPayNo.limit
+    }
+    val !== '' && (params.key = val)
+    try {
+      let result:IState[] = await this.loadQueryPayNoweywords(params)
+      this.payNoOption.push()
+    } catch (err) {
+      console.log(11)
+    } finally {
+      console.log('finally')
+    }
+  }
+  // 搜索缴费编号
+  private querySearchByPayNo(val:string) {
+    this.queryPageOfPayNo.page = 1
+    this.resetPayNo()
+    this.searchOfPayNo = val
+    this.loadQueryPayNoweyword(val)
+  }
+  // 清除缴费编号
+  private handleClearQueryPayNo() {
+    this.searchOfPayNo = ''
+    this.resetPayNo()
+    this.loadQueryPayNoweyword()
+  }
+  // 重置缴费编号
+  private resetPayNo() {
+    this.listQuery.payNo = ''
+    this.searchOfPayNo = ''
+    let len:number = this.payNoOption.length
+    if (len > 0) {
+      this.queryPageOfPayNo.page = 0
+      this.payNoOption.splice(0, len)
+    }
+  }
+
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {

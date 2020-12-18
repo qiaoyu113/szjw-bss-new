@@ -104,7 +104,11 @@
             label="是否开收据"
             align="center"
             header-align="center"
-          />
+          >
+            <template slot-scope="row">
+              {{ row.existReceipt?'是':'否' }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="payDate"
             label="打款时间"
@@ -127,6 +131,7 @@
             </template>
           </el-table-column>
           <el-table-column
+            v-if="routePage === 'payDetail'"
             prop="payResult"
             label="缴费结果"
             align="center"

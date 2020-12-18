@@ -207,6 +207,20 @@ export const payExport = (params: any) =>
     method: 'get',
     params
   })
+  // 缴费管理 交易流水号
+export const getSnoList = (params: any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/tradeNoList`,
+    method: 'get',
+    params
+  })
+  // 缴费编号
+export const getPayNoList = (params: any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payNoList`,
+    method: 'get',
+    params
+  })
   // 获取计费管理列表
 export const GetChargingList = (params:any) =>
   request({
