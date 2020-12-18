@@ -277,17 +277,13 @@
                     :ref="'upload'+scope.$index"
                     class="upload-demo"
                     action="https://httpbin.org/post"
-                    :limit="1"
                     accept="image/*"
                     :on-success="handleAvatarSuccess"
-                    :on-progress="progressUpload"
                     :before-upload="beforeUpload"
-                    :on-error="errorUpload"
-                    :on-remove="errorUpload"
+                    :on-change="onExceed"
                     :file-list="obj[`upload${scope.$index}`]"
                     @click.native="upload(scope,scope.$index)"
                   >
-                    <!-- v-if="scope.row.canUpload" -->
                     <el-button
                       size="small"
                     >
@@ -477,7 +473,6 @@ export default class extends Vue {
       payType: '',
       payDate: '',
       payModel: '',
-      canUpload: true,
       existReceipt: '',
       orderCode: '',
       payProof: ''
@@ -505,7 +500,7 @@ export default class extends Vue {
     let tableArray:any[] = []
     this.payForm.tableData.map((item:any) => {
       let itemArray = Object.entries(item).filter((ele:any) => {
-        return ele[1] !== '' && ele[0] !== 'canUpload'
+        return ele[1] !== ''
       })
       tableArray.push(...itemArray)
     })
@@ -568,7 +563,6 @@ export default class extends Vue {
           payType: res.data.payStatusValue,
           payDate: new Date(res.data.payDate),
           payModel: String(res.data.payModelValue),
-          canUpload: true,
           existReceipt: res.data.existReceipt ? 1 : 0,
           orderCode: res.data.orderCode,
           payProof: res.data.payImageUrl
@@ -632,7 +626,6 @@ export default class extends Vue {
           payType: '',
           payDate: '',
           payModel: '',
-          canUpload: true,
           existReceipt: '',
           orderCode: '',
           payProof: ''
@@ -796,12 +789,12 @@ export default class extends Vue {
       payType: '',
       payDate: '',
       payModel: '',
-      canUpload: true,
       existReceipt: '',
       orderCode: '',
       payProof: ''
     }
     this.payForm.tableData.push(column)
+    this.setOrderId()
   }
 
   // private handleAdd(index:number, row:any) {
@@ -811,7 +804,6 @@ export default class extends Vue {
   //     payType: '',
   //     payProof: '',
   //     payDate: '',
-  //     canUpload: true
   //   }
   //   this.payForm.tableData.splice(index + 1, 0, column)
   // }
@@ -830,17 +822,7 @@ export default class extends Vue {
     this.columnIndex = value.$index
   }
   private handleAvatarSuccess(res:any, file:any) {
-    this.payForm.tableData[this.columnIndex].payProof = URL.createObjectURL(file.raw)
-    // console.log(`uploadItem${this.columnIndex}`, `upload${this.columnIndex}`, this.$refs[`upload${this.columnIndex}`])
-    setTimeout(() => {
-      // console.log('uploadItem', this.$refs[`uploadItem${this.columnIndex}`][1].$children);
-      // (this.$refs[`uploadItem${this.columnIndex}`] as any).$children[1].clearFiles()
-
-      // (this.$refs[`upload${this.columnIndex}`] as any).clearFiles()
-    }, 1000)
-  }
-  private progressUpload(file:any) {
-    this.payForm.tableData[this.columnIndex].canUpload = false
+    this.payForm.tableData[this.columnIndex].payProof = file.response.files.file
   }
 
   private beforeUpload(file:any) {
@@ -854,15 +836,17 @@ export default class extends Vue {
     }
     return isJPG && isLt2M
   }
-
-  private errorUpload(file:any) {
-    this.payForm.tableData[this.columnIndex].canUpload = true
+  private onExceed(file:any, fileList:any) {
+    if (fileList.length > 1) {
+      fileList.splice(0, 1)
+    }
   }
 
   private seePic(url:string) {
     this.showViewer = true
     this.imageUrl = url
   }
+
   private closePic() {
     this.imageUrl = ''
     this.showViewer = false
@@ -908,7 +892,6 @@ export default class extends Vue {
     let params:any = {}
     let tableData = this.payForm.tableData
     tableData.map((ele:any) => {
-      delete ele.canUpload
       if (ele.payType === 0) {
         ele.orderCode = ''
       }
