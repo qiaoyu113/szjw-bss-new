@@ -369,6 +369,7 @@ export default class extends Vue {
   }
   // 查询
   private handleFilterClick() {
+    (this.$refs.MarketClueTable as any).toggleRowSelection()
     this.page.page = 1
     this.getLists()
   }

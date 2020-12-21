@@ -85,7 +85,7 @@
         :is-p30="false"
         :operation-list="[]"
         :func="disabledFunc"
-        row-key="id"
+        row-key="marketClueId"
         :table-data="tableData"
         :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
         :columns="columns"
@@ -617,6 +617,7 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
+    (this.$refs.multipleTable as any).toggleRowSelection()
     this.page.page = 1
     this.getLists()
   }
