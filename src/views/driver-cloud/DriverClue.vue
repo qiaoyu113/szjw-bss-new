@@ -237,6 +237,7 @@ interface IState {
   [key: string]: any;
 }
 @Component({
+  name: 'DriverClue',
   components: {
     SelfForm,
     SelfTable,
@@ -881,12 +882,17 @@ export default class extends Vue {
       console.log(err)
     }
   }
-
-  mounted() {
+  init() {
     this.getLists()
     this.getDutyListByLevel()
     this.getBaseInfo()
     this.getGmOptions()
+  }
+  activated() {
+    this.init()
+  }
+  mounted() {
+    this.init()
   }
 }
 </script>

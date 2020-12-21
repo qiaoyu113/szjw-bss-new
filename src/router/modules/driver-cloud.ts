@@ -39,7 +39,7 @@ const driverCloud: RouteConfig = {
       meta: {
         apiUrl: '/v2/clueH5/list',
         title: 'DriverClueNew',
-        noCache: true
+        noCache: false
       }
     },
     {
