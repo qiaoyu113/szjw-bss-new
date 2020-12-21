@@ -20,6 +20,21 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+          type="primary"
+          @click="handleFilterClick"
+        >
+          查询
+        </el-button>
+        <el-button
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+          @click="handleResetClick"
+        >
+          重置
+        </el-button>
+        <el-button
           v-permission="['/v2/clueH5/updateFollowerByMarketClueId1']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
@@ -37,21 +52,6 @@
           @click="handleExportClick"
         >
           导出
-        </el-button>
-        <el-button
-          size="small"
-          :class="isPC ? '' : 'btnMobile'"
-          type="primary"
-          @click="handleFilterClick"
-        >
-          查询
-        </el-button>
-        <el-button
-          size="small"
-          :class="isPC ? '' : 'btnMobile'"
-          @click="handleResetClick"
-        >
-          重置
         </el-button>
       </div>
       <template slot="status">
@@ -139,22 +139,33 @@
             v-if="scope.row.interviewDate"
             class="text"
           >
-            {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+            {{ scope.row.interviewDate }}
           </p>
         </template>
         <template v-slot:allocatedDate="scope">
-          <p
-            v-if="scope.row.allocatedDate"
-            class="text"
-          >
-            {{ scope.row.allocatedDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
-          </p>
-          <p
-            v-if="scope.row.followerDate"
-            class="text"
-          >
-            {{ scope.row.followerDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
-          </p>
+          <template v-if="scope.row.allocatedDate || scope.row.followerDate">
+            <p
+              v-if="scope.row.allocatedDate"
+              class="text"
+            >
+              {{ scope.row.allocatedDate }}
+            </p>
+            <template v-else>
+              暂无数据
+            </template>
+            <p
+              v-if="scope.row.followerDate"
+              class="text"
+            >
+              {{ scope.row.followerDate }}
+            </p>
+            <template v-else>
+              暂无数据
+            </template>
+          </template>
+          <template v-else>
+            暂无数据
+          </template>
         </template>
         <template v-slot:op="scope">
           <el-button
@@ -180,6 +191,7 @@
     <SelfDialog
       class="driverClueContainerDialog"
       :visible.sync="showDialog"
+      :title="title"
       :confirm="confirm"
       width="500px"
       :destroy-on-close="false"
@@ -227,6 +239,7 @@ interface IState {
 export default class extends Vue {
   private listLoading:boolean = false;
   private showDialog:boolean = false; // 弹框
+  private title:string = '';
   private rows:IState[] = []; // 弹框选中的数据
   private dutyListOptions:IState[] = [];// 业务线
   private multipleSelection:IState[] = [];// 多选选中
@@ -367,26 +380,6 @@ export default class extends Vue {
       options: this.contactsOption
     },
     {
-      type: 3,
-      col: 8,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true
-      },
-      label: '分配时间',
-      key: 'time'
-    },
-    {
-      type: 3,
-      col: 8,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true
-      },
-      label: '创建时间',
-      key: 'createTime'
-    },
-    {
       type: 5,
       label: '只看自己',
       key: 'onlyMe',
@@ -396,6 +389,26 @@ export default class extends Vue {
           value: 1
         }
       ]
+    },
+    {
+      type: 3,
+      col: 10,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      },
+      label: '分配时间',
+      key: 'time'
+    },
+    {
+      type: 3,
+      col: 10,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      },
+      label: '创建时间',
+      key: 'createTime'
     },
     {
       type: 'status',
@@ -541,9 +554,20 @@ export default class extends Vue {
   private dialogListQuery:IState = {
     follow: []
   };
+
+  private validateFollow(rule:any, value:any, callback:Function) {
+    if (value === '') {
+      callback(new Error('请选择跟进人!'))
+    } else if (value.length === 2) {
+      callback(new Error('该组织下无跟进人!'))
+    } else {
+      callback()
+    }
+  }
   private rules:IState = {
     follow: [
-      { required: true, message: '请选择跟进人', trigger: 'blur' }
+      { required: true, message: '请选择跟进人', trigger: 'blur' },
+      { validator: this.validateFollow, trigger: 'change' }
     ]
   };
   // 判断是否是PC
@@ -615,6 +639,7 @@ export default class extends Vue {
   // 分配
   handleDistributionClick(row:IState) {
     this.rows.push(row)
+    this.title = '分配'
     this.showDialog = true
   }
   // 多选选中
@@ -623,6 +648,7 @@ export default class extends Vue {
   }
   // 批量分配
   handleMulDistributionClick() {
+    this.title = '批量分配'
     this.rows.push(...this.multipleSelection)
     this.showDialog = true
   }
@@ -718,11 +744,7 @@ export default class extends Vue {
         this.page.total = res.page.total
         this.btns.forEach(item => {
           let key = item.name
-          if (key === '') {
-            key = 'all'
-          } else {
-            key = +key
-          }
+          key = +key
           item.num = res.title[key]
         })
       } else {
@@ -757,6 +779,7 @@ export default class extends Vue {
       let { data: res } = await allocationClue1(params)
       if (res.success) {
         if (res.data.flag) {
+          (this.$refs.multipleTable as any).toggleRowSelection()
           this.$message.success(res.data.msg)
         } else {
           this.$message.warning(res.data.msg)
@@ -781,8 +804,7 @@ export default class extends Vue {
       follow: []
     }
     let len = this.rows.length
-    this.rows.splice(0, len);
-    (this.$refs.multipleTable as any).toggleRowSelection()
+    this.rows.splice(0, len)
   }
   // 获取车型
   async getBaseInfo() {
