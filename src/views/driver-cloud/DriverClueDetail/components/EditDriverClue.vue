@@ -26,8 +26,7 @@
             @input="handleValidateExperience"
           >
             <template
-              slot="
-            append"
+              slot="append"
             >
               年
             </template>
