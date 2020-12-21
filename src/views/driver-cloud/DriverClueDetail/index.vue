@@ -502,11 +502,13 @@ export default class extends Vue {
       if (res.success) {
         this.listQuery = { ...this.listQuery, ...res.data }
         if (this.listQuery.status === 40) {
-          this.formItem.push({
-            type: 'interviewDate',
-            label: '已约面试',
-            slot: true
-          })
+          if (this.formItem.findIndex((item:IState) => item.type === 'interviewDate') === -1) {
+            this.formItem.push({
+              type: 'interviewDate',
+              label: '已约面试',
+              slot: true
+            })
+          }
         }
       } else {
         this.$message.error(res.errorMsg)
