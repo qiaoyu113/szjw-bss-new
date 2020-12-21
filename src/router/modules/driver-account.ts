@@ -20,7 +20,7 @@ const driverAccountRouter: RouteConfig = {
       meta: {
         title: 'payFee',
         icon: '',
-        apiUrl: 'root',
+        apiUrl: '/wt-driver-account/pay',
         noCache: true
       }
     },
@@ -29,7 +29,7 @@ const driverAccountRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/payDetail/index.vue'),
       name: 'payDetail',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/wt-driver-account/pay/detail',
         title: 'payDetail',
         hidden: true,
         noCache: true
@@ -40,7 +40,7 @@ const driverAccountRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/payDetail/index.vue'),
       name: 'payAudit',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/wt-driver-account/pay/check',
         title: 'payAudit',
         hidden: true,
         noCache: true
@@ -51,7 +51,7 @@ const driverAccountRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/addPay/index.vue'),
       name: 'payEdit',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/wt-driver-account/pay/update',
         title: 'payEdit',
         hidden: true,
         noCache: true
@@ -62,7 +62,7 @@ const driverAccountRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "billing" */ '@/views/acount/payFee/addPay/index.vue'),
       name: 'addPay',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/wt-driver-account/pay/create',
         title: 'addPay',
         hidden: true,
         noCache: true
