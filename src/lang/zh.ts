@@ -184,7 +184,7 @@ export default {
     configManager: '配置管理',
     driverClond: '司机云',
     selfDriverTag: '自承运司机标签',
-    marketClue: '待市场部分配线索'
+    marketClue: '待市场分配线索'
   },
   navbar: {
     setPassword: '修改密码',
