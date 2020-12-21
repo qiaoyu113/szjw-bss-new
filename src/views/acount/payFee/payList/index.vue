@@ -51,7 +51,7 @@
         >
           <el-option
             v-for="item in snoOption"
-            :key="item.value"
+            :key="item.key"
             :label="item.label"
             :value="item.value"
           />
@@ -685,9 +685,10 @@ export default class extends Vue {
   async loadQuerySnoweywords(params:IState) {
     try {
       let { data: res } = await getSnoList(params)
-      let result:any[] = res.data.map((item:any) => ({
+      let result:any[] = res.data.map((item:any, index:number) => ({
         label: item,
-        value: item
+        value: item,
+        key: index
       }))
       return result
     } catch (err) {

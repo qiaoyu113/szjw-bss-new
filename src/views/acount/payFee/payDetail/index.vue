@@ -253,7 +253,7 @@ export default class extends Vue {
     if (type === 1) {
       text = '确认要审核通过此退款信息吗?'
     } else {
-      text = '确认要审核不通过并驳回此退款信息吗?'
+      text = '确认要审核不通过并驳回此缴费信息吗?'
     }
     this.$confirm(text, '提示', {
       confirmButtonText: '确定',
