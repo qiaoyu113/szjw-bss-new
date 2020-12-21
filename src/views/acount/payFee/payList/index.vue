@@ -83,6 +83,7 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
+          v-permission="['/wt-driver-account/pay/create']"
           size="small"
           @click="goRoute('addPay')"
         >
@@ -105,6 +106,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/wt-driver-account/pay/export']"
           :class="isPC ? '' : 'btnMobile'"
           name="driverlist_export_btn"
           size="small"
@@ -169,16 +171,19 @@
         <template v-slot:op="scope">
           <div>
             <span
+              v-permission="['/wt-driver-account/pay/detail']"
               class="doItem"
               @click="goRoute('payDetail',scope.row.id)"
             >详情</span>
             <span
               v-if="scope.row.payStatusValue === 0 "
+              v-permission="['/wt-driver-account/pay/check']"
               class="doItem"
               @click="goRoute('payAudit',scope.row.id)"
             >审核</span>
             <span
               v-if="scope.row.payStatusValue === 2"
+              v-permission="['/wt-driver-account/pay/update']"
               class="doItem"
               @click="goRoute('payEdit',scope.row.id)"
             >编辑</span>
