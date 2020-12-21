@@ -708,7 +708,8 @@ export default class extends Vue {
       this.loading = false
       this.keyWord = keyWord
       let params = {
-        key: ''
+        key: '',
+        status: 1
       }
       keyWord !== '' && (params.key = keyWord)
       params = { ...params, ...this.driverPage }
@@ -716,7 +717,7 @@ export default class extends Vue {
         return
       }
       let { data: res } = await getDriverNoAndNameList(params, {
-        url: ''
+        url: '/wt-driver-account/pay/create'
       })
       if (res.success) {
         if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
