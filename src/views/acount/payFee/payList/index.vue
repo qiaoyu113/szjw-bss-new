@@ -11,21 +11,91 @@
       :list-query="listQuery"
       :form-item="formItem"
       :rules="searchRules"
-      label-width="80px"
+      label-width="100px"
       class="p15"
+      size="small"
     >
+      <template slot="driverId">
+        <el-select
+          v-model.trim="listQuery.driverId"
+          v-loadmore="loadQueryDriverByKeyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchByKeyword"
+          @clear="handleClearQueryDriver"
+        >
+          <el-option
+            v-for="item in driverOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+      <template slot="sno">
+        <el-select
+          v-model.trim="listQuery.sno"
+          v-loadmore="loadQuerySnoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchBySno"
+          @clear="handleClearQuerySno"
+        >
+          <el-option
+            v-for="item in snoOption"
+            :key="item.key"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+      <template slot="payNo">
+        <el-select
+          v-model.trim="listQuery.payNo"
+          v-loadmore="loadQueryPayNoweyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="querySearchByPayNo"
+          @clear="handleClearQueryPayNo"
+        >
+          <el-option
+            v-for="item in payNoOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
       <div
         slot="btn1"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          type="primary"
+          v-permission="['/wt-driver-account/pay/create']"
+          size="small"
+          @click="goRoute('addPay')"
+        >
+          新建缴费
+        </el-button>
+        <el-button
           :class="isPC ? '' : 'btnMobile'"
           name="driverlist_query_btn"
           size="small"
           @click="handleQueryClick"
         >
-          筛选
+          查询
         </el-button>
         <el-button
           :class="isPC ? '' : 'btnMobile'"
@@ -35,23 +105,32 @@
         >
           重置
         </el-button>
+        <el-button
+          v-permission="['/wt-driver-account/pay/export']"
+          :class="isPC ? '' : 'btnMobile'"
+          name="driverlist_export_btn"
+          size="small"
+          @click="handleExportClick"
+        >
+          导出
+        </el-button>
       </div>
 
       <div
-        slot="statusBox"
+        slot="payStatus"
         class="tableTitle"
       >
         <div class="statusBox">
           <div class="btnBox">
             <el-badge
-              v-for="(item,index) in statusOptions"
+              v-for="(item,index) in status"
               :key="index"
               :value="item.num"
               class="item"
             >
               <el-button
                 size="small"
-                :plain="item.value !== listQuery.status"
+                :plain="item.value !== listQuery.payStatus"
                 :type="index === active ? 'primary' : 'default' "
                 @click="changeStatus(item,index)"
               >
@@ -60,13 +139,6 @@
             </el-badge>
           </div>
         </div>
-        <el-button
-          size="small"
-          type="primary"
-          @click="goRoute('addPay')"
-        >
-          新建缴费
-        </el-button>
       </div>
     </self-form>
     <!-- 表头 -->
@@ -82,7 +154,6 @@
       <self-table
         ref="driverListTable"
         v-loading="listLoading"
-        :indexes="true"
         height="calc(100vh - 550px)"
         :index="false"
         :operation-list="[]"
@@ -91,8 +162,8 @@
         :page="page"
         @onPageSize="handlePageSize"
       >
-        <template v-slot:createDate="scope">
-          {{ scope.row.createDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+        <template v-slot:applyDate="scope">
+          {{ scope.row.applyDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
         </template>
         <template v-slot:isReceipt="scope">
           {{ scope.row.isReceipt ? '是' : '否' }}
@@ -100,13 +171,22 @@
         <template v-slot:op="scope">
           <div>
             <span
+              v-permission="['/wt-driver-account/pay/detail']"
               class="doItem"
-              @click="goRoute('payDetail',scope.row.payId)"
+              @click="goRoute('payDetail',scope.row.id)"
             >详情</span>
             <span
+              v-if="scope.row.payStatusValue === 0 "
+              v-permission="['/wt-driver-account/pay/check']"
               class="doItem"
-              @click="goRoute('payAudit',scope.row.payId)"
+              @click="goRoute('payAudit',scope.row.id)"
             >审核</span>
+            <span
+              v-if="scope.row.payStatusValue === 2"
+              v-permission="['/wt-driver-account/pay/update']"
+              class="doItem"
+              @click="goRoute('payEdit',scope.row.id)"
+            >编辑</span>
           </div>
         </template>
       </self-table>
@@ -120,10 +200,12 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
 import { getLabel, phoneRegExp, IdRegExp } from '@/utils/index.ts'
-import { getPayList } from '@/api/driver-account'
+import { getPayList, payExport, getSnoList, getPayNoList } from '@/api/driver-account'
 import { delayTime } from '@/settings.ts'
-import { HandlePages, phoneReg } from '@/utils/index'
-import { getSpecifiedUserListByCondition, GetOpenCityData } from '@/api/common'
+import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
+import { HandlePages, phoneReg, lock } from '@/utils/index'
+import { getSpecifiedUserListByCondition, GetOpenCityData, GetSpecifiedRoleList, getOfficeByTypeAndOfficeId, getOfficeByType, GetDutyListByLevel } from '@/api/common'
+import data from '@/views/pdf/content'
 interface IState {
   [key: string]: any;
 }
@@ -152,14 +234,29 @@ export default class extends Vue {
   private active: number = 0;
   private listLoading: boolean = false; // loading
   private tags: any[] = []; // 回显label
+  private dutyListOptions:IState[] = [];// 业务线列表
+  private driverOptions:IState[] = [];
+  private searchKeyword:string = '';
+  private row:IState = {}
   private type: string = ''; // 修改加盟经理or分配加盟经理
-  private statusOptions: any[] = [
+  private queryPage:PageObj = {
+    page: 0,
+    limit: 10
+  }
+  private queryPageOfSno = {
+    page: 0,
+    limit: 30
+  }
+  private queryPageOfPayNo = {
+    page: 0,
+    limit: 30
+  }
+  private status: any[] = [
     { label: '全部', value: '', num: '' },
     { label: '待审核', value: 0, num: '' },
     { label: '审核通过', value: 1, num: '' },
-    { label: '审核未通过', value: 2, num: '' }
+    { label: '审核不通过', value: 2, num: '' }
   ];
-  private workCityOptions: any[] = []; // 工作城市列表
   private gmOptions: any[] = []; // 加盟经理列表
   private pageTitle: any = {
     all: '',
@@ -169,159 +266,198 @@ export default class extends Vue {
   };
   // 表单对象
   private listQuery: IState = {
-    payId: '',
     workCity: '',
+    busiType: '',
+    gmName: '',
+    payModel: '',
+    payNo: '',
+    applyDate: [],
+    sno: '',
     driverId: '',
-    name: '',
-    phone: '',
-    gmId: '',
-    status: '',
-    time: []
+    driverStatus: '',
+    payStatus: ''
   };
   private searchRules: any = {
-    payId: [{ validator: this.checkID, trigger: 'blur' }],
-    driverId: [{ validator: this.checkID, trigger: 'blur' }],
-    phone: [{ validator: this.checkPhone, trigger: 'blur' }]
+    payNo: [{ validator: this.checkID, trigger: 'blur' }],
+    driverCode: [{ validator: this.checkID, trigger: 'blur' }]
   };
   // 表单数组
   private formItem: any[] = [
     {
-      type: 1,
-      key: 'payId',
-      label: '缴费编号',
-      col: 8,
-      tagAttrs: {
-        placeholder: '请输入司机编号',
-        maxlength: 20,
-        'show-word-limit': true,
-        clearable: true,
-        name: 'driverList_driverId_input'
-      }
-    },
-    {
-      type: 1,
-      key: 'driverId',
-      label: '司机编号',
-      col: 8,
-      tagAttrs: {
-        placeholder: '请输入司机编号',
-        maxlength: 20,
-        'show-word-limit': true,
-        clearable: true,
-        name: 'driverList_driverId_input'
-      }
-    },
-    {
-      type: 1,
-      key: 'name',
-      col: 8,
-      label: '司机姓名',
-      tagAttrs: {
-        placeholder: '请输入姓名',
-        maxlength: 10,
-        'show-word-limit': true,
-        clearable: true,
-        name: 'driverList_name_input'
-      }
-    },
-    {
-      type: 1,
-      col: 8,
-      key: 'phone',
-      label: '联系电话',
-      tagAttrs: {
-        placeholder: '请输入手机号',
-        maxlength: 11,
-        clearable: true,
-        // type: 'number',
-        name: 'driverList_phone_input'
-      }
-    },
-    {
-      type: 2,
+      type: 8,
       key: 'workCity',
+      col: 8,
       label: '所属城市',
-      col: 8,
       tagAttrs: {
-        placeholder: '请选择所属城市',
-        filterable: true,
+        placeholder: '请选择',
         clearable: true,
-        name: 'driverList_workCity_select'
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'workCity',
+        props: {
+          lazy: true,
+          lazyLoad: this.showWork
+        }
       },
-      options: this.workCityOptions
-    },
-    {
-      type: 2,
-      key: 'gmId',
-      col: 8,
-      label: '加盟经理',
-      tagAttrs: {
-        placeholder: '请选择加盟经理',
-        filterable: true,
-        clearable: true,
-        name: 'driverList_gmId_select'
-      },
-      options: this.gmOptions
-    },
-    {
-      type: 3,
-      key: 'time',
-      label: '创建日期',
-      col: 12,
-      // dateType: 'datetimerange',
-      tagAttrs: {
-        pickerOptions: {
-          shortcuts: [
-            {
-              text: '今天',
-              onClick(picker: any) {
-                const end = new Date()
-                const start = new Date()
-                picker.$emit('pick', [start, end])
-              }
-            },
-            {
-              text: '昨天',
-              onClick(picker: any) {
-                const end = new Date()
-                const start = new Date()
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 1)
-                picker.$emit('pick', [start, start])
-              }
-            },
-            {
-              text: '近7天',
-              onClick(picker: any) {
-                const end = new Date()
-                const start = new Date()
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-                picker.$emit('pick', [start, end])
-              }
-            },
-            {
-              text: '近30天',
-              onClick(picker: any) {
-                const end = new Date()
-                const start = new Date()
-                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
-                picker.$emit('pick', [start, end])
-              }
-            }
-          ]
+      listeners: {
+        'change': () => {
+          this.listQuery.gmName = ''
+          this.listQuery.busiType = ''
+          this.resetDriver()
+          this.handleClearQueryDriver()
+          this.getGmOptions()
         }
       }
     },
     {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true
+      },
+      label: '业务线',
+      key: 'busiType',
+      col: 8,
+      options: this.dutyListOptions,
+      listeners: {
+        'change': () => {
+          this.listQuery.gmName = ''
+          this.handleClearQueryDriver()
+          this.getGmOptions()
+        }
+      }
+    },
+    {
+      type: 2,
+      key: 'gmName',
+      col: 8,
+      label: '加盟经理',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      options: this.gmOptions,
+      listeners: {
+        'change': this.handleClearQueryDriver
+      }
+    },
+    {
+      type: 2,
+      key: 'payModel',
+      label: '缴费类型',
+      col: 8,
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '订单续费',
+          value: 1
+        },
+        {
+          label: '无订单充值',
+          value: 0
+        }
+      ]
+    },
+    {
+      type: 'payNo',
+      key: 'payNo',
       slot: true,
-      col: 12,
-      w: '0px',
-      type: 'btn1'
+      label: '缴费编号',
+      col: 8,
+      tagAttrs: {
+        placeholder: '请输入',
+        // maxlength: 20,
+        // 'show-word-limit': true,
+        clearable: true
+      }
+    },
+    {
+      type: 3,
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true,
+        filterable: true
+      },
+      label: '缴费申请日期',
+      col: 8,
+      key: 'applyDate'
+    },
+    {
+      type: 'sno',
+      key: 'sno',
+      label: '交易流水号',
+      slot: true,
+      col: 8
+    },
+    {
+      type: 'driverId',
+      slot: true,
+      col: 8,
+      w: '180',
+      label: '司机姓名/编号/手机号',
+      key: 'driverId',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      }
+    },
+    {
+      type: 2,
+      col: 8,
+      key: 'driverStatus',
+      label: '司机状态',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      },
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '已面试',
+          value: 1
+        },
+        {
+          label: '待成交',
+          value: 2
+        },
+        {
+          label: '已成交',
+          value: 3
+        },
+        {
+          label: '已上岗',
+          value: 4
+        },
+        {
+          label: '已终止服务',
+          value: 5
+        }
+      ]
     },
     {
       slot: true,
-      label: '审核状态',
-      col: 24,
-      type: 'statusBox'
+      label: '缴费状态',
+      col: 18,
+      type: 'payStatus'
+    },
+    {
+      slot: true,
+      col: 6,
+      w: '0px',
+      type: 'btn1'
     }
   ];
   // 表格
@@ -329,64 +465,85 @@ export default class extends Vue {
   // 列数组
   private columns: any[] = [
     {
-      key: 'payId',
+      key: 'payNo',
       label: '缴费编号'
     },
     {
-      key: 'driverId',
+      key: 'driverCode',
       label: '司机编号',
       width: '140px'
     },
     {
-      key: 'name',
+      key: 'driverName',
       label: '司机姓名'
     },
     {
-      key: 'phone',
-      label: '联系电话',
-      width: '120px'
-    },
-    {
-      key: 'workCityName',
+      key: 'driverCity',
       label: '所属城市'
     },
     {
-      key: 'orderId',
-      label: '订单编号',
+      key: 'gmName',
+      label: '所属加盟经理'
+    },
+    {
+      key: 'busiType',
+      label: '业务线'
+    },
+    {
+      key: 'driverStatus',
+      label: '司机状态'
+    },
+    {
+      key: 'balance',
+      label: '账户总金额（元）',
       width: '120px'
     },
     {
-      key: 'canExtractMoney',
+      key: 'freezing',
+      label: '冻结金额（元）',
+      width: '120px'
+    },
+    {
+      key: 'canExtract',
       label: '可提现金额（元）',
       width: '120px'
     },
     {
-      key: 'totalMoney',
-      label: '本笔交易金额总计',
+      key: 'payAmount',
+      label: '缴费金额',
       width: '120px'
     },
     {
-      key: 'isReceipt',
-      label: '是否开收据',
-      slot: true
+      key: 'payModel',
+      label: '支付方式'
     },
     {
-      key: 'gmName',
-      label: '加盟经理'
+      key: 'sno',
+      label: '交易流水号'
     },
     {
-      key: 'statusName',
-      label: '审核状态'
+      key: 'payDate',
+      label: '打款时间'
     },
     {
-      key: 'createName',
-      label: '创建人'
+      key: 'applyDate',
+      label: '申请时间'
     },
     {
-      key: 'createDate',
-      label: '创建时间',
-      slot: true,
-      width: '180px'
+      key: 'checkDate',
+      label: '审核时间'
+    },
+    {
+      key: 'applyBy',
+      label: '申请人'
+    },
+    {
+      key: 'operator',
+      label: '审批人'
+    },
+    {
+      key: 'payStatus',
+      label: '缴费状态'
     },
     {
       key: 'op',
@@ -406,19 +563,6 @@ export default class extends Vue {
     total: 0
   };
 
-  // 手机号验证
-  private checkPhone(rule: any, value: any, callback: any) {
-    if (value === '') {
-      callback()
-    }
-    const can = phoneRegExp.test(value)
-    if (can) {
-      callback()
-    } else {
-      callback(new Error('请输入正确的手机号'))
-    }
-  }
-
   // 字母数字校验
   private checkID(rule: any, value: any, callback: any) {
     const can = IdRegExp.test(value)
@@ -428,15 +572,47 @@ export default class extends Vue {
       callback(new Error('请输入正确的编号'))
     }
   }
+  // 获取业务线
+  private async getDutyListByLevel() {
+    try {
+      let params = {
+        dutyLevel: 1
+      }
+      let { data: res } = await GetDutyListByLevel(params)
+      if (res.success) {
+        let options = res.data.map((item:any) => ({
+          label: item.dutyName,
+          value: item.id
+        }))
+        if (options.length === 1) {
+          this.listQuery.busiType = options[0].value
+        } else {
+          this.dutyListOptions.unshift({
+            label: '全部',
+            value: ''
+          })
+        }
+        this.dutyListOptions.push(...options)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get duty list fail:${err}`)
+    }
+  }
   /**
    *获取加盟经理列表
    */
-  async getManagers() {
+  async getGmOptions() {
     try {
-      let params = {
-        roleType: 1
+      this.listQuery.gmName = ''
+      let params:any = {
+        roleTypes: [1],
+        uri: '/v2/wt-driver-account/refund/queryGM'
       }
-      let { data: res } = await getSpecifiedUserListByCondition(params)
+      this.listQuery.workCity[1] !== '' && (params.cityCode = this.listQuery.workCity[1])
+      this.listQuery.busiType !== '' && (params.productLine = this.listQuery.busiType)
+      let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
         let gms = res.data.map(function(item: any) {
           return {
@@ -444,34 +620,253 @@ export default class extends Vue {
             value: item.id
           }
         })
+        let lenGm:number = this.gmOptions.length
+        if (lenGm > 0) {
+          this.gmOptions.splice(0, lenGm)
+        }
         this.gmOptions.push(...gms)
+        if (this.gmOptions.length === 1) {
+          this.listQuery.gmName = this.gmOptions[0].value
+        }
       } else {
         this.$message.error(res.errorMsg)
       }
     } catch (err) {
-      console.log(`get manager fail:${err}`)
+      console.log(err)
     }
   }
 
-  /**
-   *获取开通城市
-   */
-  async getOpenCitys() {
+  // 获取大区和城市
+  private async showWork(node:any, resolve:any) {
+    let query: any = {
+      parentId: ''
+    }
+    if (node.level === 1) {
+      query.parentId = node.value
+    }
     try {
-      let { data: res } = await GetOpenCityData()
-      if (res.success) {
-        let workCity = res.data.map(function(item: any) {
-          return {
-            label: item.name,
-            value: item.code
-          }
-        })
-        this.workCityOptions.push(...workCity)
-      } else {
-        this.$message.error(res.errorMsg)
+      if (node.level === 0) {
+        let nodes = await this.areaAddress({ type: 2 })
+        resolve(nodes)
+      } else if (node.level === 1) {
+        let nodes = await this.cityDetail(query)
+        resolve(nodes)
       }
     } catch (err) {
-      console.log(`get `)
+      resolve([])
+    }
+  }
+  private async areaAddress(params: any) {
+    try {
+      let { data: res } = await getOfficeByType(params)
+      if (res.success) {
+        const nodes = res.data.map(function(item: any) {
+          return {
+            value: item.id,
+            label: item.name,
+            leaf: false
+          }
+        })
+        return nodes
+      }
+    } catch (err) {
+      console.log(`load city by code fail:${err}`)
+    }
+  }
+  private async cityDetail(params: any) {
+    let { data: city } = await getOfficeByTypeAndOfficeId(params)
+    if (city.success) {
+      const nodes = city.data.map(function(item: any) {
+        return {
+          value: item.areaCode,
+          label: item.name,
+          leaf: true
+        }
+      })
+      return nodes
+    }
+  }
+  // 获取交易流水号接口
+  async loadQuerySnoweywords(params:IState) {
+    try {
+      let { data: res } = await getSnoList(params)
+      let result:any[] = res.data.map((item:any, index:number) => ({
+        label: item,
+        value: item,
+        key: index
+      }))
+      return result
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+  // 获取交易流水号
+  private searchOfSno:string=''
+
+  private snoOption:IState[] = []
+  // 获取跟多交易流水号
+  private async loadQuerySnoweyword(val?:String) {
+    val = this.searchOfSno
+    this.queryPageOfSno.page = (this.queryPageOfSno.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfSno.page,
+      limit: this.queryPageOfSno.limit
+    }
+    val !== '' && (params.sno = val)
+    try {
+      let result:IState[] = await this.loadQuerySnoweywords(params)
+      this.snoOption.push(...result)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      // console.log('finally')
+    }
+  }
+  // 搜索交易流水号
+  private querySearchBySno(val:string) {
+    this.queryPageOfSno.page = 0
+    this.resetSno()
+    this.searchOfSno = val
+    this.loadQuerySnoweyword(val)
+  }
+  // 清除交易流水号
+  private handleClearQuerySno() {
+    this.searchOfSno = ''
+    this.resetSno()
+    this.loadQuerySnoweyword()
+  }
+  // 重置交易流水号
+  private resetSno() {
+    this.listQuery.sno = ''
+    this.searchOfSno = ''
+    let len:number = this.snoOption.length
+    if (len > 0) {
+      this.queryPageOfSno.page = 0
+      this.snoOption.splice(0, len)
+    }
+  }
+
+  // 获取缴费编号接口
+  async loadQueryPayNoweywords(params:IState) {
+    try {
+      let { data: res } = await getPayNoList(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item,
+        value: item
+      }))
+      return result
+    } catch (err) {
+      console.log(err)
+      return []
+    }
+  }
+  // 获取缴费编号
+  private searchOfPayNo:string=''
+
+  private payNoOption:IState[] = []
+  // 获取更多缴费编号
+  private async loadQueryPayNoweyword(val?:String) {
+    val = this.searchOfPayNo
+    this.queryPageOfPayNo.page = (this.queryPageOfPayNo.page as number) + 1
+    let params:IState = {
+      page: this.queryPageOfPayNo.page,
+      limit: this.queryPageOfPayNo.limit
+    }
+    val !== '' && (params.payNo = val)
+    try {
+      let result:IState[] = await this.loadQueryPayNoweywords(params)
+      this.payNoOption.push(...result)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      // console.log('finally')
+    }
+  }
+  // 搜索缴费编号
+  private querySearchByPayNo(val:string) {
+    this.queryPageOfPayNo.page = 0
+    this.resetPayNo()
+    this.searchOfPayNo = val
+    this.loadQueryPayNoweyword(val)
+  }
+  // 清除缴费编号
+  private handleClearQueryPayNo() {
+    this.searchOfPayNo = ''
+    this.resetPayNo()
+    this.loadQueryPayNoweyword()
+  }
+  // 重置缴费编号
+  private resetPayNo() {
+    this.listQuery.payNo = ''
+    this.searchOfPayNo = ''
+    let len:number = this.payNoOption.length
+    if (len > 0) {
+      this.queryPageOfPayNo.page = 0
+      this.payNoOption.splice(0, len)
+    }
+  }
+
+  // 获取司机列表接口
+  async loadDriverByKeyword(params:IState) {
+    try {
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
+        params.workCity = this.listQuery.workCity[1]
+      }
+      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+      this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
+      let { data: res } = await getDriverNoAndNameList(params, {
+        url: '/v2/wt-driver-account/refund/queryDriverList'
+      })
+      let result:any[] = res.data.map((item:any) => ({
+        label: `${item.name}/${item.phone}`,
+        value: item.driverId
+      }))
+      return result
+    } catch (err) {
+      console.log(`get driver list fail:${err}`)
+      return []
+    }
+  }
+  // 获取更多司机
+  async loadQueryDriverByKeyword(val?:string) {
+    val = this.searchKeyword
+    this.queryPage.page = (this.queryPage.page as number) + 1
+    let params:IState = {
+      page: this.queryPage.page,
+      limit: this.queryPage.limit
+    }
+    val !== '' && (params.key = val)
+
+    try {
+      let result:IState[] = await this.loadDriverByKeyword(params)
+      this.driverOptions.push(...result)
+    } finally {
+      // console.log('finally')
+    }
+  }
+  // 搜索司机
+  querySearchByKeyword(val:string) {
+    this.queryPage.page = 0
+    this.resetDriver()
+    this.searchKeyword = val
+    this.loadQueryDriverByKeyword(val)
+  }
+  // 清除司机
+  handleClearQueryDriver() {
+    this.searchKeyword = ''
+    this.resetDriver()
+    this.loadQueryDriverByKeyword()
+  }
+  // 重置司机
+  resetDriver() {
+    this.listQuery.driverId = ''
+    // this.listQuery.gmName = ''
+    this.searchKeyword = ''
+    let len:number = this.driverOptions.length
+    if (len > 0) {
+      this.queryPage.page = 0
+      this.driverOptions.splice(0, len)
     }
   }
   /**
@@ -479,26 +874,28 @@ export default class extends Vue {
    */
   async getList() {
     try {
-      if (this.listQuery.phone && !phoneReg.test(this.listQuery.phone)) {
-        return this.$message.error('请输入正确的手机号')
-      }
+      // if (this.listQuery.driverMobile && !phoneReg.test(this.listQuery.driverMobile)) {
+      //   return this.$message.error('请输入正确的手机号')
+      // }
       this.listLoading = true
       let params: any = {
         limit: this.page.limit,
         page: this.page.page
       }
 
-      this.listQuery.status !== '' && (params.status = +this.listQuery.status)
-      this.listQuery.status && (params.status = +this.listQuery.status)
+      this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
+      this.listQuery.payStatus && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
-      this.listQuery.name && (params.name = this.listQuery.name)
-      this.listQuery.phone && (params.phone = this.listQuery.phone)
-      this.listQuery.payId !== '' && (params.payId = this.listQuery.payId)
-      this.listQuery.gmId !== '' && (params.gmId = this.listQuery.gmId)
-      if (this.listQuery.time.length > 1) {
-        params.startDate = new Date(this.listQuery.time[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.time[1]).setHours(23, 59, 59)
+      this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
+      this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
+      this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
+      this.listQuery.sno && (params.sno = this.listQuery.sno)
+      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+      this.listQuery.driverStatus && (params.driverStatus = this.listQuery.driverStatus)
+      if (this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
       }
       let { data: res } = await getPayList(params)
       this.listLoading = false
@@ -519,13 +916,14 @@ export default class extends Vue {
 
   private changeStatus(item: any, index: number) {
     this.active = index
-    this.listQuery.status = item.value
+    this.listQuery.payStatus = item.value
     this.getList()
   }
   /**
    * 路径跳转
    */
   goRoute(url: string, id: any) {
+    console.log(id, 'id')
     if (id) {
       this.$router.push({ path: url, query: { id: id } })
     } else {
@@ -536,24 +934,6 @@ export default class extends Vue {
    * 查询
    */
   private handleQueryClick() {
-    let blackLists = ['status']
-    this.tags = []
-    for (let key in this.listQuery) {
-      if (
-        this.listQuery[key] !== '' &&
-        this.tags.findIndex((item) => item.key === key) === -1 &&
-        !blackLists.includes(key)
-      ) {
-        let name = getLabel(this.formItem, this.listQuery, key)
-        if (name) {
-          this.tags.push({
-            type: 'info',
-            name,
-            key: key
-          })
-        }
-      }
-    }
     this.getList()
   }
   /**
@@ -561,18 +941,52 @@ export default class extends Vue {
    */
   private handleResetClick() {
     this.listQuery = {
-      payId: '',
       workCity: '',
+      busiType: '',
+      gmName: '',
+      payModel: '',
+      payNo: '',
+      applyDate: [],
+      sno: '',
       driverId: '',
-      name: '',
-      phone: '',
-      gmId: '',
-      status: '',
-      time: []
+      driverStatus: '',
+      payStatus: ''
     };
     ((this.$refs.searchForm) as any).resetForm()
     this.tags = []
     // this.getList()
+  }
+  // 导出
+  @lock
+  private async handleExportClick() {
+    try {
+      let params:IState = {}
+      if (this.listQuery.applyDate && this.listQuery.applyDate.length > 1) {
+        params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
+        params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
+      } else {
+        return this.$message.error('需要按缴费申请日期进行导出')
+      }
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+        params.workCity = this.listQuery.workCity[1]
+      }
+      this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
+      this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
+      this.listQuery.busiType && (params.busiType = this.listQuery.busiType)
+      this.listQuery.gmName && (params.gmName = this.listQuery.gmName)
+      this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
+
+      const { data } = await payExport(params)
+      if (data.success) {
+        this.$message.success('导出成功')
+      } else {
+        this.$message.error(data.errorMsg || data.message)
+      }
+    } catch (err) {
+      console.log(`export fail:${err}`)
+    } finally {
+      console.log(`export finish`)
+    }
   }
 
   /**
@@ -590,15 +1004,18 @@ export default class extends Vue {
 
   mounted() {
     this.getList()
-    this.getManagers()
-    this.getOpenCitys()
+    this.getGmOptions()
+    this.getDutyListByLevel()
+    this.loadQueryDriverByKeyword()
+    this.querySearchByPayNo('')
+    this.querySearchBySno('')
   }
 }
 </script>
 <style lang="scss" scoped>
 .payList {
   .table_box {
-    padding: 0px 30px;
+    padding: 0px 20px;
     background: #ffffff;
     -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
     box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
@@ -624,7 +1041,7 @@ export default class extends Vue {
     align-items: center;
     box-sizing: border-box;
     .el-badge {
-      margin-right: 30px;
+      margin-right: 10px;
     }
     .statusBox {
       display: flex;
@@ -682,6 +1099,9 @@ export default class extends Vue {
   .payList >>> .el-collapse-item__content {
     padding-bottom: 0px;
   }
+  .payList >>> .selfTable {
+    padding: 0px!important;
+  }
 }
 </style>
 
@@ -696,4 +1116,5 @@ export default class extends Vue {
     width: 100%;
   }
 }
+
 </style>

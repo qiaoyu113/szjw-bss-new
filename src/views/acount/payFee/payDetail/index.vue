@@ -1,5 +1,8 @@
 <template>
-  <div class="payDetail">
+  <div
+    v-loading="loadingStatus"
+    class="payDetail"
+  >
     <SectionContainer
       title="基础信息"
       :md="true"
@@ -15,64 +18,47 @@
         </el-button>
       </template>
       <el-row>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="订单编号："
-            :value="formData.orderId"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="司机姓名："
+            name="司机姓名（司机编号/手机号）"
             :value="formData.driverName"
           />
         </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="司机编号："
-            :value="formData.driverId"
+            name="所属城市"
+            :value="formData.driverCity"
           />
         </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="可提现金额："
-            :value="formData.canExtractMoney"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="联系电话："
-            :value="formData.phone"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="所属城市："
-            :value="formData.workCityName"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="订单编号："
-            :value="formData.orderId"
-          />
-        </el-col>
-        <el-col span="6">
-          <DetailItem
-            name="加盟经理："
+            name="所属加盟经理"
             :value="formData.gmName"
           />
         </el-col>
-        <el-col span="6">
+        <el-col :span="6">
           <DetailItem
-            name="是否开收据："
-            :value="formData.isReceipt ? '是' : '否'"
+            name="业务线"
+            :value="formData.busiType"
           />
         </el-col>
-        <el-col span="6">
+      </el-row>
+    </SectionContainer>
+    <SectionContainer
+      title="账户信息"
+      :md="true"
+    >
+      <el-row>
+        <el-col :span="6">
           <DetailItem
-            name="备注："
-            :value="formData.remark"
+            name="账户总金额"
+            :value="formData.balance"
+          />
+        </el-col>
+        <el-col :span="6">
+          <DetailItem
+            name="可提现金额"
+            :value="formData.canExtract"
           />
         </el-col>
       </el-row>
@@ -85,79 +71,100 @@
         <el-table
           :data="tableData"
           style="width: 100%"
-          show-summary
         >
           <el-table-column
-            type="index"
-            label="序号"
-            width="100"
+            prop="payAmount"
+            label="缴费金额"
             align="center"
             header-align="center"
           />
           <el-table-column
-            prop="payNumber"
-            label="交易流水号"
-            width="180"
-            align="center"
-            header-align="center"
-          />
-          <el-table-column
-            prop="payDate"
-            label="交易时间"
-            width="180"
-            align="center"
-            header-align="center"
-          />
-          <el-table-column
-            prop="payMoney"
-            label="交易金额"
-            width="180"
-            align="center"
-            header-align="center"
-          />
-          <el-table-column
-            prop="payTypeName"
+            prop="payModel"
             label="支付方式"
             align="center"
             header-align="center"
           />
           <el-table-column
-            prop="payPic"
-            label="交易凭证"
+            prop="sno"
+            label="交易流水号"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="payTypeName"
+            label="缴费类型"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="orderCode"
+            label="订单编号"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="existReceipt"
+            label="是否开收据"
+            align="center"
+            header-align="center"
+          >
+            <template slot-scope="row">
+              {{ row.existReceipt?'是':'否' }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="payDate"
+            label="打款时间"
+            align="center"
+            header-align="center"
+          />
+          <el-table-column
+            prop="payProof"
+            label="查看交易凭证"
             align="center"
             header-align="center"
           >
             <template slot-scope="scope">
               <el-button
                 type="text"
-                @click="seePic(scope.row.payPic)"
+                @click="seePic(scope.row.payImageUrl)"
               >
                 查看
               </el-button>
             </template>
           </el-table-column>
+          <el-table-column
+            v-if="routePage === 'payDetail' && formData.payStatusValue === 1"
+            prop="payResult"
+            label="缴费结果"
+            align="center"
+            header-align="center"
+          />
         </el-table>
       </template>
     </SectionContainer>
-
-    <div
+    <SectionContainer
       v-if="routePage === 'payDetail'"
-      class="checkStatus"
+      title="审核状态"
+      :md="true"
     >
-      <span>审核状态：</span>
-      <span>{{ formData.statusName }}</span>
-    </div>
-
+      <div
+        class="checkStatus"
+      >
+        <span>审核状态：</span>
+        <span>{{ formData.payStatus | DataIsNull }}</span>
+      </div>
+    </SectionContainer>
     <div
       v-if="routePage === 'payAudit'"
       class="btnBox"
     >
-      <el-button @click="audit('reject')">
-        审核未通过
+      <el-button @click="audit(2)">
+        审核不通过
       </el-button>
       <el-button
         type="primary"
-        @click="audit('resolve')"
+        @click="audit(1)"
       >
         审核通过
       </el-button>
@@ -197,7 +204,7 @@ export default class extends Vue {
     this.id = (this.$route.query.id) as string
     this.getDetail(this.id)
   }
-
+  private loadingStatus:boolean = true
   private showViewer:boolean = false
   private imageUrl:string = ''
   private routePage:string = ''
@@ -217,22 +224,36 @@ export default class extends Vue {
   private async getDetail(id:string) {
     try {
       let params = {
-        payId: id
+        id: id
       }
       let { data: res } = await payDetail(params)
-      this.tableData = res.data.payInfo
-      this.formData = res.data.baseInfo
+      this.loadingStatus = false
+      this.formData = res.data
+      const tableData = [{
+        sno: res.data.sno,
+        payAmount: res.data.payAmount,
+        payTypeName: res.data.payTypeName,
+        payDate: res.data.payDate,
+        payModel: res.data.payModel,
+        canUpload: true,
+        existReceipt: res.data.existReceipt,
+        orderCode: res.data.orderCode,
+        payImageUrl: res.data.payImageUrl,
+        payResult: res.data.payResult
+      }]
+      this.tableData = tableData
     } catch (err) {
+      this.loadingStatus = false
       console.log(err)
     }
   }
 
-  private audit(type:string) {
+  private audit(type:number) {
     let text:string = ''
-    if (type === 'resolve') {
-      text = '确定要审核通过此退款信息?'
+    if (type === 1) {
+      text = '确认要审核通过此退款信息吗?'
     } else {
-      text = '确定要审核未通过并驳回此退款信息?'
+      text = '确认要审核不通过并驳回此缴费信息吗?'
     }
     this.$confirm(text, '提示', {
       confirmButtonText: '确定',
@@ -248,18 +269,18 @@ export default class extends Vue {
     })
   }
 
-  private async doAudit(flag:string) {
+  private async doAudit(flag:number) {
     try {
       let param = {
-        payId: this.id,
-        flag: flag
+        id: this.id,
+        checkStatus: flag
       }
       let { data: res } = await payAudit(param)
       if (res.success) {
-        if (flag === 'pass') {
+        if (flag === 1) {
           this.$message.success('审核通过成功')
         } else {
-          this.$message.success('审核未通过成功')
+          this.$message.success('审核不通过成功')
         }
         this.$router.push({
           path: '/driveraccount/payFee'
@@ -280,15 +301,13 @@ export default class extends Vue {
     align-items: center;
     font-size: 14px;
     margin-left: 20px;
-    margin-top: 30px;
-    padding-bottom: 60px;
   }
   .btnBox{
-    padding: 30px 30%;
+    padding-top: 30px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-end;
   }
 }
 </style>
