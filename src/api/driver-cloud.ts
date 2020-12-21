@@ -5,6 +5,8 @@ import request from '@/utils/request'
 let prefix = '/carrier_center'
 const driverPrefix = '/driver'
 const carrierPrefix = '/carrier_center'
+const businessPrefix = '/order'
+
 // 获取自承运司机标签列表
 export const GetDriverTagList = (data: any) =>
   request({
@@ -41,6 +43,7 @@ export const GetDriverByDriverName = (data: any) =>
     method: 'post',
     data
   })
+
 // 获取司机线索列表
 export const GetDriverClueList = (data: any) =>
   request({
@@ -130,3 +133,13 @@ export const editClue = (data: any) =>
     method: 'post',
     data
   })
+
+
+// 根据司机ID查询已成交订单
+export const getDealOrdersByDriverIds = (data: any) =>
+  request({
+    url: `${businessPrefix}/v2/order/getDealOrdersByDriverIds`,
+    method: 'post',
+    data
+  })
+
