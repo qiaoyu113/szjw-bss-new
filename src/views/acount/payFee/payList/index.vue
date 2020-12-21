@@ -713,7 +713,7 @@ export default class extends Vue {
       page: this.queryPageOfSno.page,
       limit: this.queryPageOfSno.limit
     }
-    val !== '' && (params.key = val)
+    val !== '' && (params.sno = val)
     try {
       let result:IState[] = await this.loadQuerySnoweywords(params)
       this.snoOption.push(...result)
@@ -773,7 +773,7 @@ export default class extends Vue {
       page: this.queryPageOfPayNo.page,
       limit: this.queryPageOfPayNo.limit
     }
-    val !== '' && (params.key = val)
+    val !== '' && (params.payNo = val)
     try {
       let result:IState[] = await this.loadQueryPayNoweywords(params)
       this.payNoOption.push(...result)
