@@ -16,7 +16,7 @@
         @onPageSize="handlePageSize"
       >
         <template v-slot:createDate="scope">
-          {{ scope.row.createDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          {{ scope.row.createDate }}
         </template>
       </self-table>
     </div>
@@ -51,8 +51,7 @@ export default class extends Vue {
     {
       key: 'createDate',
       label: '',
-      slot: true,
-      'width': '140px'
+      slot: true
     }
   ];
   // 表格分页
@@ -89,9 +88,6 @@ export default class extends Vue {
     } finally {
       //
     }
-  }
-  mounted() {
-    this.getLists()
   }
 }
 </script>

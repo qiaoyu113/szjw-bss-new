@@ -22,15 +22,6 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          v-permission="['/v2/clueH5/updateFollowerByMarketClueId0']"
-          size="small"
-          :class="isPC ? '' : 'btnMobile'"
-          :disabled="multipleSelection.length > 0 ? false :true"
-          @click="handleallAllotClick"
-        >
-          批量分配
-        </el-button>
-        <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -44,6 +35,15 @@
           @click="handleResetClick"
         >
           重置
+        </el-button>
+        <el-button
+          v-permission="['/v2/clueH5/updateFollowerByMarketClueId0']"
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+          :disabled="multipleSelection.length > 0 ? false :true"
+          @click="handleallAllotClick"
+        >
+          批量分配
         </el-button>
       </div>
     </self-form>
@@ -65,7 +65,7 @@
         @selection-change="handleSelectionChange"
       >
         <template v-slot:createDate="scope">
-          {{ scope.row.createDate | parseTime('{y}-{m}-{d} {h}:{i}:{s}') }}
+          {{ scope.row.createDate }}
         </template>
         <template v-slot:op="scope">
           <el-button

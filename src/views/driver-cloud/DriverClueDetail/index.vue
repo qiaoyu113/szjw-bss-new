@@ -1,64 +1,6 @@
 <template>
   <div class="driverClueDetailContainer">
     <div class="box">
-      <div class="top">
-        <el-button
-          v-if="[20,30,40].includes(listQuery.status)"
-          v-permission="['/v2/clueH5/edit']"
-          type="text"
-          @click="handleEditClick"
-        >
-          编辑
-        </el-button>
-
-        <el-button
-          v-if="[20,30,40].includes(listQuery.status)"
-          v-permission="['/v2/clueH5/addFollow']"
-          type="text"
-          @click="() => {
-            if (btns.length === 0) {
-              getBaseInfo()
-            }
-            showDialog1 = true;
-          }"
-        >
-          添加跟进
-        </el-button>
-        <el-button
-          v-if="[20,30].includes(listQuery.status)"
-          v-permission="['/v2/clueH5/inviteInterview']"
-          type="text"
-          @click="() => {
-            isInvite = true;
-            showDialog2 = true;
-          }"
-        >
-          邀约面试
-        </el-button>
-
-        <el-button
-          v-if="[40].includes(listQuery.status)"
-          v-permission="['/v2/clueH5/abolishInterview']"
-          type="text"
-          @click="() => {
-            showDialog3 = true;
-          }"
-        >
-          取消面试
-        </el-button>
-        <el-button
-          v-if="[40].includes(listQuery.status)"
-          v-permission="['/v2/clueH5/updateInterviewTime']"
-          type="text"
-          @click="() => {
-            isInvite = false;
-            dialogListQuery2.interviewDate = new Date(listQuery.interviewDate);
-            showDialog2 = true;
-          }"
-        >
-          调整面试时间
-        </el-button>
-      </div>
       <div class="table-box">
         <SectionContainer
           v-if="[20,30,40].includes(listQuery.status)"
@@ -75,20 +17,7 @@
             :pc-col="6"
           >
             <template v-slot:remark="scope">
-              <el-tooltip
-                class="item"
-                effect="dark"
-                :disabled="scope.row.remark ? false :true"
-                :content="scope.row.remark"
-                placement="top-start"
-              >
-                <el-button
-                  type="text"
-                  class="overflow"
-                >
-                  {{ scope.row.remark | DataIsNull }}
-                </el-button>
-              </el-tooltip>
+              {{ scope.row.remark | DataIsNull }}
             </template>
             <template v-slot:interviewDate="scope">
               <template v-if="scope.row.interviewDate">
@@ -99,6 +28,56 @@
               </template>
             </template>
           </self-form>
+          <template slot="rightBox">
+            <div>
+              <el-button
+                v-if="[20,30,40].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/addFollow']"
+                type="text"
+                @click="() => {
+                  if (btns.length === 0) {
+                    getBaseInfo()
+                  }
+                  showDialog1 = true;
+                }"
+              >
+                添加跟进
+              </el-button>
+              <el-button
+                v-if="[20,30].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/inviteInterview']"
+                type="text"
+                @click="() => {
+                  isInvite = true;
+                  showDialog2 = true;
+                }"
+              >
+                邀约面试
+              </el-button>
+              <el-button
+                v-if="[40].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/updateInterviewTime']"
+                type="text"
+                @click="() => {
+                  isInvite = false;
+                  dialogListQuery2.interviewDate = new Date(listQuery.interviewDate);
+                  showDialog2 = true;
+                }"
+              >
+                调整面试时间
+              </el-button>
+              <el-button
+                v-if="[40].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/abolishInterview']"
+                type="text"
+                @click="() => {
+                  showDialog3 = true;
+                }"
+              >
+                取消面试
+              </el-button>
+            </div>
+          </template>
         </SectionContainer>
         <SectionContainer
           title="基本信息"
@@ -130,11 +109,16 @@
               </template>
             </template>
             <template v-slot:followPerson="scope">
-              {{ scope.row.followName }} ({{ scope.row.followPhone }})
+              <template v-if="scope.row.followName || scope.row.followPhone">
+                {{ scope.row.followName }} {{ scope.row.followPhone }}
+              </template>
+              <template v-else>
+                暂无数据
+              </template>
             </template>
             <template v-slot:prevFollowPerson="scope">
               <template v-if="scope.row.beforeFollowerName || scope.row.beforeFollowerPhone">
-                {{ scope.row.beforeFollowerName }} ({{ scope.row.beforeFollowerPhone }})
+                {{ scope.row.beforeFollowerName }} {{ scope.row.beforeFollowerPhone }}
               </template>
               <template v-else>
                 暂无数据
@@ -145,7 +129,7 @@
             </template>
             <template v-slot:expectAddressCityName="scope">
               <template v-if="scope.row.expectAddressCityName || scope.row.expectAddressCountyName">
-                {{ scope.row.expectAddressCityName }} ({{ scope.row.expectAddressCountyName }})
+                {{ scope.row.expectAddressCityName }}{{ scope.row.expectAddressCountyName }}
               </template>
               <template v-else>
                 暂无数据
@@ -157,6 +141,18 @@
               </div>
             </template>
           </self-form>
+          <template slot="rightBox">
+            <div>
+              <el-button
+                v-if="[20,30,40].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/edit']"
+                type="text"
+                @click="handleEditClick"
+              >
+                编辑
+              </el-button>
+            </div>
+          </template>
         </SectionContainer>
       </div>
     </div>
@@ -241,7 +237,7 @@
       :list-query="form"
       @fresh="getDriverClueDetail"
     />
-    <LogList />
+    <LogList ref="logs" />
   </div>
 </template>
 <script lang="ts">
@@ -456,7 +452,8 @@ export default class extends Vue {
         pickerOptions: {
           disabledDate(time:any) {
             return time.getTime() < Date.now() - 86400000
-          }
+          },
+          step: '00:30'
         }
       }
     }
@@ -492,22 +489,58 @@ export default class extends Vue {
       { required: true, message: '请输入取消面试原因', trigger: 'change' }
     ]
   }
+  resetListQuery() {
+    this.listQuery = {
+      marketClueId: '',
+      contactSituationName: '',
+      remark: '',
+      interviewDate: '',
+      name: '',
+      haveCar: 0,
+      haveCarName: '',
+      carType: '',
+      carTypeName: '',
+      phone: '',
+      experience: '',
+      age: '',
+      nowAddress: '',
+      status: '',
+      statusName: '',
+      followName: '',
+      followPhone: '',
+      beforeFollowerName: '',
+      beforeFollowerPhone: '',
+      busiTypeName: '',
+      sourceChannelName: '',
+      expectAddressCityName: '',
+      expectAddressCountyName: '',
+      city: [],
+      occupation: ''
+    }
+  }
   // 获取司机线索详情
   async getDriverClueDetail() {
     try {
       let params:IState = {
         marketClueId: this.$route.query.id
       }
+      this.resetListQuery();
+      (this.$refs.logs as any).getLists()
       let { data: res } = await GetDriverClueDetail(params)
       if (res.success) {
         this.listQuery = { ...this.listQuery, ...res.data }
+        let index:number = this.formItem.findIndex((item:IState) => item.type === 'interviewDate')
         if (this.listQuery.status === 40) {
-          if (this.formItem.findIndex((item:IState) => item.type === 'interviewDate') === -1) {
+          if (index === -1) {
             this.formItem.push({
               type: 'interviewDate',
               label: '已约面试',
               slot: true
             })
+          }
+        } else {
+          if (index > -1) {
+            this.formItem.splice(index, 1)
           }
         }
       } else {
@@ -713,10 +746,6 @@ export default class extends Vue {
     overflow: hidden;
     transform: translateZ(0);
     padding: 20px;
-  }
-  .top {
-    display: flex;
-    justify-content: flex-end;
   }
   .overflow {
     color:#1d1d1d;

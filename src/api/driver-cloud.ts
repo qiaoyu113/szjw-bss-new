@@ -134,7 +134,6 @@ export const editClue = (data: any) =>
     data
   })
 
-
 // 根据司机ID查询已成交订单
 export const getDealOrdersByDriverIds = (data: any) =>
   request({
@@ -142,4 +141,3 @@ export const getDealOrdersByDriverIds = (data: any) =>
     method: 'post',
     data
   })
-

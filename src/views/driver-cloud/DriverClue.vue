@@ -220,6 +220,13 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDriverClueList, ExportDriverClue, allocationClue1 } from '@/api/driver-cloud'
 import { delayTime } from '@/settings'
 import { HandlePages, lock, parseTime, showCityGroupPerson, showWork, DataIsNull } from '@/utils/index'
+import {
+  today,
+  yesterday,
+  month,
+  lastmonth,
+  threemonth
+} from '../driver-freight/components/date'
 interface PageObj {
   page:number,
   limit:number,
@@ -395,9 +402,13 @@ export default class extends Vue {
       col: 10,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        'default-time': ['00:00:00', '23:59:59'],
+        pickerOptions: {
+          shortcuts: [today, yesterday, month, lastmonth, threemonth]
+        }
       },
-      label: '分配时间',
+      label: '分配日期',
       key: 'time'
     },
     {
@@ -405,9 +416,13 @@ export default class extends Vue {
       col: 10,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        'default-time': ['00:00:00', '23:59:59'],
+        pickerOptions: {
+          shortcuts: [today, yesterday, month, lastmonth, threemonth]
+        }
       },
-      label: '创建时间',
+      label: '创建日期',
       key: 'createTime'
     },
     {
@@ -680,7 +695,7 @@ export default class extends Vue {
           params.createStartDate = createStartDate
           params.createEndDate = createEndDate
         } else {
-          return this.$message.warning('请选择创建时间')
+          return this.$message.warning('请选择创建日期')
         }
         let { data: res } = await ExportDriverClue(params)
         if (res.success) {

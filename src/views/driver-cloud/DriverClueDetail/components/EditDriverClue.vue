@@ -22,18 +22,24 @@
           <el-input
             v-model="listQuery.experience"
             maxlength="2"
-            oninput="value=Number(value.replace(/[^\d]/g,''))"
+            placeholder="请输入"
+            @input="handleValidateExperience"
           >
-            <template slot="append">
+            <template
+              slot="
+            append"
+            >
               年
             </template>
           </el-input>
         </template>
+
         <template slot="age">
           <el-input
             v-model="listQuery.age"
             maxlength="2"
-            oninput="value=Number(value.replace(/[^\d]/g,''))"
+            placeholder="请输入"
+            @input="handleValidateAge"
           >
             <template slot="append">
               岁
@@ -315,6 +321,32 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log(`get base info fail:${err}`)
+    }
+  }
+  // 校验数字-工作经验
+  handleValidateExperience(value:string) {
+    if (value) {
+      let experience:number = Number(value.replace(/[^\d]/g, ''))
+      if (experience) {
+        this.listQuery.experience = experience
+      } else {
+        this.listQuery.experience = ''
+      }
+    } else {
+      return false
+    }
+  }
+  // 校验数字-年龄
+  handleValidateAge(value:string) {
+    if (value) {
+      let age:number = Number(value.replace(/[^\d]/g, ''))
+      if (age) {
+        this.listQuery.age = age
+      } else {
+        this.listQuery.age = ''
+      }
+    } else {
+      return false
     }
   }
   mounted() {
