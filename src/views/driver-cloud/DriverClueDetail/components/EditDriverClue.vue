@@ -292,8 +292,7 @@ export default class extends Vue {
             label: item.name,
             leaf: params.length > 1
           }
-        }).filter((item:any) => item.value !== '-99')
-
+        })
         return nodes
       }
     } catch (err) {
