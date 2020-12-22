@@ -1,5 +1,12 @@
 // Parse the time to string
 import Vue from 'vue'
+import {
+  getOfficeByTypeAndOfficeId,
+  getOfficeByType,
+  GetDictionaryCity,
+  getGroupInfoByCityCodeAndProductLine,
+  GetSpecifiedRoleList
+} from '@/api/common'
 let context = new Vue()
 
 export const parseTime = (
@@ -371,5 +378,141 @@ export function lock(target:any, key:string, desc:any) {
       this.$lock = false
     })
     return target
+  }
+}
+
+// 大区城市联动 级联选择器方法
+export async function showWork(node: any, resolve: any) {
+  let query: any = {
+    parentId: ''
+  }
+  if (node.level > 0) {
+    query.parentId = node.value
+  }
+  try {
+    if (node.level === 0) {
+      let nodes = await areaAddress({ type: 2 })
+      resolve(nodes)
+    } else if (node.level === 1) {
+      let nodes = await cityDetail(query, node)
+      resolve(nodes)
+    }
+  } catch (err) {
+    resolve([])
+  }
+}
+
+async function areaAddress(params: any) {
+  try {
+    let { data: res } = await getOfficeByType(params)
+    if (res.success) {
+      const nodes = res.data.map(function(item: any) {
+        return {
+          value: item.id,
+          label: item.name,
+          leaf: false
+        }
+      })
+      return nodes
+    }
+  } catch (err) {
+    console.log(`load city by code fail:${err}`)
+  }
+}
+
+async function cityDetail(params: any, node: any) {
+  let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  if (city.success) {
+    const nodes = city.data.map((item: any) => {
+      return {
+        value: item.areaCode,
+        label: item.name,
+        leaf: true
+      }
+    })
+    return nodes
+  }
+}
+
+// 获取城市、小组、跟进人
+export async function showCityGroupPerson(node: any, resolve: any) {
+  if (node.level === 0) {
+    let citys = await getOpenCitys()
+    resolve(citys)
+  } else if (node.level === 1) {
+    let groups = await GroupInfoByCityCodeAndProductLine(+node.value)
+    resolve(groups)
+  } else if (node.level === 2) {
+    let [groupId, busiType] = node.value.split(',')
+    let users = await getGmOptions(node.parent.value, busiType, groupId)
+    resolve(users)
+  }
+}
+// 获取开通城市
+async function getOpenCitys() {
+  try {
+    let { data: res } = await GetDictionaryCity()
+    if (res.success) {
+      return res.data.map((item:any) => ({
+        value: item.code,
+        label: item.name
+      }))
+    } else {
+      context.$message.error(res.errorMsg)
+    }
+  } catch (err) {
+    console.log(`get open city fail:${err}`)
+  } finally {
+    //
+  }
+}
+// 获取小组
+async function GroupInfoByCityCodeAndProductLine(cityCode:number) {
+  try {
+    let params:any = {
+      busiLine: [0, 1].toString(),
+      cityCode
+    }
+    let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
+    if (res.success) {
+      return res.data.map((item:any) => ({
+        value: item.id + ',' + item.dutyId,
+        label: item.name
+      }))
+    } else {
+      context.$message.error(res.errorMsg)
+    }
+  } catch (err) {
+    console.log(`get group fail:${err}`)
+  } finally {
+    //
+  }
+}
+// 获取小组下的人
+async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
+  try {
+    let params:any = {
+      roleTypes: [1, 4],
+      cityCode,
+      busiType,
+      groupId,
+      uri: '/v2/clueH5/updateFollowerByMarketClueId/queryFollowerList'
+    }
+
+    let { data: res } = await GetSpecifiedRoleList(params)
+    if (res.success) {
+      return res.data.map(function(item: any) {
+        return {
+          label: item.status === 2 ? item.name + `(停用)` : item.name + `(${item.mobile})`,
+          value: item.id,
+          disabled: item.status === 2,
+          leaf: true
+        }
+      })
+    } else {
+      context.$message.error(res.errorMsg)
+    }
+  } catch (err) {
+    console.log(err)
   }
 }
