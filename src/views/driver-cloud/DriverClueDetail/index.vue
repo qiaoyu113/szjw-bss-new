@@ -17,7 +17,9 @@
             :pc-col="6"
           >
             <template v-slot:remark="scope">
-              {{ scope.row.remark | DataIsNull }}
+              <div class="wordWrap">
+                {{ scope.row.remark | DataIsNull }}
+              </div>
             </template>
             <template v-slot:interviewDate="scope">
               <template v-if="scope.row.interviewDate">

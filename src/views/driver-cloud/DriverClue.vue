@@ -167,6 +167,22 @@
             暂无数据
           </template>
         </template>
+        <template v-slot:remark="scope">
+          <template v-if="scope.row.remark">
+            <el-tooltip placement="top">
+              <div
+                slot="content"
+                v-html="toBreak(scope.row.remark)"
+              />
+              <div class="ellipsis">
+                {{ scope.row.remark }}
+              </div>
+            </el-tooltip>
+          </template>
+          <template v-else>
+            暂无数据
+          </template>
+        </template>
         <template v-slot:op="scope">
           <el-button
             v-permission="['/v2/clueH5/detail']"
@@ -506,9 +522,7 @@ export default class extends Vue {
       key: 'remark',
       label: '备注',
       'width': '140px',
-      attrs: {
-        'show-overflow-tooltip': true
-      }
+      slot: true
     },
     {
       key: 'statusName',
@@ -589,6 +603,20 @@ export default class extends Vue {
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
+  }
+  toBreak(content:string) {
+    if (!content) {
+      return ''
+    }
+    let str:string = ''
+    if (content.length > 50) {
+      str = content.substring(0, 50)
+      str += '<br/>'
+      str += content.substring(50, -1)
+    } else {
+      str = content
+    }
+    return str
   }
 
   // 获取业务线
@@ -934,6 +962,14 @@ export default class extends Vue {
     }
     .text {
       margin:0px;
+    }
+    .wordWrap {
+      word-break: break-all;
+    }
+    .ellipsis {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
     }
   }
 </style>
