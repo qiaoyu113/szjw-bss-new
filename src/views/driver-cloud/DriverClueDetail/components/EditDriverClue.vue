@@ -231,12 +231,12 @@ export default class extends Vue {
       }
 
       let { data: res } = await editClue(params)
-      if (res.success) {
+      if (res.success && res.data.flag) {
         this.showDialog = false
         this.$message.success('操作成功')
         this.$emit('fresh')
       } else {
-        this.$message.error(res.errorMsg)
+        this.$message.error(res.errorMsg || res.data.msg)
       }
     } catch (err) {
       console.log(`edit clue fail:${err}`)
