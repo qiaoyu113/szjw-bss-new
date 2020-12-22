@@ -218,8 +218,14 @@ export default class extends Vue {
   @lock
   async editClue() {
     try {
+      let obj:IState = {}
+      for (let key in this.listQuery) {
+        if (this.listQuery[key]) {
+          obj[key] = this.listQuery[key]
+        }
+      }
       let params:IState = {
-        ...this.listQuery,
+        ...obj,
         expectAddressCity: this.listQuery.city[0],
         expectAddressCounty: this.listQuery.city[1]
       }

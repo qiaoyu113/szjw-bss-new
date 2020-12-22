@@ -21,7 +21,7 @@
             </template>
             <template v-slot:interviewDate="scope">
               <template v-if="scope.row.interviewDate">
-                {{ scope.row.interviewDate }}
+                {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
               </template>
               <template v-else>
                 暂无数据
@@ -42,6 +42,16 @@
                 }"
               >
                 添加跟进
+              </el-button>
+              <el-button
+                v-if="[40].includes(listQuery.status)"
+                v-permission="['/v2/clueH5/abolishInterview']"
+                type="text"
+                @click="() => {
+                  showDialog3 = true;
+                }"
+              >
+                取消面试
               </el-button>
               <el-button
                 v-if="[20,30].includes(listQuery.status)"
@@ -65,16 +75,6 @@
                 }"
               >
                 调整面试时间
-              </el-button>
-              <el-button
-                v-if="[40].includes(listQuery.status)"
-                v-permission="['/v2/clueH5/abolishInterview']"
-                type="text"
-                @click="() => {
-                  showDialog3 = true;
-                }"
-              >
-                取消面试
               </el-button>
             </div>
           </template>
@@ -248,7 +248,7 @@ import { GetDriverClueDetail, AddContactInfo, CancelInteview, InvitelInteview, A
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfEdit from './components/EditDriverClue.vue'
 import LogList from './components/opLogs.vue'
-import { lock, DataIsNull } from '@/utils/index'
+import { lock, DataIsNull, parseTime } from '@/utils/index'
 import { delayTime } from '@/settings'
 import { GetDictionaryList } from '@/api/common'
 interface IState {

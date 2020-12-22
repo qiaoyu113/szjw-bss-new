@@ -484,10 +484,16 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
-  mounted() {
+  init() {
     this.getGetDutyListByLevel()
     this.getLists()
     this.cityArea = showCityGroupPerson
+  }
+  activated() {
+    this.init()
+  }
+  mounted() {
+    this.init()
   }
 }
 </script>
