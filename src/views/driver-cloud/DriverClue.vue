@@ -136,7 +136,7 @@
             {{ scope.row.statusName | DataIsNull }}
           </p>
           <p
-            v-if="scope.row.interviewDate"
+            v-if="scope.row.status === 40 && scope.row.interviewDate"
             class="text"
           >
             {{ scope.row.interviewDate }}
