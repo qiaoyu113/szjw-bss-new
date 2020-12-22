@@ -101,12 +101,12 @@
               <span v-else>无</span>
             </template>
             <template v-slot:experience="scope">
-              {{ scope.row.experience | DataIsNull }} <template v-if="scope.row.experience">
+              {{ scope.row.experience | DataIsNull }} <template v-if="scope.row.experience || scope.row.experience ===0">
                 年
               </template>
             </template>
             <template v-slot:age="scope">
-              {{ scope.row.age | DataIsNull }}<template v-if="scope.row.age">
+              {{ scope.row.age | DataIsNull }}<template v-if="scope.row.age || scope.row.age === 0">
                 岁
               </template>
             </template>
