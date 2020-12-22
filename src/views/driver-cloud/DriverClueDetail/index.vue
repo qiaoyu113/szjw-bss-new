@@ -21,7 +21,7 @@
             </template>
             <template v-slot:interviewDate="scope">
               <template v-if="scope.row.interviewDate">
-                {{ scope.row.interviewDate | parseTime('{y}/{m}/{d} {h}:{i}') }}
+                {{ scope.row.interviewDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
               </template>
               <template v-else>
                 暂无数据
