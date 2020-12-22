@@ -143,8 +143,9 @@
           </self-form>
           <template slot="rightBox">
             <div>
+              <!-- v-if="[20,30,40].includes(listQuery.status)" -->
               <el-button
-                v-if="[20,30,40].includes(listQuery.status)"
+
                 v-permission="['/v2/clueH5/edit']"
                 type="text"
                 @click="handleEditClick"

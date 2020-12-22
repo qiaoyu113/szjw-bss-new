@@ -474,8 +474,9 @@ export default class extends Vue {
       if (res.success) {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
-        this.tableData = res.data
+        this.tableData = res.data || []
       } else {
+        this.tableData = res.data || []
         this.$message.error(res.errorMsg)
       }
     } catch (err) {

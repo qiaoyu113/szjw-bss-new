@@ -756,7 +756,7 @@ export default class extends Vue {
 
       let { data: res } = await GetDriverClueList(params)
       if (res.success) {
-        this.tableData = res.data
+        this.tableData = res.data || []
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.btns.forEach(item => {
@@ -765,6 +765,7 @@ export default class extends Vue {
           item.num = res.title[key]
         })
       } else {
+        this.tableData = []
         this.$message.warning(res.message)
       }
     } catch (err) {

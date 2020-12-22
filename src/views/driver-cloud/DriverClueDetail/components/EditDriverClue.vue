@@ -220,7 +220,7 @@ export default class extends Vue {
     try {
       let obj:IState = {}
       for (let key in this.listQuery) {
-        if (this.listQuery[key]) {
+        if (this.listQuery[key] || this.listQuery[key] === 0) {
           obj[key] = this.listQuery[key]
         }
       }
@@ -332,7 +332,7 @@ export default class extends Vue {
   handleValidateExperience(value:string) {
     if (value) {
       let experience:number = Number(value.replace(/[^\d]/g, ''))
-      if (experience) {
+      if (experience || experience === 0) {
         this.listQuery.experience = experience
       } else {
         this.listQuery.experience = ''
@@ -345,7 +345,7 @@ export default class extends Vue {
   handleValidateAge(value:string) {
     if (value) {
       let age:number = Number(value.replace(/[^\d]/g, ''))
-      if (age) {
+      if (age || age === 0) {
         this.listQuery.age = age
       } else {
         this.listQuery.age = ''
