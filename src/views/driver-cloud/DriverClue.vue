@@ -967,6 +967,7 @@ export default class extends Vue {
       word-break: break-all;
     }
     .ellipsis {
+      width:140px;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
