@@ -13,6 +13,7 @@ export default {
     refundAudit: '审核退费',
     payFee: '缴费管理',
     payDetail: '缴费详情',
+    payEdit: '缴费编辑',
     payAudit: '缴费审核',
     addPay: '新建缴费',
     wtAcountList: '梧桐账户列表',
@@ -55,6 +56,8 @@ export default {
     editorTransport: '编辑运力',
     transportDetail: '运力详情',
     driverClue: '司机线索',
+    DriverClueNew: '线索列表',
+    DriverClueDetail: '线索详情',
     createDriverClue: '创建司机线索',
     editDriverClue: '编辑司机线索',
     driverInterview: '司机面试',
@@ -180,7 +183,8 @@ export default {
     adjustmentList: '司机运费调整',
     configManager: '配置管理',
     driverClond: '司机云',
-    selfDriverTag: '自承运司机标签'
+    selfDriverTag: '自承运司机标签',
+    marketClue: '待市场分配线索'
   },
   navbar: {
     setPassword: '修改密码',

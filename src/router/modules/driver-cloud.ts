@@ -9,8 +9,7 @@ const driverCloud: RouteConfig = {
   meta: {
     title: 'driverClond',
     icon: 'driver-cloud',
-    apiUrl: '/v2/driver/label-sync/list',
-    alwaysShow: true
+    apiUrl: 'root'
   },
   children: [
     {
@@ -20,6 +19,37 @@ const driverCloud: RouteConfig = {
       meta: {
         apiUrl: '/v2/driver/label-sync/list',
         title: 'selfDriverTag',
+        noCache: false
+      }
+    },
+    {
+      path: 'marketclue',
+      component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/MarketClue.vue'),
+      name: 'MarketClue',
+      meta: {
+        apiUrl: '/v2/clueH5/waitAllocate/list',
+        title: 'marketClue',
+        noCache: false
+      }
+    },
+    {
+      path: 'driverClue',
+      component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/DriverClue.vue'),
+      name: 'DriverClue',
+      meta: {
+        apiUrl: '/v2/clueH5/list',
+        title: 'DriverClueNew',
+        noCache: false
+      }
+    },
+    {
+      path: 'driverClueDetail',
+      component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/DriverClueDetail/index.vue'),
+      name: 'DriverClueDetail',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'DriverClueDetail',
         noCache: false
       }
     }
