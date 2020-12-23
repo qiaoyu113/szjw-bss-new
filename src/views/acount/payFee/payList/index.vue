@@ -885,7 +885,6 @@ export default class extends Vue {
       }
 
       this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
-      this.listQuery.payStatus && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.workCity.length === 2 && (params.workCity = this.listQuery.workCity[1])
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
       this.listQuery.payType !== '' && (params.payType = this.listQuery.payType)
@@ -893,7 +892,7 @@ export default class extends Vue {
       this.listQuery.gmId !== '' && (params.gmId = this.listQuery.gmId)
       this.listQuery.sno && (params.sno = this.listQuery.sno)
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.driverStatus && (params.driverStatus = this.listQuery.driverStatus)
+      this.listQuery.driverStatus !== '' && (params.driverStatus = this.listQuery.driverStatus)
       if (this.listQuery.applyDate.length > 1) {
         params.startDate = new Date(this.listQuery.applyDate[0]).setHours(0, 0, 0)
         params.endDate = new Date(this.listQuery.applyDate[1]).setHours(23, 59, 59)
@@ -972,10 +971,13 @@ export default class extends Vue {
         params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
-      this.listQuery.payType && (params.payType = this.listQuery.payType)
-      this.listQuery.busiType && (params.busiType = this.listQuery.busiType)
+      this.listQuery.payType !== '' && (params.payType = this.listQuery.payType)
+      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.gmId && (params.gmId = this.listQuery.gmId)
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
+      this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
+      this.listQuery.sno && (params.sno = this.listQuery.sno)
+      this.listQuery.driverStatus !== '' && (params.driverStatus = this.listQuery.driverStatus)
 
       const { data } = await payExport(params)
       if (data.success) {
