@@ -153,6 +153,8 @@
       >
         <span>审核状态：</span>
         <span>{{ formData.payStatus | DataIsNull }}</span>
+        &nbsp; &nbsp;
+        <span>{{ formData.checkDate | DataIsNull }}</span>
       </div>
     </SectionContainer>
     <div
@@ -185,6 +187,7 @@ import DetailItem from '@/components/DetailItem/index.vue'
 import { payDetail, payAudit } from '@/api/driver-account'
 // 引入element-ui 大图预览的隐藏组件
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
+import { delayTime } from '@/settings'
  @Component({
    name: 'payDetail',
    components: {
@@ -251,7 +254,7 @@ export default class extends Vue {
   private audit(type:number) {
     let text:string = ''
     if (type === 1) {
-      text = '确认要审核通过此退款信息吗?'
+      text = '确认要审核通过此缴费信息吗?'
     } else {
       text = '确认要审核不通过并驳回此缴费信息吗?'
     }
@@ -282,9 +285,13 @@ export default class extends Vue {
         } else {
           this.$message.success('审核不通过成功')
         }
-        this.$router.push({
-          path: '/driveraccount/payFee'
-        })
+        setTimeout(() => {
+          this.$router.push({
+            path: '/driveraccount/payFee'
+          })
+        }, delayTime)
+      } else {
+        this.$message.warning(res.errorMsg)
       }
     } catch (err) {
       console.log(err)

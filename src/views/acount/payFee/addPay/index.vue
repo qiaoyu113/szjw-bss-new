@@ -109,7 +109,8 @@
                   :rules="payForm.rules.payAmount"
                 >
                   <el-input
-                    v-model="scope.row.payAmount"
+                    v-model.trim="scope.row.payAmount"
+                    v-only-number="{min: 0, max: 999999.99, precision: 2}"
                     type="number"
                     placeholder="请输入缴费金额"
                   />
@@ -153,9 +154,10 @@
                 >
                   <el-input
                     v-model="scope.row.sno"
-                    maxlength="50"
+                    maxlength="32"
                     show-word-limit
                     placeholder="请输入完整流水号"
+                    @input="changeSno(scope.$index)"
                   />
                 </el-form-item>
               </template>
@@ -176,10 +178,11 @@
                     placeholder="请选择缴费类型"
                   >
                     <el-option
-                      v-for="item in billTypeOptions"
+                      v-for="item in billSetArr"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
+                      :disabled="item.disabled"
                     />
                   </el-select>
                 </el-form-item>
@@ -209,7 +212,10 @@
                     />
                   </el-select>
                 </el-form-item>
-                <div v-else-if="scope.row.payType === 0">
+                <div
+                  v-else-if="scope.row.payType === 0"
+                  style="font-size:14px"
+                >
                   无
                 </div>
               </template>
@@ -365,6 +371,7 @@ import { deleteUser } from '@/api/users'
 import { getDriverNoAndNameList } from '@/api/driver'
 import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
+import { lock } from '@/utils'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
@@ -492,10 +499,8 @@ export default class extends Vue {
     { label: '是', value: 1 }
   ] // 请确认是否开收据数组
   private payModelOptions:any = [] // 支付数组
-  private billTypeOptions:any = [
-    { label: '订单续费', value: 1 }
-  ] // 缴费数组
   private picShow:Boolean = false
+  private editId:string =''
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -536,29 +541,55 @@ export default class extends Vue {
     }
   }
 
+  get billSetArr() {
+    let arr = []
+    const item1 = { label: '无订单充值', value: 0 }
+    const item2 = { label: '订单续费', value: 1, disabled: false }
+    if (!this.isEdit) {
+      if (this.formData.busiType === 0) {
+        arr.push(item1)
+        this.payForm.tableData.forEach((ele:any) => {
+          ele.payType = 0
+        })
+      } else {
+        if (this.orderOptions.length === 0) {
+          item2.disabled = true
+        }
+        arr = Array.of(item1, item2)
+      }
+    } else {
+      if (this.formData.busiTypeValue === 0) {
+        arr.push(item1)
+        this.payForm.tableData.forEach((ele:any) => {
+          ele.payType = 0
+        })
+      } else {
+        if (this.orderOptions.length === 0) {
+          item2.disabled = true
+        }
+        arr = Array.of(item1, item2)
+      }
+    }
+    return arr
+  }
+
   @Watch('formData.driverCode')
-  private handleDriverChange(val:any) {
+  private async handleDriverChange(val:any) {
     if (!this.isEdit) {
       this.formItem.splice(1, this.formItem.length - 1)
-      this.billTypeOptions.splice(1, this.billTypeOptions.length - 1)
       if (val) {
         this.formItem.push(...this.otherFormItem)
         this.getCanExtractMoney(val)
         this.computedInfo(val)
         this.resetTableData()
-        this.dealOrder()
+        await this.dealOrder()
       } else {
         this.remoteMethod('')
       }
-      if (this.formData.busiType === 1) {
-        const item = { label: '无订单充值', value: 0 }
-        this.billTypeOptions.push(item)
-      }
+      this.setOrderId()
     } else {
-      if (this.formData.busiTypeValue === 1) {
-        const item = { label: '无订单充值', value: 0 }
-        this.billTypeOptions.push(item)
-      }
+      await this.dealOrder(this.editId)
+      this.setOrderId()
     }
   }
 
@@ -576,11 +607,15 @@ export default class extends Vue {
   private validatepayAmount(rule:any, value:any, callback:any) {
     if (Number(value) <= 0) {
       callback(new Error('缴费金额必须大于0'))
-    } else if (Number(value) > 99999.99) {
-      callback(new Error('缴费金额必须小于六位数'))
+    } else if (Number(value) > 999999.99) {
+      callback(new Error('缴费金额必须小于七位数'))
     } else {
       callback()
     }
+  }
+
+  private changeSno(index:number) {
+    this.payForm.tableData[index].sno = this.payForm.tableData[index].sno.replace(/[\W]/g, '')
   }
 
   private async getDetail(id:string) {
@@ -588,6 +623,7 @@ export default class extends Vue {
       const { data: res } = await payDetail({ id: id })
       if (res.success) {
         this.loading = false
+        this.editId = res.data.driverCode
         this.formData = { ...res.data }
         this.formItem.push(...this.otherFormItem)
         this.formData.driverCode = res.data.driverName
@@ -627,9 +663,15 @@ export default class extends Vue {
       console.log('err:', err)
     }
   }
-  private async dealOrder() {
+  private async dealOrder(id ?:string) {
+    let params = []
+    if (id) {
+      params.push(id)
+    } else {
+      params.push(this.formData.driverCode)
+    }
     try {
-      const { data: res } = await getDealOrdersByDriverIds([this.formData.driverCode])
+      const { data: res } = await getDealOrdersByDriverIds(params)
       if (res.success) {
         this.orderOptions = res.data.map((ele:any) => {
           return { label: ele.orderId, value: ele.orderId }
@@ -644,10 +686,30 @@ export default class extends Vue {
   }
 
   private setOrderId() {
-    if (this.orderOptions.length === 1) {
-      this.payForm.tableData.forEach((ele:any) => {
-        ele.orderCode = this.orderOptions[0].value
-      })
+    if (!this.isEdit) {
+      if (this.formData.busiType === 1) {
+        if (this.orderOptions.length === 1) {
+          this.payForm.tableData.forEach((ele:any) => {
+            ele.orderCode = this.orderOptions[0].value
+          })
+        } else {
+          this.payForm.tableData.forEach((ele:any) => {
+            ele.payType = 0
+          })
+        }
+      }
+    } else {
+      if (this.formData.busiTypeValue === 1) {
+        if (this.orderOptions.length === 1) {
+          this.payForm.tableData.forEach((ele:any) => {
+            ele.orderCode = this.orderOptions[0].value
+          })
+        } else {
+          this.payForm.tableData.forEach((ele:any) => {
+            ele.payType = 0
+          })
+        }
+      }
     }
   }
 
@@ -708,8 +770,7 @@ export default class extends Vue {
       this.loading = false
       this.keyWord = keyWord
       let params = {
-        key: '',
-        status: 1
+        key: ''
       }
       keyWord !== '' && (params.key = keyWord)
       params = { ...params, ...this.driverPage }
@@ -717,7 +778,7 @@ export default class extends Vue {
         return
       }
       let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/wt-driver-account/pay/create'
+        url: '/v2/wt-driver-account/pay/queryDriverList'
       })
       if (res.success) {
         if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
@@ -734,7 +795,7 @@ export default class extends Vue {
             busiTypeName: item.busiTypeName
           }
           return {
-            label: `${item.name}(${item.driverId})`,
+            label: `${item.name}(${item.phone})`,
             value: item.driverId,
             data: info
           }
@@ -874,6 +935,7 @@ export default class extends Vue {
     }
     await this.handleValidateTableForm()
   }
+
   private async handleSaveClick() {
     await this.handleValidateForm()
   }
@@ -904,6 +966,7 @@ export default class extends Vue {
   /**
    * 提交表单
    */
+  @lock
   private saveData() {
     let params:any = {}
     let tableData = this.payForm.tableData
@@ -931,6 +994,11 @@ export default class extends Vue {
       if (type === 'create') {
         const { data: res } = await payCostBillsCreate(params)
         if (res.success) {
+          setTimeout(() => {
+            this.$router.push({
+              path: '/driveraccount/payFee'
+            })
+          }, delayTime)
           this.$message.success('新建缴费成功')
         } else {
           this.$message.warning(res.errorMsg)
@@ -938,16 +1006,16 @@ export default class extends Vue {
       } else {
         const { data: res } = await payCostBillsUpdate(params)
         if (res.success) {
+          setTimeout(() => {
+            this.$router.push({
+              path: '/driveraccount/payFee'
+            })
+          }, delayTime)
           this.$message.success('编辑缴费成功')
         } else {
           this.$message.warning(res.errorMsg)
         }
       }
-      setTimeout(() => {
-        this.$router.push({
-          path: '/driveraccount/payFee'
-        })
-      }, delayTime)
     } catch (err) {
       console.log('err:', err)
     }

@@ -268,8 +268,8 @@ export default class extends Vue {
   private listQuery: IState = {
     workCity: '',
     busiType: '',
-    gmName: '',
-    payModel: '',
+    gmId: '',
+    payType: '',
     payNo: '',
     applyDate: [],
     sno: '',
@@ -301,7 +301,7 @@ export default class extends Vue {
       },
       listeners: {
         'change': () => {
-          this.listQuery.gmName = ''
+          this.listQuery.gmId = ''
           this.listQuery.busiType = ''
           this.resetDriver()
           this.handleClearQueryDriver()
@@ -322,7 +322,7 @@ export default class extends Vue {
       options: this.dutyListOptions,
       listeners: {
         'change': () => {
-          this.listQuery.gmName = ''
+          this.listQuery.gmId = ''
           this.handleClearQueryDriver()
           this.getGmOptions()
         }
@@ -330,7 +330,7 @@ export default class extends Vue {
     },
     {
       type: 2,
-      key: 'gmName',
+      key: 'gmId',
       col: 8,
       label: '加盟经理',
       tagAttrs: {
@@ -345,7 +345,7 @@ export default class extends Vue {
     },
     {
       type: 2,
-      key: 'payModel',
+      key: 'payType',
       label: '缴费类型',
       col: 8,
       tagAttrs: {
@@ -605,12 +605,12 @@ export default class extends Vue {
    */
   async getGmOptions() {
     try {
-      this.listQuery.gmName = ''
+      this.listQuery.gmId = ''
       let params:any = {
         roleTypes: [1],
-        uri: '/v2/wt-driver-account/refund/queryGM'
+        uri: '/wt-driver-account/pay/queryGM'
       }
-      this.listQuery.workCity[1] !== '' && (params.cityCode = this.listQuery.workCity[1])
+      this.listQuery.workCity.length === 2 && (params.workCity[1] = this.listQuery.workCity[1])
       this.listQuery.busiType !== '' && (params.productLine = this.listQuery.busiType)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
@@ -626,7 +626,7 @@ export default class extends Vue {
         }
         this.gmOptions.push(...gms)
         if (this.gmOptions.length === 1) {
-          this.listQuery.gmName = this.gmOptions[0].value
+          this.listQuery.gmId = this.gmOptions[0].value
         }
       } else {
         this.$message.error(res.errorMsg)
@@ -814,9 +814,9 @@ export default class extends Vue {
         params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
+      this.listQuery.gmId !== '' && (params.gmId = this.listQuery.gmId)
       let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/v2/wt-driver-account/refund/queryDriverList'
+        url: '/v2/wt-driver-account/pay/queryDriverList'
       })
       let result:any[] = res.data.map((item:any) => ({
         label: `${item.name}/${item.phone}`,
@@ -861,7 +861,7 @@ export default class extends Vue {
   // 重置司机
   resetDriver() {
     this.listQuery.driverId = ''
-    // this.listQuery.gmName = ''
+    // this.listQuery.gmId = ''
     this.searchKeyword = ''
     let len:number = this.driverOptions.length
     if (len > 0) {
@@ -872,6 +872,7 @@ export default class extends Vue {
   /**
    *获取列表
    */
+  @lock
   async getList() {
     try {
       // if (this.listQuery.driverMobile && !phoneReg.test(this.listQuery.driverMobile)) {
@@ -885,11 +886,11 @@ export default class extends Vue {
 
       this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.payStatus && (params.payStatus = +this.listQuery.payStatus)
-      this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
+      this.listQuery.workCity.length === 2 && (params.workCity = this.listQuery.workCity[1])
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
-      this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
+      this.listQuery.payType !== '' && (params.payType = this.listQuery.payType)
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
-      this.listQuery.gmName !== '' && (params.gmName = this.listQuery.gmName)
+      this.listQuery.gmId !== '' && (params.gmId = this.listQuery.gmId)
       this.listQuery.sno && (params.sno = this.listQuery.sno)
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       this.listQuery.driverStatus && (params.driverStatus = this.listQuery.driverStatus)
@@ -923,7 +924,6 @@ export default class extends Vue {
    * 路径跳转
    */
   goRoute(url: string, id: any) {
-    console.log(id, 'id')
     if (id) {
       this.$router.push({ path: url, query: { id: id } })
     } else {
@@ -933,6 +933,7 @@ export default class extends Vue {
   /**
    * 查询
    */
+
   private handleQueryClick() {
     this.getList()
   }
@@ -943,8 +944,8 @@ export default class extends Vue {
     this.listQuery = {
       workCity: '',
       busiType: '',
-      gmName: '',
-      payModel: '',
+      gmId: '',
+      payType: '',
       payNo: '',
       applyDate: [],
       sno: '',
@@ -971,9 +972,9 @@ export default class extends Vue {
         params.workCity = this.listQuery.workCity[1]
       }
       this.listQuery.payNo !== '' && (params.payNo = this.listQuery.payNo)
-      this.listQuery.payModel && (params.payModel = this.listQuery.payModel)
+      this.listQuery.payType && (params.payType = this.listQuery.payType)
       this.listQuery.busiType && (params.busiType = this.listQuery.busiType)
-      this.listQuery.gmName && (params.gmName = this.listQuery.gmName)
+      this.listQuery.gmId && (params.gmId = this.listQuery.gmId)
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
 
       const { data } = await payExport(params)
@@ -1034,6 +1035,7 @@ export default class extends Vue {
       }
     }
   }
+  min-width: 800px;
   .tableTitle {
     width: 100%;
     display: flex;
