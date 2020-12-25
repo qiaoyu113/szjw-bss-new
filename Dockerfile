@@ -2,7 +2,8 @@ FROM registry.cn-beijing.aliyuncs.com/wutong-library/node:10.21.0-stretch as bui
 
 
 RUN yarn config set registry https://registry.npm.taobao.org/ \
-        && curl -o /tmp/cypress.zip   https://cdn.cypress.io/desktop/3.4.1/linux-x64/cypress.zip
+        && curl -o /tmp/cypress.zip   https://cdn.cypress.io/desktop/3.4.1/linux-x64/cypress.zip \
+        && mkdir /code
         
 ADD yarn.lock /code/
 ADD package.json /code/
