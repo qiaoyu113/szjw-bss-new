@@ -10,7 +10,7 @@ const businessPrefix = '/order'
 // 获取自承运司机标签列表
 export const GetDriverTagList = (data: any) =>
   request({
-    url: `${driverPrefix}/v2/driver/label-sync/list`,
+    url: `${carrierPrefix}/v2/driver/label-sync/list`,
     method: 'post',
     data
   })
