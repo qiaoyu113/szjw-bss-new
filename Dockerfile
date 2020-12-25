@@ -10,7 +10,8 @@ ADD package.json /code/
 ADD .yarnrc /code/
 
 RUN cd /code && yarn config get registry && ls -l \
-        && export CYPRESS_INSTALL_BINARY=/tmp/cypress.zip yarn install 
+        && export CYPRESS_INSTALL_BINARY=/tmp/cypress.zip \
+        && yarn install 
         
 ADD . /code 
 
