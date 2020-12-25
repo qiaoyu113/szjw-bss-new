@@ -1,11 +1,18 @@
 FROM registry.cn-beijing.aliyuncs.com/wutong-library/node:10.21.0-stretch as builder
 
-RUN yarn config set registry https://registry.npm.taobao.org/ 
+
+RUN yarn config set registry https://registry.npm.taobao.org/ \
+        && curl -o /tmp/cypress.zip   https://cdn.cypress.io/desktop/3.4.1/linux-x64/cypress.zip \
+        && mkdir /code
+        
 ADD yarn.lock /code/
 ADD package.json /code/
 ADD .yarnrc /code/
 
-RUN cd /code && yarn config get registry && yarn install 
+RUN cd /code && yarn config get registry && ls -l \
+        && export CYPRESS_INSTALL_BINARY=/tmp/cypress.zip \
+        && yarn install 
+        
 ADD . /code 
 
 RUN cd /code && ls -la  &&  yarn dist

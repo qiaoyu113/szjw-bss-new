@@ -41,7 +41,6 @@
           @selection-change="handleSelectionChange"
         >
           <el-table-column
-            :key="checkList.length + 'selectable'"
             fixed
             reserve-selection
             type="selection"
@@ -49,7 +48,6 @@
             :selectable="selectable"
           />
           <el-table-column
-            :key="checkList.length + 'departureDate'"
             type="index"
             width="55"
             label="序号"
@@ -57,8 +55,6 @@
             align="center"
           />
           <el-table-column
-            v-if="checkList.indexOf('出车日期') > -1"
-            :key="checkList.length + 'a'"
             align="left"
             label="出车日期"
             min-width="100"
@@ -69,8 +65,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('出车单号') > -1"
-            :key="checkList.length + 'wayBillId'"
             align="left"
             label="出车单号"
             min-width="140"
@@ -87,8 +81,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('司机姓名') > -1"
-            :key="checkList.length + 'driverName'"
             align="left"
             label="司机姓名"
             min-width="145"
@@ -99,8 +91,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('线路名称') > -1"
-            :key="checkList.length + 'lineId'"
             align="left"
             label="线路名称"
             min-width="150"
@@ -111,8 +101,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('客户名称') > -1"
-            :key="checkList.length + 'customerClueName'"
             align="left"
             label="客户名称"
             min-width="100"
@@ -123,8 +111,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('项目名称') > -1"
-            :key="checkList.length + 'projectName'"
             align="left"
             label="项目名称"
             min-width="100"
@@ -135,8 +121,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('出车状态') > -1"
-            :key="checkList.length + 'departStatus'"
             align="left"
             label="出车状态"
           >
@@ -146,55 +130,62 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('运费金额') > -1"
-            :key="checkList.length + 'floowData'"
             align="left"
             label="运费金额（元）"
             min-width="110"
           >
             <template slot-scope="{row}">
-              <el-popover
-                placement="right"
-                trigger="hover"
-                @show="getFloowData(row.wayBillId, 'confirm')"
-              >
-                <el-table
-                  v-loading="floowLoading"
-                  :data="floowData"
-                  size="mini"
-                >
-                  <el-table-column
-                    type="index"
-                    width="55"
-                    label="趟数"
-                    align="center"
-                  />
-                  <el-table-column
-                    width="150"
-                    property="deliverTime"
-                    label="时间段"
-                  />
-                  <el-table-column
-                    width="100"
-                    property="money"
-                    label="运费"
-                  />
-                </el-table>
-                <el-button
-                  slot="reference"
-                  type="text"
-                >
-                  <span v-if="row.status === 20 && row.departStatusCode !== 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
-                  <span v-if="row.status !== 20 && row.isLookFee === 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
-                </el-button>
-              </el-popover>
               <span v-if="row.departStatusCode === 1">未出车</span>
+              <template v-else>
+                <template v-if="row.flag">
+                  <el-popover
+                    placement="right"
+                    trigger="hover"
+                    @show="getFloowData(row.wayBillId, 'confirm')"
+                  >
+                    <el-table
+
+                      v-loading="floowLoading"
+                      :data="floowData"
+                      size="mini"
+                    >
+                      <el-table-column
+                        type="index"
+                        width="55"
+                        label="趟数"
+                        align="center"
+                      />
+                      <el-table-column
+                        width="150"
+                        property="deliverTime"
+                        label="时间段"
+                      />
+                      <el-table-column
+                        width="100"
+                        property="money"
+                        label="运费"
+                      />
+                    </el-table>
+                    <el-button
+                      slot="reference"
+                      type="text"
+                    >
+                      <span v-if="row.status === 20 && row.departStatusCode !== 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
+                      <span v-if="row.status !== 20 && row.isLookFee === 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
+                    </el-button>
+                  </el-popover>
+                </template>
+                <template v-else>
+                  <div @mouseover="handleHoverChange(row)">
+                    <span v-if="row.status === 20 && row.departStatusCode !== 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
+                    <span v-else-if="row.status !== 20 && row.isLookFee === 1">{{ Number(row.freightFee).toFixed(2) | DataIsNull }}</span>
+                  </div>
+                </template>
+              </template>
             </template>
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('运费状态') > -1"
-            :key="checkList.length + 'statusName'"
             align="left"
             label="运费状态"
             min-width="105"
@@ -214,8 +205,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('预估运费') > -1"
-            :key="checkList.length + 'predictCost'"
             align="left"
             label="预估运费(元)"
             min-width="100"
@@ -226,8 +215,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('司机运费上报状态') > -1"
-            :key="checkList.length + 'driverFreightFeeUpStatus'"
             align="left"
             label="司机运费上报状态"
             min-width="130"
@@ -238,55 +225,61 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('加盟侧运费') > -1 && getPermission('/canDriverFee')"
-            :key="checkList.length + 'gmFee'"
             align="left"
             label="司机运费上报金额（元）"
             min-width="155"
           >
             <template slot-scope="scope">
-              <el-popover
-                v-if="scope.row.gmStatusCode !== 2"
-                placement="right"
-                trigger="hover"
-                @show="getFloowData(scope.row.wayBillId, 'driver')"
-              >
-                <el-table
-                  v-loading="floowLoading"
-                  :data="floowData"
-                  size="mini"
-                >
-                  <el-table-column
-                    type="index"
-                    width="55"
-                    label="趟数"
-                    align="center"
-                  />
-                  <el-table-column
-                    width="150"
-                    property="deliverTime"
-                    label="时间段"
-                  />
-                  <el-table-column
-                    width="100"
-                    property="money"
-                    label="运费"
-                  />
-                </el-table>
-                <el-button
-                  slot="reference"
-                  type="text"
-                >
-                  <span v-if="scope.row.gmStatusCode === 1">{{ Number(scope.row.gmFee).toFixed(2) | DataIsNull }}</span>
-                </el-button>
-              </el-popover>
+              <template v-if="scope.row.gmStatusCode !== 2 && scope.row.gmStatusCode === 1">
+                <template v-if="scope.row.flag">
+                  <el-popover
+                    v-if="scope.row.gmStatusCode !== 2"
+                    placement="right"
+                    trigger="hover"
+                    @show="getFloowData(scope.row.wayBillId, 'driver')"
+                  >
+                    <el-table
+
+                      v-loading="floowLoading"
+                      :data="floowData"
+                      size="mini"
+                    >
+                      <el-table-column
+                        type="index"
+                        width="55"
+                        label="趟数"
+                        align="center"
+                      />
+                      <el-table-column
+                        width="150"
+                        property="deliverTime"
+                        label="时间段"
+                      />
+                      <el-table-column
+                        width="100"
+                        property="money"
+                        label="运费"
+                      />
+                    </el-table>
+                    <el-button
+                      slot="reference"
+                      type="text"
+                    >
+                      <span v-if="scope.row.gmStatusCode === 1">{{ Number(scope.row.gmFee).toFixed(2) | DataIsNull }}</span>
+                    </el-button>
+                  </el-popover>
+                </template>
+                <template v-else>
+                  <div @mouseover="handleHoverChange(scope.row)">
+                    {{ Number(scope.row.gmFee).toFixed(2) | DataIsNull }}
+                  </div>
+                </template>
+              </template>
               <span v-else>未出车</span>
             </template>
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('客户运费上报状态') > -1"
-            :key="checkList.length + 'customerFreightFeeUpStatus'"
             align="left"
             label="客户运费上报状态"
             min-width="120"
@@ -297,55 +290,61 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('外线侧运费') > -1 && getPermission('/canLineFee')"
-            :key="checkList.length + 'lineFee'"
             align="left"
             label="客户运费上报金额（元）"
             min-width="160"
           >
             <template slot-scope="scope">
-              <el-popover
-                v-if="scope.row.lineStatusCode !== 2"
-                placement="right"
-                trigger="hover"
-                @show="getFloowData(scope.row.wayBillId, 'line')"
-              >
-                <el-table
-                  v-loading="floowLoading"
-                  :data="floowData"
-                  size="mini"
-                >
-                  <el-table-column
-                    type="index"
-                    width="55"
-                    label="趟数"
-                    align="center"
-                  />
-                  <el-table-column
-                    width="150"
-                    property="deliverTime"
-                    label="时间段"
-                  />
-                  <el-table-column
-                    width="100"
-                    property="money"
-                    label="运费"
-                  />
-                </el-table>
-                <el-button
-                  slot="reference"
-                  type="text"
-                >
-                  <span v-if="scope.row.lineStatusCode === 1">{{ Number(scope.row.lineFee).toFixed(2) | DataIsNull }}</span>
-                </el-button>
-              </el-popover>
+              <template v-if="scope.row.lineStatusCode !== 2 && scope.row.lineStatusCode === 1">
+                <template v-if="scope.row.flag">
+                  <el-popover
+                    v-if="scope.row.lineStatusCode !== 2"
+                    placement="right"
+                    trigger="hover"
+                    @show="getFloowData(scope.row.wayBillId, 'line')"
+                  >
+                    <el-table
+
+                      v-loading="floowLoading"
+                      :data="floowData"
+                      size="mini"
+                    >
+                      <el-table-column
+                        type="index"
+                        width="55"
+                        label="趟数"
+                        align="center"
+                      />
+                      <el-table-column
+                        width="150"
+                        property="deliverTime"
+                        label="时间段"
+                      />
+                      <el-table-column
+                        width="100"
+                        property="money"
+                        label="运费"
+                      />
+                    </el-table>
+                    <el-button
+                      slot="reference"
+                      type="text"
+                    >
+                      <span v-if="scope.row.lineStatusCode === 1">{{ Number(scope.row.lineFee).toFixed(2) | DataIsNull }}</span>
+                    </el-button>
+                  </el-popover>
+                </template>
+                <template v-else>
+                  <div @mouseover="handleHoverChange(scope.row)">
+                    {{ Number(scope.row.lineFee).toFixed(2) | DataIsNull }}
+                  </div>
+                </template>
+              </template>
               <span v-else>未出车</span>
             </template>
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('有无差额') > -1"
-            :key="checkList.length + 'feeDiffValue'"
             align="left"
             label="有无差额（元）"
             min-width="120"
@@ -356,8 +355,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('加盟经理') > -1"
-            :key="checkList.length + 'joinManagerName'"
             align="left"
             label="加盟经理"
             min-width="150"
@@ -368,8 +365,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('上岗经理') > -1"
-            :key="checkList.length + 'dutyManagerName'"
             align="left"
             label="上岗经理"
             min-width="170"
@@ -380,8 +375,6 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('运费更新时间') > -1"
-            :key="checkList.length + 'freightUpdate'"
             align="left"
             label="运费更新时间"
             min-width="160"
@@ -392,8 +385,7 @@
           </el-table-column>
 
           <el-table-column
-            v-if="checkList.indexOf('操作') > -1"
-            :key="checkList.length + 'status'"
+
             align="left"
             label="操作"
             fixed="right"
@@ -729,28 +721,7 @@ export default class extends Vue {
       { icon: 'el-icon-finished', name: '运费确认', color: '#F2A33A', key: '3', pUrl: ['/v2/waybill/shipping/reportMoneyBatch'] },
       { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
     ];
-    private dropdownList: any[] = [
-      '出车日期',
-      '出车单号',
-      '司机姓名',
-      '出车状态',
-      '项目名称',
-      '客户名称',
-      '运费金额',
-      '司机运费上报状态',
-      '客户运费上报状态',
-      '运费更新时间',
-      '线路名称',
-      '预估运费',
-      '加盟侧运费',
-      '外线侧运费',
-      '有无差额',
-      '运费状态',
-      '加盟经理',
-      '上岗经理',
-      '操作'
-    ];
-    private checkList: any[] = this.dropdownList;
+
     private floowData: any[] = [];
     private floowLoading: Boolean = false;
     private tab: any[] = [
@@ -879,13 +850,6 @@ export default class extends Vue {
     };
     private delay: number = 1000;
 
-    @Watch('checkList', { deep: true })
-    private checkListChange(val:any) {
-      this.$nextTick(() => {
-        ((this.$refs['multipleTable']) as any).doLayout()
-      })
-    }
-
     private getPermission(role: any) {
       let permission = (localStorage as any).getItem('permission')
       if (!permission) {
@@ -945,6 +909,10 @@ export default class extends Vue {
     // 处理check方法
     private handleCheck() {
       (this.$refs.multipleTable as any).clearSelection()
+    }
+
+    handleHoverChange(row:IState) {
+      row.flag = true
     }
 
     // 处理选择日期方法
@@ -1024,10 +992,16 @@ export default class extends Vue {
       this.listQuery.page = value.page
       this.listQuery.limit = value.limit
       this.listLoading = true
+      console.time('time')
       const { data } = await GetConfirmInfoList(this.listQuery)
+      this.listLoading = false
+      console.timeEnd('time')
       if (data.success) {
-        this.$refs['multipleTable'].clearSelection()
-        this.list = data.data
+        // this.$refs['multipleTable'].clearSelection()
+        this.list = data.data.map((item:IState) => {
+          item.flag = false
+          return item
+        })
         this.tableTitle = data.title
         this.handleChecked(data.data)
         // this.tab[0].num = data.title.all
@@ -1038,7 +1012,6 @@ export default class extends Vue {
         // this.tab[5].num = data.title.secondConfirmed
         data.page = await HandlePages(data.page)
         this.total = data.page.total
-        this.listLoading = false
       } else {
         this.$message.error(data)
         this.listLoading = false
@@ -1406,19 +1379,6 @@ export default class extends Vue {
       let nowYear = now.getFullYear() // 当前年
       nowYear += (nowYear < 2000) ? 1900 : 0
       return this.formatDate(new Date(nowYear, nowMonth, nowDay + 10 - nowDayOfWeek))
-    }
-
-    // 重制
-    private reset() {
-      for (let key in this.listQuery) {
-        if (key !== 'page' && key !== 'limit' && key !== 'state') {
-          this.listQuery[key] = ''
-        }
-      }
-      this.handleCheck() // 处理选择checked
-      setTimeout(() => {
-        this.getList(this.listQuery)
-      }, 1 * 1500)
     }
 
     // 格式化日期：yyyy-MM-dd
