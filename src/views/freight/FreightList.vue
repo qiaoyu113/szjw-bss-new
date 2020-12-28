@@ -934,6 +934,7 @@ export default class extends Vue {
 
     // 所有请求方法
     private fetchData() {
+      this.listQuery.state = this.$route.params.state || ''
       this.getList(this.listQuery)
     }
 

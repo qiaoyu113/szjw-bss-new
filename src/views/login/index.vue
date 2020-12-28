@@ -296,6 +296,9 @@ export default class extends Vue {
           path: this.redirect || '/',
           query: this.otherQuery
         })
+        document.dispatchEvent(
+          new CustomEvent('showConfirmation', { detail: '' })
+        )
       } else {
         return false
       }

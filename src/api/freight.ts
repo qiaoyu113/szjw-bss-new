@@ -124,3 +124,9 @@ export const managementDerive = (data: any) =>
     method: 'post',
     data
   })
+
+// 运费待单边确认
+export const showConfirmations = () =>
+  request({
+    url: '/mock/67/v2/user/showConfirmation'
+  })
