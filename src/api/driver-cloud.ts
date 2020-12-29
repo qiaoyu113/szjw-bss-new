@@ -10,14 +10,14 @@ const businessPrefix = '/order'
 // 获取自承运司机标签列表
 export const GetDriverTagList = (data: any) =>
   request({
-    url: `${driverPrefix}/v2/driver/label-sync/list`,
+    url: `${carrierPrefix}/v2/driver/label-sync/list`,
     method: 'post',
     data
   })
 // 导出自承运司机标签列表
 export const ExportDriverTagList = (data: any) =>
   request({
-    url: `${driverPrefix}/v2/driver/label-sync/export`,
+    url: `${carrierPrefix}/v2/driver/label-sync/export`,
     method: 'post',
     data
   })
@@ -25,14 +25,14 @@ export const ExportDriverTagList = (data: any) =>
 // 承运司机标签新增或修改
 export const AddDriverTag = (data: any) =>
   request({
-    url: `${driverPrefix}/v2/driver/label-sync/create`,
+    url: `${carrierPrefix}/v2/driver/label-sync/create`,
     method: 'post',
     data
   })
 
 export const EditDriverTag = (data: any) =>
   request({
-    url: `${driverPrefix}/v2/driver/label-sync/update`,
+    url: `${carrierPrefix}/v2/driver/label-sync/update`,
     method: 'post',
     data
   })
