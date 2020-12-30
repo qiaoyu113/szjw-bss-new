@@ -8,7 +8,7 @@ import { showConfirmations } from '@/api/freight.ts'
 export default class extends Vue {
   private promptTiele = ''
   private promptbutton = '去处理'
-  private promptMsg = '你还有9999999条待单边确认的运费未处理，请及时处理！'
+  private promptMsg = ''
   private notifyHT!: ElNotificationComponent
   created() {
     document.addEventListener('showConfirmation', this.isRenderNotify)

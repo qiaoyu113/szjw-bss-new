@@ -390,6 +390,17 @@
               <span>{{ scope.row.freightUpdate | Timestamp }}</span>
             </template>
           </el-table-column>
+          <el-table-column
+            v-if="checkList.includes('单边已确认操作人')"
+            :key="checkList.length + 'confirmName'"
+            align="left"
+            label="单边已确认操作人"
+            min-width="160"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.confirmName }}</span>
+            </template>
+          </el-table-column>
 
           <el-table-column
             v-if="checkList.indexOf('操作') > -1"
@@ -748,6 +759,7 @@ export default class extends Vue {
       '运费状态',
       '加盟经理',
       '上岗经理',
+      '单边已确认操作人',
       '操作'
     ];
     private checkList: any[] = this.dropdownList;
