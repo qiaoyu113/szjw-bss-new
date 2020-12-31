@@ -52,7 +52,7 @@ export default class extends Vue {
     const isToken = !this.$store.state.user.token
     if (this.$route.path === '/' && isToken) return
     const day = new Date().getDate()
-    if (day >= 10) {
+    if (day <= 10) {
       this.showConfirmationSure()
     }
   }
@@ -69,8 +69,8 @@ export default class extends Vue {
   async showConfirmationSure() {
     try {
       const { data } = await showConfirmations()
-      if (data.success) {
-        this.promptMsg = `你还有${data.data.total}条待单边确认的运费未处理，请及时处理！`
+      if (data.success && data.data) {
+        this.promptMsg = `你还有${data.data}条待单边确认的运费未处理，请及时处理！`
         this.runderConfirmation()
       }
     } catch (error) {

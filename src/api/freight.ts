@@ -128,5 +128,5 @@ export const managementDerive = (data: any) =>
 // 运费待单边确认
 export const showConfirmations = () =>
   request({
-    url: '/mock/67/v2/user/showConfirmation'
+    url: 'waybill_center/v2/waybill/remindConfirmWaybillInfo'
   })
