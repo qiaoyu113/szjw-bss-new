@@ -1452,15 +1452,25 @@ export default class extends Vue {
     private splice(value: any) {
       return value.slice(0, 16)
     }
-
-    // 生命周期
-    created() {
+    private init() {
       let wayBillId = this.$route.query.wayBillId
       if (wayBillId) this.listQuery.wayBillId = wayBillId
       this.fetchData()
     }
+    get showioioio() {
+      return this.$store.state.app.states
+    }
+    @Watch('showioioio', { deep: true })
+    private onRouteChange() {
+      this.init()
+    }
+    // 生命周期
+    created() {
+      this.init()
+    }
 
     activated() {
+      this.init()
       this.$nextTick(() => {
         ((this.$refs['multipleTable']) as any).doLayout()
       })
