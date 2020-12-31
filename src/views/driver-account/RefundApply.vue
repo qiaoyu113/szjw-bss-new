@@ -150,9 +150,9 @@ interface listQuerys {
   bankCardNo: string // 银行卡号
   bankName: string // 开户行
   remarks: string // 备注
-  money: number|undefined // 申请退款金额
-  hasReceipt?: number|undefined // 是否有收据
-  recoveryReceipt?: number|undefined // 是否回收收据
+  money: number | undefined // 申请退款金额
+  hasReceipt?: number | undefined // 是否有收据
+  recoveryReceipt?: number | undefined // 是否回收收据
   driverId: string // 司机ID
   reason: string // 退款原因
   payMethod: number // 退款方式
@@ -162,9 +162,9 @@ interface dirverGMC {
   city: string
   gmName: string
 }
-interface accountMoney{
-  balance: number|undefined,
-  canRefund: number|undefined
+interface accountMoney {
+  balance: number | undefined
+  canRefund: number | undefined
 }
 @Component({
   name: 'RefundApply',
@@ -186,7 +186,7 @@ export default class extends Vue {
     payMethod: 6,
     payeeName: ''
   }
-  private accountMoney:accountMoney = {
+  private accountMoney: accountMoney = {
     balance: undefined,
     canRefund: undefined
   }
@@ -288,16 +288,15 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true,
         filterable: true,
-        maxlength: '30',
+        maxlength: '23',
         id: 'bank-card-no'
       },
       label: '退款银行卡号:',
       key: 'bankCardNo',
       // slot: true,
       listeners: {
-        // input: (e:any, $event:any) => this.CjuNUm(e, $event)
+        input: this.backCarInput
       }
-
     },
     {
       type: 1,
@@ -353,9 +352,7 @@ export default class extends Vue {
     }
   }
   private rules: any = {
-    driverId: [
-      { required: true, message: '请选择司机', trigger: 'change' }
-    ],
+    driverId: [{ required: true, message: '请选择司机', trigger: 'change' }],
     money: [
       { required: true, message: '请输入申请退款金额!', trigger: 'blur' },
       { validator: this.validateMaxMoney, trigger: 'blur' }
@@ -367,7 +364,7 @@ export default class extends Vue {
     bankCardNo: [
       { required: true, message: '请输入退款银行卡号！', trigger: 'blur' },
       {
-        pattern: /^[0-9]{1,30}$/,
+        pattern: /^[0-9-]{1,30}$/,
         message: '银行卡号不可有特殊字符、空格，文字等',
         trigger: 'blur'
       }
@@ -425,28 +422,36 @@ export default class extends Vue {
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
-  // private CjuNUm(e:any, event:any) {
-  //   // console.log(event)
-  //   let qx = document.querySelector('#bank-card-no')
-  //   // console.log(qx.selectionStart)
-  //   const aaac = qx.selectionStart
-  //   const oldStr = e.substring(0, aaac)
-  //   const oldStrq = oldStr.replace(/[-]/g, '')
-  //   const oldNum = oldStr.length - oldStrq.length
-  //   e = e.replace(/[-]/g, '')
-  //   e = e.split('').reverse().join('')
-  //   var t = e.replace(/\B(?=([a-zA-Z0-9]{4})+(?![a-zA-Z0-9]))/g, '-')
-  //   t = t.split('').reverse().join('')
-  //   this.listQuery.bankCardNo = t
-  //   const newStr = t.substring(0, aaac)
-  //   const newStrs = newStr.replace(/[-]/g, '')
-  //   const newNum = newStr.length - newStrs.length
-  //   const aaa = t.replace(/[-]/g, '')
-  //   setTimeout(() => {
-  //     qx.selectionStart = qx.selectionEnd = aaac + oldNum - newNum
-  //   })
-  //   // console.log(aaa)
-  // }
+  private backCarInput(cardNum: any) {
+    let input: any = document.querySelector('#bank-card-no')
+    const cursorIndex = input.selectionStart
+    const lineNumOfCursorLeft = (
+      cardNum.slice(0, cursorIndex).match(/-/g) || []
+    ).length
+    // 去掉所有-的字符串
+    const noLine = cardNum.replace(/-/g, '')
+    // 去除格式不对的字符并重新插入-的字符串
+    const newCardNum = noLine
+      .replace(/\D+/g, '')
+      .replace(/(\d{4})/g, '$1-')
+      .replace(/-$/, '')
+    // 改后字符串中原光标之前-的个数
+    const newLineNumOfCursorLeft = (
+      newCardNum.slice(0, cursorIndex).match(/-/g) || []
+    ).length
+    // 光标在改后字符串中应在的位置
+    const newCursorIndex =
+      cursorIndex + newLineNumOfCursorLeft - lineNumOfCursorLeft
+    this.$nextTick(() => {
+      this.listQuery.bankCardNo = newCardNum
+      // 修正光标位置，nextTick保证在渲染新值后定位光标
+      this.$nextTick(() => {
+        // selectionStart、selectionEnd分别代表选择一段文本时的开头和结尾位置
+        input.selectionStart = newCursorIndex
+        input.selectionEnd = newCursorIndex
+      })
+    })
+  }
   private keyup() {}
   private handleClearQueryDriver() {
     this.createFrom.splice(2)
@@ -499,6 +504,8 @@ export default class extends Vue {
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
+      const obj = { ...this.listQuery }
+      obj.bankCardNo = obj.bankCardNo.replace(/-/g, '')
       this.createRefundSure(this.listQuery)
     } catch (error) {
       return error
@@ -506,7 +513,7 @@ export default class extends Vue {
   }
 
   // 接口
-  driverSelect(this:any, e: string) {
+  driverSelect(this: any, e: string) {
     this.haveRecordToBeApprovedSure(e)
     this.$refs.RefundForm.resetForm()
     // 判断是否有已经退费的订单
@@ -657,8 +664,8 @@ export default class extends Vue {
     this.getDriverInfo(this.keyWord)
   }
   mounted() {
-    const qx:any = document.querySelector('#bank-card-no')
-    qx.addEventListener('keyup')
+    // const qx:any = document.querySelector('#bank-card-no')
+    // qx.addEventListener('keyup')
   }
 }
 </script>
