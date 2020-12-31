@@ -79,6 +79,12 @@
               退款信息
             </p>
           </template>
+          <template v-slot:bankCardNo>
+            <el-input
+              v-model="listQuery.bankCardNo"
+              placeholder="请输入123213"
+            />
+          </template>
           <!--收据 -->
           <template slot="hasReceipt">
             <el-radio-group
@@ -271,10 +277,10 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true,
         filterable: true,
-        maxlength: '30'
+        maxlength: 10
       },
-      label: '退款银行卡号:',
-      key: 'bankCardNo'
+      label: '持卡人姓名',
+      key: 'payeeName'
     },
     {
       type: 1,
@@ -282,10 +288,16 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true,
         filterable: true,
-        maxlength: 10
+        maxlength: '30',
+        id: 'bank-card-no'
       },
-      label: '持卡人姓名',
-      key: 'payeeName'
+      label: '退款银行卡号:',
+      key: 'bankCardNo',
+      // slot: true,
+      listeners: {
+        // input: (e:any, $event:any) => this.CjuNUm(e, $event)
+      }
+
     },
     {
       type: 1,
@@ -413,7 +425,29 @@ export default class extends Vue {
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
-
+  // private CjuNUm(e:any, event:any) {
+  //   // console.log(event)
+  //   let qx = document.querySelector('#bank-card-no')
+  //   // console.log(qx.selectionStart)
+  //   const aaac = qx.selectionStart
+  //   const oldStr = e.substring(0, aaac)
+  //   const oldStrq = oldStr.replace(/[-]/g, '')
+  //   const oldNum = oldStr.length - oldStrq.length
+  //   e = e.replace(/[-]/g, '')
+  //   e = e.split('').reverse().join('')
+  //   var t = e.replace(/\B(?=([a-zA-Z0-9]{4})+(?![a-zA-Z0-9]))/g, '-')
+  //   t = t.split('').reverse().join('')
+  //   this.listQuery.bankCardNo = t
+  //   const newStr = t.substring(0, aaac)
+  //   const newStrs = newStr.replace(/[-]/g, '')
+  //   const newNum = newStr.length - newStrs.length
+  //   const aaa = t.replace(/[-]/g, '')
+  //   setTimeout(() => {
+  //     qx.selectionStart = qx.selectionEnd = aaac + oldNum - newNum
+  //   })
+  //   // console.log(aaa)
+  // }
+  private keyup() {}
   private handleClearQueryDriver() {
     this.createFrom.splice(2)
     this.isOneCreate = true
@@ -621,6 +655,10 @@ export default class extends Vue {
   }
   created() {
     this.getDriverInfo(this.keyWord)
+  }
+  mounted() {
+    const qx:any = document.querySelector('#bank-card-no')
+    qx.addEventListener('keyup')
   }
 }
 </script>
