@@ -409,6 +409,9 @@ export default class extends Vue {
         nowYear += (nowYear < 2000) ? 1900 : 0//
         let lastMonthDate = new Date()// 上月日期
         lastMonthDate.setDate(1)
+        if (lastMonthDate.getMonth() + 1 === 1) { // 如果当月年份为1月 需要年份减1
+          nowYear -= 1
+        }
         lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
         let lastMonth = lastMonthDate.getMonth()
         // 获得某月天数
