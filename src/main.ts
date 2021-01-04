@@ -54,7 +54,7 @@ Vue.config.productionTip = false
 if (window.location.host === 'szjw-bss-web.yunniao.cn' || window.location.host === 'szjw-bss-web-m1.yunniao.cn') {
   Sentry.init({
     Vue,
-    dsn: 'https://08a5a7a0aa944b118317eaf044afcbe0@o496888.ingest.sentry.io/5572228',
+    dsn: 'http://102c65171fc5431b910a2bb4c320a958@sentry.yunniao.cn/2',
     autoSessionTracking: true,
     integrations: [
       new Integrations.BrowserTracing()
