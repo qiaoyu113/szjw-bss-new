@@ -79,11 +79,18 @@
               退款信息
             </p>
           </template>
-          <template v-slot:bankCardNo>
-            <el-input
-              v-model="listQuery.bankCardNo"
-              placeholder="请输入123213"
-            />
+          <template v-slot:bankName>
+            <div style="width:100%">
+              <el-input
+                v-model="listQuery.bankName"
+                clearable
+                filterable
+                maxlength="50"
+                placeholder="请输入"
+                style="width:100%"
+              />
+              &nbsp;<span style="color:#999">银行卡号自动关联开户行请谨慎修改！</span>
+            </div>
           </template>
           <!--收据 -->
           <template slot="hasReceipt">
@@ -295,19 +302,15 @@ export default class extends Vue {
       key: 'bankCardNo',
       // slot: true,
       listeners: {
-        input: this.backCarInput
+        input: this.backCardInput,
+        clear: this.backCardClear
       }
     },
     {
-      type: 1,
-      tagAttrs: {
-        placeholder: '请输入',
-        clearable: true,
-        filterable: true,
-        maxlength: '50'
-      },
+      type: 'bankName',
       label: '开户行:',
-      key: 'bankName'
+      key: 'bankName',
+      slot: true
     },
     ...this.activeFromC,
     {
@@ -422,7 +425,7 @@ export default class extends Vue {
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
-  private backCarInput(cardNum: any) {
+  private backCardInput(cardNum: any) {
     let input: any = document.querySelector('#bank-card-no')
     const cursorIndex = input.selectionStart
     const lineNumOfCursorLeft = (
@@ -430,6 +433,9 @@ export default class extends Vue {
     ).length
     // 去掉所有-的字符串
     const noLine = cardNum.replace(/-/g, '')
+    if (noLine.length >= 6) {
+      this.listQuery.bankName = '中国银行'
+    }
     // 去除格式不对的字符并重新插入-的字符串
     const newCardNum = noLine
       .replace(/\D+/g, '')
@@ -452,7 +458,9 @@ export default class extends Vue {
       })
     })
   }
-  private keyup() {}
+  private backCardClear() {
+    this.listQuery.bankName = ''
+  }
   private handleClearQueryDriver() {
     this.createFrom.splice(2)
     this.isOneCreate = true
@@ -490,7 +498,18 @@ export default class extends Vue {
   }
   // 触发表单校验
   private Submit(this: any) {
+    // 待补充
+    if (!this.backCardNoValidator()) return
     this.$refs.RefundForm.submitForm()
+  }
+  private backCardNoValidator() {
+    const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
+    if (noLine.length > 3) return true
+    this.$message({
+      type: 'error',
+      message: '您的银行卡号输入错误~请重新输入后提交~'
+    })
+    return false
   }
   // 表单检验通过
   private handlePassClick(valid: any) {
@@ -501,6 +520,9 @@ export default class extends Vue {
           message: '该司机当前有待退费记录，请处理完毕后在申请退费！'
         })
       }
+      // 校验银行卡信息
+      // this.backCardNoValidator()
+      // return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
