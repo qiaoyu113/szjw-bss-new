@@ -51,9 +51,10 @@ Object.keys(filters).forEach(key => {
 
 Vue.config.productionTip = false
 
-if (window.location.host === 'szjw-bss-web.yunniao.cn' || window.location.host === 'szjw-bss-web-m1.yunniao.cn') {
+if (window.location.host === 'szjw-bss-web.yunniao.cn') {
   Sentry.init({
     Vue,
+    release: 'szjw-web',
     dsn: 'http://102c65171fc5431b910a2bb4c320a958@sentry.yunniao.cn/2',
     autoSessionTracking: true,
     integrations: [
