@@ -52,7 +52,7 @@ export default class extends Vue {
     const isToken = !this.$store.state.user.token
     if (this.$route.path === '/' && isToken) return
     const day = new Date().getDate()
-    if (day >= 10) {
+    if (day <= 10) {
       this.showConfirmationSure()
     }
   }
