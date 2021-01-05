@@ -356,6 +356,7 @@ export default class extends Vue {
       this.createFrom.splice(inx, splicInx, ...this.activeFromC)
     }
   }
+  // 校验规则
   private rules: any = {
     driverId: [{ required: true, message: '请选择司机', trigger: 'change' }],
     money: [
@@ -404,7 +405,6 @@ export default class extends Vue {
     }
     callback()
   }
-  // 校验规则
   private backToList() {
     this.$confirm('确认要放弃已填写内容返回上一页面？', '提示', {
       confirmButtonText: '确定',
@@ -418,11 +418,13 @@ export default class extends Vue {
       })
       .catch(() => {})
   }
-  // 司机列表收索
+  // 司机列表搜索
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
+  // 创建校验BankCard
   private BC = new CardBin()
+  // 处理cardNo
   private backCardInput(cardNum: any) {
     let input: any = document.querySelector('#bank-card-no')
     const cursorIndex = input.selectionStart
@@ -431,6 +433,7 @@ export default class extends Vue {
     ).length
     // 去掉所有-的字符串
     const noLine = cardNum.replace(/-/g, '');
+    // 清除状态
     ((this.$refs['RefundForm']) as any).clearValidate(['bankCardNo', 'bankName'])
     // 是否回显银行卡的信息
     if (noLine.length >= 6) {
@@ -502,7 +505,7 @@ export default class extends Vue {
   // 触发表单校验
   private Submit(this: any) {
     // 待补充
-    if (!this.backCardNoValidator()) return
+    // if (!this.backCardNoValidator()) return
     this.$refs.RefundForm.submitForm()
   }
   private backCardNoValidator() {
@@ -533,7 +536,7 @@ export default class extends Vue {
       }
       const obj = { ...this.listQuery }
       obj.bankCardNo = obj.bankCardNo.replace(/-/g, '')
-      this.createRefundSure(this.listQuery)
+      this.createRefundSure(obj)
     } catch (error) {
       return error
     }
@@ -609,6 +612,7 @@ export default class extends Vue {
         return false
       }
       const { data } = res
+      // 金额回显处理
       const newCardNum = data.bankCardNo && data.bankCardNo
         .replace(/\D+/g, '')
         .replace(/(\d{4})/g, '$1-')
@@ -640,8 +644,6 @@ export default class extends Vue {
       })
     } catch (error) {
       return error
-    } finally {
-      console.log('')
     }
   }
   async getDriverInfo(keyWord: string = '') {
