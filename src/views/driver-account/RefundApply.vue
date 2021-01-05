@@ -79,6 +79,19 @@
               退款信息
             </p>
           </template>
+          <template v-slot:bankName>
+            <div style="width:100%">
+              <el-input
+                v-model="listQuery.bankName"
+                clearable
+                filterable
+                maxlength="50"
+                placeholder="请输入"
+                style="width:100%"
+              />
+              &nbsp;<span style="color:#999">银行卡号自动关联开户行请谨慎修改！</span>
+            </div>
+          </template>
           <!--收据 -->
           <template slot="hasReceipt">
             <el-radio-group
@@ -128,6 +141,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
+// import { CardBin } from 'bankcard'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { options } from 'numeral'
 import { getDriverNoAndNameList } from '@/api/driver'
@@ -137,6 +151,7 @@ import {
   getRefundEcho,
   createRefund
 } from '@/api/driver-refund'
+const { CardBin } = require('bankcard')
 interface IState {
   [key: string]: any
 }
@@ -144,9 +159,9 @@ interface listQuerys {
   bankCardNo: string // 银行卡号
   bankName: string // 开户行
   remarks: string // 备注
-  money: number|undefined // 申请退款金额
-  hasReceipt?: number|undefined // 是否有收据
-  recoveryReceipt?: number|undefined // 是否回收收据
+  money: number | undefined // 申请退款金额
+  hasReceipt?: number | undefined // 是否有收据
+  recoveryReceipt?: number | undefined // 是否回收收据
   driverId: string // 司机ID
   reason: string // 退款原因
   payMethod: number // 退款方式
@@ -156,9 +171,9 @@ interface dirverGMC {
   city: string
   gmName: string
 }
-interface accountMoney{
-  balance: number|undefined,
-  canRefund: number|undefined
+interface accountMoney {
+  balance: number | undefined
+  canRefund: number | undefined
 }
 @Component({
   name: 'RefundApply',
@@ -180,7 +195,7 @@ export default class extends Vue {
     payMethod: 6,
     payeeName: ''
   }
-  private accountMoney:accountMoney = {
+  private accountMoney: accountMoney = {
     balance: undefined,
     canRefund: undefined
   }
@@ -271,17 +286,6 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true,
         filterable: true,
-        maxlength: '30'
-      },
-      label: '退款银行卡号:',
-      key: 'bankCardNo'
-    },
-    {
-      type: 1,
-      tagAttrs: {
-        placeholder: '请输入',
-        clearable: true,
-        filterable: true,
         maxlength: 10
       },
       label: '持卡人姓名',
@@ -293,10 +297,22 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true,
         filterable: true,
-        maxlength: '50'
+        maxlength: '23',
+        id: 'bank-card-no'
       },
+      label: '退款银行卡号:',
+      key: 'bankCardNo',
+      // slot: true,
+      listeners: {
+        input: this.backCardInput,
+        clear: this.backCardClear
+      }
+    },
+    {
+      type: 'bankName',
       label: '开户行:',
-      key: 'bankName'
+      key: 'bankName',
+      slot: true
     },
     ...this.activeFromC,
     {
@@ -340,10 +356,9 @@ export default class extends Vue {
       this.createFrom.splice(inx, splicInx, ...this.activeFromC)
     }
   }
+  // 校验规则
   private rules: any = {
-    driverId: [
-      { required: true, message: '请选择司机', trigger: 'change' }
-    ],
+    driverId: [{ required: true, message: '请选择司机', trigger: 'change' }],
     money: [
       { required: true, message: '请输入申请退款金额!', trigger: 'blur' },
       { validator: this.validateMaxMoney, trigger: 'blur' }
@@ -355,7 +370,7 @@ export default class extends Vue {
     bankCardNo: [
       { required: true, message: '请输入退款银行卡号！', trigger: 'blur' },
       {
-        pattern: /^[0-9]{1,30}$/,
+        pattern: /^[0-9-]{1,30}$/,
         message: '银行卡号不可有特殊字符、空格，文字等',
         trigger: 'blur'
       }
@@ -376,11 +391,6 @@ export default class extends Vue {
     ],
     payeeName: [
       { required: true, message: '请输入持卡人姓名！', trigger: 'blur' }
-      // {
-      //   pattern: /^[\u4e00-\u9fa5]{1,10}$/,
-      //   message: '持卡人姓名不可超过10个字',
-      //   trigger: 'blur'
-      // }
     ]
   }
   // 校验函数
@@ -395,7 +405,6 @@ export default class extends Vue {
     }
     callback()
   }
-  // 校验规则
   private backToList() {
     this.$confirm('确认要放弃已填写内容返回上一页面？', '提示', {
       confirmButtonText: '确定',
@@ -409,11 +418,57 @@ export default class extends Vue {
       })
       .catch(() => {})
   }
-  // 司机列表收索
+  // 司机列表搜索
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
-
+  // 创建校验BankCard
+  private BC = new CardBin()
+  // 处理cardNo
+  private backCardInput(cardNum: any) {
+    let input: any = document.querySelector('#bank-card-no')
+    const cursorIndex = input.selectionStart
+    const lineNumOfCursorLeft = (
+      cardNum.slice(0, cursorIndex).match(/-/g) || []
+    ).length
+    // 去掉所有-的字符串
+    const noLine = cardNum.replace(/-/g, '');
+    // 清除状态
+    ((this.$refs['RefundForm']) as any).clearValidate(['bankCardNo', 'bankName'])
+    // 是否回显银行卡的信息
+    if (noLine.length >= 6) {
+      const aa = this.BC.searchCardBin(noLine)
+      if (aa !== null && !this.listQuery.bankName.includes(aa.bankName)) {
+        this.listQuery.bankName = aa.bankName
+      }
+    } else if (noLine.length === 0) {
+      this.listQuery.bankName = ''
+    }
+    // 去除格式不对的字符并重新插入-的字符串
+    const newCardNum = noLine
+      .replace(/\D+/g, '')
+      .replace(/(\d{4})/g, '$1-')
+      .replace(/-$/, '')
+    // 改后字符串中原光标之前-的个数
+    const newLineNumOfCursorLeft = (
+      newCardNum.slice(0, cursorIndex).match(/-/g) || []
+    ).length
+    // 光标在改后字符串中应在的位置
+    const newCursorIndex =
+      cursorIndex + newLineNumOfCursorLeft - lineNumOfCursorLeft
+    this.$nextTick(() => {
+      this.listQuery.bankCardNo = newCardNum
+      // 修正光标位置，nextTick保证在渲染新值后定位光标
+      this.$nextTick(() => {
+        // selectionStart、selectionEnd分别代表选择一段文本时的开头和结尾位置
+        input.selectionStart = newCursorIndex
+        input.selectionEnd = newCursorIndex
+      })
+    })
+  }
+  private backCardClear() {
+    this.listQuery.bankName = ''
+  }
   private handleClearQueryDriver() {
     this.createFrom.splice(2)
     this.isOneCreate = true
@@ -424,8 +479,6 @@ export default class extends Vue {
       driverId: '',
       bankCardNo: '',
       money: undefined,
-      // hasReceipt: undefined,
-      // recoveryReceipt: undefined,
       bankName: '',
       remarks: '',
       reason: '',
@@ -451,7 +504,21 @@ export default class extends Vue {
   }
   // 触发表单校验
   private Submit(this: any) {
+    // 待补充
+    // if (!this.backCardNoValidator()) return
     this.$refs.RefundForm.submitForm()
+  }
+  private backCardNoValidator() {
+    const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
+    const resBnak = this.BC.validateCardInfo(noLine)
+    if (!resBnak.validated) {
+      this.$message({
+        type: 'error',
+        message: '您的银行卡号输入错误~请重新输入后提交~'
+      })
+      return false
+    }
+    return true
   }
   // 表单检验通过
   private handlePassClick(valid: any) {
@@ -462,17 +529,21 @@ export default class extends Vue {
           message: '该司机当前有待退费记录，请处理完毕后在申请退费！'
         })
       }
+      // 校验银行卡信息
+      if (!this.backCardNoValidator()) return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
-      this.createRefundSure(this.listQuery)
+      const obj = { ...this.listQuery }
+      obj.bankCardNo = obj.bankCardNo.replace(/-/g, '')
+      this.createRefundSure(obj)
     } catch (error) {
       return error
     }
   }
 
   // 接口
-  driverSelect(this:any, e: string) {
+  driverSelect(this: any, e: string) {
     this.haveRecordToBeApprovedSure(e)
     this.$refs.RefundForm.resetForm()
     // 判断是否有已经退费的订单
@@ -541,7 +612,12 @@ export default class extends Vue {
         return false
       }
       const { data } = res
-      this.listQuery.bankCardNo = data.bankCardNo || ''
+      // 金额回显处理
+      const newCardNum = data.bankCardNo && data.bankCardNo
+        .replace(/\D+/g, '')
+        .replace(/(\d{4})/g, '$1-')
+        .replace(/-$/, '')
+      this.listQuery.bankCardNo = newCardNum || ''
       this.listQuery.bankName = data.bankName || ''
       this.accountMoney.balance = data.balance || 0
       this.accountMoney.canRefund = data.canRefund || 0
@@ -568,8 +644,6 @@ export default class extends Vue {
       })
     } catch (error) {
       return error
-    } finally {
-      console.log('')
     }
   }
   async getDriverInfo(keyWord: string = '') {
@@ -621,6 +695,10 @@ export default class extends Vue {
   }
   created() {
     this.getDriverInfo(this.keyWord)
+  }
+  mounted() {
+    // const qx:any = document.querySelector('#bank-card-no')
+    // qx.addEventListener('keyup')
   }
 }
 </script>
