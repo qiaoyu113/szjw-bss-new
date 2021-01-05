@@ -18,7 +18,7 @@ export default class extends Vue {
     const h = this.$createElement
     // this.registration = (e as CustomEvent).detail
     this.notifyHT = this.$notify.info({
-      title: '',
+      title: '重要提示',
       message: h('div', { class: 'sw-update-popup' }, [
         this.promptMsg,
         h('br'),
