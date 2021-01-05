@@ -141,6 +141,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
+// import { CardBin } from 'bankcard'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { options } from 'numeral'
 import { getDriverNoAndNameList } from '@/api/driver'
@@ -150,6 +151,7 @@ import {
   getRefundEcho,
   createRefund
 } from '@/api/driver-refund'
+const { CardBin } = require('bankcard')
 interface IState {
   [key: string]: any
 }
@@ -388,11 +390,6 @@ export default class extends Vue {
     ],
     payeeName: [
       { required: true, message: '请输入持卡人姓名！', trigger: 'blur' }
-      // {
-      //   pattern: /^[\u4e00-\u9fa5]{1,10}$/,
-      //   message: '持卡人姓名不可超过10个字',
-      //   trigger: 'blur'
-      // }
     ]
   }
   // 校验函数
@@ -425,6 +422,7 @@ export default class extends Vue {
   private loadmore() {
     this.getDriverInfo(this.keyWord)
   }
+  private BC = new CardBin()
   private backCardInput(cardNum: any) {
     let input: any = document.querySelector('#bank-card-no')
     const cursorIndex = input.selectionStart
@@ -432,9 +430,16 @@ export default class extends Vue {
       cardNum.slice(0, cursorIndex).match(/-/g) || []
     ).length
     // 去掉所有-的字符串
-    const noLine = cardNum.replace(/-/g, '')
+    const noLine = cardNum.replace(/-/g, '');
+    ((this.$refs['RefundForm']) as any).clearValidate(['bankCardNo', 'bankName'])
+    // 是否回显银行卡的信息
     if (noLine.length >= 6) {
-      this.listQuery.bankName = '中国银行'
+      const aa = this.BC.searchCardBin(noLine)
+      if (aa !== null && !this.listQuery.bankName.includes(aa.bankName)) {
+        this.listQuery.bankName = aa.bankName
+      }
+    } else if (noLine.length === 0) {
+      this.listQuery.bankName = ''
     }
     // 去除格式不对的字符并重新插入-的字符串
     const newCardNum = noLine
@@ -471,8 +476,6 @@ export default class extends Vue {
       driverId: '',
       bankCardNo: '',
       money: undefined,
-      // hasReceipt: undefined,
-      // recoveryReceipt: undefined,
       bankName: '',
       remarks: '',
       reason: '',
@@ -504,12 +507,15 @@ export default class extends Vue {
   }
   private backCardNoValidator() {
     const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
-    if (noLine.length > 3) return true
-    this.$message({
-      type: 'error',
-      message: '您的银行卡号输入错误~请重新输入后提交~'
-    })
-    return false
+    const resBnak = this.BC.validateCardInfo(noLine)
+    if (!resBnak.validated) {
+      this.$message({
+        type: 'error',
+        message: '您的银行卡号输入错误~请重新输入后提交~'
+      })
+      return false
+    }
+    return true
   }
   // 表单检验通过
   private handlePassClick(valid: any) {
@@ -521,8 +527,7 @@ export default class extends Vue {
         })
       }
       // 校验银行卡信息
-      // this.backCardNoValidator()
-      // return
+      if (!this.backCardNoValidator()) return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
@@ -604,7 +609,11 @@ export default class extends Vue {
         return false
       }
       const { data } = res
-      this.listQuery.bankCardNo = data.bankCardNo || ''
+      const newCardNum = data.bankCardNo && data.bankCardNo
+        .replace(/\D+/g, '')
+        .replace(/(\d{4})/g, '$1-')
+        .replace(/-$/, '')
+      this.listQuery.bankCardNo = newCardNum || ''
       this.listQuery.bankName = data.bankName || ''
       this.accountMoney.balance = data.balance || 0
       this.accountMoney.canRefund = data.canRefund || 0
