@@ -266,6 +266,7 @@ export default class extends Vue {
         setTimeout(() => {
           this.loading = false
         }, 0.5 * 1000)
+
         if (data && data.isWeakPwd) {
           // 强制修改密码
           this.token = data.token
@@ -284,6 +285,10 @@ export default class extends Vue {
           return
         }
 
+        document.dispatchEvent(
+          new CustomEvent('showConfirmation', { detail: '' })
+        )
+
         // if (data && !data.settingFlag) {
         //   // 强制修改密码
         //   // this.reCreat.id = data.
@@ -296,9 +301,6 @@ export default class extends Vue {
           path: this.redirect || '/',
           query: this.otherQuery
         })
-        document.dispatchEvent(
-          new CustomEvent('showConfirmation', { detail: '' })
-        )
       } else {
         return false
       }

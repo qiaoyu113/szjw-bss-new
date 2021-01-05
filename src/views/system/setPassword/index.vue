@@ -271,6 +271,9 @@ export default class extends Vue {
               this.$router.push('/profile/index')
             }, 0)
           }
+          document.dispatchEvent(
+            new CustomEvent('showConfirmation', { detail: '' })
+          )
           setTimeout(() => {
             this.isSetAll = false
             this.$router.push('/profile/index')
