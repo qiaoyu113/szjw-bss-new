@@ -156,6 +156,6 @@ export default class extends Vue {
   border: none;
   height: 100%;
   width: 100% !important;
-  background: #4589 !important;
+  background: #474C4F !important;
 }
 </style>
