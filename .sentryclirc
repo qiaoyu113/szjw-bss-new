@@ -1,5 +1,5 @@
 [defaults]
-url = http://sentry.yunniao.cn/
+url = https://sentry.yunniao.cn/
 project=szjw-web
 org=sentry
 
