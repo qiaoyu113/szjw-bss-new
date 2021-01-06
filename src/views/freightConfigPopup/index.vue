@@ -59,10 +59,8 @@ export default class extends Vue {
   refreshApp() {
     this.notifyHT.close() // 关闭弹窗
     if (this.$route.name === 'FreightList') {
-      console.log(this.$store.state.app.states)
       this.$route.params.state = '10'
       this.$store.commit('TOGGLE_STATE', '10')
-      console.log(this.$store.state.app.states)
       return
     }
     this.$router.push({
