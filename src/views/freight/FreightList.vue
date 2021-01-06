@@ -383,6 +383,17 @@
               <span>{{ scope.row.freightUpdate | Timestamp }}</span>
             </template>
           </el-table-column>
+          <el-table-column
+            v-if="checkList.includes('单边已确认操作人')"
+            :key="checkList.length + 'confirmName'"
+            align="left"
+            label="单边已确认操作人"
+            min-width="160"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.confirmName }}</span>
+            </template>
+          </el-table-column>
 
           <el-table-column
 
@@ -721,7 +732,29 @@ export default class extends Vue {
       { icon: 'el-icon-finished', name: '运费确认', color: '#F2A33A', key: '3', pUrl: ['/v2/waybill/shipping/reportMoneyBatch'] },
       { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
     ];
-
+    private dropdownList: any[] = [
+      '出车日期',
+      '出车单号',
+      '司机姓名',
+      '出车状态',
+      '项目名称',
+      '客户名称',
+      '运费金额',
+      '司机运费上报状态',
+      '客户运费上报状态',
+      '运费更新时间',
+      '线路名称',
+      '预估运费',
+      '加盟侧运费',
+      '外线侧运费',
+      '有无差额',
+      '运费状态',
+      '加盟经理',
+      '上岗经理',
+      '单边已确认操作人',
+      '操作'
+    ];
+    private checkList: any[] = this.dropdownList;
     private floowData: any[] = [];
     private floowLoading: Boolean = false;
     private tab: any[] = [
@@ -898,6 +931,7 @@ export default class extends Vue {
 
     // 所有请求方法
     private fetchData() {
+      this.listQuery.state = this.$route.params.state || ''
       this.getList(this.listQuery)
     }
 
@@ -1399,15 +1433,25 @@ export default class extends Vue {
     private splice(value: any) {
       return value.slice(0, 16)
     }
-
-    // 生命周期
-    created() {
+    private init() {
       let wayBillId = this.$route.query.wayBillId
       if (wayBillId) this.listQuery.wayBillId = wayBillId
       this.fetchData()
     }
+    get showioioio() {
+      return this.$store.state.app.states
+    }
+    @Watch('showioioio', { deep: true })
+    private onRouteChange() {
+      this.init()
+    }
+    // 生命周期
+    created() {
+      this.init()
+    }
 
     activated() {
+      this.init()
       this.$nextTick(() => {
         ((this.$refs['multipleTable']) as any).doLayout()
       })

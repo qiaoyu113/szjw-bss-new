@@ -6,6 +6,7 @@
     />
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <el-menu
+        :class="getLocal ? 'el-menu' : 'el-menu-m1'"
         :default-active="activeMenu"
         :collapse="isCollapse"
         :background-color="variables.menuBg"
@@ -85,6 +86,10 @@ export default class extends Vue {
     return !this.sidebar.opened
   }
 
+  get getLocal() {
+    return window.location.host === 'szjw-bss-web.yunniao.cn'
+  }
+
   get Version() {
     return AppModule.version
   }
@@ -141,11 +146,16 @@ export default class extends Vue {
     height: calc(100% - 50px);
   }
 }
-
 .el-menu {
   border: none;
   height: 100%;
   width: 100% !important;
   background: $subMenuBg !important;
+}
+.el-menu-m1 {
+  border: none;
+  height: 100%;
+  width: 100% !important;
+  background: #474C4F !important;
 }
 </style>

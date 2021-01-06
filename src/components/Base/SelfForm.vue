@@ -243,6 +243,9 @@ export default class extends Vue {
     resetForm() {
       ((this.$refs['ruleForm']) as any).resetFields()
     }
+    clearValidate(props:Array<string>|string) {
+      ((this.$refs['ruleForm']) as any).clearValidate(props)
+    }
     @Emit('onPass')
     handlePass(isPass:boolean, args:any) {
     }

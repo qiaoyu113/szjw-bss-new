@@ -124,3 +124,9 @@ export const managementDerive = (data: any) =>
     method: 'post',
     data
   })
+
+// 运费待单边确认
+export const showConfirmations = () =>
+  request({
+    url: 'waybill_center/v2/waybill/remindConfirmWaybillInfo'
+  })
