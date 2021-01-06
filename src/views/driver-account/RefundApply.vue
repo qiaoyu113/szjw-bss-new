@@ -508,18 +508,18 @@ export default class extends Vue {
     // if (!this.backCardNoValidator()) return
     this.$refs.RefundForm.submitForm()
   }
-  private backCardNoValidator() {
-    const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
-    const resBnak = this.BC.validateCardInfo(noLine)
-    if (!resBnak.validated) {
-      this.$message({
-        type: 'error',
-        message: '您的银行卡号输入错误~请重新输入后提交~'
-      })
-      return false
-    }
-    return true
-  }
+  // private backCardNoValidator() {
+  //   const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
+  //   const resBnak = this.BC.validateCardInfo(noLine)
+  //   if (!resBnak.validated) {
+  //     this.$message({
+  //       type: 'error',
+  //       message: '您的银行卡号输入错误~请重新输入后提交~'
+  //     })
+  //     return false
+  //   }
+  //   return true
+  // }
   // 表单检验通过
   private handlePassClick(valid: any) {
     try {
@@ -530,7 +530,7 @@ export default class extends Vue {
         })
       }
       // 校验银行卡信息
-      if (!this.backCardNoValidator()) return
+      // if (!this.backCardNoValidator()) return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
