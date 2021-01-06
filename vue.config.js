@@ -61,6 +61,7 @@ module.exports = {
   },
   // other configuration
   configureWebpack: {
+    name: name,
     plugins: [
       new SentryWebpackPlugin({
         // sentry-cli configuration
