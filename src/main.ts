@@ -19,6 +19,8 @@ import '@/utils/error-log'
 import '@/pwa/register-service-worker'
 import * as directives from '@/directives'
 import * as filters from '@/filters'
+import * as Sentry from '@sentry/vue'
+import { Integrations } from '@sentry/tracing'
 
 Vue.use(ElementUI, {
   size: AppModule.size, // Set element-ui default size
@@ -48,6 +50,22 @@ Object.keys(filters).forEach(key => {
 })
 
 Vue.config.productionTip = false
+
+if (window.location.host === 'szjw-bss-web.yunniao.cn') {
+  Sentry.init({
+    Vue,
+    release: 'szjw-web',
+    dsn: 'https://102c65171fc5431b910a2bb4c320a958@sentry.yunniao.cn/2',
+    autoSessionTracking: true,
+    integrations: [
+      new Integrations.BrowserTracing()
+    ],
+
+    // We recommend adjusting this value in production, or using tracesSampler
+    // for finer control
+    tracesSampleRate: 1.0
+  })
+}
 
 new Vue({
   router,

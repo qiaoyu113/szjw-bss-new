@@ -1,0 +1,7 @@
+[defaults]
+url = https://sentry.yunniao.cn/
+project=szjw-web
+org=sentry
+
+[auth]  
+token=e4512f5bd6fc49ab81461a62ad5e278070cbd248ece94bcfaf10eb91d47dc8a9
