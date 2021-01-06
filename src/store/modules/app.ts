@@ -28,7 +28,11 @@ class App extends VuexModule implements IAppState {
   public language = getLocale()
   public size = getSize() || 'medium'
   public version = '2.1.0'
-
+  public states = ''
+  @Mutation
+  private TOGGLE_STATE(state:string) {
+    this.states = state
+  }
   @Mutation
   private TOGGLE_SIDEBAR(withoutAnimation: boolean) {
     this.sidebar.opened = !this.sidebar.opened
