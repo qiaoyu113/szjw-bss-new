@@ -63,6 +63,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@sentry/webpack-plugin": "^1.14.0",
     "@types/clipboard": "^2.0.1",
     "@types/codemirror": "^0.0.76",
     "@types/compression": "^1.0.0",
