@@ -230,7 +230,7 @@
             min-width="155"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.gmStatusCode !== 2 && scope.row.gmStatusCode === 1">
+              <template v-if="scope.row.gmStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.gmStatusCode !== 2"
@@ -295,7 +295,7 @@
             min-width="160"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.lineStatusCode !== 2 && scope.row.lineStatusCode === 1">
+              <template v-if="scope.row.lineStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.lineStatusCode !== 2"
