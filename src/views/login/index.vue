@@ -71,6 +71,9 @@
         </el-button>
       </div>
     </el-form>
+    <div class="domain-text">
+      <p>©2014-2020 北京云鸟科技有限公司 版权所有 京ICP备<a href="https://beian.miit.gov.cn/">16001633号-1</a></p>
+    </div>
 
     <el-dialog
       :title="$t('login.thirdparty')"
@@ -659,6 +662,17 @@ $color: #2194e0;
       right: 0;
       bottom: 6px;
     }
+  }
+}
+.domain-text{
+  width: 100%;
+  text-align: center;
+  color: #999;
+  position: fixed;
+  bottom: 40px;
+  font-size: 14px;
+  a{
+    color: #999;
   }
 }
 .shadowBg {
