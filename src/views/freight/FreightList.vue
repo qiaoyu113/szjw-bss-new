@@ -230,7 +230,7 @@
             min-width="155"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.gmStatusCode !== 2 && scope.row.gmStatusCode === 1">
+              <template v-if="scope.row.gmStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.gmStatusCode !== 2"
@@ -269,7 +269,7 @@
                     </el-button>
                   </el-popover>
                 </template>
-                <template v-else>
+                <template v-else-if="scope.row.gmStatusCode === 1">
                   <div @mouseover="handleHoverChange(scope.row)">
                     {{ Number(scope.row.gmFee).toFixed(2) | DataIsNull }}
                   </div>
@@ -295,7 +295,7 @@
             min-width="160"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.lineStatusCode !== 2 && scope.row.lineStatusCode === 1">
+              <template v-if="scope.row.lineStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.lineStatusCode !== 2"
@@ -334,7 +334,7 @@
                     </el-button>
                   </el-popover>
                 </template>
-                <template v-else>
+                <template v-else-if="scope.row.lineStatusCode === 1">
                   <div @mouseover="handleHoverChange(scope.row)">
                     {{ Number(scope.row.lineFee).toFixed(2) | DataIsNull }}
                   </div>
@@ -1498,7 +1498,7 @@ export default class extends Vue {
       padding: 15px 30px 0;
       box-sizing: border-box;
       background: #ffffff;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
   }
   .edit-input {
