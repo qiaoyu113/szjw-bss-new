@@ -1317,21 +1317,23 @@ export default class extends Vue {
           noCheck.push(element.wayBillAmountId)
         })
       })
-      this.$alert('确定全部' + noCheck.length + '个出车，全部未出车！', '提示', {
+      this.$alert('确定全部' + this.freightFormAll.lists.length + '个出车，全部未出车！', '提示', {
         confirmButtonText: '确定',
         callback: async action => {
-          const { data } = await NoCarBatch(noCheck, this.remarkAll)
-          if (data.success) {
-            this.assignShowDialogMin = false
-            this.handleCheck()
-            setTimeout(() => {
-              this.getList(this.listQuery)
-              this.$message.success('已成功操作全部未出车')
-              document.body.scrollTop = document.documentElement.scrollTop = 0
-            }, this.delay)
-            done()
-          } else {
-            this.$message.error(data.errorMsg)
+          if (action === 'confirm') {
+            const { data } = await NoCarBatch(noCheck, this.remarkAll)
+            if (data.success) {
+              this.assignShowDialogMin = false
+              this.handleCheck()
+              setTimeout(() => {
+                this.getList(this.listQuery)
+                this.$message.success('已成功操作全部未出车')
+                document.body.scrollTop = document.documentElement.scrollTop = 0
+              }, this.delay)
+              done()
+            } else {
+              this.$message.error(data.errorMsg)
+            }
           }
         }
       })
