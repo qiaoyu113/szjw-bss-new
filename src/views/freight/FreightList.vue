@@ -1313,7 +1313,9 @@ export default class extends Vue {
     private confirmAssignOther(done: any) {
       let noCheck: any = []
       this.freightFormAll.lists.forEach((i: any) => {
-        noCheck.push(i.wayBillAmountId)
+        i.list.forEach((element: any) => {
+          noCheck.push(element.wayBillAmountId)
+        })
       })
       this.$alert('确定全部' + noCheck.length + '个出车，全部未出车！', '提示', {
         confirmButtonText: '确定',
