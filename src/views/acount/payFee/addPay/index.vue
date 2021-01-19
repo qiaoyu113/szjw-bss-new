@@ -26,9 +26,7 @@
         :pc-col="24"
         @onPass="handlePassClick"
       >
-        <template
-          slot="driverCode"
-        >
+        <template slot="driverCode">
           <div>
             <el-select
               v-model="formData.driverCode"
@@ -289,9 +287,7 @@
                     :on-change="onExceed"
                     @click.native="upload(scope,scope.$index)"
                   >
-                    <el-button
-                      size="small"
-                    >
+                    <el-button size="small">
                       上传
                     </el-button>
                   </el-upload>
@@ -369,45 +365,48 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { deleteUser } from '@/api/users'
 import { getDriverNoAndNameList } from '@/api/driver'
-import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
+import {
+  payCostBillsCreate,
+  payDetail,
+  payCostBillsUpdate,
+  detailByUserId
+} from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import { lock } from '@/utils'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
 import { GetDictionaryList } from '@/api/common'
- @Component({
-   name: 'addPay',
-   components: {
-     SectionContainer,
-     SelfForm,
-     ElImageViewer
-   }
- })
+@Component({
+  name: 'addPay',
+  components: {
+    SectionContainer,
+    SelfForm,
+    ElImageViewer
+  }
+})
 export default class extends Vue {
   private myHeaders: any = { Authorization: UserModule.token };
-  private loading:Boolean = true
-  private isEdit:Boolean = false
-  private id:string = ''
-  private driverLoading:Boolean = false
-  private keyWord:String = ''
-  private driverOver:Boolean = false
-  private showViewer:boolean = false
-  private imageUrl:string = ''
-  private ReceiptOptions:any = []
-  private orderOptions:any[] = []
-  private driverOptions:any[] = []
-  private driverInfo:any = ''
-  private driverPage:any = {
+  private loading: Boolean = true;
+  private isEdit: Boolean = false;
+  private id: string = '';
+  private driverLoading: Boolean = false;
+  private keyWord: String = '';
+  private driverOver: Boolean = false;
+  private showViewer: boolean = false;
+  private imageUrl: string = '';
+  private ReceiptOptions: any = [];
+  private orderOptions: any[] = [];
+  private driverOptions: any[] = [];
+  private driverInfo: any = '';
+  private driverPage: any = {
     page: 1,
     limit: 20
-  }
-  private addRules:any = {
-    driverCode: [
-      { required: true, message: '请选择司机!', trigger: 'change' }
-    ]
-  }
-  private formData:any = {
+  };
+  private addRules: any = {
+    driverCode: [{ required: true, message: '请选择司机!', trigger: 'change' }]
+  };
+  private formData: any = {
     driverCode: '',
     canExtract: '',
     balance: '',
@@ -415,7 +414,7 @@ export default class extends Vue {
     gmName: '',
     busiType: '',
     busiTypeName: ''
-  }
+  };
   private formItem: any[] = [
     {
       type: 'driverCode',
@@ -424,8 +423,8 @@ export default class extends Vue {
       slot: true,
       col: 10
     }
-  ]
-  private otherFormItem:any[] = [
+  ];
+  private otherFormItem: any[] = [
     {
       type: 7,
       key: 'driverCity',
@@ -441,8 +440,8 @@ export default class extends Vue {
       key: 'busiTypeName',
       label: '业务线'
     }
-  ]
-  private accountItem:any[] = [
+  ];
+  private accountItem: any[] = [
     {
       type: 7,
       key: 'balance',
@@ -453,16 +452,12 @@ export default class extends Vue {
       key: 'canExtract',
       label: '可提现金额'
     }
-  ]
-  private columnIndex:number = 0
-  private payForm:any = {
+  ];
+  private columnIndex: number = 0;
+  private payForm: any = {
     rules: {
-      sno: [
-        { required: true, message: '请输入交易流水号', trigger: 'blur' }
-      ],
-      payDate: [
-        { required: true, message: '请填写打款日期', trigger: 'blur' }
-      ],
+      sno: [{ required: true, message: '请输入交易流水号', trigger: 'blur' }],
+      payDate: [{ required: true, message: '请填写打款日期', trigger: 'blur' }],
       payAmount: [
         { required: true, message: '请输入缴费金额', trigger: 'blur' },
         { validator: this.validatepayAmount, trigger: 'blur' }
@@ -470,9 +465,7 @@ export default class extends Vue {
       payModel: [
         { required: true, message: '请输入支付方式', trigger: 'blur' }
       ],
-      payType: [
-        { required: true, message: '请输入缴费类型', trigger: 'blur' }
-      ],
+      payType: [{ required: true, message: '请输入缴费类型', trigger: 'blur' }],
       payProof: [
         { required: true, message: '请上传交易凭证', trigger: 'change' }
       ],
@@ -483,37 +476,39 @@ export default class extends Vue {
         { required: true, message: '请确认是否开收据', trigger: 'change' }
       ]
     },
-    tableData: [{
-      sno: '',
-      payAmount: '',
-      payType: '',
-      payDate: '',
-      payModel: '',
-      existReceipt: '',
-      orderCode: '',
-      payProof: ''
-    }]
-  }
-  private isReceiptOptions:any[] = [
+    tableData: [
+      {
+        sno: '',
+        payAmount: '',
+        payType: '',
+        payDate: '',
+        payModel: '',
+        existReceipt: '',
+        orderCode: '',
+        payProof: ''
+      }
+    ]
+  };
+  private isReceiptOptions: any[] = [
     { label: '否', value: 0 },
     { label: '是', value: 1 }
-  ] // 请确认是否开收据数组
-  private payModelOptions:any = [] // 支付数组
-  private picShow:Boolean = false
-  private editId:string =''
+  ]; // 请确认是否开收据数组
+  private payModelOptions: any = []; // 支付数组
+  private picShow: Boolean = false;
+  private editId: string = '';
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
   }
 
   get isWrite() {
-    let formArray:any[] = []
-    formArray = Object.entries(this.formData).filter((ele:any) => {
+    let formArray: any[] = []
+    formArray = Object.entries(this.formData).filter((ele: any) => {
       return ele[1] !== ''
     })
-    let tableArray:any[] = []
-    this.payForm.tableData.map((item:any) => {
-      let itemArray = Object.entries(item).filter((ele:any) => {
+    let tableArray: any[] = []
+    this.payForm.tableData.map((item: any) => {
+      let itemArray = Object.entries(item).filter((ele: any) => {
         return ele[1] !== ''
       })
       tableArray.push(...itemArray)
@@ -530,7 +525,10 @@ export default class extends Vue {
           return true
         }
       } else {
-        if (this.formData.busiTypeValue === 0 && this.formData.canExtract >= 0) {
+        if (
+          this.formData.busiTypeValue === 0 &&
+          this.formData.canExtract >= 0
+        ) {
           return false
         } else {
           return true
@@ -548,7 +546,7 @@ export default class extends Vue {
     if (!this.isEdit) {
       if (this.formData.busiType === 0) {
         arr.push(item1)
-        this.payForm.tableData.forEach((ele:any) => {
+        this.payForm.tableData.forEach((ele: any) => {
           ele.payType = 0
         })
       } else {
@@ -560,7 +558,7 @@ export default class extends Vue {
     } else {
       if (this.formData.busiTypeValue === 0) {
         arr.push(item1)
-        this.payForm.tableData.forEach((ele:any) => {
+        this.payForm.tableData.forEach((ele: any) => {
           ele.payType = 0
         })
       } else {
@@ -574,7 +572,7 @@ export default class extends Vue {
   }
 
   @Watch('formData.driverCode')
-  private async handleDriverChange(val:any) {
+  private async handleDriverChange(val: any) {
     if (!this.isEdit) {
       this.formItem.splice(1, this.formItem.length - 1)
       if (val) {
@@ -597,14 +595,14 @@ export default class extends Vue {
     this.getPayTypeOptions()
     if (this.$route.name === 'payEdit') {
       this.isEdit = true
-      this.id = (this.$route.query.id) as string
+      this.id = this.$route.query.id as string
       await this.getDetail(this.id)
     } else {
       this.getDriverInfoOptions()
     }
   }
 
-  private validatepayAmount(rule:any, value:any, callback:any) {
+  private validatepayAmount(rule: any, value: any, callback: any) {
     if (Number(value) <= 0) {
       callback(new Error('缴费金额必须大于0'))
     } else if (Number(value) > 999999.99) {
@@ -614,11 +612,11 @@ export default class extends Vue {
     }
   }
 
-  private changeSno(index:number) {
+  private changeSno(index: number) {
     this.payForm.tableData[index].sno = this.payForm.tableData[index].sno.replace(/[\W]/g, '')
   }
 
-  private async getDetail(id:string) {
+  private async getDetail(id: string) {
     try {
       const { data: res } = await payDetail({ id: id })
       if (res.success) {
@@ -628,16 +626,18 @@ export default class extends Vue {
         this.formItem.push(...this.otherFormItem)
         this.formData.driverCode = res.data.driverName
         this.formData.busiTypeName = res.data.busiType
-        const tableData = [{
-          sno: res.data.sno,
-          payAmount: res.data.payAmount,
-          payType: res.data.payType,
-          payDate: new Date(res.data.payDate),
-          payModel: String(res.data.payModelValue),
-          existReceipt: res.data.existReceipt ? 1 : 0,
-          orderCode: res.data.orderCode,
-          payProof: res.data.payImageUrl
-        }]
+        const tableData = [
+          {
+            sno: res.data.sno,
+            payAmount: res.data.payAmount,
+            payType: res.data.payType,
+            payDate: new Date(res.data.payDate),
+            payModel: String(res.data.payModelValue),
+            existReceipt: res.data.existReceipt ? 1 : 0,
+            orderCode: res.data.orderCode,
+            payProof: res.data.payImageUrl
+          }
+        ]
         this.payForm.tableData = [...tableData]
       } else {
         this.$message.warning(res.errorMsg)
@@ -653,7 +653,7 @@ export default class extends Vue {
     try {
       const { data: res } = await GetDictionaryList(['pay_type'])
       if (res.success) {
-        this.payModelOptions = res.data.pay_type.map((ele:any) => {
+        this.payModelOptions = res.data.pay_type.map((ele: any) => {
           return { label: ele.dictLabel, value: ele.dictValue }
         })
       } else {
@@ -663,7 +663,7 @@ export default class extends Vue {
       console.log('err:', err)
     }
   }
-  private async dealOrder(id ?:string) {
+  private async dealOrder(id?: string) {
     let params = []
     if (id) {
       params.push(id)
@@ -673,7 +673,7 @@ export default class extends Vue {
     try {
       const { data: res } = await getDealOrdersByDriverIds(params)
       if (res.success) {
-        this.orderOptions = res.data.map((ele:any) => {
+        this.orderOptions = res.data.map((ele: any) => {
           return { label: ele.orderId, value: ele.orderId }
         })
         this.setOrderId()
@@ -689,11 +689,11 @@ export default class extends Vue {
     if (!this.isEdit) {
       if (this.formData.busiType === 1) {
         if (this.orderOptions.length === 1) {
-          this.payForm.tableData.forEach((ele:any) => {
+          this.payForm.tableData.forEach((ele: any) => {
             ele.orderCode = this.orderOptions[0].value
           })
         } else {
-          this.payForm.tableData.forEach((ele:any) => {
+          this.payForm.tableData.forEach((ele: any) => {
             ele.payType = 0
           })
         }
@@ -701,11 +701,11 @@ export default class extends Vue {
     } else {
       if (this.formData.busiTypeValue === 1) {
         if (this.orderOptions.length === 1) {
-          this.payForm.tableData.forEach((ele:any) => {
+          this.payForm.tableData.forEach((ele: any) => {
             ele.orderCode = this.orderOptions[0].value
           })
         } else {
-          this.payForm.tableData.forEach((ele:any) => {
+          this.payForm.tableData.forEach((ele: any) => {
             ele.payType = 0
           })
         }
@@ -717,22 +717,24 @@ export default class extends Vue {
     this.payForm = {
       ...this.payForm,
       ...{
-        tableData: [{
-          sno: '',
-          payAmount: '',
-          payType: '',
-          payDate: '',
-          payModel: '',
-          existReceipt: '',
-          orderCode: '',
-          payProof: ''
-        }]
+        tableData: [
+          {
+            sno: '',
+            payAmount: '',
+            payType: '',
+            payDate: '',
+            payModel: '',
+            existReceipt: '',
+            orderCode: '',
+            payProof: ''
+          }
+        ]
       }
     }
   }
 
-  private computedInfo(id:string) {
-    this.driverOptions.forEach((ele:any) => {
+  private computedInfo(id: string) {
+    this.driverOptions.forEach((ele: any) => {
       if (ele.value === id) {
         this.formData = { ...ele.data }
       }
@@ -740,7 +742,7 @@ export default class extends Vue {
   }
 
   // 查询对应订单的可提现金额
-  private async getCanExtractMoney(driverId:string) {
+  private async getCanExtractMoney(driverId: string) {
     try {
       let params = { driverId: driverId }
       let { data: res } = await detailByUserId(params)
@@ -765,7 +767,7 @@ export default class extends Vue {
     this.getDriverInfoOptions(this.keyWord)
   }
 
-  private async getDriverInfoOptions(keyWord:any = '') {
+  private async getDriverInfoOptions(keyWord: any = '') {
     try {
       this.loading = false
       this.keyWord = keyWord
@@ -781,7 +783,11 @@ export default class extends Vue {
         url: '/v2/wt-driver-account/pay/queryDriverList'
       })
       if (res.success) {
-        if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
+        if (
+          res.data.length &&
+          res.data.length > 0 &&
+          res.data.length === this.driverPage.limit
+        ) {
           this.driverPage.page++
         } else {
           this.driverOver = true
@@ -811,7 +817,7 @@ export default class extends Vue {
     }
   }
 
-  private async remoteMethod(query:any) {
+  private async remoteMethod(query: any) {
     this.keyWord = query
     this.driverLoading = true
     this.driverPage.page = 1
@@ -878,7 +884,7 @@ export default class extends Vue {
   //   }
   //   this.payForm.tableData.splice(index + 1, 0, column)
   // }
-  private async handleDelete(index:number, row:any) {
+  private async handleDelete(index: number, row: any) {
     if (this.payForm.tableData.length === 1) {
       this.$message({
         message: '不能再删了，这是最后一条了。',
@@ -886,13 +892,13 @@ export default class extends Vue {
       })
       return
     }
-    await ((this.$refs.payForm) as any).clearValidate()
+    await (this.$refs.payForm as any).clearValidate()
     this.payForm.tableData.splice(index, 1)
   }
-  private upload(value:any, num:number) {
+  private upload(value: any, num: number) {
     this.columnIndex = value.$index
   }
-  private handleAvatarSuccess(res:any, file:any) {
+  private handleAvatarSuccess(res: any, file: any) {
     if (res.success) {
       this.payForm.tableData[this.columnIndex].payProof = res.data.url
     } else {
@@ -902,8 +908,11 @@ export default class extends Vue {
     this.payForm.tableData[this.columnIndex].payProof = res.data.url
   }
 
-  private beforeUpload(file:any) {
-    const isJPG = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg')
+  private beforeUpload(file: any) {
+    const isJPG =
+      file.type === 'image/jpeg' ||
+      file.type === 'image/png' ||
+      file.type === 'image/jpg'
     const isLt2M = file.size / 1024 / 1024 < 4
     if (!isJPG) {
       this.$message.error('上传头像图片支持JPEG/PNG/JPG!')
@@ -913,13 +922,13 @@ export default class extends Vue {
     }
     return isJPG && isLt2M
   }
-  private onExceed(file:any, fileList:any) {
+  private onExceed(file: any, fileList: any) {
     if (fileList.length > 1) {
       fileList.splice(0, 1)
     }
   }
 
-  private seePic(url:string) {
+  private seePic(url: string) {
     this.showViewer = true
     this.imageUrl = url
   }
@@ -929,7 +938,7 @@ export default class extends Vue {
     this.showViewer = false
   }
 
-  private async handlePassClick(valid:boolean) {
+  private async handlePassClick(valid: boolean) {
     if (!this.canPay) {
       return this.$message.warning('不可以充值')
     }
@@ -946,16 +955,18 @@ export default class extends Vue {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        this.$router.push({
-          path: '/driveraccount/payFee'
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消'
-        })
       })
+        .then(() => {
+          this.$router.push({
+            path: '/driveraccount/payFee'
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
     } else {
       this.$router.push({
         path: '/driveraccount/payFee'
@@ -966,11 +977,11 @@ export default class extends Vue {
   /**
    * 提交表单
    */
-  @lock
+
   private saveData() {
-    let params:any = {}
+    let params: any = {}
     let tableData = this.payForm.tableData
-    tableData.map((ele:any) => {
+    tableData.map((ele: any) => {
       if (ele.payType === 0) {
         ele.orderCode = ''
       }
@@ -989,7 +1000,8 @@ export default class extends Vue {
     }
   }
 
-  private async sendData(params:any, type:string) {
+  @lock
+  private async sendData(params: any, type: string) {
     try {
       if (type === 'create') {
         const { data: res } = await payCostBillsCreate(params)
@@ -1018,6 +1030,8 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log('err:', err)
+    } finally {
+      //
     }
   }
 
@@ -1025,10 +1039,10 @@ export default class extends Vue {
    *校验表单
    */
   private handleValidateForm() {
-    ((this.$refs.SelfForm) as any).submitForm()
+    (this.$refs.SelfForm as any).submitForm()
   }
   private handleValidateTableForm() {
-    ((this.$refs['payForm']) as any).validate((valid:any) => {
+    (this.$refs['payForm'] as any).validate((valid: any) => {
       if (valid) {
         this.saveData()
       } else {
@@ -1047,11 +1061,11 @@ export default class extends Vue {
     color: #649cee;
     cursor: pointer;
   }
-  .tableStyle{
-    .el-form-item{
+  .tableStyle {
+    .el-form-item {
       margin-top: 20px;
     }
-    .el-form-item__content{
+    .el-form-item__content {
       width: 100%;
       display: flex;
       align-items: center;
@@ -1069,10 +1083,10 @@ export default class extends Vue {
 /* .addPay .payInfo >>> .el-input__inner {
   border: none;
 } */
-.addPay .btnBox{
+.addPay .btnBox {
   width: 100%;
- margin: 30px auto;
- text-align: right;
+  margin: 30px auto;
+  text-align: right;
 }
 .hide >>> .el-upload--picture-card {
   display: none;
@@ -1080,7 +1094,7 @@ export default class extends Vue {
 /* .uploadItem >>> .el-upload{
   display: block;
 } */
-.baseInfo >>> .el-form-item__content div{
+.baseInfo >>> .el-form-item__content div {
   width: 100%;
 }
 </style>
