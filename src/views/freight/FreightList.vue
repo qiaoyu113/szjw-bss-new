@@ -230,7 +230,7 @@
             min-width="155"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.gmStatusCode !== 2 && scope.row.gmStatusCode === 1">
+              <template v-if="scope.row.gmStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.gmStatusCode !== 2"
@@ -269,7 +269,7 @@
                     </el-button>
                   </el-popover>
                 </template>
-                <template v-else>
+                <template v-else-if="scope.row.gmStatusCode === 1">
                   <div @mouseover="handleHoverChange(scope.row)">
                     {{ Number(scope.row.gmFee).toFixed(2) | DataIsNull }}
                   </div>
@@ -295,7 +295,7 @@
             min-width="160"
           >
             <template slot-scope="scope">
-              <template v-if="scope.row.lineStatusCode !== 2 && scope.row.lineStatusCode === 1">
+              <template v-if="scope.row.lineStatusCode !== 2">
                 <template v-if="scope.row.flag">
                   <el-popover
                     v-if="scope.row.lineStatusCode !== 2"
@@ -334,7 +334,7 @@
                     </el-button>
                   </el-popover>
                 </template>
-                <template v-else>
+                <template v-else-if="scope.row.lineStatusCode === 1">
                   <div @mouseover="handleHoverChange(scope.row)">
                     {{ Number(scope.row.lineFee).toFixed(2) | DataIsNull }}
                   </div>
@@ -1313,23 +1313,27 @@ export default class extends Vue {
     private confirmAssignOther(done: any) {
       let noCheck: any = []
       this.freightFormAll.lists.forEach((i: any) => {
-        noCheck.push(i.wayBillAmountId)
+        i.list.forEach((element: any) => {
+          noCheck.push(element.wayBillAmountId)
+        })
       })
-      this.$alert('确定全部' + noCheck.length + '个出车，全部未出车！', '提示', {
+      this.$alert('确定全部' + this.freightFormAll.lists.length + '个出车，全部未出车！', '提示', {
         confirmButtonText: '确定',
         callback: async action => {
-          const { data } = await NoCarBatch(noCheck, this.remarkAll)
-          if (data.success) {
-            this.assignShowDialogMin = false
-            this.handleCheck()
-            setTimeout(() => {
-              this.getList(this.listQuery)
-              this.$message.success('已成功操作全部未出车')
-              document.body.scrollTop = document.documentElement.scrollTop = 0
-            }, this.delay)
-            done()
-          } else {
-            this.$message.error(data.errorMsg)
+          if (action === 'confirm') {
+            const { data } = await NoCarBatch(noCheck, this.remarkAll)
+            if (data.success) {
+              this.assignShowDialogMin = false
+              this.handleCheck()
+              setTimeout(() => {
+                this.getList(this.listQuery)
+                this.$message.success('已成功操作全部未出车')
+                document.body.scrollTop = document.documentElement.scrollTop = 0
+              }, this.delay)
+              done()
+            } else {
+              this.$message.error(data.errorMsg)
+            }
           }
         }
       })
@@ -1498,7 +1502,7 @@ export default class extends Vue {
       padding: 15px 30px 0;
       box-sizing: border-box;
       background: #ffffff;
-      overflow-y: scroll;
+      overflow-y: auto;
     }
   }
   .edit-input {
