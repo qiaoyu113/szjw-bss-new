@@ -12,7 +12,7 @@ module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   lintOnSave: process.env.NODE_ENV === 'development',
   outputDir: 'web',
-  productionSourceMap: false,
+  productionSourceMap: true,
   devServer: {
     port: devServerPort,
     open: true,
@@ -70,10 +70,10 @@ module.exports = {
         project: 'szjw-web',
 
         // webpack specific configuration
-        include: '.', // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
+        include: path.resolve(__dirname, './web'), // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
         configFile: '.sentryclirc',
         ignore: ['node_modules', 'webpack.config.js'],
-        urlPrefix: '~/static/js' //  线上对应的url资源的相对路径 比如我的域名是 http://XXX  .com/,静态资源都在 static文件夹里面,
+        urlPrefix: '~' //  线上对应的url资源的相对路径 比如我的域名是 http://XXX  .com/,静态资源都在 static文件夹里面,
       })
     ]
   },
