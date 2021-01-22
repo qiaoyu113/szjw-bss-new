@@ -240,6 +240,7 @@ interface IState {
 }
 
 @Component({
+  name: 'FinancialFlow',
   components: {
     SelfTable,
     SelfForm,
@@ -1056,6 +1057,9 @@ export default class extends Vue {
   }
   mounted() {
     this.init()
+  }
+  activated() {
+    this.getLists()
   }
 }
 </script>
