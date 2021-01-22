@@ -21,7 +21,7 @@ const driverAccountRouter: RouteConfig = {
         title: 'payFee',
         icon: '',
         apiUrl: '/wt-driver-account/pay',
-        noCache: true
+        noCache: false
       }
     },
     {
@@ -32,7 +32,7 @@ const driverAccountRouter: RouteConfig = {
         apiUrl: '/wt-driver-account/pay/detail',
         title: 'payDetail',
         hidden: true,
-        noCache: true
+        noCache: false
       }
     },
     {
@@ -75,7 +75,7 @@ const driverAccountRouter: RouteConfig = {
       meta: {
         apiUrl: '/v2/wt-driver-account/management/list',
         title: 'driverAccount',
-        noCache: true,
+        noCache: false,
         icon: '',
         activeMenu: '/driveraccount/wtAcountList'
       }

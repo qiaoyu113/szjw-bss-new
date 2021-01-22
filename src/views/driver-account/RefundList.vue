@@ -207,7 +207,7 @@ interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'RefundDetail',
+  name: 'RefundList',
   components: {
     SelfTable,
     SelfForm,
@@ -970,6 +970,10 @@ export default class extends Vue {
     this.getGmOptions()
     this.getDutyListByLevel()
     this.loadQueryDriverByKeyword()
+  }
+
+  activated() {
+    this.getLists()
   }
 }
 </script>

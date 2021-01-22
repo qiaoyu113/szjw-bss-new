@@ -1184,6 +1184,10 @@ export default class extends Vue {
   mounted() {
     this.fetchData()
   }
+
+  activated() {
+    this.getList()
+  }
 }
 </script>
 <style lang="scss" scoped>

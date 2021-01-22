@@ -1013,6 +1013,10 @@ export default class extends Vue {
     this.querySearchByPayNo('')
     this.querySearchBySno('')
   }
+
+  activated() {
+    this.getList()
+  }
 }
 </script>
 <style lang="scss" scoped>
