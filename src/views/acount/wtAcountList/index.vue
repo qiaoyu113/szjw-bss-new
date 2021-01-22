@@ -910,7 +910,11 @@ export default class extends Vue {
     }
   }
   private goRouter(id:string) {
-    this.$router.push({ path: '/driveraccount/financialFlow', query: { id: id } })
+    let routeUrl = this.$router.resolve({
+      path: '/driveraccount/financialFlow',
+      query: { id: id }
+    })
+    window.open(routeUrl.href, '_blank')
   }
 
   private onPass(val:Boolean) {
