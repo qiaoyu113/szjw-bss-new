@@ -32,7 +32,7 @@ const driverAccountRouter: RouteConfig = {
         apiUrl: '/wt-driver-account/pay/detail',
         title: 'payDetail',
         hidden: true,
-        noCache: false
+        noCache: true
       }
     },
     {
