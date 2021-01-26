@@ -54,6 +54,8 @@ export default class extends Vue {
     const day = new Date().getDate()
     if (day <= 10) {
       this.showConfirmationSure()
+    } else {
+      this.closeNotify()
     }
   }
   refreshApp() {
