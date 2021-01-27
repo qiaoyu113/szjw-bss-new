@@ -143,6 +143,7 @@ export default class extends Vue {
     try {
       const formData = new FormData()
       formData.append('jsonStr', JSON.stringify(this.ruleForm))
+      // 保存系统设置
       const { data } = await settingSystem(formData)
       if (data.success) {
         this.$message.success(`系统设置保存成功`)
@@ -166,6 +167,7 @@ export default class extends Vue {
     })
   }
   private async getSetting() {
+    // 获取系统设置
     const { data } = await getSettingSystem()
     if (data.success) {
       // console.log(data.data)
@@ -180,6 +182,7 @@ export default class extends Vue {
     }
   }
   private async getDictionary() {
+    // 获取工作城市
     const { data } = await GetDictionaryCity()
     if (data.success) {
       this.optionsCity = data.data
