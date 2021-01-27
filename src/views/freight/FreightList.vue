@@ -37,7 +37,7 @@
           stripe
           highlight-current-row
           style="width: 100%"
-          row-key="customerNo"
+          row-key="wayBillId"
           @selection-change="handleSelectionChange"
         >
           <el-table-column
