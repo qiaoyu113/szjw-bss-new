@@ -52,7 +52,6 @@
         </template>
       </self-form>
     </SectionContainer>
-
     <SectionContainer
       v-if="formData.driverCode"
       title="账户信息"
@@ -66,7 +65,6 @@
         label-position="right"
       />
     </SectionContainer>
-
     <SectionContainer
       v-if="canPay"
       title="缴费信息"
@@ -96,7 +94,6 @@
             style="width: 100%"
             size="mini"
           >
-            <!--show-summary :summary-method="getSummaries" -->
             <el-table-column
               width="180"
               label="缴费金额（元）"
@@ -115,7 +112,6 @@
                 </el-form-item>
               </template>
             </el-table-column>
-
             <el-table-column
               width="180"
               label="支付方式"
@@ -186,7 +182,6 @@
                 </el-form-item>
               </template>
             </el-table-column>
-
             <el-table-column
               width="180"
               label="订单编号"
@@ -218,7 +213,6 @@
                 </div>
               </template>
             </el-table-column>
-
             <el-table-column
               width="180"
               label="是否开收据"
@@ -243,7 +237,6 @@
                 </el-form-item>
               </template>
             </el-table-column>
-
             <el-table-column
               label="打款日期"
               width="250px"
@@ -262,7 +255,6 @@
                 </el-form-item>
               </template>
             </el-table-column>
-
             <el-table-column
               label="上传交易凭证"
               width="200px"
@@ -320,11 +312,6 @@
               fixed="right"
             >
               <template slot-scope="scope">
-                <!-- <el-button
-                  size="mini"
-                  icon="el-icon-plus"
-                  @click="handleAdd(scope.$index, scope.row)"
-                /> -->
                 <div style="line-height:114px">
                   <el-button
                     size="mini"
@@ -365,12 +352,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { deleteUser } from '@/api/users'
 import { getDriverNoAndNameList } from '@/api/driver'
-import {
-  payCostBillsCreate,
-  payDetail,
-  payCostBillsUpdate,
-  detailByUserId
-} from '@/api/driver-account'
+import { payCostBillsCreate, payDetail, payCostBillsUpdate, detailByUserId } from '@/api/driver-account'
 import { getDealOrdersByDriverIds } from '@/api/driver-cloud'
 import { lock } from '@/utils'
 import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
@@ -500,7 +482,6 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
-
   get isWrite() {
     let formArray: any[] = []
     formArray = Object.entries(this.formData).filter((ele: any) => {
@@ -538,7 +519,7 @@ export default class extends Vue {
       return false
     }
   }
-
+  // 判断缴费类型
   get billSetArr() {
     let arr = []
     const item1 = { label: '无订单充值', value: 0 }
@@ -601,7 +582,7 @@ export default class extends Vue {
       this.getDriverInfoOptions()
     }
   }
-
+  // 判断缴费金额
   private validatepayAmount(rule: any, value: any, callback: any) {
     if (Number(value) <= 0) {
       callback(new Error('缴费金额必须大于0'))
@@ -611,7 +592,7 @@ export default class extends Vue {
       callback()
     }
   }
-
+  // 判断交易流水号
   private changeSno(index: number) {
     this.payForm.tableData[index].sno = this.payForm.tableData[index].sno.replace(/[\W]/g, '')
   }
@@ -648,7 +629,7 @@ export default class extends Vue {
       this.loading = false
     }
   }
-
+  // 判断支付方式
   private async getPayTypeOptions() {
     try {
       const { data: res } = await GetDictionaryList(['pay_type'])
@@ -663,6 +644,7 @@ export default class extends Vue {
       console.log('err:', err)
     }
   }
+
   private async dealOrder(id?: string) {
     let params = []
     if (id) {
@@ -688,31 +670,26 @@ export default class extends Vue {
   private setOrderId() {
     if (!this.isEdit) {
       if (this.formData.busiType === 1) {
-        if (this.orderOptions.length === 1) {
-          this.payForm.tableData.forEach((ele: any) => {
-            ele.orderCode = this.orderOptions[0].value
-          })
-        } else {
-          this.payForm.tableData.forEach((ele: any) => {
-            ele.payType = 0
-          })
-        }
+        this.orders()
       }
     } else {
       if (this.formData.busiTypeValue === 1) {
-        if (this.orderOptions.length === 1) {
-          this.payForm.tableData.forEach((ele: any) => {
-            ele.orderCode = this.orderOptions[0].value
-          })
-        } else {
-          this.payForm.tableData.forEach((ele: any) => {
-            ele.payType = 0
-          })
-        }
+        this.orders()
       }
     }
   }
-
+  // 判断订单编号
+  private orders() {
+    if (this.orderOptions.length === 1) {
+      this.payForm.tableData.forEach((ele: any) => {
+        ele.orderCode = this.orderOptions[0].value
+      })
+    } else {
+      this.payForm.tableData.forEach((ele: any) => {
+        ele.payType = 0
+      })
+    }
+  }
   private resetTableData() {
     this.payForm = {
       ...this.payForm,
@@ -732,7 +709,6 @@ export default class extends Vue {
       }
     }
   }
-
   private computedInfo(id: string) {
     this.driverOptions.forEach((ele: any) => {
       if (ele.value === id) {
@@ -740,7 +716,6 @@ export default class extends Vue {
       }
     })
   }
-
   // 查询对应订单的可提现金额
   private async getCanExtractMoney(driverId: string) {
     try {
@@ -762,11 +737,9 @@ export default class extends Vue {
       console.log(`fail:${err}`)
     }
   }
-
   private loadmore() {
     this.getDriverInfoOptions(this.keyWord)
   }
-
   private async getDriverInfoOptions(keyWord: any = '') {
     try {
       this.loading = false
@@ -826,35 +799,7 @@ export default class extends Vue {
     await this.getDriverInfoOptions(this.keyWord)
     this.driverLoading = false
   }
-
-  // private getSummaries(param:any) {
-  //   const { columns, data } = param
-  //   const sums:Array<string | number> = []
-  //   columns.forEach((column:any, index:any) => {
-  //     if (index === 0) {
-  //       sums[index] = '总价'
-  //     } else if (index === 3) {
-  //       sums[index] = data.reduce((prev:any, curr:any) => {
-  //         const value = Number(curr.payAmount)
-  //         if (!isNaN(value)) {
-  //           return Number(prev) + value
-  //         } else {
-  //           return prev
-  //         }
-  //       }, 0)
-  //       if (sums[index] === 0) {
-  //         sums[index] = ''
-  //       } else {
-  //         sums[index] += ' 元'
-  //       }
-  //     } else {
-  //       sums[index] = ''
-  //     }
-  //   })
-
-  //   return sums
-  // }
-
+  // 添加缴费
   private handleAddPay() {
     if (this.payForm.tableData.length >= 10) {
       this.$message.warning('最多填写10条缴费数据')
@@ -873,17 +818,7 @@ export default class extends Vue {
     this.payForm.tableData.push(column)
     this.setOrderId()
   }
-
-  // private handleAdd(index:number, row:any) {
-  //   const column = {
-  //     sno: '',
-  //     payAmount: '',
-  //     payType: '',
-  //     payProof: '',
-  //     payDate: '',
-  //   }
-  //   this.payForm.tableData.splice(index + 1, 0, column)
-  // }
+  // 删除
   private async handleDelete(index: number, row: any) {
     if (this.payForm.tableData.length === 1) {
       this.$message({
@@ -895,6 +830,7 @@ export default class extends Vue {
     await (this.$refs.payForm as any).clearValidate()
     this.payForm.tableData.splice(index, 1)
   }
+  // 上传图片
   private upload(value: any, num: number) {
     this.columnIndex = value.$index
   }
@@ -907,7 +843,7 @@ export default class extends Vue {
     }
     this.payForm.tableData[this.columnIndex].payProof = res.data.url
   }
-
+  // 上传
   private beforeUpload(file: any) {
     const isJPG =
       file.type === 'image/jpeg' ||
@@ -927,7 +863,7 @@ export default class extends Vue {
       fileList.splice(0, 1)
     }
   }
-
+  // 查看
   private seePic(url: string) {
     this.showViewer = true
     this.imageUrl = url
@@ -944,11 +880,11 @@ export default class extends Vue {
     }
     await this.handleValidateTableForm()
   }
-
+  // 提交
   private async handleSaveClick() {
     await this.handleValidateForm()
   }
-
+  // 返回
   private handleBackClick() {
     if (this.isWrite.length > 0) {
       this.$confirm('确定要放弃已填写的内容返回上一页吗?', '提示', {
@@ -974,10 +910,7 @@ export default class extends Vue {
     }
   }
 
-  /**
-   * 提交表单
-   */
-
+  // 提交表单
   private saveData() {
     let params: any = {}
     let tableData = this.payForm.tableData
@@ -999,7 +932,7 @@ export default class extends Vue {
       this.sendData(params, type)
     }
   }
-
+  // 新建缴费
   @lock
   private async sendData(params: any, type: string) {
     try {
@@ -1034,10 +967,7 @@ export default class extends Vue {
       //
     }
   }
-
-  /**
-   *校验表单
-   */
+  // 校验表单
   private handleValidateForm() {
     (this.$refs.SelfForm as any).submitForm()
   }
@@ -1077,12 +1007,8 @@ export default class extends Vue {
 <style scoped>
 .addPay >>> .el-select,
 .addPay >>> .el-textarea {
-  /* width: 100%; */
   flex: none;
 }
-/* .addPay .payInfo >>> .el-input__inner {
-  border: none;
-} */
 .addPay .btnBox {
   width: 100%;
   margin: 30px auto;
@@ -1091,9 +1017,6 @@ export default class extends Vue {
 .hide >>> .el-upload--picture-card {
   display: none;
 }
-/* .uploadItem >>> .el-upload{
-  display: block;
-} */
 .baseInfo >>> .el-form-item__content div {
   width: 100%;
 }

@@ -115,7 +115,6 @@
           导出
         </el-button>
       </div>
-
       <div
         slot="payStatus"
         class="tableTitle"
@@ -376,8 +375,6 @@ export default class extends Vue {
       col: 8,
       tagAttrs: {
         placeholder: '请输入',
-        // maxlength: 20,
-        // 'show-word-limit': true,
         clearable: true
       }
     },
@@ -553,16 +550,13 @@ export default class extends Vue {
       fixed: 'right',
       width: this.isPC ? '150px' : '50px'
     }
-  ];
-  /**
-   *分页对象
-   */
+  ]
+  // 分页对象
   private page: PageObj = {
     page: 1,
     limit: 30,
     total: 0
-  };
-
+  }
   // 字母数字校验
   private checkID(rule: any, value: any, callback: any) {
     const can = IdRegExp.test(value)
@@ -600,9 +594,7 @@ export default class extends Vue {
       console.log(`get duty list fail:${err}`)
     }
   }
-  /**
-   *获取加盟经理列表
-   */
+  // 获取加盟经理列表
   async getGmOptions() {
     try {
       this.listQuery.gmId = ''
@@ -635,7 +627,6 @@ export default class extends Vue {
       console.log(err)
     }
   }
-
   // 获取大区和城市
   private async showWork(node:any, resolve:any) {
     let query: any = {
@@ -703,7 +694,6 @@ export default class extends Vue {
   }
   // 获取交易流水号
   private searchOfSno:string=''
-
   private snoOption:IState[] = []
   // 获取跟多交易流水号
   private async loadQuerySnoweyword(val?:String) {
@@ -746,7 +736,6 @@ export default class extends Vue {
       this.snoOption.splice(0, len)
     }
   }
-
   // 获取缴费编号接口
   async loadQueryPayNoweywords(params:IState) {
     try {
@@ -763,7 +752,6 @@ export default class extends Vue {
   }
   // 获取缴费编号
   private searchOfPayNo:string=''
-
   private payNoOption:IState[] = []
   // 获取更多缴费编号
   private async loadQueryPayNoweyword(val?:String) {
@@ -806,7 +794,6 @@ export default class extends Vue {
       this.payNoOption.splice(0, len)
     }
   }
-
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
@@ -861,7 +848,6 @@ export default class extends Vue {
   // 重置司机
   resetDriver() {
     this.listQuery.driverId = ''
-    // this.listQuery.gmId = ''
     this.searchKeyword = ''
     let len:number = this.driverOptions.length
     if (len > 0) {
@@ -869,21 +855,15 @@ export default class extends Vue {
       this.driverOptions.splice(0, len)
     }
   }
-  /**
-   *获取列表
-   */
+  // 获取列表
   @lock
   async getList() {
     try {
-      // if (this.listQuery.driverMobile && !phoneReg.test(this.listQuery.driverMobile)) {
-      //   return this.$message.error('请输入正确的手机号')
-      // }
       this.listLoading = true
       let params: any = {
         limit: this.page.limit,
         page: this.page.page
       }
-
       this.listQuery.payStatus !== '' && (params.payStatus = +this.listQuery.payStatus)
       this.listQuery.workCity.length === 2 && (params.workCity = this.listQuery.workCity[1])
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
@@ -904,7 +884,6 @@ export default class extends Vue {
         this.page.total = res.page.total
         this.tableData = res.data
         this.pageTitle = res.title
-        // this.statusOptions[0].num = this.pageTitle.all
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -913,15 +892,12 @@ export default class extends Vue {
       console.log(`get lists fail:`, err)
     }
   }
-
   private changeStatus(item: any, index: number) {
     this.active = index
     this.listQuery.payStatus = item.value
     this.getList()
   }
-  /**
-   * 路径跳转
-   */
+  // 路径跳转
   goRoute(url: string, id: any) {
     if (id) {
       this.$router.push({ path: url, query: { id: id } })
@@ -929,16 +905,11 @@ export default class extends Vue {
       this.$router.push({ path: url })
     }
   }
-  /**
-   * 查询
-   */
-
+  // 查询
   private handleQueryClick() {
     this.getList()
   }
-  /**
-   *重置
-   */
+  // 重置
   private handleResetClick() {
     this.listQuery = {
       workCity: '',
@@ -991,10 +962,7 @@ export default class extends Vue {
       console.log(`export finish`)
     }
   }
-
-  /**
-   * 分页
-   */
+  // 分页
   handlePageSize(page: any) {
     this.page.page = page.page
     this.page.limit = page.limit
@@ -1004,7 +972,6 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
-
   mounted() {
     this.getList()
     this.getGmOptions()
@@ -1013,7 +980,6 @@ export default class extends Vue {
     this.querySearchByPayNo('')
     this.querySearchBySno('')
   }
-
   activated() {
     this.getList()
   }
