@@ -334,11 +334,13 @@
                     :class="isPC ? 'filter-item' : 'filter-item-m'"
                     type="primary"
                     size="small"
+                    :disabled="times === 10 ? false :true"
                     name="ownerlist_derive_btn"
-                    :loading="isExport"
-                    @click="handleDeriveClick"
+                    @click="_exportFile"
                   >
-                    导出
+                    导出<template v-if="times !== 10">
+                      {{ times }} s
+                    </template>
                   </el-button>
                 </el-form-item>
               </el-col>
@@ -358,6 +360,7 @@ import { PermissionModule } from '@/store/modules/permission'
 import { SettingsModule } from '@/store/modules/settings'
 import { TimestampYMD } from '@/utils/index'
 import '@/styles/common.scss'
+import { exportFileTip } from '@/utils/exportTip'
 
 @Component({
   name: 'SuggestForm',
@@ -369,6 +372,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) private DateValue2!: any[];
   @Prop({ default: () => [] }) private tab!: any[];
   @Prop({ default: () => [] }) private dispatch!: any[];
+  times:number = 10;
   private optionsCity: any[] = []; // 字典查询定义(命名规则为options + 类型名称)
   private optionsCompany: any[] = []
   private optionsJoin: any[] = []
@@ -802,8 +806,12 @@ export default class extends Vue {
     this.DateValueChild = []
     this.DateValueChild2 = []
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleDeriveClick)
+  }
   // 导出
-  private async handleDeriveClick() {
+  private async handleDeriveClick(sucFun:Function) {
     try {
       this.isExport = true
       let params = { ...this.listQuery }
@@ -812,6 +820,7 @@ export default class extends Vue {
       if (this.DateValueChild && this.DateValueChild.length === 2) {
         const { data } = await managementDerive(params)
         if (data.success) {
+          sucFun()
           this.$message.success('导出成功')
         } else {
           this.$message.error(data.errorMsg || data.message)
