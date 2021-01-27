@@ -277,8 +277,8 @@ export default class extends Vue {
   private outsideSalesOptions:IState[] = [];// 外线销售列表
   private submitLoading:boolean = false;
   private projectListOptions:IState[] = [];// 项目列表
-  private ids:string|number[] = []
-  private btns:any[] = [
+  private ids:string|number[] = [] // 多选的id集合
+  private btns:any[] = [ // 状态按钮
     {
       name: '',
       text: '全部'
@@ -501,6 +501,7 @@ export default class extends Vue {
     { icon: 'el-icon-thumb', name: '批量标记收款', color: '#5E7BBB', key: '1', pUrl: ['/v2/waybill/custBilling/monthlyBill/check'] },
     { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
   ]
+  // 选择框选择的表格行
   private multipleSelection: any[] = []
 
   // 分页
@@ -515,6 +516,7 @@ export default class extends Vue {
     limit: 100,
     total: 0
   }
+  // 项目模糊查询关键字
   private projectKeyword:string = ''
   // 弹窗
   private showDialog: boolean = false;
@@ -528,12 +530,15 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件上传列表
   private fileList: []= [];
+  // 标记收款弹窗 表单校验规则
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款弹窗表单列表
   private dialogFormItem:any[] = []
   // 弹窗表单容器
   private dialogItem: any[] = [
@@ -582,16 +587,19 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
   }
+  // 判断选线
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/waybill/custBilling/monthlyBill/check'
     })
   }
+  // 表格的checkbox是否可选
   private disabledFunc(row:any) {
     if (row && (!row.closeStatus || row.checkStatus || !this.isCheck)) {
       return false
@@ -823,6 +831,7 @@ export default class extends Vue {
   private handlePassClick(valid: any) {
     this.saveData()
   }
+  // 弹框确认按钮触发表单校验
   private async confirm(done: any) {
     ((this.$refs.dialogForm) as any).submitForm()
   }
@@ -929,6 +938,7 @@ export default class extends Vue {
       this.dialogFormItem = this.dialogItem.slice(3)
     }
   }
+  // 重置查询项目列表
   resetProjectList() {
     this.projectKeyword = ''
     let len:number = this.projectListOptions.length
@@ -982,6 +992,7 @@ export default class extends Vue {
       return []
     }
   }
+  // 获取上岗经理、外销销售列表
   async init() {
     // 加盟经理(1)  外销销售(2) 上岗经理(3)
     let data1 = await this.getManagerList(3, '/v2/waybill/custBilling/monthlyBill/queryDutyManager')

@@ -215,8 +215,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { HandlePages, validatorValue, lock } from '@/utils/index'
 import { SettingsModule } from '@/store/modules/settings'
-import { Vue, Component, Watch } from 'vue-property-decorator'
-import { fileUpload } from '@/api/cargo'
+import { Vue, Component } from 'vue-property-decorator'
 
 import { month, lastmonth, threemonth } from './components/date'
 
@@ -497,6 +496,7 @@ export default class extends Vue {
     { icon: 'el-icon-thumb', name: '批量标记收款', color: '#5E7BBB', key: '1', pUrl: ['/v2/driverBilling/freightCharge/receive'] },
     { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
   ]
+  // 表格checkbox选择项列表
   private multipleSelection: any[] = []
   // 分页
   private page :PageObj= {
@@ -516,12 +516,15 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件上传列表
   private fileList: []= [];
+  // 标记收款表单校验
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款表单列表
   private dialogFormItem:IState[] = [];
   // 弹窗表单容器
   private dialogItem: IState[] = [
@@ -569,16 +572,19 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
   }
+  // 判断权限
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/driverBilling/freightCharge/receive'
     })
   }
+  // 判断表格checkbox是否可选
   private disabledFunc(row:any) {
     if (row && (row.paymentReceivedFlag || !this.isCheck)) {
       return false
