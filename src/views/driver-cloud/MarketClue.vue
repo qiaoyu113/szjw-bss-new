@@ -118,9 +118,7 @@ import {
   threemonth
 } from '../driver-freight/components/date'
 import {
-  GetDutyListByLevel,
-  getOfficeByTypeAndOfficeId,
-  getOfficeByType
+  GetDutyListByLevel
 } from '@/api/common'
 import { showWork, showCityGroupPerson } from '@/utils'
 import {
@@ -148,7 +146,6 @@ interface IState {
 export default class extends Vue {
   private multipleSelection: any[] = []; // 当前页选中的数据
   private idKey:string = 'phone'; // 标识列表数据中每一行的唯一键的名称
-  private cityArea:any = {};
   private driverOver: Boolean = false;
   private driverLoading: Boolean = false;
   private showDialog: boolean = false;
@@ -307,7 +304,6 @@ export default class extends Vue {
       { validator: this.validateFollow, trigger: 'change' }
     ]
   };
-
   private rowData:any[] = []
   // 分页
   private page: PageObj = {
@@ -315,6 +311,7 @@ export default class extends Vue {
     limit: 30,
     total: 0
   };
+  // 取选择item的marketClueId
   get getMarketIds() {
     return this.rowData.map((item:any) => item.marketClueId)
   }
@@ -322,6 +319,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 表格高度计算
   get tableHeight() {
     let otherHeight = 400
     return (
@@ -330,10 +328,12 @@ export default class extends Vue {
     )
   }
 
+  // 权限计算
   get isCanallocation() {
     return UserModule.roles.includes('/v2/clueH5/updateFollowerByMarketClueId0')
   }
 
+  // 选择跟进人效验规则
   private validateFollow(rule:any, value:any, callback:Function) {
     if (value === '') {
       callback(new Error('请选择跟进人!'))
@@ -343,6 +343,7 @@ export default class extends Vue {
       callback()
     }
   }
+
   // 获取业务线
   private async getGetDutyListByLevel() {
     try {
@@ -385,6 +386,7 @@ export default class extends Vue {
     this.rowData.push(row)
   }
 
+  // 选择多条数据赋值
   private handleSelectionChange(val:any) {
     this.multipleSelection = val
   }
@@ -396,6 +398,7 @@ export default class extends Vue {
     this.rowData.push(...this.multipleSelection)
   }
 
+  // 手机号验证
   private oninputOnlyNum(value:string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -445,7 +448,7 @@ export default class extends Vue {
   }
 
   // 处理params
-  private dealParams(params: any) {
+  private dealParams(params: IState) {
     this.listQuery.workCity.length === 2 &&
       (params.workCity = this.listQuery.workCity[1])
     this.listQuery.busiType !== '' &&
@@ -488,10 +491,9 @@ export default class extends Vue {
   init() {
     this.getGetDutyListByLevel()
     this.getLists()
-    this.cityArea = showCityGroupPerson
   }
   activated() {
-    this.init()
+    this.getLists()
   }
   mounted() {
     this.init()
