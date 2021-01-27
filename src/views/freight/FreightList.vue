@@ -712,7 +712,7 @@ export default class extends Vue {
     private page: Object | undefined = '';
     private listLoading = true;
     private tags: any[] = [];
-    private templateRadio: any[] = [] // TODO
+    // private templateRadio: any[] = [] // TODO
     private DateValue: any[] = [];
     private DateValue2: any[] = [];
     private multipleSelection: any[] = []
@@ -720,29 +720,6 @@ export default class extends Vue {
       { icon: 'el-icon-finished', name: '运费确认', color: '#F2A33A', key: '3', pUrl: ['/v2/waybill/shipping/reportMoneyBatch'] },
       { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
     ];
-    // private dropdownList: any[] = [
-    //   '出车日期',
-    //   '出车单号',
-    //   '司机姓名',
-    //   '出车状态',
-    //   '项目名称',
-    //   '客户名称',
-    //   '运费金额',
-    //   '司机运费上报状态',
-    //   '客户运费上报状态',
-    //   '运费更新时间',
-    //   '线路名称',
-    //   '预估运费',
-    //   '加盟侧运费',
-    //   '外线侧运费',
-    //   '有无差额',
-    //   '运费状态',
-    //   '加盟经理',
-    //   '上岗经理',
-    //   '单边已确认操作人',
-    //   '操作'
-    // ];
-    // private checkList: any[] = this.dropdownList;
     private floowData: any[] = [];
     private floowLoading: Boolean = false;
     private tab: any[] = [
@@ -850,40 +827,40 @@ export default class extends Vue {
         ]
       }
     ] }
-    private freightRules: any = {
-      price: [
-        { required: true, message: '请输入金额', trigger: 'change' }
-      ]
-    };
+    // private freightRules: any = {
+    //   price: [
+    //     { required: true, message: '请输入金额', trigger: 'change' }
+    //   ]
+    // };
     private saleId: any = '';
     private remarkAll: any = '';
     // 弹窗分配
     private dialogList: any[] = [];
-    private dialogLoading: boolean= false;
-    private multipleSelectionAssign: any[] = []
+    // private dialogLoading: boolean= false;
+    // private multipleSelectionAssign: any[] = []
     private assignShowDialog: boolean= false;
     private assignShowDialogMin: boolean= false;
     // 弹窗分页
-    private dialogTotal: number = 0;
+    // private dialogTotal: number = 0;
     private dialogListQuery: IState = {
       page: 1,
       limit: 20
     };
     private delay: number = 1000;
 
-    private getPermission(role: any) {
-      let permission = (localStorage as any).getItem('permission')
-      if (!permission) {
-        return false
-      } else {
-        let permissionArr = permission.split(',')
-        if (permissionArr.indexOf(role) > -1) {
-          return true
-        } else {
-          return false
-        }
-      }
-    }
+    // private getPermission(role: any) {
+    //   let permission = (localStorage as any).getItem('permission')
+    //   if (!permission) {
+    //     return false
+    //   } else {
+    //     let permissionArr = permission.split(',')
+    //     if (permissionArr.indexOf(role) > -1) {
+    //       return true
+    //     } else {
+    //       return false
+    //     }
+    //   }
+    // }
 
     // 判断是否是PC
     get isPC() {
@@ -892,9 +869,6 @@ export default class extends Vue {
 
     // table列表高度适配
     get tableHeight() {
-      // let otherHeight = 590
-      // let value = document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
-      // return value
       return 'auto'
     }
     // 确认清除
@@ -938,13 +912,13 @@ export default class extends Vue {
     }
 
     // 处理选择日期方法
-    private handleDate(value: any, name: any) {
-      if (name === 'startDate') {
-        this.DateValue = value
-      } else {
-        this.DateValue2 = value
-      }
-    }
+    // private handleDate(value: any, name: any) {
+    //   if (name === 'startDate') {
+    //     this.DateValue = value
+    //   } else {
+    //     this.DateValue2 = value
+    //   }
+    // }
     private renderRefund(item:any) {
       let shipping = ''
       let driverFreight = ''
@@ -1026,12 +1000,6 @@ export default class extends Vue {
         })
         this.tableTitle = data.title
         this.handleChecked(data.data)
-        // this.tab[0].num = data.title.all
-        // this.tab[1].num = data.title.notReported
-        // this.tab[2].num = data.title.toBeConfirmed
-        // this.tab[3].num = data.title.confirmed
-        // this.tab[4].num = data.title.secondToBeConfirmed
-        // this.tab[5].num = data.title.secondConfirmed
         data.page = await HandlePages(data.page)
         this.total = data.page.total
       } else {
@@ -1352,9 +1320,9 @@ export default class extends Vue {
     }
 
     // 弹窗表格选中
-    private handleSelectionDialog(val: any) {
-      this.saleId = val
-    }
+    // private handleSelectionDialog(val: any) {
+    //   this.saleId = val
+    // }
 
     private async getFloowData(id: any, type: any) {
       this.floowData = []
@@ -1388,18 +1356,6 @@ export default class extends Vue {
       }
     }
 
-    // // 获得本周的开始日期
-    // private getWeekStartDate(times: any) {
-    //   let now = new Date() // 当前日期
-    //   let nowDayOfWeek = now.getDay() // 今天本周的第几天
-    //   let nowDay = now.getDate() // 当前日
-    //   let nowMonth = now.getMonth() // 当前月
-    //   let nowYear = now.getFullYear() // 当前年
-    //   nowYear += (nowYear < 2000) ? 1900 : 0
-    //   let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek).getTime()
-    //   return !(times - weekStartDate < 0)
-    // }
-
     // 获得本周的开始日期
     private getWednesdayDate(times: any) {
       let now = new Date() // 当前日期
@@ -1426,18 +1382,18 @@ export default class extends Vue {
       return (myyear + '-' + mymonth + '-' + myweekday)
     }
     // 截取备注
-    private splice(value: any) {
-      return value.slice(0, 16)
-    }
+    // private splice(value: any) {
+    //   return value.slice(0, 16)
+    // }
     private init() {
       let wayBillId = this.$route.query.wayBillId
       if (wayBillId) this.listQuery.wayBillId = wayBillId
       this.fetchData()
     }
-    get showioioio() {
+    get shippingState() {
       return this.$store.state.app.states
     }
-    @Watch('showioioio', { deep: true })
+    @Watch('shippingState', { deep: true })
     private onRouteChange() {
       this.init()
     }
