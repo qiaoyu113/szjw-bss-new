@@ -727,7 +727,7 @@ export default class extends Vue {
       let params:IState = {
         monthBillId: row.id
       }
-      this.exportExcel(params)
+      this.exportExcel(params, () => {})
     }
   }
 

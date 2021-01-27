@@ -65,12 +65,12 @@ module.exports = {
       new SentryWebpackPlugin({
         // sentry-cli configuration
         authToken: 'e4512f5bd6fc49ab81461a62ad5e278070cbd248ece94bcfaf10eb91d47dc8a9',
-        release: 'szjw-web',
+        release: process.env.NODE_ENV === 'production',
         org: 'sentry',
         project: 'szjw-web',
 
         // webpack specific configuration
-        include: /(\.js\.map | \.js)$/, // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
+        include: process.env.NODE_ENV === 'production' ? './web' : './', // 需要上传到sentry服务器的资源目录,会自动匹配js 以及map文件
         configFile: '.sentryclirc',
         ignore: ['node_modules', 'webpack.config.js'],
         urlPrefix: '~/js' //  线上对应的url资源的相对路径 比如我的域名是 http://XXX  .com/,静态资源都在 static文件夹里面,

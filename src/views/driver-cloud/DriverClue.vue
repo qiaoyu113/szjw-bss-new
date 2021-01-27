@@ -173,6 +173,7 @@
         <template v-slot:remark="scope">
           <template v-if="scope.row.remark">
             <el-tooltip placement="top">
+              <!-- eslint-disable vue/no-v-html -->
               <div
                 slot="content"
                 v-html="toBreak(scope.row.remark)"
