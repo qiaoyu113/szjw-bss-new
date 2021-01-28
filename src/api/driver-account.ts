@@ -115,7 +115,18 @@ export const countConfirmByDriver = (data: any) => {
     params: data
   })
 }
-// 获取财务流水列表
+
+/**
+ * 获取财务流水列表
+ * @param  {number} data.busiType 业务线
+ * @param  {string} data.city 工作城市
+ * @param  {string} data.driverCode 司机编号
+ * @param  {number} data.gmId 加盟经理Id
+ * @param  {number} data.limit 每页条数
+ * @param  {number} data.page 页码
+ * @param  {number} data.startDate 开始时间
+ * @param  {number} data.endDate 结束时间
+ */
 export const getFlowList = (data: any) =>
   request({
     url: `/bill_center/v2/wt-driver-account/flow/list`,
@@ -123,7 +134,15 @@ export const getFlowList = (data: any) =>
     data
   })
 
-// 导出财务流水
+/**
+ * 导出财务流水
+ * @param  {number} data.busiType 业务线
+ * @param  {string} data.city 工作城市
+ * @param  {string} data.driverCode 司机编号
+ * @param  {number} data.gmId 加盟经理Id
+ * @param  {number} data.startDate 开始时间
+ * @param  {number} data.endDate 结束时间
+ */
 export const exportFlowList = (data: any) =>
   request({
     url: `/bill_center/v2/wt-driver-account/flow/export`,
@@ -131,21 +150,41 @@ export const exportFlowList = (data: any) =>
     data
   })
 
-// 手动添加流水
+/**
+ * 手动添加流水
+ * @param  {number} data.driverName 司机姓名
+ * @param  {string} data.orderCode 订单ID
+ * @param  {string} data.driverCode 司机编号
+ * @param  {number} data.orderStatus 订单状态
+ * @param  {number} data.billingId 账户ID
+ * @param  {number} data.amount 金额
+ * @param  {number} data.reason 原因
+ */
 export const saveFlowData = (data: any) =>
   request({
     url: `/bill/v2/wt-driver-account/flow/manual/create`,
     method: 'post',
     data
   })
-// 根据司机id获取已终止订单列表
+
+/**
+ * 根据司机id获取已终止订单列表
+ * @param  {string} data.driverId 司机ID
+ * @param  {string} data.operateFlag 操作标识
+ */
 export const getOrderListByDriverId = (params: any) =>
   request({
     url: `/order/v2/order/getOnlyOrderListByDriverId`,
     method: 'get',
     params
   })
-  // 根据司机id订单id获取订单详情
+
+/**
+ * 根据司机id订单id获取订单详情
+ * @param  {string} data.driverId 司机ID
+ * @param  {string} data.operateFlag 操作标识
+ * @param  {string} data.orderId 订单ID
+ */
 export const getOrderDetailByDriverId = (params: any) =>
   request({
     url: `/order/v2/order/getOrderOnlyDetialByDriverId`,
@@ -161,7 +200,10 @@ export const getDriverListByGmId = (params: any) =>
     params
   })
 
-// 获取计费类型列表
+/**
+ * 获取计费类型列表
+ * @param  {number} data.busiType 业务线
+ */
 export const getListAll = (params:any) =>
   request({
     url: `/bill/v2/wt-driver-account/billing/getChargeByBusiType`,
@@ -169,7 +211,11 @@ export const getListAll = (params:any) =>
     params
   })
 
-// 获取计费金额
+/**
+ * 获取计费金额
+ * @param  {number} data.chargeId 账户ID
+ * @param  {number} data.orderId 订单ID
+ */
 export const GetChargeAmountByChargeId = (params:any) =>
   request({
     url: `${prefix}/v2/wt-driver-account/billing/getChargeAmountByChargeId`,
