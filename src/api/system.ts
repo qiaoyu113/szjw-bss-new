@@ -108,28 +108,53 @@ export const getSpecifiedLower = (data: any = {}) =>
     data
   })
 
-// 角色管理-角色列表
+/**
+ * 角色管理-角色列表
+ * @param {number} data.page 页码
+ * @param {number} data.limit 每页条数
+ */
 export const roleList = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/role/list`,
     method: 'post',
     data
   })
-// 角色管理-角色新增
+
+/**
+ * 角色管理-角色新增
+ * @param {string} data.nick 昵称
+ * @param {object} data.productLine 业务线
+ * @param {string} data.description 描述
+ * @param {number} data.syncCRMAbility 是否能同步到CRM，0同步，1不同步
+ * @param {object} data.authorities 权限
+ * @param {number} data.dutyId 职责ID
+ */
 export const createRole = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/role/create`,
     method: 'post',
     data
   })
-// 角色管理-角色修改
+
+/**
+ * 角色管理-角色修改
+ * @param {string} data.nick 昵称
+ * @param {object} data.productLine 业务线
+ * @param {string} data.description 描述
+ * @param {number} data.syncCRMAbility 是否能同步到CRM，0同步，1不同步
+ * @param {object} data.authorities 权限
+ * @param {number} data.dutyId 职责ID
+ */
 export const updateRole = (data: any = {}) =>
   request({
     url: `${baseURL}/v1/base/role/update`,
     method: 'post',
     data
   })
-// 角色管理-角色删除
+/**
+ * 角色管理-角色删除
+ * @param {number} roleId 传入id
+ */
 export const deleteRole = (id:number) =>
   request({
     url: `${baseURL}/v2/base/role/deleteByRoleId`,
@@ -138,7 +163,11 @@ export const deleteRole = (id:number) =>
       roleId: id
     }
   })
-// 角色管理-获取角色详情
+
+/**
+ * 角色管理-获取角色详情
+ * @param {number} id
+ */
 export const getRoleDetail = (id:number) =>
   request({
     url: `${baseURL}/v2/base/role/getByRoleId`,
@@ -148,7 +177,9 @@ export const getRoleDetail = (id:number) =>
     }
   })
 
-// 权限管理-权限列表
+/**
+ * 权限管理-权限列表
+ */
 export const authorityList = () =>
   request({
     url: `${baseURL}/v1/base/authority/list`,
@@ -178,7 +209,9 @@ export const deleteAuthority = (id: number) =>
     }
   })
 
-// 职责管理-职责列表
+/**
+ * 职责管理-职责列表
+ */
 export const dutyList = () =>
   request({
     url: `${baseURL}/v2/base/duty/list`,

@@ -1,7 +1,6 @@
 <template>
   <div :class="isPC ? 'RoleManage' : 'RoleManage-m'">
     <div class="table_box">
-      <!--操作栏-->
       <TableHeader
         :tab="tab"
         :active-name="'0'"
@@ -167,10 +166,9 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import SuggestContainer from '@/components/SuggestContainer/index.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
-import { roleList, createRole, updateRole, deleteRole } from '@/api/system'
+import { roleList, deleteRole } from '@/api/system'
 import Pagination from '@/components/Pagination/index.vue'
 import { HandlePages } from '@/utils/index'
-
 import { SettingsModule } from '@/store/modules/settings'
 import '@/styles/common.scss'
 
@@ -203,7 +201,6 @@ export default class extends Vue {
     '操作'
   ];
   private checkList: any[] = this.dropdownList;
-  // table
   private total = 0;
   private list: any[] = [];
   private page: Object | undefined = '';
@@ -212,7 +209,8 @@ export default class extends Vue {
     page: 1,
     limit: 30
   };
-  // Watch
+  // 监听状态框对表格进行重新渲染
+  // table实例 doLayout方法 对 Table 进行重新布局。当 Table 或其祖先元素由隐藏切换为显示时，可能需要调用此方法
   @Watch('checkList', { deep: true })
   private onval(value: any) {
     this.$nextTick(() => {
@@ -223,6 +221,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 计算表格高度
   get tableHeight() {
     return SettingsModule.tableHeight + 110
   }
@@ -232,7 +231,6 @@ export default class extends Vue {
   private fetchData() {
     this.getList(this.listQuery)
   }
-  // button
   // 添加明细原因 row 当前行 column 当前列
   private tableClick(row: any, column: any, cell: any, event: any) {}
   // 请求列表
@@ -250,12 +248,15 @@ export default class extends Vue {
       this.$message.error(data)
     }
   }
+  // 跳转创建角色
   private goCreateUser() {
     this.$router.push({ name: 'CreateRole' })
   }
+  // 跳转编辑角色
   private editRole(row: any) {
     this.$router.push({ name: 'EditRole', query: { id: row.id } })
   }
+  // 删除角色
   private deleteRole(item: any) {
     this.$confirm(`您确定要删除“${item.nick}”吗？`, '删除角色', {
       confirmButtonText: '确定',
@@ -271,12 +272,14 @@ export default class extends Vue {
       }
     })
   }
+  // 跳转详情
   private goDetails(row: any) {
     this.$router.push({ name: 'RoleDetails', query: { id: row.id } })
   }
   mounted() {
     this.fetchData()
   }
+  // keepalive后页面重新渲染表格
   activated() {
     this.$nextTick(() => {
       ((this.$refs['multipleTable']) as any).doLayout()
@@ -328,5 +331,4 @@ export default class extends Vue {
     border-color: $assist-btn;
   }
 }
-
 </style>
