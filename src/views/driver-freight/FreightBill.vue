@@ -35,6 +35,7 @@
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/driverBilling/freightCharge/export']"
           size="small"
@@ -43,7 +44,9 @@
           :disabled="true"
           @click="handleExportClick"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -224,7 +227,7 @@ import { GetFreightChargeList, ExportFreightChargeList, ReceiveFreightChargeList
 import { Upload, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
-
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:Number,
   limit:Number,
@@ -243,6 +246,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private dutyListOptions:IState[] = [];// 业务线列表
   private gmIdOptions:IState[] = [];// 所属加盟经理列表
   private filelist:IState[] = []
@@ -615,8 +619,12 @@ export default class extends Vue {
     this.page.page = 1
     this.getLists()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -653,6 +661,7 @@ export default class extends Vue {
 
       let { data: res } = await ExportFreightChargeList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)

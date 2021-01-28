@@ -24,10 +24,15 @@
           size="small"
           :class="isPC ? 'btn-item' : 'btn-item-m'"
           name="rentcartype_download_btn"
-          @click="downLoad"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
           <i class="el-icon-download" />
-          <span v-if="isPC">导出</span>
+          <span v-if="isPC">
+            导出<template v-if="times !== 10">
+              {{ times }} s
+            </template>
+          </span>
         </el-button>
         <el-button
           v-permission="['/v1/product/product/rentalCar/create']"
@@ -324,6 +329,7 @@ import { GetDictionaryList } from '@/api/common'
 import { getProductList, shelvesOrTheshelves, createProduct, updateProduct, ProductDownload } from '@/api/product'
 import { SettingsModule } from '@/store/modules/settings'
 import '@/styles/common.scss'
+import { exportFileTip } from '@/utils/exportTip'
 
 interface IState {
   [key: string]: any;
@@ -339,6 +345,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private tags: any[] = [];
   private tab: any[] = [
     {
@@ -625,13 +632,18 @@ export default class extends Vue {
       this.$message.error(data)
     }
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.downLoad)
+  }
   @lock
-  private async downLoad() {
+  private async downLoad(sucFun:Function) {
     try {
       const postData = this.filterObj(this.listQuery)
       delete postData.page
       delete postData.limit
       let res = await ProductDownload(postData)
+      sucFun()
       this.$message({
         type: 'success',
         message: '导出成功!'
