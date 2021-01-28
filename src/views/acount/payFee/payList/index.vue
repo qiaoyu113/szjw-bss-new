@@ -202,7 +202,7 @@ import { getLabel, phoneRegExp, IdRegExp } from '@/utils/index.ts'
 import { getPayList, payExport, getSnoList, getPayNoList } from '@/api/driver-account'
 import { delayTime } from '@/settings.ts'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
-import { HandlePages, phoneReg, lock } from '@/utils/index'
+import { HandlePages, phoneReg, lock, showWork } from '@/utils/index'
 import { getSpecifiedUserListByCondition, GetOpenCityData, GetSpecifiedRoleList, getOfficeByTypeAndOfficeId, getOfficeByType, GetDutyListByLevel } from '@/api/common'
 import data from '@/views/pdf/content'
 interface IState {
@@ -295,7 +295,7 @@ export default class extends Vue {
         'node-key': 'workCity',
         props: {
           lazy: true,
-          lazyLoad: this.showWork
+          lazyLoad: showWork
         }
       },
       listeners: {
@@ -628,55 +628,55 @@ export default class extends Vue {
     }
   }
   // 获取大区和城市
-  private async showWork(node:any, resolve:any) {
-    let query: any = {
-      parentId: ''
-    }
-    if (node.level === 1) {
-      query.parentId = node.value
-    }
-    try {
-      if (node.level === 0) {
-        let nodes = await this.areaAddress({ type: 2 })
-        resolve(nodes)
-      } else if (node.level === 1) {
-        let nodes = await this.cityDetail(query)
-        resolve(nodes)
-      }
-    } catch (err) {
-      resolve([])
-    }
-  }
-  private async areaAddress(params: any) {
-    try {
-      let { data: res } = await getOfficeByType(params)
-      if (res.success) {
-        const nodes = res.data.map(function(item: any) {
-          return {
-            value: item.id,
-            label: item.name,
-            leaf: false
-          }
-        })
-        return nodes
-      }
-    } catch (err) {
-      console.log(`load city by code fail:${err}`)
-    }
-  }
-  private async cityDetail(params: any) {
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
-        return {
-          value: item.areaCode,
-          label: item.name,
-          leaf: true
-        }
-      })
-      return nodes
-    }
-  }
+  // private async showWork(node:any, resolve:any) {
+  //   let query: any = {
+  //     parentId: ''
+  //   }
+  //   if (node.level === 1) {
+  //     query.parentId = node.value
+  //   }
+  //   try {
+  //     if (node.level === 0) {
+  //       let nodes = await this.areaAddress({ type: 2 })
+  //       resolve(nodes)
+  //     } else if (node.level === 1) {
+  //       let nodes = await this.cityDetail(query)
+  //       resolve(nodes)
+  //     }
+  //   } catch (err) {
+  //     resolve([])
+  //   }
+  // }
+  // private async areaAddress(params: any) {
+  //   try {
+  //     let { data: res } = await getOfficeByType(params)
+  //     if (res.success) {
+  //       const nodes = res.data.map(function(item: any) {
+  //         return {
+  //           value: item.id,
+  //           label: item.name,
+  //           leaf: false
+  //         }
+  //       })
+  //       return nodes
+  //     }
+  //   } catch (err) {
+  //     console.log(`load city by code fail:${err}`)
+  //   }
+  // }
+  // private async cityDetail(params: any) {
+  //   let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  //   if (city.success) {
+  //     const nodes = city.data.map(function(item: any) {
+  //       return {
+  //         value: item.areaCode,
+  //         label: item.name,
+  //         leaf: true
+  //       }
+  //     })
+  //     return nodes
+  //   }
+  // }
   // 获取交易流水号接口
   async loadQuerySnoweywords(params:IState) {
     try {

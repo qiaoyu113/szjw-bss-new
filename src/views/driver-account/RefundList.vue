@@ -188,7 +188,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import { getUserManagerList, enableOrDisableUser, resetPassword, pushUserToCRM } from '@/api/system'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SuggestContainer from '@/components/SuggestContainer/index.vue'
-import { HandlePages, lock } from '@/utils/index'
+import { HandlePages, lock, showWork } from '@/utils/index'
 import { refundList, refundExport, refundExecute, refundRejection, batchRefundExecute, refundDownLod, checkBatch } from '@/api/driver-refund.ts'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
@@ -255,13 +255,12 @@ export default class extends Vue {
         'node-key': 'workCity',
         props: {
           lazy: true,
-          lazyLoad: this.showWork
+          lazyLoad: showWork
         }
       },
       listeners: {
         'change': () => {
           this.listQuery.joinManagerId = ''
-          // this.resetDriver()
           this.handleClearQueryDriver()
           this.getGmOptions()
         }
@@ -498,7 +497,6 @@ export default class extends Vue {
       time: []
     }
   }
-
   // 分页
   handlePageSize(page:PageObj) {
     this.page.page = page.page
@@ -550,7 +548,6 @@ export default class extends Vue {
   }
   // 详情
   private handleClick(row:IState) {
-    console.log(row)
     this.$router.push({
       path: '/driveraccount/refunddetail',
       query: { id: row.refundApplyId }
@@ -582,8 +579,6 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log('退费失败')
-    } finally {
-      console.log('1')
     }
   }
 
@@ -606,7 +601,6 @@ export default class extends Vue {
       this.multipleSelection.forEach((item:any) => {
         totalMoney += item.refundAmount
       })
-
       let params = this.getRefundApplyIds
       let check = await this.checkBefore(params)
       if (!check) {
@@ -618,7 +612,6 @@ export default class extends Vue {
         dangerouslyUseHTMLString: true,
         type: 'warning'
       }).then(() => {
-        // 此处写个方法调接口
         this.handMulRefund()
       }).catch(() => {
         this.multipleSelection.splice(0, this.multipleSelection.length)
@@ -658,8 +651,6 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log(err)
-    } finally {
-      console.log('1')
     }
   }
   // 驳回
@@ -670,7 +661,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     } finally {
-      console.log('1')
+      //
     }
   }
   // 批量驳回
@@ -689,7 +680,6 @@ export default class extends Vue {
         dangerouslyUseHTMLString: true,
         type: 'warning'
       }).then(async() => {
-      // 此处写个方法调接口
         let params = this.getRefundApplyIds
         await this.handleRefundReject(params, 'mul')
       }).catch(() => {
@@ -725,15 +715,12 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     } finally {
-      console.log('1')
+      //
     }
   }
-
   handleSelectionChange(val:any) {
-    // console.log(val)
     this.multipleSelection = val
   }
-
   // 导出
   @lock
   private async handleExportClick() {
@@ -753,7 +740,6 @@ export default class extends Vue {
       this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
       this.listQuery.refundApplyId && (params.refundApplyId = this.listQuery.refundApplyId)
       this.listQuery.status !== '' && (params.status = this.listQuery.status)
-
       const { data } = await refundExport(params)
       if (data.success) {
         this.$message.success('导出成功')
@@ -783,10 +769,9 @@ export default class extends Vue {
     } catch (err) {
       console.log('下载失败', err)
     } finally {
-      console.log('1')
+      //
     }
   }
-
   // 获取业务线
   private async getDutyListByLevel() {
     try {
@@ -870,56 +855,55 @@ export default class extends Vue {
     }
   }
   // 获取大区和城市
-  private async showWork(node:any, resolve:any) {
-    let query: any = {
-      parentId: ''
-    }
-    if (node.level === 1) {
-      query.parentId = node.value
-    }
-    try {
-      if (node.level === 0) {
-        let nodes = await this.areaAddress({ type: 2 })
-        resolve(nodes)
-      } else if (node.level === 1) {
-        let nodes = await this.cityDetail(query)
-        resolve(nodes)
-      }
-    } catch (err) {
-      resolve([])
-    }
-  }
-  private async areaAddress(params: any) {
-    try {
-      let { data: res } = await getOfficeByType(params)
-      if (res.success) {
-        const nodes = res.data.map(function(item: any) {
-          return {
-            value: item.id,
-            label: item.name,
-            leaf: false
-          }
-        })
-        return nodes
-      }
-    } catch (err) {
-      console.log(`load city by code fail:${err}`)
-    }
-  }
-
-  private async cityDetail(params: any) {
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
-        return {
-          value: item.areaCode,
-          label: item.name,
-          leaf: true
-        }
-      })
-      return nodes
-    }
-  }
+  // private async showWork(node:any, resolve:any) {
+  //   let query: any = {
+  //     parentId: ''
+  //   }
+  //   if (node.level === 1) {
+  //     query.parentId = node.value
+  //   }
+  //   try {
+  //     if (node.level === 0) {
+  //       let nodes = await this.areaAddress({ type: 2 })
+  //       resolve(nodes)
+  //     } else if (node.level === 1) {
+  //       let nodes = await this.cityDetail(query)
+  //       resolve(nodes)
+  //     }
+  //   } catch (err) {
+  //     resolve([])
+  //   }
+  // }
+  // private async areaAddress(params: any) {
+  //   try {
+  //     let { data: res } = await getOfficeByType(params)
+  //     if (res.success) {
+  //       const nodes = res.data.map(function(item: any) {
+  //         return {
+  //           value: item.id,
+  //           label: item.name,
+  //           leaf: false
+  //         }
+  //       })
+  //       return nodes
+  //     }
+  //   } catch (err) {
+  //     console.log(`load city by code fail:${err}`)
+  //   }
+  // }
+  // private async cityDetail(params: any) {
+  //   let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  //   if (city.success) {
+  //     const nodes = city.data.map(function(item: any) {
+  //       return {
+  //         value: item.areaCode,
+  //         label: item.name,
+  //         leaf: true
+  //       }
+  //     })
+  //     return nodes
+  //   }
+  // }
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -933,12 +917,11 @@ export default class extends Vue {
       limit: this.queryPage.limit
     }
     val !== '' && (params.key = val)
-
     try {
       let result:IState[] = await this.loadDriverByKeyword(params)
       this.driverOptions.push(...result)
     } finally {
-      console.log('finally')
+      //
     }
   }
   // 搜索司机
@@ -957,7 +940,6 @@ export default class extends Vue {
   // 重置司机
   resetDriver() {
     this.listQuery.driverId = ''
-    // this.listQuery.joinManagerId = ''
     this.searchKeyword = ''
     let len:number = this.driverOptions.length
     if (len > 0) {

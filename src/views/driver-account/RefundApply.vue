@@ -141,16 +141,11 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-// import { CardBin } from 'bankcard'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { options } from 'numeral'
 import { getDriverNoAndNameList } from '@/api/driver'
 import { lock } from '@/utils/index.ts'
-import {
-  haveRecordToBeApproved,
-  getRefundEcho,
-  createRefund
-} from '@/api/driver-refund'
+import { haveRecordToBeApproved, getRefundEcho, createRefund } from '@/api/driver-refund'
 const { CardBin } = require('bankcard')
 interface IState {
   [key: string]: any
@@ -504,22 +499,8 @@ export default class extends Vue {
   }
   // 触发表单校验
   private Submit(this: any) {
-    // 待补充
-    // if (!this.backCardNoValidator()) return
     this.$refs.RefundForm.submitForm()
   }
-  // private backCardNoValidator() {
-  //   const noLine = this.listQuery.bankCardNo.replace(/-/g, '')
-  //   const resBnak = this.BC.validateCardInfo(noLine)
-  //   if (!resBnak.validated) {
-  //     this.$message({
-  //       type: 'error',
-  //       message: '您的银行卡号输入错误~请重新输入后提交~'
-  //     })
-  //     return false
-  //   }
-  //   return true
-  // }
   // 表单检验通过
   private handlePassClick(valid: any) {
     try {
@@ -530,7 +511,6 @@ export default class extends Vue {
         })
       }
       // 校验银行卡信息
-      // if (!this.backCardNoValidator()) return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
@@ -541,7 +521,6 @@ export default class extends Vue {
       return error
     }
   }
-
   // 接口
   driverSelect(this: any, e: string) {
     this.haveRecordToBeApprovedSure(e)
@@ -697,8 +676,6 @@ export default class extends Vue {
     this.getDriverInfo(this.keyWord)
   }
   mounted() {
-    // const qx:any = document.querySelector('#bank-card-no')
-    // qx.addEventListener('keyup')
   }
 }
 </script>

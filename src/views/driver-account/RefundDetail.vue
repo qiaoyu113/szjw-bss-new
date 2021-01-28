@@ -1,5 +1,5 @@
 <template>
-  <div class="RefundDetail">
+  <div class="refundDetail">
     <div class="box">
       <div class="table-box">
         <SectionContainer
@@ -7,7 +7,7 @@
           :md="true"
         >
           <self-form
-            ref="RefundForm"
+            ref="refundForm"
             label-position="top"
             :list-query="listQuery"
             :form-item="formItem"
@@ -22,7 +22,7 @@
           :md="true"
         >
           <self-form
-            ref="RefundForm"
+            ref="refundForm"
             label-position="top"
             :list-query="listQuery"
             :form-item="formItem1"
@@ -37,7 +37,7 @@
           :md="true"
         >
           <self-form
-            ref="RefundForm"
+            ref="refundForm"
             label-position="top"
             :list-query="listQuery"
             :form-item="formItem2"
@@ -368,14 +368,14 @@ export default class extends Vue {
       } catch (err) {
         console.log(err)
       } finally {
-        console.log('1')
+        //
       }
     }
 }
 </script>
 
 <style lang="scss" scoped>
-.RefundDetail{
+.refundDetail{
   width: 100%;
   height: 100%;
   padding: 0;
@@ -395,10 +395,10 @@ export default class extends Vue {
 .one-line{
   margin: 0;
   white-space: nowrap;
-overflow: hidden;
-width: 100%;
-max-width: 150px;
-text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  max-width: 150px;
+  text-overflow: ellipsis;
 }
 </style>
 
