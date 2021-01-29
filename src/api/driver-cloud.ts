@@ -44,35 +44,85 @@ export const GetDriverByDriverName = (data: any) =>
     data
   })
 
-// 获取司机线索列表
+/**
+ * 获取司机线索列表
+ * 请求参数：
+ * page | 页码
+ * limit | 条数
+ * haveCar | 是否有车
+ * onlyMe | 只看自己
+ * name | 司机姓名
+ * phone | 手机号
+ * workCity | 城市
+ * carTypes | 车型
+ * contactSituations | 联系情况
+ * followerId | 跟进人
+ * busiType | 业务线
+ * status | 状态
+ * startDate 分配日期开始时间
+ * endDate | 分配日期开始时间
+ */
 export const GetDriverClueList = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/list`,
     method: 'post',
     data
   })
-  // 导出司机线索
+/**
+ * 导出司机线索
+ * 请求参数：
+ * haveCar | 是否有车
+ * onlyMe | 只看自己
+ * name | 司机姓名
+ * phone | 手机号
+ * workCity | 城市
+ * carTypes | 车型
+ * contactSituations | 联系情况
+ * followerId | 跟进人
+ * busiType | 业务线
+ * status | 状态
+ * startDate 分配日期开始时间
+ * endDate | 分配日期开始时间
+ */
 export const ExportDriverClue = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/export`,
     method: 'post',
     data
   })
-// 获取司机线索详情
+
+/**
+ * 获取司机线索详情
+ * 请求参数：
+ * marketClueId | 司机线索id
+ */
 export const GetDriverClueDetail = (params: any) =>
   request({
     url: `${prefix}/v2/clueH5/detail`,
     method: 'get',
     params
   })
-// 司机线索详情添加跟进
+
+/**
+ * 司机线索详情添加跟进
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * remark | 备注
+ * contactSituation | 联系情况
+ */
 export const AddContactInfo = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/addFollow`,
     method: 'post',
     data
   })
-// 司机线索详情取消面试
+
+/**
+ * 司机线索详情取消面试
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * remark | 备注
+ */
 export const CancelInteview = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/abolishInterview`,
@@ -80,7 +130,12 @@ export const CancelInteview = (data: any) =>
     data
   })
 
-//  司机线索详情邀请面试
+/**
+ * 邀请面试
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * interviewDate | 面试日期
+ */
 export const InvitelInteview = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/inviteInterview`,
@@ -88,14 +143,26 @@ export const InvitelInteview = (data: any) =>
     data
   })
 
-// 司机线索详情调整面试
+/**
+ * 司机线索详情调整面试
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * interviewDate | 面试日期
+ */
 export const AdjustmentlInteview = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/updateInterviewTime`,
     method: 'post',
     data
   })
-  // 司机线索详情日志列表
+
+/**
+ * 司机线索详情日志列表
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * page | 页码
+ * limit | 每页条数
+ */
 export const GetDriverClueLogList = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/log`,
@@ -118,7 +185,13 @@ export const allocationClue = (data: any) =>
     method: 'post',
     data
   })
-// 线索分配
+
+/**
+ * 线索分配
+ * 请求参数：
+ * marketClueId | 司机线索id
+ * followerId | 跟进人
+ */
 export const allocationClue1 = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/updateFollowerByMarketClueIdForSuccess`,
@@ -126,7 +199,21 @@ export const allocationClue1 = (data: any) =>
     data
   })
 
-// 编辑司机线索
+/**
+ * 编辑司机线索
+ * 请求参数：
+ * marketClueId | 期望工作城市
+ * name | 姓名
+ * phone | 手机号
+ * haveCar | 是否有车
+ * carType | 车型
+ * experience | 货运经验
+ * age | 年龄
+ * nowProfession | 当前职业
+ * nowAddress | 现住址
+ * expectAddressCity | 期望工作城市
+ * expectAddressCounty | 期望工作县/区
+ */
 export const editClue = (data: any) =>
   request({
     url: `${prefix}/v2/clueH5/edit`,

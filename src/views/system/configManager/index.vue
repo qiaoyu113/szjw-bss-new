@@ -190,14 +190,20 @@ interface ColumnObj {
   }
 })
 export default class extends Vue {
+  // loading
   private listLoading:boolean = false
+  // 是否可以下一步
   private isvalidating:boolean = false
+  // 是否打开弹框
   private dialogTableVisible:boolean = false
+  // 提交按钮的loading
   private submitLoading:boolean = false
+  // 新增or编辑
   private stepOne:boolean = true
   private cityListOptions:IState[] = [] // 城市列表
   private fsListOptions:IState[] = [] // 肥瘦标签列表
   private tableData:ColumnObj[] = [];
+  // 渲染表格的列表
   private columns:IState[] = [
     {
       key: 'cityName',
@@ -241,9 +247,11 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
+  // 编辑表单
   private form1:IState = {
     cityCode: ''
   }
+  // 渲染编辑表单的列表
   private formItem1:any[] = [
     {
       type: 2,
@@ -269,14 +277,17 @@ export default class extends Vue {
       w: '0px'
     }
   ]
+  // 新增表单
   private form2:IState = {
     shareCodes: [],
     sepcialCodes: [],
     id: ''
   }
+  // 编辑表单的校验规则
   private rules1:IState ={
     cityCode: { required: true, message: '请选择城市', trigger: 'change' }
   }
+  // 渲染新增表单的列表
   private formItem2:any[] = [
     {
       type: 'city',
@@ -318,6 +329,7 @@ export default class extends Vue {
       w: '0px'
     }
   ]
+  // 新增表单的校验
   private rules2:IState = {
     shareCodes: [
       { required: true, message: '请选择肥瘦标签', trigger: 'change' }
@@ -352,6 +364,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格的高度
   get tableHeight() {
     let otherHeight = 340
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight

@@ -217,6 +217,7 @@ export default class extends Vue {
   private tags:any[] = []// 顶部查询按钮回显的数组
   private listLoading:boolean = false
   private tableData:tableObj[] = []
+  // 渲染表格的列表
   private columns:ColumnsObj[] = [
     {
       key: 'nickName',
@@ -252,16 +253,19 @@ export default class extends Vue {
       'min-width': this.isPC ? '200px' : '50px'
     }
   ]
+  // 分页
   private page :PageObj= {
     page: 1,
     limit: 30,
     total: 0
   }
+  // 查询表单
   private listQuery:IState = {
     status: '',
     mobile: '',
     nickName: ''
   }
+  // 渲染查询表单的列表
   private formItem:any[] = [
     {
       type: 1,
@@ -484,6 +488,7 @@ export default class extends Vue {
     this.tags = []
     // this.getLists()
   }
+  // 获取列表
   handleFilterClick() {
     let blackLists = ['status']
     this.tags = []
