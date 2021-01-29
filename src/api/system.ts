@@ -244,21 +244,40 @@ export const dutyList = () =>
     url: `${baseURL}/v2/base/duty/list`,
     method: 'get'
   })
-// 职责管理-创建职责
+
+/**
+   * 职责管理-创建职责
+   * @param {number} data.dutyLevel 职责等级
+   * @param {string} data.dutyName 职责名称
+   * @param {number} data.id 职责id
+   * @param {number} data.parentId  上级节点
+   * @param {string} data.parentsId  上级节点，逗号分隔
+   */
 export const createDuty = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/duty/create`,
     method: 'post',
     data
   })
-// 职责管理-编辑职责
+/**
+ * 职责管理-编辑职责
+  * @param {number} data.dutyLevel 职责等级
+  * @param {string} data.dutyName 职责名称
+  * @param {number} data.id 职责id
+  * @param {number} data.parentId  上级节点
+  * @param {string} data.parentsId  上级节点，逗号分隔
+ */
 export const updateDuty = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/duty/update`,
     method: 'post',
     data
   })
-// 职责管理-删除职责
+/**
+ * 职责管理-删除职责
+ * @param {number} data.dutyLevel 职责等级
+ * @param {number} data.id 职责id
+ */
 export const deleteDuty = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/duty/delete`,
