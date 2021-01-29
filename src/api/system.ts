@@ -59,41 +59,68 @@ export const getOfficeList2 = (params: any) =>
     params
   })
 
-// 组织管理-组织列表
+/**
+ * 组织管理-组织列表
+ */
 export const getOfficeList = () =>
   request({
     url: `${baseURL}/v2/base/office/list`,
     method: 'get'
   })
-// 组织管理-创建组织
+/**
+ * 组织管理-创建组织
+ * @param {string} data.name 组织名称
+ * @param {number} data.parentId 父节点
+ * @param {string} data.parentIds 根节点到父节点序列
+ * @param {number} data.type  层级类型:1总部，2大区，3城市，4业务线，5小组
+ * @param {string} data.dutyId 职责ID
+ * @param {string} data.areaCode 城市code
+ */
 export const createOffice = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/office/create`,
     method: 'post',
     data
   })
-// 组织管理-俩个组织排序
+
+/**
+ * 组织管理-俩个组织排序
+ * @param {number} data.fromId 要换位置的组织Id
+ * @param {number} data.toId 要换位置目标的组织Id
+ */
 export const sortOffice = (data: any = {}) =>
   request({
     url: `${baseURL}/v1/base/office/sort`,
     method: 'post',
     data
   })
-  // 组织管理-查询职责列表
+  /**
+   * 组织管理-查询职责列表
+   * @param {number} params.dutyLevel 职责级别
+   */
 export const getDutyListByLevel = (params: any = {}) =>
   request({
     url: `${baseURL}/v2/base/duty/getDutyListByLevel`,
     method: 'post',
     params
   })
-// 组织管理-修改组织信息
+/**
+ * 组织管理-修改组织信息
+ * @param {string} data.areaCode 区域编码
+ * @param {number} data.dutyId 职责Id
+ * @param {string} data.name 组织名
+ * @param {number} data.id 主键Id
+ */
 export const updateOffice = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/office/update`,
     method: 'post',
     data
   })
-  // 组织管理-删除组织
+/**
+ * 组织管理-删除组织
+ * @param {number} data.id 主键Id
+ */
 export const deleteOffice = (data: any = {}) =>
   request({
     url: `${baseURL}/v2/base/office/delete`,
