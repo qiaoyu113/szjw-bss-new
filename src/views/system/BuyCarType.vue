@@ -354,6 +354,32 @@ interface IState {
   [key: string]: any;
 }
 
+type listQuery = {
+  busiType: number, // 业务类型：1购车，2租车
+    carType: string,
+    city: string,
+    productCode: string,
+    status: string,
+    supplier: string,
+    // eslint-disable-next-line camelcase
+    Intentional_compartment:string, // 车型
+    endDate: string,
+    startDate: string,
+    page: number,
+    limit: number,
+    [key:string]: any
+}
+type DialogFrom = {
+  carDescribe :string
+  carType :number|string
+  city :any,
+  price :string
+  supplier :string
+  id ?:string
+  model :string,
+  busiType:number,
+  name?:string
+}
 @Component({
   name: 'BuyCarType',
   components: {
@@ -384,7 +410,7 @@ export default class extends Vue {
     }
   ];
   private DateValue: any[] = [];
-  private listQuery: IState = {
+  private listQuery: listQuery = {
     busiType: 1, // 业务类型：1购车，2租车
     carType: '',
     city: '',
@@ -424,7 +450,7 @@ export default class extends Vue {
   private isAdd: boolean = false;
   private dialogVisible: boolean = false;
   private dialogTit: string = '';
-  private dialogForm: IState = {
+  private dialogForm: DialogFrom = {
     'busiType': 1,
     'carDescribe': '', // 车辆描述
     'carType': '', // 车型
@@ -521,7 +547,7 @@ export default class extends Vue {
   // 添加明细原因 row 当前行 column 当前列
   private tableClick(row: any, column: any, cell: any, event: any) {}
   // 请求列表
-  private async getList(value: any) {
+  private async getList(value: listQuery) {
     this.listQuery.page = value.page
     this.listQuery.limit = value.limit
     this.listLoading = true
@@ -568,7 +594,7 @@ export default class extends Vue {
     })
   }
   // dialog
-  private showDialog(key: any) {
+  private showDialog(key:any) {
     if (key === 'create') {
       // 新建
       this.isAdd = true
@@ -599,6 +625,7 @@ export default class extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(async() => {
+      // 上下架车型
       const { data } = await shelvesOrTheshelves({
         id,
         status: status ^ 10 ^ 20,
@@ -628,7 +655,7 @@ export default class extends Vue {
       postData.city = postData.city.join()
       postData.name = this.optionsCar.find((item: any) => Number(item.dictValue) === postData.carType).dictLabel + postData.model
       if (this.isAdd) {
-        // 添加
+        // 添加车型
         delete postData.id
         const { data } = await createProduct(postData)
         if (data.success) {
@@ -639,7 +666,7 @@ export default class extends Vue {
           this.$message.error(data)
         }
       } else {
-        // 编辑
+        // 编辑车型
         const { data } = await updateProduct(postData)
         if (data.success) {
           this.$message.success(`编辑成功`)
@@ -656,6 +683,7 @@ export default class extends Vue {
     }
   }
   private async getDictionary() {
+    // 获取字数据
     const { data } = await GetDictionaryList(['Intentional_compartment'])
     if (data.success) {
       this.optionsCar = data.data.Intentional_compartment
@@ -664,6 +692,7 @@ export default class extends Vue {
     }
   }
   private async getCarModelList() {
+    // 获取车型列表
     const { data } = await GetCarModelList({
       busiType: 1
     })
@@ -683,6 +712,7 @@ export default class extends Vue {
       const postData = this.filterObj(this.listQuery)
       delete postData.page
       delete postData.limit
+      // 导出车型
       let res = await ProductDownload(postData)
       sucFun()
       this.$message({
@@ -701,6 +731,7 @@ export default class extends Vue {
     if (!data) {
       return
     }
+    // 下载文件
     let url = window.URL.createObjectURL(new Blob([data]))
     let link = document.createElement('a')
     link.style.display = 'none'
