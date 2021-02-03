@@ -31,10 +31,12 @@
           v-permission="['/v2/driver/label-sync/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          :loading="ExportClick"
-          @click="handleExportClick"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           v-permission="['/v2/driver/label-sync/create']"
@@ -138,6 +140,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { today, yesterday, month, lastmonth, threemonth } from '../driver-freight/components/date'
 import { GetDutyListByLevel, GetDictionaryCity } from '@/api/common'
 import { GetDriverTagList, ExportDriverTagList, EditDriverTag, AddDriverTag, GetDriverByDriverName } from '@/api/driver-cloud'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -156,6 +159,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private driverOver:Boolean = false
   private driverLoading:Boolean = false
   private ExportClick:boolean = false
@@ -239,7 +243,7 @@ export default class extends Vue {
     time: []
   };
   // 司机状态
-  private driverStatus:any = [
+  private driverStatus:IState[] = [
     {
       label: '全部',
       value: ''
@@ -265,7 +269,7 @@ export default class extends Vue {
       value: 5
     }
   ]
-  private formItem:any[] = [
+  private formItem:IState[] = [
     {
       type: 1,
       label: '梧桐司机姓名',
@@ -398,13 +402,14 @@ export default class extends Vue {
     }
   ]
 
-  private dialogRules = {
+  private dialogRules:IState = {
     aDriverCode: [
       { required: true, message: '请输入7位自承运司机编号', trigger: 'blur' },
       { validator: this.validateADriverCode, trigger: 'blur' }
     ],
     driverName: { required: true, message: '请输入选择司机', trigger: 'blur' }
   }
+
   private validateADriverCode(rule:any, value:any, callback:any) {
     const isInteger = Number.isInteger(Number(value))
     if (!isInteger) {
@@ -421,6 +426,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 表格高度
   get tableHeight() {
     let otherHeight = 400
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
@@ -475,28 +481,20 @@ export default class extends Vue {
     this.page.page = 1
     this.getLists()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  private async handleExportClick(row:IState) {
+  private async handleExportClick(sucFun:Function) {
     try {
       this.ExportClick = true
       let params:IState = {}
-      this.listQuery.key && (params.key = this.listQuery.key)
-      this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
-      this.listQuery.aDriverId && (params.otherDriverId = this.listQuery.aDriverId)
-      this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
-      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.status && (params.status = this.listQuery.status)
-      if (this.listQuery.time && this.listQuery.time.length > 0) {
-        let startDate = new Date(this.listQuery.time[0])
-        let endDate = new Date(this.listQuery.time[1])
-        startDate.setHours(0, 0, 0)
-        endDate.setHours(23, 59, 59)
-        params.startDate = startDate.setHours(0, 0, 0)
-        params.endDate = endDate.setHours(23, 59, 59)
-      }
+      params = this.dealData(params)
       let { data: res } = await ExportDriverTagList(params)
       if (res.success) {
+        sucFun()
         this.ExportClick = false
         this.$message({
           type: 'success',
@@ -537,7 +535,6 @@ export default class extends Vue {
     this.dialogQuery.businessTypeName = row.busiTypeName
     this.dialogQuery.aDriverCode = row.adriverId
   }
-
   // 表单验证通过
   handlePassClick(valid:boolean) {
     this.saveData()
@@ -547,7 +544,7 @@ export default class extends Vue {
     ((this.$refs.dialogSelfTag) as any).submitForm()
   }
   // 保存-编辑或新增
-  private async saveData() {
+  async saveData() {
     try {
       this.submitLoading = true
       let params:IState = {
@@ -555,7 +552,6 @@ export default class extends Vue {
         otherDriverId: this.dialogQuery.aDriverCode
       }
       await this.chooseAddorUpdata(params)
-
       setTimeout(() => {
         this.submitLoading = false
       }, 1000)
@@ -565,7 +561,7 @@ export default class extends Vue {
     }
   }
   @lock
-  private async chooseAddorUpdata(params:any) {
+  async chooseAddorUpdata(params:any) {
     try {
       if (this.dialogTit === '编辑司机标签') {
         let { data: res } = await EditDriverTag(params)
@@ -608,14 +604,16 @@ export default class extends Vue {
         limit: this.queryPage.limit
       }
       val !== '' && (params.key = val)
-      let result:IState[] = await this.loadDriverByKeyword(params)
-      this.driverOptions.push(...result)
+      let result:(undefined | IState[]) = await this.loadDriverByKeyword(params)
+      if (result) {
+        this.driverOptions.push(...result)
+      }
     } catch (err) {
       console.log(`get driver fail:${err}`)
     }
   }
   // 根据关键字查司机信息
-  async loadDriverByKeyword(params:IState) {
+  async loadDriverByKeyword(params:IState):(Promise<undefined | IState[]>) {
     if (this.driverOver) {
       return
     }
@@ -637,7 +635,7 @@ export default class extends Vue {
       return []
     }
   }
-  // 搜索
+  // 输入司机框检索
   async querySearchByKeyword(val:string) {
     this.reset()
     this.driverLoading = true
@@ -658,38 +656,43 @@ export default class extends Vue {
     this.driverOver = false
     this.driverOptions.splice(0, this.driverOptions.length)
   }
-  // 删除司机
+  // 删除司机信息
   handleClearQueryDriver() {
     this.searchKeyword = ''
     this.reset()
     this.loadQueryDriverByKeyword()
   }
   // 分页
-  private handlePageSize(page:PageObj) {
+  handlePageSize(page:PageObj) {
     this.page.page = page.page
     this.page.limit = page.limit
     this.getLists()
   }
+  // 处理导出和查询列表相同逻辑
+  dealData(params:IState) {
+    this.listQuery.key && (params.key = this.listQuery.key)
+    this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
+    this.listQuery.aDriverId && (params.otherDriverId = this.listQuery.aDriverId)
+    this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
+    this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+    this.listQuery.status && (params.status = this.listQuery.status)
+    if (this.listQuery.time && this.listQuery.time.length > 1) {
+      let startDate = new Date(this.listQuery.time[0])
+      let endDate = new Date(this.listQuery.time[1])
+      params.startDate = startDate.setHours(0, 0, 0)
+      params.endDate = endDate.setHours(23, 59, 59)
+    }
+    return params
+  }
   // 获取列表
-  private async getLists() {
+  async getLists() {
     try {
       this.listLoading = true
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit
       }
-      this.listQuery.key && (params.key = this.listQuery.key)
-      this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
-      this.listQuery.aDriverId && (params.otherDriverId = this.listQuery.aDriverId)
-      this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
-      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.status && (params.status = this.listQuery.status)
-      if (this.listQuery.time && this.listQuery.time.length > 1) {
-        let startDate = new Date(this.listQuery.time[0])
-        let endDate = new Date(this.listQuery.time[1])
-        params.startDate = startDate.setHours(0, 0, 0)
-        params.endDate = endDate.setHours(23, 59, 59)
-      }
+      params = this.dealData(params)
       let { data: res } = await GetDriverTagList(params)
       if (res.success) {
         res.page = await HandlePages(res.page)
@@ -764,6 +767,5 @@ export default class extends Vue {
       font-size: 13px;
       color: #FF5D5D;
     }
-
   }
 </style>

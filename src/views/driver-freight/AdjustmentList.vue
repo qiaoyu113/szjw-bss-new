@@ -43,6 +43,7 @@
         >
           新增
         </el-button>
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/driverBilling/shippingChange/export']"
           size="small"
@@ -51,7 +52,9 @@
           :disabled="true"
           @click="handleExportClick"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -205,6 +208,7 @@ import { GetShippingChangeList, GetShippingChangeExport, SaveShippingChange, Get
 import { Upload, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { getOrderListByDriverId } from '@/api/driver-account'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -224,7 +228,8 @@ interface IState {
   }
 })
 export default class extends Vue {
-  private searchKeyword:string = '' // 关键字
+  times:number = 10;
+  private searchKeyword:string = ''
   private dutyListOptions:IState[] = [];// 业务线列表
   private gmIdOptions:IState[] = [];// 所属加盟经理列表
   private orderListOptions:IState[] = []; // 订单列表
@@ -568,8 +573,12 @@ export default class extends Vue {
     ], this)
     return ret
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  async handleExportClick() {
+  async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -594,6 +603,7 @@ export default class extends Vue {
       }
       let { data: res } = await GetShippingChangeExport(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)

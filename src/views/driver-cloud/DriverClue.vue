@@ -49,9 +49,12 @@
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
-          @click="handleExportClick"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
       </div>
       <template slot="status">
@@ -170,6 +173,7 @@
         <template v-slot:remark="scope">
           <template v-if="scope.row.remark">
             <el-tooltip placement="top">
+              <!-- eslint-disable vue/no-v-html -->
               <div
                 slot="content"
                 v-html="toBreak(scope.row.remark)"
@@ -243,6 +247,7 @@ import {
   lastmonth,
   threemonth
 } from '../driver-freight/components/date'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -261,6 +266,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private listLoading:boolean = false;
   private showDialog:boolean = false; // 弹框
   private title:string = ''; // 弹框title
@@ -705,9 +711,13 @@ export default class extends Vue {
     this.rows.push(...this.multipleSelection)
     this.showDialog = true
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  async handleExportClick() {
+  async handleExportClick(sucFun:Function) {
     try {
       try {
         let params:IState = {}
@@ -737,6 +747,7 @@ export default class extends Vue {
         }
         let { data: res } = await ExportDriverClue(params)
         if (res.success) {
+          sucFun()
           this.$message.success('操作成功')
         } else {
           this.$message.error(res.message)

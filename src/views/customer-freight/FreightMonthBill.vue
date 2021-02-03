@@ -65,15 +65,18 @@
         slot="mulBtn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/waybill/custBilling/monthlyBill/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
           :disabled="true"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -251,7 +254,7 @@ import { GetMonthlyBillList, ExportMonthlyBill, CustomerMonthlyBillCheck, GetPro
 import { Upload, GetSpecifiedRoleList, getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
-
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -270,6 +273,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private filelist:IState[] = []
   // loading
   private listLoading:Boolean = false;
@@ -709,8 +713,12 @@ export default class extends Vue {
     ], this)
     return ret
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  private handleExportClick() {
+  private handleExportClick(sucFun:Function) {
     if (!this.validatorQuery()) {
       return false
     }
@@ -737,13 +745,14 @@ export default class extends Vue {
     } else {
       return this.$message.error('请选择月份')
     }
-    this.exportExcel(params)
+    this.exportExcel(params, sucFun)
   }
   // 导出或下载月账单
-  async exportExcel(params:IState) {
+  async exportExcel(params:IState, sucFun:Function) {
     try {
       let { data: res } = await ExportMonthlyBill(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)
@@ -824,7 +833,7 @@ export default class extends Vue {
       let params:IState = {
         monthBillId: row.id
       }
-      this.exportExcel(params)
+      this.exportExcel(params, () => {})
     }
   }
   // 确认弹窗

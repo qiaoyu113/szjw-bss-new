@@ -157,7 +157,6 @@ import SectionContainer from '@/components/SectionContainer/index.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import { TagsViewModule } from '@/store/modules/tags-view'
 import { RoleTree } from './components'
-// import { GetDictionaryList } from '@/api/common'
 import { lock } from '@/utils/index'
 import {
   authorityList,
@@ -212,10 +211,6 @@ export default class extends Vue {
       dictValue: 2,
       dictLabel: '城市数据'
     },
-    // {
-    //   dictValue: 1,
-    //   dictLabel: '大区数据'
-    // },
     {
       dictValue: 0,
       dictLabel: '全部数据'
@@ -330,6 +325,7 @@ export default class extends Vue {
     this.resetChecked();
     (this.$refs[formName] as any).resetFields()
   }
+  // 获取tree选中的数据
   private getCheckedNodes() {
     const list = (this.$refs['tree'] as any).$refs['roleTree'].getCheckedNodes()
     return list.map((item: any) => ({
@@ -337,10 +333,12 @@ export default class extends Vue {
       dataScope: item.checked
     }))
   }
+  // 清空tree数据
   private resetChecked() {
     (this.$refs['tree'] as any).$refs['roleTree'].setCheckedKeys([])
   }
 
+  // 编辑时回显数据
   private async getAuth() {
     const { data } = await authorityList()
     if (data.success) {
@@ -364,7 +362,6 @@ export default class extends Vue {
       }
     }
     this.getDutyList()
-    // this.getDictionary() 取消请求产品线接口
     this.getAuth()
   }
   // 递归解决children 为空数组

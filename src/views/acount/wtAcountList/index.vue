@@ -63,11 +63,14 @@
         <el-button
           v-permission="['/v2/wt-driver-account/management/export']"
           :class="isPC ? '' : 'btnMobile'"
+          :disabled="times === 10 ? false :true"
           name="driverlist_offout_btn"
           size="small"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
       </div>
     </self-form>
@@ -180,6 +183,7 @@ import { delayTime } from '@/settings.ts'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { HandlePages, phoneReg } from '@/utils/index'
 import { GetOpenCityData, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
+import { exportFileTip } from '@/utils/exportTip'
 interface IState {
   [key: string]: any;
 }
@@ -198,6 +202,7 @@ interface PageObj {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private keyWord:String = ''
   private sumbitAgain:Boolean = false
   private fullscreenLoading:Boolean = false
@@ -969,16 +974,21 @@ export default class extends Vue {
     this.driverOtions.splice(0, this.driverOtions.length)
     this.getDriverInfo()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   /**
    * 导出
    */
   @lock
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     if (this.listQuery.time && this.listQuery.time.length === 2) {
       let params: any = {}
       this.setData(params)
       const { data } = await managementExport(params)
       if (data.success) {
+        sucFun()
         this.$message({
           type: 'success',
           message: '导出成功!'

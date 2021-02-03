@@ -260,7 +260,6 @@ export default class extends Vue {
   async saveData() {
     try {
       if (this.isAdd) {
-        // 添加
         const postData = {
           ...this.dialogForm
         }
@@ -272,6 +271,7 @@ export default class extends Vue {
             parentsId + (parentsId ? ',' : '') + `${this.addData.id}`
         delete postData.id
         delete postData.childAuth
+        // 权限管理-新增权限
         const { data } = await createAuthority(postData)
         if (data.success) {
           this.$message.success(`创建成功`)
@@ -286,6 +286,7 @@ export default class extends Vue {
         }
         postData.authType = Number(this.activeName)
         delete postData.childAuth
+        // 权限管理-修改权限
         const { data } = await updateAuthority(postData)
         if (data.success) {
           this.$message.success(`编辑成功`)
@@ -303,6 +304,7 @@ export default class extends Vue {
   }
   private async authorityList() {
     this.loading = true
+    // 权限管理-权限列表
     const { data } = await authorityList()
     this.loading = false
     if (data.success) {

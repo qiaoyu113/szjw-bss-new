@@ -37,7 +37,7 @@
           stripe
           highlight-current-row
           style="width: 100%"
-          row-key="customerNo"
+          row-key="wayBillId"
           @selection-change="handleSelectionChange"
         >
           <el-table-column
@@ -194,13 +194,6 @@
               <span v-if="row.status !== 5">
                 {{ row.statusName | DataIsNull }}
               </span>
-              <!-- <span v-if="row.status === 20 && row.gmcIsNoCar === 1">/ 未出车</span>
-              <span v-if="row.status === 20 && row.gmcIsNoCar !== 1">/ {{ row.confirmMoney || 0 }}元</span>
-              <span v-if="row.status === 40 && row.againIsNoCar === 1">/ 未出车</span>
-              <span v-if="row.status === 40 && row.againIsNoCar !== 1">/ {{ row.againConfirmMoney || 0 }}元</span> -->
-              <!-- <span v-if="(row.status === 20 || row.status === 40) && row.gmcIsNoCar === 1">/ 未出车</span>
-              <span v-else-if="(row.status === 20 || row.status === 40) && row.againIsNoCar === 1">/ 未出车</span>
-              <span v-if="(row.status === 20 || row.status === 40) && row.againIsNoCar !== 1 && row.againIsNoCar !== 1">{{ row.confirmMoney || 0 }}元</span> -->
             </template>
           </el-table-column>
 
@@ -239,7 +232,6 @@
                     @show="getFloowData(scope.row.wayBillId, 'driver')"
                   >
                     <el-table
-
                       v-loading="floowLoading"
                       :data="floowData"
                       size="mini"
@@ -304,7 +296,6 @@
                     @show="getFloowData(scope.row.wayBillId, 'line')"
                   >
                     <el-table
-
                       v-loading="floowLoading"
                       :data="floowData"
                       size="mini"
@@ -384,8 +375,6 @@
             </template>
           </el-table-column>
           <el-table-column
-            v-if="checkList.includes('单边已确认操作人')"
-            :key="checkList.length + 'confirmName'"
             align="left"
             label="单边已确认操作人"
             min-width="160"
@@ -396,7 +385,6 @@
           </el-table-column>
 
           <el-table-column
-
             align="left"
             label="操作"
             fixed="right"
@@ -677,11 +665,11 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { Form as ElForm, Input } from 'element-ui'
+// import { Form as ElForm, Input } from 'element-ui'
 import { GetConfirmInfoList, ReportMoneyBatch, WayBillAmountDetail, NoCarBatch, freightTripMoney } from '@/api/freight'
-import { GetFindBusinessPhone } from '@/api/cargo'
+// import { GetFindBusinessPhone } from '@/api/cargo'
 import { CargoListData } from '@/api/types'
-import { HandlePages, lock, parseTime } from '@/utils/index'
+import { HandlePages, lock } from '@/utils/index'
 import Pagination from '@/components/Pagination/index.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
 import SuggestContainer from '@/components/SuggestContainer/index.vue'
@@ -724,7 +712,7 @@ export default class extends Vue {
     private page: Object | undefined = '';
     private listLoading = true;
     private tags: any[] = [];
-    private templateRadio: any[] = []
+    // private templateRadio: any[] = [] // TODO
     private DateValue: any[] = [];
     private DateValue2: any[] = [];
     private multipleSelection: any[] = []
@@ -732,29 +720,6 @@ export default class extends Vue {
       { icon: 'el-icon-finished', name: '运费确认', color: '#F2A33A', key: '3', pUrl: ['/v2/waybill/shipping/reportMoneyBatch'] },
       { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
     ];
-    private dropdownList: any[] = [
-      '出车日期',
-      '出车单号',
-      '司机姓名',
-      '出车状态',
-      '项目名称',
-      '客户名称',
-      '运费金额',
-      '司机运费上报状态',
-      '客户运费上报状态',
-      '运费更新时间',
-      '线路名称',
-      '预估运费',
-      '加盟侧运费',
-      '外线侧运费',
-      '有无差额',
-      '运费状态',
-      '加盟经理',
-      '上岗经理',
-      '单边已确认操作人',
-      '操作'
-    ];
-    private checkList: any[] = this.dropdownList;
     private floowData: any[] = [];
     private floowLoading: Boolean = false;
     private tab: any[] = [
@@ -862,40 +827,40 @@ export default class extends Vue {
         ]
       }
     ] }
-    private freightRules: any = {
-      price: [
-        { required: true, message: '请输入金额', trigger: 'change' }
-      ]
-    };
+    // private freightRules: any = {
+    //   price: [
+    //     { required: true, message: '请输入金额', trigger: 'change' }
+    //   ]
+    // };
     private saleId: any = '';
     private remarkAll: any = '';
     // 弹窗分配
     private dialogList: any[] = [];
-    private dialogLoading: boolean= false;
-    private multipleSelectionAssign: any[] = []
+    // private dialogLoading: boolean= false;
+    // private multipleSelectionAssign: any[] = []
     private assignShowDialog: boolean= false;
     private assignShowDialogMin: boolean= false;
     // 弹窗分页
-    private dialogTotal: number = 0;
+    // private dialogTotal: number = 0;
     private dialogListQuery: IState = {
       page: 1,
       limit: 20
     };
     private delay: number = 1000;
 
-    private getPermission(role: any) {
-      let permission = (localStorage as any).getItem('permission')
-      if (!permission) {
-        return false
-      } else {
-        let permissionArr = permission.split(',')
-        if (permissionArr.indexOf(role) > -1) {
-          return true
-        } else {
-          return false
-        }
-      }
-    }
+    // private getPermission(role: any) {
+    //   let permission = (localStorage as any).getItem('permission')
+    //   if (!permission) {
+    //     return false
+    //   } else {
+    //     let permissionArr = permission.split(',')
+    //     if (permissionArr.indexOf(role) > -1) {
+    //       return true
+    //     } else {
+    //       return false
+    //     }
+    //   }
+    // }
 
     // 判断是否是PC
     get isPC() {
@@ -904,9 +869,6 @@ export default class extends Vue {
 
     // table列表高度适配
     get tableHeight() {
-      // let otherHeight = 590
-      // let value = document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
-      // return value
       return 'auto'
     }
     // 确认清除
@@ -950,13 +912,13 @@ export default class extends Vue {
     }
 
     // 处理选择日期方法
-    private handleDate(value: any, name: any) {
-      if (name === 'startDate') {
-        this.DateValue = value
-      } else {
-        this.DateValue2 = value
-      }
-    }
+    // private handleDate(value: any, name: any) {
+    //   if (name === 'startDate') {
+    //     this.DateValue = value
+    //   } else {
+    //     this.DateValue2 = value
+    //   }
+    // }
     private renderRefund(item:any) {
       let shipping = ''
       let driverFreight = ''
@@ -1027,7 +989,7 @@ export default class extends Vue {
       this.listQuery.limit = value.limit
       this.listLoading = true
       console.time('time')
-      const { data } = await GetConfirmInfoList(this.listQuery)
+      const { data } = await GetConfirmInfoList(this.listQuery) // 获取列表
       this.listLoading = false
       console.timeEnd('time')
       if (data.success) {
@@ -1038,12 +1000,6 @@ export default class extends Vue {
         })
         this.tableTitle = data.title
         this.handleChecked(data.data)
-        // this.tab[0].num = data.title.all
-        // this.tab[1].num = data.title.notReported
-        // this.tab[2].num = data.title.toBeConfirmed
-        // this.tab[3].num = data.title.confirmed
-        // this.tab[4].num = data.title.secondToBeConfirmed
-        // this.tab[5].num = data.title.secondConfirmed
         data.page = await HandlePages(data.page)
         this.total = data.page.total
       } else {
@@ -1064,7 +1020,7 @@ export default class extends Vue {
           }
         })
       } else {
-        const { data } = await WayBillAmountDetail([id])
+        const { data } = await WayBillAmountDetail([id]) // 批量上报、运费回显
         if (data.success) {
           this.freightForm.list = data.data
           this.assignShowDialogMin = true
@@ -1114,7 +1070,7 @@ export default class extends Vue {
           this.multipleSelection.forEach((i: any) => {
             ids.push(i.wayBillId)
           })
-          const { data } = await WayBillAmountDetail(ids)
+          const { data } = await WayBillAmountDetail(ids) // 批量上报、运费回显
           if (data.success) {
             let ret: any = []
             let list: any = []
@@ -1219,6 +1175,7 @@ export default class extends Vue {
           moneysArr.push(i.preMoney)
           wayBillAmountIdsArr.push(i.wayBillAmountId)
         })
+        // 上报出车金额
         const { data } = await ReportMoneyBatch({
           moneys: moneysArr,
           wayBillAmountIds: wayBillAmountIdsArr
@@ -1269,6 +1226,7 @@ export default class extends Vue {
           }
         })
         if (noCheck.length) {
+          // 批量未上报
           const { data } = await NoCarBatch(noCheck, this.remarkAll)
           if (data.success) {
             if (!wayBillAmountIdsArr.length) {
@@ -1286,6 +1244,7 @@ export default class extends Vue {
           }
         }
         if (wayBillAmountIdsArr.length) {
+          // 上报出车金额
           const { data } = await ReportMoneyBatch({
             moneys: moneysArr,
             wayBillAmountIds: wayBillAmountIdsArr
@@ -1321,7 +1280,7 @@ export default class extends Vue {
         confirmButtonText: '确定',
         callback: async action => {
           if (action === 'confirm') {
-            const { data } = await NoCarBatch(noCheck, this.remarkAll)
+            const { data } = await NoCarBatch(noCheck, this.remarkAll) // 批量未上报
             if (data.success) {
               this.assignShowDialogMin = false
               this.handleCheck()
@@ -1345,7 +1304,7 @@ export default class extends Vue {
       this.freightForm.list.forEach((i: any) => {
         wayBillAmountIdsArr.push(i.wayBillAmountId)
       })
-      const { data } = await NoCarBatch(wayBillAmountIdsArr, this.freightForm.remark)
+      const { data } = await NoCarBatch(wayBillAmountIdsArr, this.freightForm.remark) // 批量未上报
       if (data.success) {
         this.assignShowDialogMin = false
         this.handleCheck()
@@ -1361,13 +1320,14 @@ export default class extends Vue {
     }
 
     // 弹窗表格选中
-    private handleSelectionDialog(val: any) {
-      this.saleId = val
-    }
+    // private handleSelectionDialog(val: any) {
+    //   this.saleId = val
+    // }
 
     private async getFloowData(id: any, type: any) {
       this.floowData = []
       this.floowLoading = true
+      // 获取出车详情运费列表
       const { data } = await freightTripMoney({ wayBillId: id })
       if (data.success) {
         let dataList: any = []
@@ -1397,18 +1357,6 @@ export default class extends Vue {
     }
 
     // 获得本周的开始日期
-    private getWeekStartDate(times: any) {
-      let now = new Date() // 当前日期
-      let nowDayOfWeek = now.getDay() // 今天本周的第几天
-      let nowDay = now.getDate() // 当前日
-      let nowMonth = now.getMonth() // 当前月
-      let nowYear = now.getFullYear() // 当前年
-      nowYear += (nowYear < 2000) ? 1900 : 0
-      let weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek).getTime()
-      return !(times - weekStartDate < 0)
-    }
-
-    // 获得本周的开始日期
     private getWednesdayDate(times: any) {
       let now = new Date() // 当前日期
       let nowDayOfWeek = now.getDay() // 今天本周的第几天
@@ -1434,18 +1382,18 @@ export default class extends Vue {
       return (myyear + '-' + mymonth + '-' + myweekday)
     }
     // 截取备注
-    private splice(value: any) {
-      return value.slice(0, 16)
-    }
+    // private splice(value: any) {
+    //   return value.slice(0, 16)
+    // }
     private init() {
       let wayBillId = this.$route.query.wayBillId
       if (wayBillId) this.listQuery.wayBillId = wayBillId
       this.fetchData()
     }
-    get showioioio() {
+    get shippingState() {
       return this.$store.state.app.states
     }
-    @Watch('showioioio', { deep: true })
+    @Watch('shippingState', { deep: true })
     private onRouteChange() {
       this.init()
     }

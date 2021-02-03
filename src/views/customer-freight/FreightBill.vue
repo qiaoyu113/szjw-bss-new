@@ -19,15 +19,18 @@
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/waybill/custBilling/freightCharge/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
           :disabled="true"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -198,6 +201,7 @@ import { GetSubjectList } from '@/api/driver-freight'
 import { Upload } from '@/api/common'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:Number,
   limit:Number,
@@ -216,6 +220,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private filelist:IState[] = []
   // 变动类型列表
   private subjectOptions:IState[] = []
@@ -618,8 +623,12 @@ export default class extends Vue {
     ], this)
     return ret
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -655,6 +664,7 @@ export default class extends Vue {
       }
       let { data: res } = await ExportFreightChargeList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)

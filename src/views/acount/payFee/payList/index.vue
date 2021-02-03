@@ -110,9 +110,12 @@
           :class="isPC ? '' : 'btnMobile'"
           name="driverlist_export_btn"
           size="small"
-          @click="handleExportClick"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
       </div>
 
@@ -206,6 +209,7 @@ import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
 import { getSpecifiedUserListByCondition, GetOpenCityData, GetSpecifiedRoleList, getOfficeByTypeAndOfficeId, getOfficeByType, GetDutyListByLevel } from '@/api/common'
 import data from '@/views/pdf/content'
+import { exportFileTip } from '@/utils/exportTip'
 interface IState {
   [key: string]: any;
 }
@@ -231,6 +235,7 @@ interface Tab {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private active: number = 0;
   private listLoading: boolean = false; // loading
   private tags: any[] = []; // 回显label
@@ -956,9 +961,13 @@ export default class extends Vue {
     this.tags = []
     // this.getList()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       let params:IState = {}
       if (this.listQuery.applyDate && this.listQuery.applyDate.length > 1) {
@@ -981,6 +990,7 @@ export default class extends Vue {
 
       const { data } = await payExport(params)
       if (data.success) {
+        sucFun()
         this.$message.success('导出成功')
       } else {
         this.$message.error(data.errorMsg || data.message)
