@@ -65,34 +65,6 @@
                 }
               "
             />
-
-            <!-- <el-button
-              v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
-              circle
-              size="mini"
-              icon="el-icon-top"
-              name="organizationmanage_upOffice_btn"
-              @click.stop="
-                () => {
-                  upOffice(node, data);
-                }
-              "
-            /> -->
-
-            <!-- <el-button
-              v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
-              circle
-              size="mini"
-              icon="el-icon-bottom"
-              name="organizationmanage_downOffice_btn"
-              @click.stop="
-                () => {
-                  downOffice(node, data);
-                }
-              "
-            /> -->
           </div>
         </template>
       </RoleTree>
@@ -210,15 +182,6 @@
               </el-form-item>
             </div>
           </template>
-          <!-- <el-form-item
-            v-if="addData.type === 3"
-            label="城市"
-            prop="areaCode"
-          >
-            <test
-              :form="dialogForm"
-            />
-          </el-form-item> -->
           <el-form-item
             v-if="addData.type === 3 "
             label="城市"
@@ -306,12 +269,10 @@ import {
   sortOffice,
   updateOffice,
   deleteOffice,
-  getDutyListByLevel,
-  getSpecifiedLower
+  getDutyListByLevel
 } from '@/api/system'
 
 import '@/styles/common.scss'
-import { forEach } from 'jszip'
 
 @Component({
   name: 'CreateRole',
@@ -347,34 +308,6 @@ export default class extends Vue {
 
   private busitypeOptions: any = [];
   private optionsArea: any = [];
-  //  props: any = {
-  //    lazy: true,
-  //    emitPath: false,
-  //    lazyLoad(node: any, resolve: any) {
-  //      const { level } = node
-  //      let params:string[] = []
-  //      if (level === 0) {
-  //        params = ['100000']
-  //      } else if (level === 1) {
-  //        params = ['100000']
-  //        params.push(node.value)
-  //      }
-  //      if (level < 2) {
-  //        GetArea(params).then(({ data }) => {
-  //          if (data.success) {
-  //            const nodes = data.data.map((item: any) => ({
-  //              value: item.code,
-  //              label: item.name,
-  //              leaf: level === 1
-  //            }))
-  //            resolve(nodes)
-  //          } else {
-  //            this.$message.error(data)
-  //          }
-  //        })
-  //      }
-  //    }
-  //  };
   private props: any = {
     label: 'name',
     value: 'code',
@@ -414,7 +347,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
-
+  // 新建组织
   private appendOffice(node: any, data: any) {
     this.addNode = node
     this.addData = data
@@ -425,6 +358,7 @@ export default class extends Vue {
       this.getBusitype()
     }
   }
+  // 更新组织
   private updateOffice(node: any, data: any) {
     this.addNode = node
     this.addData = data
@@ -438,93 +372,7 @@ export default class extends Vue {
       this.getBusitype()
     }
   }
-  private async upOffice(node: any, item: any) {
-    // 向上
-    if (this.disabled) {
-      return
-    }
-    const prev = node.previousSibling
-    const parent = node.parent
-    if (!prev) {
-      this.$message.error(`处于顶端，不能继续上移`)
-      return
-    }
-    const nodeExpaned = node.expanded
-    const prevExpaned = prev.expanded
-    this.disabled = true
-    this.sortOffice(
-      {
-        fromId: node.data.id,
-        toId: prev.data.id
-      },
-      () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return prev.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(node.data)),
-          JSON.parse(JSON.stringify(prev.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let prev1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            prev.data.id
-          )
-          prev1.expanded = prevExpaned
-        })
-      }
-    )
-  }
-  private async downOffice(node: any, item: any) {
-    // 下
-    if (this.disabled) {
-      return
-    }
-    const next = node.nextSibling
-    const parent = node.parent
-    if (!next) {
-      this.$message.error(`处于末端，不能继续下移`)
-      return
-    }
-    const nodeExpaned = node.expanded
-    const nextExpaned = next.expanded
-
-    this.disabled = true
-    this.sortOffice(
-      {
-        fromId: node.data.id,
-        toId: next.data.id
-      },
-      () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return node.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(next.data)),
-          JSON.parse(JSON.stringify(node.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let next1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            next.data.id
-          )
-          next1.expanded = nextExpaned
-        })
-      }
-    )
-  }
+  // 排序
   private async sortOffice(postData: any, callback: any) {
     const { data } = await sortOffice(postData)
     this.disabled = false
@@ -534,6 +382,7 @@ export default class extends Vue {
       this.$message.error(data)
     }
   }
+  // 查询组织
   private async getBusitype() {
     let params = {
       dutyLevel: 1
@@ -621,7 +470,7 @@ export default class extends Vue {
       console.log(`finally`)
     }
   }
-  // 清楚dialog
+  // 清除dialog
   private resetDialog() {
     this.dialogForm.name = ''
     this.dialogForm.areaCode = ''
@@ -632,6 +481,7 @@ export default class extends Vue {
       (this.$refs.dialogForm as any).clearValidate()
     })
   }
+  // 更新tree
   private handleChange(value: any) {
     this.dialogForm.areaCode = value.slice().pop() || ''
     const node = (this.$refs.cascader as any).getCheckedNodes()
@@ -703,6 +553,7 @@ export default class extends Vue {
     this.$set(this.addNode.data, 'areaCode', item.areaCode)
     this.$set(this.addNode.data, 'dutyId', item.dutyId)
   }
+  // 城市
   private async getArea() {
     const { data } = await GetArea(['100000'])
     if (data.success) {
@@ -715,6 +566,7 @@ export default class extends Vue {
     this.getOfficeList()
     this.getArea()
   }
+  // 业务线
   private changeDuty(value: any) {
     this.busitypeOptions.forEach((ele: any) => {
       if (ele.id === value) {

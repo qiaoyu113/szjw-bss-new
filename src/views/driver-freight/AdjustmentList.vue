@@ -43,6 +43,7 @@
         >
           新增
         </el-button>
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/driverBilling/shippingChange/export']"
           size="small"
@@ -51,7 +52,9 @@
           :disabled="true"
           @click="handleExportClick"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -205,6 +208,7 @@ import { GetShippingChangeList, GetShippingChangeExport, SaveShippingChange, Get
 import { Upload, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { getOrderListByDriverId } from '@/api/driver-account'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -224,6 +228,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private searchKeyword:string = ''
   private dutyListOptions:IState[] = [];// 业务线列表
   private gmIdOptions:IState[] = [];// 所属加盟经理列表
@@ -430,7 +435,7 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
-
+  // 标记收款表单
   private dialogForm:IState = {
     subject: '',
     driverId: '',
@@ -439,7 +444,9 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件列表
   private filelist:string[] = []
+  // 标记收款表单列表渲染列表
   private dialogFormItem:any[] = [
     {
       type: 2,
@@ -495,6 +502,7 @@ export default class extends Vue {
       key: 'remark'
     }
   ]
+  // 标记收款表单校验
   private dialogRole:any = {
     subject: [
       { required: true, message: '请选择', trigger: ['blur', 'change'] }
@@ -513,6 +521,7 @@ export default class extends Vue {
       { required: true, message: '请上传凭证', trigger: ['blur', 'change'] }
     ]
   }
+  // 流水金额校验
   validateAmount(rule:any, value:any, callback:any) {
     if (+value <= 0) {
       return callback(new Error('流水金额不能小于0'))
@@ -525,6 +534,7 @@ export default class extends Vue {
     page: 0,
     limit: 10
   }
+  // 加载司机列表loading
   private queryDriverLoading:boolean = false
   @Watch('showDialog')
   onDialogChange(val:boolean) {
@@ -536,6 +546,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 440
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
@@ -562,8 +573,12 @@ export default class extends Vue {
     ], this)
     return ret
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  async handleExportClick() {
+  async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -588,6 +603,7 @@ export default class extends Vue {
       }
       let { data: res } = await GetShippingChangeExport(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)
@@ -667,6 +683,7 @@ export default class extends Vue {
     this.resetDriver();
     ((this.$refs.dialogForm) as any).resetForm()
   }
+  // 标记收款表单确认按钮触发表单校验
   confirm() {
     ((this.$refs.dialogForm) as any).submitForm()
   }
@@ -889,6 +906,7 @@ export default class extends Vue {
     this.searchKeyword = val
     this.loadQueryDriverByKeyword(val)
   }
+  // 加载司机列表
   async loadQueryDriverByKeyword(val?:string) {
     val = this.searchKeyword
     this.queryPage.page++

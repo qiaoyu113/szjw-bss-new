@@ -1,140 +1,138 @@
 <template>
   <div class="refundApply">
-    <div class="box">
-      <div class="table-box">
-        <self-form
-          ref="RefundForm"
-          :list-query="listQuery"
-          :form-item="createFrom"
-          size="small"
-          label-width="200px"
-          class="p15 SuggestForm"
-          :pc-col="13"
-          :rules="rules"
-          @onPass="handlePassClick"
-        >
-          <template slot="backBtn">
-            <div class="right">
-              <el-button @click="backToList">
-                返回
-              </el-button>
-            </div>
-            <p class="title-label">
-              基础信息
-            </p>
-          </template>
-          <template slot="driverId">
-            <el-select
-              v-model="listQuery.driverId"
-              v-loadmore="loadmore"
-              style="width: 100%"
-              filterable
+    <div class="table-box">
+      <self-form
+        ref="RefundForm"
+        :list-query="listQuery"
+        :form-item="createFrom"
+        size="small"
+        label-width="200px"
+        class="p15 SuggestForm"
+        :pc-col="13"
+        :rules="rules"
+        @onPass="handlePassClick"
+      >
+        <template slot="backBtn">
+          <div class="right">
+            <el-button @click="backToList">
+              返回
+            </el-button>
+          </div>
+          <p class="title-label">
+            基础信息
+          </p>
+        </template>
+        <template slot="driverId">
+          <el-select
+            v-model="listQuery.driverId"
+            v-loadmore="loadmore"
+            style="width: 100%"
+            filterable
+            clearable
+            remote
+            reserve-keyword
+            :default-first-option="true"
+            :remote-method="remoteMethod"
+            :loading="driverLoading"
+            placeholder="请输入"
+            @change="driverSelect"
+            @clear="handleClearQueryDriver"
+          >
+            <el-option
+              v-for="(item, index) in driverOtions"
+              :key="index"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </template>
+        <template slot="information">
+          <el-form-item
+            label="所在城市:"
+            style="width: 100%"
+          >
+            <span>{{ driverCity.city }}</span>
+          </el-form-item>
+          <el-form-item
+            label="加盟经理:"
+            style="width: 100%"
+          >
+            <span>{{ driverCity.gmName }}</span>
+          </el-form-item>
+          <p class="title-label">
+            账户信息
+          </p>
+          <el-form-item
+            label="账户总金额:"
+            style="width: 100%"
+          >
+            <span>{{ accountMoney.balance }} 元</span>
+          </el-form-item>
+          <el-form-item
+            label="可提现金额:"
+            style="width: 100%"
+          >
+            <span>{{ accountMoney.canRefund }} 元</span>
+          </el-form-item>
+          <p class="title-label">
+            退款信息
+          </p>
+        </template>
+        <template v-slot:bankName>
+          <div style="width:100%">
+            <el-input
+              v-model="listQuery.bankName"
               clearable
-              remote
-              reserve-keyword
-              :default-first-option="true"
-              :remote-method="remoteMethod"
-              :loading="driverLoading"
+              filterable
+              maxlength="50"
               placeholder="请输入"
-              @change="driverSelect"
-              @clear="handleClearQueryDriver"
+              style="width:100%"
+            />
+            &nbsp;<span style="color:#999">银行卡号自动关联开户行请谨慎修改！</span>
+          </div>
+        </template>
+        <!--收据 -->
+        <template slot="hasReceipt">
+          <el-radio-group
+            v-model="listQuery.hasReceipt"
+            @change="hasReceiptChange"
+          >
+            <el-radio :label="1">
+              有
+            </el-radio>
+            <el-radio :label="0">
+              没有
+            </el-radio>
+          </el-radio-group>
+        </template>
+        <template slot="recoveryReceipt">
+          <el-radio-group v-model="listQuery.recoveryReceipt">
+            <el-radio :label="1">
+              有
+            </el-radio>
+            <el-radio :label="0">
+              没有
+            </el-radio>
+          </el-radio-group>
+        </template>
+        <template slot="btn">
+          <div class="sumbitBtn">
+            <el-button
+              style="float: center"
+              @click="backToList"
             >
-              <el-option
-                v-for="(item, index) in driverOtions"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
-          <template slot="information">
-            <el-form-item
-              label="所在城市:"
-              style="width: 100%"
+              取消
+            </el-button>
+            <el-button
+              style="float: center"
+              type="primary"
+              @click="onSubmit"
             >
-              <span>{{ driverCity.city }}</span>
-            </el-form-item>
-            <el-form-item
-              label="加盟经理:"
-              style="width: 100%"
-            >
-              <span>{{ driverCity.gmName }}</span>
-            </el-form-item>
-            <p class="title-label">
-              账户信息
-            </p>
-            <el-form-item
-              label="账户总金额:"
-              style="width: 100%"
-            >
-              <span>{{ accountMoney.balance }} 元</span>
-            </el-form-item>
-            <el-form-item
-              label="可提现金额:"
-              style="width: 100%"
-            >
-              <span>{{ accountMoney.canRefund }} 元</span>
-            </el-form-item>
-            <p class="title-label">
-              退款信息
-            </p>
-          </template>
-          <template v-slot:bankName>
-            <div style="width:100%">
-              <el-input
-                v-model="listQuery.bankName"
-                clearable
-                filterable
-                maxlength="50"
-                placeholder="请输入"
-                style="width:100%"
-              />
-              &nbsp;<span style="color:#999">银行卡号自动关联开户行请谨慎修改！</span>
-            </div>
-          </template>
-          <!--收据 -->
-          <template slot="hasReceipt">
-            <el-radio-group
-              v-model="listQuery.hasReceipt"
-              @change="hasReceiptChange"
-            >
-              <el-radio :label="1">
-                有
-              </el-radio>
-              <el-radio :label="0">
-                没有
-              </el-radio>
-            </el-radio-group>
-          </template>
-          <template slot="recoveryReceipt">
-            <el-radio-group v-model="listQuery.recoveryReceipt">
-              <el-radio :label="1">
-                有
-              </el-radio>
-              <el-radio :label="0">
-                没有
-              </el-radio>
-            </el-radio-group>
-          </template>
-          <template slot="btn">
-            <div class="sumbitBtn">
-              <el-button
-                style="float: center"
-                @click="backToList"
-              >
-                取消
-              </el-button>
-              <el-button
-                style="float: center"
-                type="primary"
-                @click="Submit"
-              >
-                提交
-              </el-button>
-            </div>
-          </template>
-        </self-form>
-      </div>
+              提交
+            </el-button>
+          </div>
+        </template>
+      </self-form>
     </div>
   </div>
 </template>
@@ -142,14 +140,11 @@
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { options } from 'numeral'
 import { getDriverNoAndNameList } from '@/api/driver'
 import { lock } from '@/utils/index.ts'
 import { haveRecordToBeApproved, getRefundEcho, createRefund } from '@/api/driver-refund'
 const { CardBin } = require('bankcard')
-interface IState {
-  [key: string]: any
-}
+
 interface listQuerys {
   bankCardNo: string // 银行卡号
   bankName: string // 开户行
@@ -190,6 +185,7 @@ export default class extends Vue {
     payMethod: 6,
     payeeName: ''
   }
+  // 可退费 金额
   private accountMoney: accountMoney = {
     balance: undefined,
     canRefund: undefined
@@ -309,7 +305,7 @@ export default class extends Vue {
       key: 'bankName',
       slot: true
     },
-    ...this.activeFromC,
+    ...this.getActiveFrom,
     {
       type: 13,
       tagAttrs: {
@@ -327,14 +323,17 @@ export default class extends Vue {
 
   // 司机列表 搜索
   private driverLoading: Boolean = false
+
   private driverOver: Boolean = false
 
   private driverOtions: any[] = []
+
   private driverPage: any = {
     page: 1,
     limit: 20
   }
-  private keyWord: string = ''
+
+  private keyWord: string = '' // 搜索关键字
   hasReceiptChange(e: number) {
     const inx = this.createFrom.findIndex(
       (item: any) => item.key === 'hasReceipt'
@@ -344,11 +343,12 @@ export default class extends Vue {
     )
     let splicInx: number
     splicInx = inxs !== -1 ? 2 : 1
+    // 切割表单
     if (this.listQuery.hasReceipt === 1) {
-      this.createFrom.splice(inx, splicInx, ...this.activeFromC)
+      this.createFrom.splice(inx, splicInx, ...this.getActiveFrom)
       delete this.listQuery.recoveryReceipt
     } else if (this.listQuery.hasReceipt === 0) {
-      this.createFrom.splice(inx, splicInx, ...this.activeFromC)
+      this.createFrom.splice(inx, splicInx, ...this.getActiveFrom)
     }
   }
   // 校验规则
@@ -498,9 +498,11 @@ export default class extends Vue {
     this.driverCity.gmName = this.driverOtions[inx].gmName
   }
   // 触发表单校验
-  private Submit(this: any) {
+
+  private onSubmit(this: any) {
     this.$refs.RefundForm.submitForm()
   }
+
   // 表单检验通过
   private handlePassClick(valid: any) {
     try {
@@ -554,7 +556,7 @@ export default class extends Vue {
       this.isOneCreate = false
     }
   }
-  async haveRecordToBeApprovedSure(driverId: string) {
+  async haveRecordToBeApprovedSure(driverId: string) { // 是否有待退费
     try {
       const { data } = await haveRecordToBeApproved({ driverId })
       if (!data.success) return
@@ -580,7 +582,7 @@ export default class extends Vue {
       return error
     }
   }
-  async getRefundEchoSure(driverId: string) {
+  async getRefundEchoSure(driverId: string) { // 获取账户金额，可提现金额
     try {
       const { data: res } = await getRefundEcho({ driverId })
       if (!res.success) {
@@ -605,7 +607,7 @@ export default class extends Vue {
     }
   }
   @lock
-  async createRefundSure(params: object) {
+  async createRefundSure(params: object) { // 发起退费
     try {
       const { data } = await createRefund(params)
       if (!data.success) {
@@ -625,7 +627,7 @@ export default class extends Vue {
       return error
     }
   }
-  async getDriverInfo(keyWord: string = '') {
+  async getDriverInfo(keyWord: string = '') { // 获取司机列表
     try {
       this.keyWord = keyWord
       let params = {
@@ -666,7 +668,7 @@ export default class extends Vue {
     }
   }
   // 计算属性
-  get activeFromC() {
+  get getActiveFrom() {
     if (this.listQuery.hasReceipt === 0) {
       return [this.activeFrom[0]]
     }
@@ -675,23 +677,17 @@ export default class extends Vue {
   created() {
     this.getDriverInfo(this.keyWord)
   }
-  mounted() {
-  }
 }
 </script>
 
 <style lang="scss" scoped>
 .refundApply {
   width: 100%;
-  height: 100%;
-  padding: 0;
-}
-.box {
   box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-  overflow: hidden;
   transform: translateZ(0);
   padding: 20px;
 }
+
 .table-box {
   background: #ffffff;
   padding: 20px 20px 5px 60px;

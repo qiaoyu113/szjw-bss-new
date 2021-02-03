@@ -354,7 +354,7 @@ export function validatorValue(array:any[], vm:any) {
 
 // 睡眠函数
 function sleep(time = 0) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve()
     }, time)

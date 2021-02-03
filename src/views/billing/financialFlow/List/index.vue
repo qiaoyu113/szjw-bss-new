@@ -75,10 +75,13 @@
         <el-button
           v-permission="['/v2/wt-driver-account/flow/export']"
           size="small"
+          :disabled="times === 10 ? false :true"
           :class="isPC ? '' : 'btnMobile'"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           v-permission="['/v2/wt-driver-account/flow/manual/create']"
@@ -222,12 +225,13 @@
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { HandlePages, lock } from '@/utils/index'
+import { HandlePages, lock, showWork } from '@/utils/index'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getFlowList, exportFlowList, saveFlowData, getOrderListByDriverId, getOrderDetailByDriverId, getDriverListByGmId, getListAll, GetChargeAmountByChargeId } from '@/api/driver-account'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
+import { exportFileTip } from '@/utils/exportTip'
 
 interface PageObj {
   page:number,
@@ -248,6 +252,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private searchKeyword:string = '';
   private dialogKeyword:string = '';
   private queryDriverLoading:boolean = false // 查询区下拉司机搜索框的loading
@@ -361,7 +366,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: this.showWork
+          lazyLoad: showWork
         }
       },
       label: '所属城市',
@@ -580,9 +585,13 @@ export default class extends Vue {
     this.resetGmId()
     this.loadQueryDriverByKeyword()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  async handleExportClick() {
+  async handleExportClick(sucFun:Function) {
     try {
       let params:IState = {}
       if (this.listQuery.city && this.listQuery.city.length > 1) {
@@ -606,6 +615,7 @@ export default class extends Vue {
       }
       let { data: res } = await exportFlowList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)
@@ -805,59 +815,6 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log(`get order detail fail:${err}`)
-    }
-  }
-
-  // 获取客户城市
-  private async showWork(node:any, resolve:any) {
-    let query: any = {
-      parentId: ''
-    }
-    if (node.level === 1) {
-      query.parentId = node.value
-    }
-    try {
-      if (node.level === 0) {
-        let nodes = await this.areaAddress({ type: 2 })
-        resolve(nodes)
-      } else if (node.level === 1) {
-        let nodes = await this.cityDetail(query)
-        resolve(nodes)
-      }
-    } catch (err) {
-      resolve([])
-    }
-  }
-  // 获取大区列表
-  private async areaAddress(params: any) {
-    try {
-      let { data: res } = await getOfficeByType(params)
-      if (res.success) {
-        const nodes = res.data.map(function(item: any) {
-          return {
-            value: item.id,
-            label: item.name,
-            leaf: false
-          }
-        })
-        return nodes
-      }
-    } catch (err) {
-      console.log(`load city by code fail:${err}`)
-    }
-  }
-  // 根据大区获取城市列表
-  private async cityDetail(params: any) {
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
-        return {
-          value: item.areaCode,
-          label: item.name,
-          leaf: true
-        }
-      })
-      return nodes
     }
   }
   // 获取业务线

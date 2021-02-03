@@ -24,10 +24,15 @@
           size="small"
           :class="isPC ? 'btn-item' : 'btn-item-m'"
           name="rentcartype_download_btn"
-          @click="downLoad"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
           <i class="el-icon-download" />
-          <span v-if="isPC">导出</span>
+          <span v-if="isPC">
+            导出<template v-if="times !== 10">
+              {{ times }} s
+            </template>
+          </span>
         </el-button>
         <el-button
           v-permission="['/v1/product/product/rentalCar/create']"
@@ -324,11 +329,42 @@ import { GetDictionaryList } from '@/api/common'
 import { getProductList, shelvesOrTheshelves, createProduct, updateProduct, ProductDownload } from '@/api/product'
 import { SettingsModule } from '@/store/modules/settings'
 import '@/styles/common.scss'
+import { exportFileTip } from '@/utils/exportTip'
 
 interface IState {
   [key: string]: any;
 }
 
+type listQuery = {
+  busiType: number, // 业务类型：1购车，2租车
+    carType: string,
+    city: string,
+    productCode: string,
+    status: string,
+    supplier: string,
+    // eslint-disable-next-line camelcase
+    Intentional_compartment?:string, // 车型
+    endDate: string,
+    startDate: string,
+    page: number,
+    limit: number,
+    [key:string]: any
+}
+type DialogFrom = {
+  carDescribe :string
+  carType :number|string
+  city :any,
+  price :string
+  supplier :string
+  id ?:string
+  busiType:number,
+  name?:string
+}
+type Tab = {
+  label: string,
+  name: string,
+  num: string,
+}
 @Component({
   name: 'RentCarType',
   components: {
@@ -339,8 +375,9 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private tags: any[] = [];
-  private tab: any[] = [
+  private tab: Array<Tab> = [
     {
       label: '全部',
       name: '',
@@ -358,7 +395,7 @@ export default class extends Vue {
     }
   ];
   private DateValue: any[] = [];
-  private listQuery: IState = {
+  private listQuery: listQuery = {
     busiType: 2, // 业务类型：1租车，2租车
     carType: '',
     city: '',
@@ -370,7 +407,7 @@ export default class extends Vue {
     page: 1,
     limit: 30
   };
-  private dropdownList: any[] = [
+  private dropdownList: Array<string> = [
     '商品编号',
     '租车车型',
     '车辆信息',
@@ -382,7 +419,7 @@ export default class extends Vue {
     '创建人',
     '操作'
   ];
-  private checkList: any[] = this.dropdownList;
+  private checkList: Array<string> = this.dropdownList;
   private optionsCity: any[] = []; // 字典查询定义(命名规则为options + 类型名称)
   private optionsCar: any[] = []; // 字典查询定义(命名规则为options + 类型名称)
   private optionsDialogCity: any[] = []
@@ -395,7 +432,7 @@ export default class extends Vue {
   private isAdd: boolean = false;
   private dialogVisible: boolean = false;
   private dialogTit: string = '';
-  private dialogForm: IState = {
+  private dialogForm: DialogFrom = {
     'busiType': 2,
     'carDescribe': '', // 车辆描述
     'carType': '', // 车辆类型
@@ -455,6 +492,7 @@ export default class extends Vue {
     this.getDictionary()
     this.getList(this.listQuery)
   }
+  // 获取城市
   private async getCity() {
     const { data } = await GetCustomerOff()
     if (data.success) {
@@ -494,9 +532,11 @@ export default class extends Vue {
     this.listQuery.limit = value.limit
     this.listLoading = true
     const postData = this.filterObj(this.listQuery)
+    // 分页查询商品信息
     const { data } = await getProductList(postData)
     if (data.success) {
       this.list = data.data
+      // 过滤分页
       data.page = await HandlePages(data.page)
       this.total = data.page.total
       // title
@@ -592,6 +632,7 @@ export default class extends Vue {
       if (this.isAdd) {
         // 添加
         delete postData.id
+        // 创建商品
         const { data } = await createProduct(postData)
         if (data.success) {
           this.$message.success(`创建成功`)
@@ -618,6 +659,7 @@ export default class extends Vue {
     }
   }
   private async getDictionary() {
+    // 获取字典数据
     const { data } = await GetDictionaryList(['Intentional_compartment'])
     if (data.success) {
       this.optionsCar = data.data.Intentional_compartment
@@ -625,13 +667,19 @@ export default class extends Vue {
       this.$message.error(data)
     }
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.downLoad)
+  }
   @lock
-  private async downLoad() {
+  private async downLoad(sucFun:Function) {
     try {
       const postData = this.filterObj(this.listQuery)
       delete postData.page
       delete postData.limit
+      // 导出车型文件
       let res = await ProductDownload(postData)
+      sucFun()
       this.$message({
         type: 'success',
         message: '导出成功!'

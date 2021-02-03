@@ -176,6 +176,7 @@ export default class extends Vue {
   private listLoading:boolean = false
   private officeArr = [] // 组织架构列表
   private roleArr = [] // 角色列表
+  // 表单
   private listQuery:FormObj = {
     id: '',
     userName: '',
@@ -190,17 +191,10 @@ export default class extends Vue {
     syncStatus: false,
     status: 0
   }
+  // 编辑时原来的电话
   sourcePhone:string = ''
+  // 表单列表
   private formItem:any[] = [
-    // {
-    //   type: 1,
-    //   key: 'userName',
-    //   label: '姓名:',
-    //   tagAttrs: {
-    //     placeholder: '请输入',
-    //     maxlength: 10
-    //   }
-    // },
     {
       type: 'userName',
       key: 'userName',
@@ -232,6 +226,7 @@ export default class extends Vue {
       slot: true
     }
   ]
+  // 校验规则
   private rules:any ={
     userName: [
       { required: true, message: '请输入姓名', trigger: 'blur' },
@@ -266,12 +261,14 @@ export default class extends Vue {
     }
     return callback()
   }
+  // 验证密码
   private validatePasswd(rule:any, value:string, callback:(string?: Error) => void) {
     if (!isValidPassWord.test(value)) {
       return callback(new Error('密码必须包含8-16，数字，大写字母，小写字母'))
     }
     return callback()
   }
+  // 验证确认密码
   private validateConfirmPassword(rule:any, value:string, callback:(string?: Error) => void) {
     if (!isValidPassWord.test(value)) {
       return callback(new Error('密码必须包含8-16，数字，大写字母，小写字母'))

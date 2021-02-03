@@ -35,6 +35,7 @@
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/driverBilling/freightCharge/export']"
           size="small"
@@ -43,7 +44,9 @@
           :disabled="true"
           @click="handleExportClick"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -215,8 +218,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { HandlePages, validatorValue, lock } from '@/utils/index'
 import { SettingsModule } from '@/store/modules/settings'
-import { Vue, Component, Watch } from 'vue-property-decorator'
-import { fileUpload } from '@/api/cargo'
+import { Vue, Component } from 'vue-property-decorator'
 
 import { month, lastmonth, threemonth } from './components/date'
 
@@ -224,7 +226,7 @@ import { GetFreightChargeList, ExportFreightChargeList, ReceiveFreightChargeList
 import { Upload, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
-
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:Number,
   limit:Number,
@@ -243,6 +245,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private dutyListOptions:IState[] = [];// 业务线列表
   private gmIdOptions:IState[] = [];// 所属加盟经理列表
   private filelist:IState[] = []
@@ -497,6 +500,7 @@ export default class extends Vue {
     { icon: 'el-icon-thumb', name: '批量标记收款', color: '#5E7BBB', key: '1', pUrl: ['/v2/driverBilling/freightCharge/receive'] },
     { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
   ]
+  // 表格checkbox选择项列表
   private multipleSelection: any[] = []
   // 分页
   private page :PageObj= {
@@ -516,12 +520,15 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件上传列表
   private fileList: []= [];
+  // 标记收款表单校验
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款表单列表
   private dialogFormItem:IState[] = [];
   // 弹窗表单容器
   private dialogItem: IState[] = [
@@ -569,16 +576,19 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
   }
+  // 判断权限
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/driverBilling/freightCharge/receive'
     })
   }
+  // 判断表格checkbox是否可选
   private disabledFunc(row:any) {
     if (row && (row.paymentReceivedFlag || !this.isCheck)) {
       return false
@@ -615,8 +625,12 @@ export default class extends Vue {
     this.page.page = 1
     this.getLists()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -653,6 +667,7 @@ export default class extends Vue {
 
       let { data: res } = await ExportFreightChargeList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)

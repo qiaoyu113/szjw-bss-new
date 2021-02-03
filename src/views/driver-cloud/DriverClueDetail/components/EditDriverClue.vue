@@ -86,6 +86,7 @@ export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!:IState
   private showDialog:boolean = false
   private carOptions:IState[] = []; // 车型列表
+  // 表单渲染列表容器
   private dialogFormItem:any[] = [
     {
       type: 1,
@@ -184,6 +185,7 @@ export default class extends Vue {
     }
   ];
   private countryValue = '' // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区
+  // 期望工作区域校验
    validateCity = (rule:any, value:any, callback:any) => {
      if (value && value.length === 2) {
        callback()
@@ -191,6 +193,7 @@ export default class extends Vue {
        callback(new Error('请选择期望工作区域'))
      }
    };
+   // 弹框校验规则
   private rules = {
     city: [
       { required: true, message: '请选择期望工作区域', trigger: 'blur' },
@@ -249,9 +252,7 @@ export default class extends Vue {
   handleClosedClick() {
     (this.$refs.driverClueEditDialog as any).resetForm()
   }
-  /**
-     * 期望工作区域
-     */
+  // 期望工作区域
   async loadWorkCity(node:any, resolve:any) {
     let params:string[] = []
     if (node.level === 0) {
@@ -285,9 +286,7 @@ export default class extends Vue {
       //
     }
   }
-  /**
-     * 加载城市
-     */
+  // 加载城市
   async loadCityByCode(params:string[]) {
     try {
       let { data: res } = await GetCityByCode(params)

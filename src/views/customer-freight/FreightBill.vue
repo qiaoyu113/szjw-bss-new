@@ -19,15 +19,18 @@
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <!-- :disabled="times === 10 ? false :true" -->
         <el-button
           v-permission="['/v2/waybill/custBilling/freightCharge/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
           :disabled="true"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           size="small"
@@ -198,6 +201,7 @@ import { GetSubjectList } from '@/api/driver-freight'
 import { Upload } from '@/api/common'
 import { delayTime } from '@/settings'
 import { UserModule } from '@/store/modules/user'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:Number,
   limit:Number,
@@ -216,6 +220,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private filelist:IState[] = []
   // 变动类型列表
   private subjectOptions:IState[] = []
@@ -488,12 +493,14 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
+  // 判断权限
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/waybill/custBilling/freightCharge/receive'
     })
   }
+  // 是否禁用表格的选择框
   private disabledFunc(row:any) {
     if (row && (row.paymentReceivedFlag || !this.isCheck)) {
       return false
@@ -512,13 +519,17 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 上传文件列表
   private fileList: []= [];
+  // 标记收款弹窗表单校验
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款弹窗表单列表
   private dialogFormItem:any[] = []
+  // 弹框表单确定按钮是否可以点击
   private submitLoading:boolean = false;
   // 弹窗表单容器
   private dialogItem: any[] = [
@@ -566,6 +577,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 计算表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
@@ -611,8 +623,12 @@ export default class extends Vue {
     ], this)
     return ret
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       if (!this.validatorQuery()) {
         return false
@@ -648,6 +664,7 @@ export default class extends Vue {
       }
       let { data: res } = await ExportFreightChargeList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)
@@ -731,6 +748,7 @@ export default class extends Vue {
   private handlePassClick(valid: any) {
     this.saveData()
   }
+  // 标记收款弹窗 确定按钮触发表单校验
   private async confirm(done: any) {
     ((this.$refs.dialogForm) as any).submitForm()
   }

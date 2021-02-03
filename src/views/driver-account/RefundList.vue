@@ -99,9 +99,12 @@
             v-permission="['/v2/wt-driver-account/refund/export']"
             type="primary"
             :class="isPC ? '' : 'btnMobile'"
-            @click="handleExportClick"
+            :disabled="times === 10 ? false :true"
+            @click="_exportFile"
           >
-            导出
+            导出<template v-if="times !== 10">
+              {{ times }} s
+            </template>
           </el-button>
           <el-button
             :class="isPC ? '' : 'btnMobile'"
@@ -198,6 +201,7 @@ import TableHeader from '@/components/TableHeader/index.vue'
 import { options } from 'numeral'
 import { identity, zipWith } from 'lodash'
 import { delayTime } from '@/settings'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -215,6 +219,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private listLoading:boolean = false;
   private tableData:any[] = [];
   private dutyListOptions:IState[] = [];// 业务线列表
@@ -721,9 +726,14 @@ export default class extends Vue {
   handleSelectionChange(val:any) {
     this.multipleSelection = val
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
+
   // 导出
   @lock
-  private async handleExportClick() {
+  private async handleExportClick(sucFun:Function) {
     try {
       let params:IState = {}
       if (this.listQuery.time && this.listQuery.time.length > 1) {
@@ -742,6 +752,7 @@ export default class extends Vue {
       this.listQuery.status !== '' && (params.status = this.listQuery.status)
       const { data } = await refundExport(params)
       if (data.success) {
+        sucFun()
         this.$message.success('导出成功')
       } else {
         this.$message.error(data.errorMsg || data.message)
