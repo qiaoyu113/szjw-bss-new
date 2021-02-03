@@ -482,11 +482,11 @@ export default class extends Vue {
     }
   ]
   // 全选
-  // https://szjw-bss-web-m1.yunniao.cn/api/waybill_center
   private operationList: any[] = [
     { icon: 'el-icon-thumb', name: '批量标记收款', color: '#5E7BBB', key: '1', pUrl: ['/v2/driverBilling/monthlyBill/check'] },
     { icon: 'el-icon-circle-close', name: '清空选择', color: '#F56C6C', key: '2' }
   ]
+  // 选中的每行数据
   private multipleSelection: any[] = []
 
   // 分页
@@ -507,12 +507,15 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件列表
   private fileList: []= [];
+  // 标记收款表单的校验
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款表单的渲染列表
   private dialogFormItem:any[] = [];
   // 弹窗表单容器
   private dialogItem: any[] = [
@@ -560,16 +563,19 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
   }
+  // 判断权限
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/driverBilling/monthlyBill/check'
     })
   }
+  // 表格checkbox是否可选
   private disabledFunc(row:any) {
     if (row && (!row.closeStatus || row.checkStatus || row.checkStatus || !this.isCheck)) {
       return false
@@ -735,6 +741,7 @@ export default class extends Vue {
   private handlePassClick(valid: any) {
     this.saveData()
   }
+  // 弹框确认按钮触发表单校验
   private async confirm(done: any) {
     ((this.$refs.dialogForm) as any).submitForm()
   }

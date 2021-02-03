@@ -43,6 +43,7 @@ interface IState {
 })
 export default class extends Vue {
   private tableData:IState[] = [];
+  // 渲染表格的列表
   private columns:IState[] = [
     {
       key: 'detail',
@@ -93,12 +94,12 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .table_box {
-      padding: 30px 30px 0px;
-      background: #ffffff;
-      -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-      box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-      overflow: hidden;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
+    padding: 30px 30px 0px;
+    background: #ffffff;
+    -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+    box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 </style>

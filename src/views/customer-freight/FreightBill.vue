@@ -493,12 +493,14 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
+  // 判断权限
   get isCheck() {
     const roles = UserModule.roles
     return roles.some(role => {
       return role === '/v2/waybill/custBilling/freightCharge/receive'
     })
   }
+  // 是否禁用表格的选择框
   private disabledFunc(row:any) {
     if (row && (row.paymentReceivedFlag || !this.isCheck)) {
       return false
@@ -517,13 +519,17 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 上传文件列表
   private fileList: []= [];
+  // 标记收款弹窗表单校验
   private dialogRole: IState= {
     fileUrl: [
       { required: true, message: '请上传凭证', trigger: 'change' }
     ]
   }
+  // 标记收款弹窗表单列表
   private dialogFormItem:any[] = []
+  // 弹框表单确定按钮是否可以点击
   private submitLoading:boolean = false;
   // 弹窗表单容器
   private dialogItem: any[] = [
@@ -571,6 +577,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 计算表格高度
   get tableHeight() {
     let otherHeight = 490
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
@@ -741,6 +748,7 @@ export default class extends Vue {
   private handlePassClick(valid: any) {
     this.saveData()
   }
+  // 标记收款弹窗 确定按钮触发表单校验
   private async confirm(done: any) {
     ((this.$refs.dialogForm) as any).submitForm()
   }

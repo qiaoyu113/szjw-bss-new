@@ -182,7 +182,7 @@ export default {
     orderList: '订单管理',
     adjustmentList: '司机运费调整',
     configManager: '配置管理',
-    driverClond: '司机云',
+    driverCloud: '司机云',
     selfDriverTag: '自承运司机标签',
     marketClue: '待市场分配线索'
   },

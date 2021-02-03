@@ -2,12 +2,12 @@ import { RouteConfig } from 'vue-router'
 import Layout from '@/layout/index.vue'
 // 司机云
 const driverCloud: RouteConfig = {
-  path: '/driverClond',
+  path: '/driverCloud',
   component: Layout,
-  redirect: '/driverClond/selfDriverTag',
+  redirect: '/driverCloud/selfDriverTag',
   name: 'DriverClond',
   meta: {
-    title: 'driverClond',
+    title: 'driverCloud',
     icon: 'driver-cloud',
     apiUrl: 'root'
   },

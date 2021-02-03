@@ -435,7 +435,7 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
-
+  // 标记收款表单
   private dialogForm:IState = {
     subject: '',
     driverId: '',
@@ -444,7 +444,9 @@ export default class extends Vue {
     fileUrl: '',
     remark: ''
   }
+  // 文件列表
   private filelist:string[] = []
+  // 标记收款表单列表渲染列表
   private dialogFormItem:any[] = [
     {
       type: 2,
@@ -500,6 +502,7 @@ export default class extends Vue {
       key: 'remark'
     }
   ]
+  // 标记收款表单校验
   private dialogRole:any = {
     subject: [
       { required: true, message: '请选择', trigger: ['blur', 'change'] }
@@ -518,6 +521,7 @@ export default class extends Vue {
       { required: true, message: '请上传凭证', trigger: ['blur', 'change'] }
     ]
   }
+  // 流水金额校验
   validateAmount(rule:any, value:any, callback:any) {
     if (+value <= 0) {
       return callback(new Error('流水金额不能小于0'))
@@ -530,6 +534,7 @@ export default class extends Vue {
     page: 0,
     limit: 10
   }
+  // 加载司机列表loading
   private queryDriverLoading:boolean = false
   @Watch('showDialog')
   onDialogChange(val:boolean) {
@@ -541,6 +546,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 获取表格高度
   get tableHeight() {
     let otherHeight = 440
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
@@ -677,6 +683,7 @@ export default class extends Vue {
     this.resetDriver();
     ((this.$refs.dialogForm) as any).resetForm()
   }
+  // 标记收款表单确认按钮触发表单校验
   confirm() {
     ((this.$refs.dialogForm) as any).submitForm()
   }
@@ -899,6 +906,7 @@ export default class extends Vue {
     this.searchKeyword = val
     this.loadQueryDriverByKeyword(val)
   }
+  // 加载司机列表
   async loadQueryDriverByKeyword(val?:string) {
     val = this.searchKeyword
     this.queryPage.page++

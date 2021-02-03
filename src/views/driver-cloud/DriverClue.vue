@@ -269,13 +269,14 @@ export default class extends Vue {
   times:number = 10;
   private listLoading:boolean = false;
   private showDialog:boolean = false; // 弹框
-  private title:string = '';
+  private title:string = ''; // 弹框title
   private rows:IState[] = []; // 弹框选中的数据
   private dutyListOptions:IState[] = [];// 业务线
   private multipleSelection:IState[] = [];// 多选选中
   private carOptions:IState[] = [];// 车型列表
   private contactsOption:IState[] = [];// 联系情况列表
   private followerListOptions:IState[] = [];// 跟进人列表
+  // 查询表单
   private listQuery:IState = {
     name: '',
     phone: '',
@@ -290,6 +291,7 @@ export default class extends Vue {
     onlyMe: '',
     status: ''
   };
+  // 查询表单渲染列表
   private formItem:any[] = [
     {
       type: 1,
@@ -462,6 +464,7 @@ export default class extends Vue {
     }
 
   ];
+  // 按钮状态
   private btns:any[] = [
     {
       name: '',
@@ -499,6 +502,7 @@ export default class extends Vue {
       num: 0
     }
   ]
+  // 表格渲染列表
   private columns:IState[] = [
     {
       key: 'name',
@@ -569,6 +573,7 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
+  // 分配弹框
   private dialogFormItem:any[] = [
     {
       type: 8,
@@ -587,10 +592,11 @@ export default class extends Vue {
       key: 'follow'
     }
   ];
+  // 分配弹框表单
   private dialogListQuery:IState = {
     follow: []
   };
-
+  //  分配弹框表单校验
   private validateFollow(rule:any, value:any, callback:Function) {
     if (value === '') {
       callback(new Error('请选择跟进人!'))
@@ -600,6 +606,7 @@ export default class extends Vue {
       callback()
     }
   }
+  // 分配弹框表单校验规则
   private rules:IState = {
     follow: [
       { required: true, message: '请选择跟进人', trigger: 'blur' },
@@ -610,6 +617,7 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // tootip换行
   toBreak(content:string) {
     if (!content) {
       return ''
@@ -681,7 +689,7 @@ export default class extends Vue {
   // 详情
   handleDetailClick(row:IState) {
     this.$router.push({
-      path: '/driverClond/driverClueDetail',
+      path: '/driverCloud/driverClueDetail',
       query: {
         id: row.marketClueId
       }

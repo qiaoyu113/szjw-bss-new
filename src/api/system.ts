@@ -15,7 +15,11 @@ export const enableOrDisable = (data: any) =>
     data
   })
 
-// 用户管理-重置密码
+/**
+ * 用户管理-重置密码
+ * 请求参数：
+ * id | 用户id
+ */
 export const resetPassword = (data: any) =>
   request({
     url: `${baseURL}/v1/base/user/password/reset`,
@@ -36,7 +40,12 @@ export const updateUser = (data: any) =>
     method: 'post',
     data
   })
-// 用户管理-用户详情
+
+/**
+ * 用户管理-用户详情
+ * 请求参数：
+ * userId | 用户id
+ */
 export const userDetail = (id: number) =>
   request({
     url: `${baseURL}/v1/base/user/getUserById`,
@@ -284,14 +293,28 @@ export const deleteDuty = (data: any = {}) =>
     method: 'post',
     data
   })
-// 获取用户列表-new
+
+/**
+ * 获取用户列表-new
+ * 请求参数：
+ * page | 页码
+ * limit | 条数
+ * status | 状态
+ * nickName | 姓名
+ * mobile | 电话
+ */
 export const getUserManagerList = (params:any) =>
   request({
     url: `${baseURL}/v1/base/user/page/list`,
     method: 'get',
     params
   })
-// 获取组织架构-new
+
+/**
+ *  获取组织架构-new
+ * 请求参数：
+ * 无
+ */
 export const getOfficeByCurrentUserV2 = () =>
   request({
     url: `${baseURL}/v2/base/office/list`,
@@ -302,7 +325,12 @@ export interface RoleParams {
     dutyId?:number;
     officeLevel:number;
   }
-// 根据组织架构获取角色-new
+
+/**
+ *   根据组织架构获取角色-new
+ * 请求参数：
+ * dutyId | 组织id
+ */
 export const getDutyAndRoleList = (data:RoleParams) =>
   request({
     url: `${baseURL}/v2/base/duty/getDutyAndRoleList`,
@@ -310,7 +338,18 @@ export const getDutyAndRoleList = (data:RoleParams) =>
     data
   })
 
-// 创建用户-new
+/**
+ * 创建用户-new
+ * 请求参数：
+ * userName | 姓名
+ * passwd | 密码
+ * confirmPassword | 确认密码
+ * crmUserStatus | crm状态
+ * syncStatus | 是否同步
+ * officeId | 组织id
+ * roleId | 角色
+ * nickName | 组织id
+ */
 export const addUser = (data:any) =>
   request({
     url: `${baseURL}/v2/base/user/create`,
@@ -318,7 +357,13 @@ export const addUser = (data:any) =>
     data
   })
 
-// 修改用户-new
+/**
+ * 修改用户-new
+ * 请求参数：
+ * id | 用户id
+ * userName | 姓名
+ * nickName | 组织id
+ */
 export const modifyUser = (data:any) =>
   request({
     url: `${baseURL}/v2/base/user/update`,
@@ -326,7 +371,12 @@ export const modifyUser = (data:any) =>
     data
   })
 
-// 启用或禁用用户
+/**
+ * 启用或禁用用户
+ * 请求参数：
+ * id | 用户id
+ * status | 状态
+ */
 export const enableOrDisableUser = (data:any) =>
   request({
     url: `${baseURL}/v2/base/user/enableOrDisable`,
@@ -334,7 +384,11 @@ export const enableOrDisableUser = (data:any) =>
     data
   })
 
-// 同步用户到crm
+/**
+ * 同步用户到crm
+ * 请求参数：
+ * id | 用户id
+ */
 export const pushUserToCRM = (params:any) =>
   request({
     url: `${baseURL}/v2/base/user/pushUserToCRM`,

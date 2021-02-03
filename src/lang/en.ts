@@ -161,7 +161,7 @@ export default {
     orderList: 'orderList',
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
-    driverClond: 'driverClond',
+    driverCloud: 'driverCloud',
     selfDriverTag: 'selfDriverTag'
   },
   navbar: {
