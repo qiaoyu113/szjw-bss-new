@@ -30,6 +30,7 @@ const driverAccountRouter: RouteConfig = {
       name: 'payDetail',
       meta: {
         apiUrl: '/wt-driver-account/pay/detail',
+        activeMenu: '/driveraccount/payFee',
         title: 'payDetail',
         hidden: true,
         noCache: true
@@ -41,6 +42,7 @@ const driverAccountRouter: RouteConfig = {
       name: 'payAudit',
       meta: {
         apiUrl: '/wt-driver-account/pay/check',
+        activeMenu: '/driveraccount/payFee',
         title: 'payAudit',
         hidden: true,
         noCache: true
@@ -99,6 +101,7 @@ const driverAccountRouter: RouteConfig = {
       name: 'RefundDetail',
       meta: {
         apiUrl: 'root',
+        activeMenu: '/driveraccount/refundlist',
         title: 'refundDetail',
         noCache: false,
         hidden: true
@@ -111,6 +114,7 @@ const driverAccountRouter: RouteConfig = {
       name: 'RefundApply',
       meta: {
         apiUrl: 'root',
+        activeMenu: '/driveraccount/refundlist',
         title: 'refundApply',
         noCache: true,
         hidden: true
@@ -123,6 +127,7 @@ const driverAccountRouter: RouteConfig = {
       name: 'RefundAudit',
       meta: {
         apiUrl: 'root',
+        activeMenu: '/driveraccount/refundlist',
         title: 'refundAudit',
         noCache: false,
         hidden: true

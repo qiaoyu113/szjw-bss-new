@@ -85,6 +85,7 @@
         <el-button
           v-permission="['/wt-driver-account/pay/create']"
           size="small"
+          type="primary"
           @click="goRoute('addPay')"
         >
           新建缴费
@@ -93,6 +94,7 @@
           :class="isPC ? '' : 'btnMobile'"
           name="driverlist_query_btn"
           size="small"
+          type="primary"
           @click="handleQueryClick"
         >
           查询
@@ -110,6 +112,7 @@
           :class="isPC ? '' : 'btnMobile'"
           name="driverlist_export_btn"
           size="small"
+          type="primary"
           :disabled="times === 10 ? false :true"
           @click="_exportFile"
         >
@@ -132,8 +135,8 @@
             >
               <el-button
                 size="small"
+                type="primary"
                 :plain="item.value !== listQuery.payStatus"
-                :type="index === active ? 'primary' : 'default' "
                 @click="changeStatus(item,index)"
               >
                 {{ item.label }}

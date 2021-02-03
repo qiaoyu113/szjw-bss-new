@@ -22,6 +22,7 @@
         <el-button
           v-permission="['/v1/product/product/rentalCar/download']"
           size="small"
+          type="primary"
           :class="isPC ? 'btn-item' : 'btn-item-m'"
           name="rentcartype_download_btn"
           :disabled="times === 10 ? false :true"

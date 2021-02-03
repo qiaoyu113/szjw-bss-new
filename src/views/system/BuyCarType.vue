@@ -23,6 +23,7 @@
         <el-button
           v-permission="['/v1/product/product/buyCar/download']"
           size="small"
+          type="primary"
           :class="isPC ? 'btn-item' : 'btn-item-m'"
           name="buycartype_downLoad_btn"
           :disabled="times === 10 ? false :true"

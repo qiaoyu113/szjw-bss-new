@@ -11,7 +11,7 @@
       :list-query="listQuery"
       :form-item="formItem"
       size="small"
-      label-width="140px"
+      label-width="90px"
       class="p15 SuggestForm"
       :pc-col="8"
     >
@@ -57,25 +57,31 @@
           </template>
         </el-button>
       </div>
-      <template slot="status">
-        <el-badge
-          v-for="item in btns"
-          :key="item.text"
-          :value="item.num"
-          :max="9999"
-          :hidden="item.num === 0"
+      <template
+        slot="status"
+      >
+        <div
+          style="margin-left:-30px"
         >
-          <el-button
-            type="primary"
-            :plain="item.name !== listQuery.status"
-            @click="() => {
-              listQuery.status = item.name
-              handleFilterClick()
-            }"
+          <el-badge
+            v-for="item in btns"
+            :key="item.text"
+            :value="item.num"
+            :max="9999"
+            :hidden="item.num === 0"
           >
-            {{ item.text }}
-          </el-button>
-        </el-badge>
+            <el-button
+              type="primary"
+              :plain="item.name !== listQuery.status"
+              @click="() => {
+                listQuery.status = item.name
+                handleFilterClick()
+              }"
+            >
+              {{ item.text }}
+            </el-button>
+          </el-badge>
+        </div>
       </template>
     </self-form>
     <!-- 表格 -->

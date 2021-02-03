@@ -381,7 +381,6 @@ export default class extends Vue {
   padding: 0;
 }
 .box{
-  box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
   overflow: hidden;
   transform: translateZ(0);
   padding: 20px;

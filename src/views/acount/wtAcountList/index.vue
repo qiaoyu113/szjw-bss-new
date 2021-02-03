@@ -10,7 +10,7 @@
     <self-form
       :list-query="listQuery"
       :form-item="formItem"
-      label-width="160px"
+      label-width="150px"
       size="small"
       class="p15"
     >
@@ -66,6 +66,7 @@
           :disabled="times === 10 ? false :true"
           name="driverlist_offout_btn"
           size="small"
+          type="primary"
           @click="_exportFile"
         >
           导出<template v-if="times !== 10">

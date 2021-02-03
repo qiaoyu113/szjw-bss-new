@@ -63,6 +63,7 @@
             <el-button
               v-permission="['/v2/wt-driver-account/refund/create']"
               :class="isPC ? '' : 'btnMobile'"
+              type="warning"
               @click="goDetail"
             >
               申请退费

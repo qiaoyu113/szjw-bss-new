@@ -296,7 +296,7 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
 .payDetail{
-  padding: 30px;
+  padding: 20px;
   box-sizing: border-box;
   .checkStatus{
     display: flex;

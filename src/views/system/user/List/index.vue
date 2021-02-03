@@ -11,7 +11,7 @@
       :form-item="formItem"
       size="small"
       :pc-col="8"
-      label-width="90px"
+      label-width="45px"
       class="p15 SuggestForm"
     >
       <div

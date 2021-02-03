@@ -1,8 +1,7 @@
 <template>
   <div class="configManagercontainer">
-    <el-card shadow="never">
+    <SectionContainer title="配置管理">
       <div>
-        <h4>配置管理</h4>
         <div
           v-permission="['/v2/line/label/create']"
           class="btn"
@@ -58,95 +57,95 @@
           </el-link>
         </template>
       </self-table>
-    </el-card>
 
-    <SelfDialog
-      :visible.sync="dialogTableVisible"
-      width="40%"
-      :show-confirm-button="false"
-      :show-cancel-button="false"
-      :show-close="false"
-      title=""
-      center
-      append-to-body
-      :sumbit-again="submitLoading"
-      @closed="handleClosed"
-    >
-      <template v-if="stepOne">
-        <self-form
-          ref="form1"
-          :rules="rules1"
-          :list-query="form1"
-          :form-item="formItem1"
-          size="small"
-          label-width="80px"
-          class="p15 SuggestForm"
-          :pc-col="24"
-          @onPass="handlePassClick1"
-        >
-          <template slot="mulBtn">
-            <div class="subBtn">
-              <el-button
-                size="small"
-                @click="beforeClose"
-              >
-                取消
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                :disabled="isvalidating"
-                @click="handleForm1Click"
-              >
-                下一步
-              </el-button>
-            </div>
-          </template>
-        </self-form>
-      </template>
-      <template v-else>
-        <self-form
-          ref="form2"
-          :list-query="form2"
-          :form-item="formItem2"
-          size="small"
-          label-width="80px"
-          class="p15 SuggestForm"
-          :rules="rules2"
-          :pc-col="24"
-          @onPass="handlePassClick2"
-        >
-          <template slot="city">
-            <div class="subBtn mt0 city">
-              {{ city }}
-            </div>
-          </template>
-          <template slot="desc">
-            <div class="subBtn mt0 desc">
-              须知:给某条业务线勾选肥瘦标签,代表该业务线司机可见该肥瘦类型线路
-            </div>
-          </template>
-          <template slot="validator" />
-          <template slot="mulBtn">
-            <div class="subBtn">
-              <el-button
-                size="small"
-                @click="beforeClose"
-              >
-                取消
-              </el-button>
-              <el-button
-                size="small"
-                type="primary"
-                @click="handleForm2Click"
-              >
-                提交
-              </el-button>
-            </div>
-          </template>
-        </self-form>
-      </template>
-    </SelfDialog>
+      <SelfDialog
+        :visible.sync="dialogTableVisible"
+        width="40%"
+        :show-confirm-button="false"
+        :show-cancel-button="false"
+        :show-close="false"
+        title=""
+        center
+        append-to-body
+        :sumbit-again="submitLoading"
+        @closed="handleClosed"
+      >
+        <template v-if="stepOne">
+          <self-form
+            ref="form1"
+            :rules="rules1"
+            :list-query="form1"
+            :form-item="formItem1"
+            size="small"
+            label-width="80px"
+            class="p15 SuggestForm"
+            :pc-col="24"
+            @onPass="handlePassClick1"
+          >
+            <template slot="mulBtn">
+              <div class="subBtn">
+                <el-button
+                  size="small"
+                  @click="beforeClose"
+                >
+                  取消
+                </el-button>
+                <el-button
+                  size="small"
+                  type="primary"
+                  :disabled="isvalidating"
+                  @click="handleForm1Click"
+                >
+                  下一步
+                </el-button>
+              </div>
+            </template>
+          </self-form>
+        </template>
+        <template v-else>
+          <self-form
+            ref="form2"
+            :list-query="form2"
+            :form-item="formItem2"
+            size="small"
+            label-width="80px"
+            class="p15 SuggestForm"
+            :rules="rules2"
+            :pc-col="24"
+            @onPass="handlePassClick2"
+          >
+            <template slot="city">
+              <div class="subBtn mt0 city">
+                {{ city }}
+              </div>
+            </template>
+            <template slot="desc">
+              <div class="subBtn mt0 desc">
+                须知:给某条业务线勾选肥瘦标签,代表该业务线司机可见该肥瘦类型线路
+              </div>
+            </template>
+            <template slot="validator" />
+            <template slot="mulBtn">
+              <div class="subBtn">
+                <el-button
+                  size="small"
+                  @click="beforeClose"
+                >
+                  取消
+                </el-button>
+                <el-button
+                  size="small"
+                  type="primary"
+                  @click="handleForm2Click"
+                >
+                  提交
+                </el-button>
+              </div>
+            </template>
+          </self-form>
+        </template>
+      </SelfDialog>
+    </SectionContainer>
   </div>
 </template>
 
@@ -156,6 +155,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
+import SectionContainer from '@/components/SectionContainer/index.vue'
 import { GetDictionaryCity, GetDictionary } from '@/api/common'
 import { getLableLists, checkCityIsExist, saveLineLabel, updateLineLabel, getLineLabelById } from '@/api/line'
 import { HandlePages, lock } from '@/utils/index'
@@ -186,7 +186,8 @@ interface ColumnObj {
   components: {
     SelfForm,
     SelfTable,
-    SelfDialog
+    SelfDialog,
+    SectionContainer
   }
 })
 export default class extends Vue {

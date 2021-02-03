@@ -49,6 +49,7 @@ const driverCloud: RouteConfig = {
       meta: {
         apiUrl: 'root',
         hidden: true,
+        activeMenu: '/driverCloud/driverClue',
         title: 'DriverClueDetail',
         noCache: false
       }

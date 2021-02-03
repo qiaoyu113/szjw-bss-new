@@ -11,7 +11,7 @@
       :list-query="listQuery"
       :form-item="formItem"
       size="small"
-      label-width="140px"
+      label-width="100px"
       class="p15 SuggestForm"
       :pc-col="8"
     >
@@ -32,6 +32,7 @@
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="times === 10 ? false :true"
+          type="primary"
           @click="_exportFile"
         >
           导出<template v-if="times !== 10">
