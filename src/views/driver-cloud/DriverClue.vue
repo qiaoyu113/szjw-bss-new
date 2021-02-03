@@ -683,7 +683,7 @@ export default class extends Vue {
   // 详情
   handleDetailClick(row:IState) {
     this.$router.push({
-      path: '/driverClond/driverClueDetail',
+      path: '/driverCloud/driverClueDetail',
       query: {
         id: row.marketClueId
       }
