@@ -31,10 +31,12 @@
           v-permission="['/v2/driver/label-sync/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          :loading="ExportClick"
-          @click="handleExportClick"
+          :disabled="times === 10 ? false :true"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           v-permission="['/v2/driver/label-sync/create']"
@@ -138,6 +140,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { today, yesterday, month, lastmonth, threemonth } from '../driver-freight/components/date'
 import { GetDutyListByLevel, GetDictionaryCity } from '@/api/common'
 import { GetDriverTagList, ExportDriverTagList, EditDriverTag, AddDriverTag, GetDriverByDriverName } from '@/api/driver-cloud'
+import { exportFileTip } from '@/utils/exportTip'
 interface PageObj {
   page:number,
   limit:number,
@@ -156,6 +159,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private driverOver:Boolean = false
   private driverLoading:Boolean = false
   private ExportClick:boolean = false
@@ -477,15 +481,20 @@ export default class extends Vue {
     this.page.page = 1
     this.getLists()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  private async handleExportClick(row:IState) {
+  private async handleExportClick(sucFun:Function) {
     try {
       this.ExportClick = true
       let params:IState = {}
       params = this.dealData(params)
       let { data: res } = await ExportDriverTagList(params)
       if (res.success) {
+        sucFun()
         this.ExportClick = false
         this.$message({
           type: 'success',

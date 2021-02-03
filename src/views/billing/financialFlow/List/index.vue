@@ -75,10 +75,13 @@
         <el-button
           v-permission="['/v2/wt-driver-account/flow/export']"
           size="small"
+          :disabled="times === 10 ? false :true"
           :class="isPC ? '' : 'btnMobile'"
-          @click="handleExportClick"
+          @click="_exportFile"
         >
-          导出
+          导出<template v-if="times !== 10">
+            {{ times }} s
+          </template>
         </el-button>
         <el-button
           v-permission="['/v2/wt-driver-account/flow/manual/create']"
@@ -227,7 +230,8 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getFlowList, exportFlowList, saveFlowData, getOrderListByDriverId, getOrderDetailByDriverId, getDriverListByGmId, getListAll, GetChargeAmountByChargeId } from '@/api/driver-account'
 import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
-import { GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
+import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
+import { exportFileTip } from '@/utils/exportTip'
 
 interface PageObj {
   page:number,
@@ -248,6 +252,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  times:number = 10;
   private searchKeyword:string = '';
   private dialogKeyword:string = '';
   private queryDriverLoading:boolean = false // 查询区下拉司机搜索框的loading
@@ -580,9 +585,13 @@ export default class extends Vue {
     this.resetGmId()
     this.loadQueryDriverByKeyword()
   }
+  // 导出文件
+  _exportFile() {
+    exportFileTip(this, this.handleExportClick)
+  }
   // 导出
   @lock
-  async handleExportClick() {
+  async handleExportClick(sucFun:Function) {
     try {
       let params:IState = {}
       if (this.listQuery.city && this.listQuery.city.length > 1) {
@@ -606,6 +615,7 @@ export default class extends Vue {
       }
       let { data: res } = await exportFlowList(params)
       if (res.success) {
+        sucFun()
         this.$message.success('操作成功')
       } else {
         this.$message.error(res.errorMsg)
