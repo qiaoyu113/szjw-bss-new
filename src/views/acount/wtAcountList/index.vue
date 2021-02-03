@@ -181,7 +181,7 @@ import { getAcountList, accountFreeze, accountUnfreeze, managementExport, orderL
 import { getDriverNoAndNameList } from '@/api/driver'
 import { delayTime } from '@/settings.ts'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { HandlePages, phoneReg } from '@/utils/index'
+import { HandlePages, phoneReg, showWork } from '@/utils/index'
 import { GetOpenCityData, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
 import { exportFileTip } from '@/utils/exportTip'
 interface IState {
@@ -259,7 +259,7 @@ export default class extends Vue {
         'node-key': 'workCity',
         props: {
           lazy: true,
-          lazyLoad: this.showWork
+          lazyLoad: showWork
         }
       }
     },
@@ -599,31 +599,29 @@ export default class extends Vue {
     total: 0
   };
 
-  /**
+  /*
    *获取开通城市
    */
-  async getOpenCitys() {
-    try {
-      let { data: res } = await getOfficeByType({ type: 2 })
-      if (res.success) {
-        let workCity = res.data.map(function(item: any) {
-          return {
-            label: item.name,
-            value: item.code
-          }
-        })
-        this.workCityOptions.push(...workCity)
-      } else {
-        this.$message.error(res.errorMsg)
-      }
-    } catch (err) {
-      console.log(`get `)
-    }
-  }
-
-  /**
-   * 获取组织
-   */
+  // async getOpenCitys() {
+  //   console.log(1)
+  //   try {
+  //     let { data: res } = await getOfficeByType({ type: 2 })
+  //     if (res.success) {
+  //       let workCity = res.data.map(function(item: any) {
+  //         return {
+  //           label: item.name,
+  //           value: item.code
+  //         }
+  //       })
+  //       this.workCityOptions.push(...workCity)
+  //     } else {
+  //       this.$message.error(res.errorMsg)
+  //     }
+  //   } catch (err) {
+  //     console.log(`get `)
+  //   }
+  // }
+  // 获取组织
   async getOffices() {
     try {
       let params = {
@@ -646,57 +644,57 @@ export default class extends Vue {
     }
   }
 
-  private async showWork(node:any, resolve:any) {
-    let query: any = {
-      parentId: ''
-    }
-    if (node.level === 1) {
-      query.parentId = node.value
-    }
-    try {
-      if (node.level === 0) {
-        let nodes = await this.areaAddress({ type: 2 })
-        resolve(nodes)
-      } else if (node.level === 1) {
-        let nodes = await this.cityDetail(query)
-        resolve(nodes)
-      }
-    } catch (err) {
-      resolve([])
-    }
-  }
+  // private async showWork(node:any, resolve:any) {
+  //   let query: any = {
+  //     parentId: ''
+  //   }
+  //   if (node.level === 1) {
+  //     query.parentId = node.value
+  //   }
+  //   try {
+  //     if (node.level === 0) {
+  //       let nodes = await this.areaAddress({ type: 2 })
+  //       resolve(nodes)
+  //     } else if (node.level === 1) {
+  //       let nodes = await this.cityDetail(query)
+  //       resolve(nodes)
+  //     }
+  //   } catch (err) {
+  //     resolve([])
+  //   }
+  // }
 
-  private async areaAddress(params: any) {
-    try {
-      let { data: res } = await getOfficeByType(params)
-      if (res.success) {
-        const nodes = res.data.map(function(item: any) {
-          return {
-            value: item.id,
-            label: item.name,
-            leaf: false
-          }
-        })
-        return nodes
-      }
-    } catch (err) {
-      console.log(`load city by code fail:${err}`)
-    }
-  }
+  // private async areaAddress(params: any) {
+  //   try {
+  //     let { data: res } = await getOfficeByType(params)
+  //     if (res.success) {
+  //       const nodes = res.data.map(function(item: any) {
+  //         return {
+  //           value: item.id,
+  //           label: item.name,
+  //           leaf: false
+  //         }
+  //       })
+  //       return nodes
+  //     }
+  //   } catch (err) {
+  //     console.log(`load city by code fail:${err}`)
+  //   }
+  // }
 
-  private async cityDetail(params: any) {
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
-        return {
-          value: item.areaCode,
-          label: item.name,
-          leaf: true
-        }
-      })
-      return nodes
-    }
-  }
+  // private async cityDetail(params: any) {
+  //   let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  //   if (city.success) {
+  //     const nodes = city.data.map(function(item: any) {
+  //       return {
+  //         value: item.areaCode,
+  //         label: item.name,
+  //         leaf: true
+  //       }
+  //     })
+  //     return nodes
+  //   }
+  // }
   /**
    *获取列表
    */
@@ -1011,7 +1009,6 @@ export default class extends Vue {
     this.listQuery.busiType !== '' &&
         (params.busiType = this.listQuery.busiType)
     this.listQuery.joinManagerId !== '' && (params.joinManagerId = this.listQuery.joinManagerId)
-
     if (this.listQuery.time.length > 1) {
       params.startDate = new Date(this.listQuery.time[0]).setHours(0, 0, 0)
       params.endDate = new Date(this.listQuery.time[1]).setHours(23, 59, 59)
@@ -1133,7 +1130,7 @@ export default class extends Vue {
   }
 
   private async fetchData() {
-    this.getOpenCitys()
+    // this.getOpenCitys()
     this.getOffices()
     this.getGmOptions()
     await this.getDriverInfo()
@@ -1189,16 +1186,13 @@ export default class extends Vue {
     let otherHeight = 440
     return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
   }
-
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
   }
-
   mounted() {
     this.fetchData()
   }
-
   activated() {
     this.getList()
   }
@@ -1271,7 +1265,6 @@ export default class extends Vue {
     margin-bottom: 10px;
     margin-left: 0px !important;
     margin-right: 0px !important;
-    /* box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5); */
 }
 .wtAcountList >>> .el-form-item__content div{
   width: 100%;

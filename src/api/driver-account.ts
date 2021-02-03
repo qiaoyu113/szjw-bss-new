@@ -6,7 +6,6 @@ const driverFix = '/business_center'
 const billFix = '/bill_center'
 const wayBillFix = '/waybill'
 let prefix2 = '/mock/25'
-
 /**
  * XXXX
  */
@@ -16,11 +15,16 @@ export const CreateActivity = (data: any) =>
     method: 'post',
     data
   })
-
-/**
-   *
-   * 获取梧桐账户列表
-   */
+/*
+  获取梧桐账户列表
+  请求参数：
+  workCity：所属城市
+  driverId：司机Id
+  busiType：所属业务线
+  joinManagerId：所属加盟经理
+  balance：账户余额
+  time：司机创建日期
+*/
 export const getAcountList = (data: any) =>
   request({
     url: `${billFix}/v2/wt-driver-account/management/list`,
@@ -28,32 +32,34 @@ export const getAcountList = (data: any) =>
     data
   })
 
-/**
-   *
-   * 梧桐账户列表冻结
-   */
+/*
+  梧桐账户列表冻结
+*/
 export const accountFreeze = (data: any) =>
   request({
     url: `${prefix}/v2/wt-driver-account/management/freeze`,
     method: 'post',
     data
   })
-
-/**
-   *
-   * 梧桐账户列表冻结
-   */
+/*
+  梧桐账户列表冻结
+*/
 export const accountUnfreeze = (data: any) =>
   request({
     url: `${prefix}/v2/wt-driver-account/management/unfreeze`,
     method: 'post',
     data
   })
-
-/**
-   *
-   * 梧桐账户列表导出
-   */
+/*
+  梧桐账户列表导出
+  请求参数：
+  workCity：所属城市
+  driverId：司机Id
+  busiType：所属业务线
+  joinManagerId：所属加盟经理
+  balance：账户余额
+  time：司机创建日期
+*/
 export const managementExport = (data: any) =>
   request({
     url: `${billFix}/v2/wt-driver-account/management/export`,
@@ -104,7 +110,6 @@ export const orderCanExtractMoney = (data: any) => {
     params: data
   })
 }
-
 /**
  * 订单是否确认
  */
@@ -222,8 +227,20 @@ export const GetChargeAmountByChargeId = (params:any) =>
     method: 'get',
     params
   })
-
-// 缴费管理列表
+/*
+  缴费管理列表
+  请求参数:
+  payStatus：缴费状态
+  workCity：所属城市
+  driverId：司机Id
+  payType：缴费类型
+  payNo：缴费编号
+  gmId：加盟经理
+  sno：交易流水号
+  busiType：业务线
+  driverStatus：司机状态
+  applyDate：缴费申请日期
+*/
 export const getPayList = (params: any) =>
   request({
     url: `${billFix}/v2.4/wt-driver-account/pay/list`,
@@ -239,14 +256,30 @@ export const payDetail = (params: any) =>
     params
   })
 
-// 缴费审核
+/*
+  缴费审核
+  checkStatus：审核状态
+*/
 export const payAudit = (data: any) =>
   request({
     url: `${billFix}/v2.4/wt-driver-account/pay/check`,
     method: 'post',
     data
   })
-// 缴费导出
+/*
+  缴费导出
+  请求参数:
+  payStatus：缴费状态
+  workCity：所属城市
+  driverId：司机Id
+  payType：缴费类型
+  payNo：缴费编号
+  gmId：加盟经理
+  sno：交易流水号
+  busiType：业务线
+  driverStatus：司机状态
+  applyDate：缴费申请日期
+*/
 export const payExport = (params: any) =>
   request({
     url: `${billFix}/v2.4/wt-driver-account/pay/export`,
@@ -266,6 +299,44 @@ export const getPayNoList = (params: any) =>
     url: `${billFix}/v2.4/wt-driver-account/pay/payNoList`,
     method: 'get',
     params
+  })
+/*
+  缴费管理-新增缴费
+  请求参数：
+  driverCode：司机姓名(司机编号/手机号)
+  existReceipt：是否开收据
+  orderCode：订单编号
+  payAmount：缴费金额（元）
+  payDate：打款日期
+  payModel：支付方式
+  payProof：上传交易凭证
+  payType：缴费类型
+  sno：交易流水号
+*/
+export const payCostBillsCreate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/create`,
+    method: 'post',
+    data
+  })
+
+/*
+  缴费管理-新增编辑缴费
+  id：id
+  existReceipt：是否开收据
+  orderCode：订单编号
+  payAmount：缴费金额（元）
+  payDate：打款日期
+  payModel：支付方式
+  payProof：上传交易凭证
+  payType：缴费类型
+  sno：交易流水号
+*/
+export const payCostBillsUpdate = (data:any) =>
+  request({
+    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/update`,
+    method: 'post',
+    data
   })
   // 获取计费管理列表
 export const GetChargingList = (params:any) =>
@@ -309,22 +380,6 @@ export const AddCharging = (data:any) =>
 export const EditCharging = (data:any) =>
   request({
     url: `${payFix}/editCharging`,
-    method: 'post',
-    data
-  })
-
-// 缴费管理-新增缴费
-export const payCostBillsCreate = (data:any) =>
-  request({
-    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/create`,
-    method: 'post',
-    data
-  })
-
-// 缴费管理-新增缴费
-export const payCostBillsUpdate = (data:any) =>
-  request({
-    url: `${billFix}/v2.4/wt-driver-account/pay/payCostBills/update`,
     method: 'post',
     data
   })

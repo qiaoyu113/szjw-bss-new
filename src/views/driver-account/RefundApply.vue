@@ -139,15 +139,10 @@
 
 <script lang="ts">
 import { Vue, Component, Watch } from 'vue-property-decorator'
-// import { CardBin } from 'bankcard'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { getDriverNoAndNameList } from '@/api/driver'
 import { lock } from '@/utils/index.ts'
-import {
-  haveRecordToBeApproved,
-  getRefundEcho,
-  createRefund
-} from '@/api/driver-refund'
+import { haveRecordToBeApproved, getRefundEcho, createRefund } from '@/api/driver-refund'
 const { CardBin } = require('bankcard')
 
 interface listQuerys {
@@ -518,7 +513,6 @@ export default class extends Vue {
         })
       }
       // 校验银行卡信息
-      // if (!this.backCardNoValidator()) return
       if ((this.listQuery.hasReceipt as number) === 0) {
         this.listQuery.recoveryReceipt = 0
       }
@@ -529,7 +523,6 @@ export default class extends Vue {
       return error
     }
   }
-
   // 接口
   driverSelect(this: any, e: string) {
     this.haveRecordToBeApprovedSure(e)

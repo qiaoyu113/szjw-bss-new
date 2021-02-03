@@ -171,7 +171,6 @@
         审核通过
       </el-button>
     </div>
-
     <el-image-viewer
       v-if="showViewer"
       :on-close="closePic"
@@ -197,16 +196,6 @@ import { delayTime } from '@/settings'
    }
  })
 export default class extends Vue {
-  // 判断是否是PC
-  get isPC() {
-    return SettingsModule.isPC
-  }
-
-  mounted() {
-    this.routePage = (this.$route.name) as string
-    this.id = (this.$route.query.id) as string
-    this.getDetail(this.id)
-  }
   private loadingStatus:boolean = true
   private showViewer:boolean = false
   private imageUrl:string = ''
@@ -214,7 +203,6 @@ export default class extends Vue {
   private id:string = ''
   private formData:any = {}
   private tableData:any[] = []
-
   private seePic(url:string) {
     this.showViewer = true
     this.imageUrl = url
@@ -223,7 +211,6 @@ export default class extends Vue {
     this.imageUrl = ''
     this.showViewer = false
   }
-
   private async getDetail(id:string) {
     try {
       let params = {
@@ -250,7 +237,7 @@ export default class extends Vue {
       console.log(err)
     }
   }
-
+  // 审核
   private audit(type:number) {
     let text:string = ''
     if (type === 1) {
@@ -271,7 +258,6 @@ export default class extends Vue {
       })
     })
   }
-
   private async doAudit(flag:number) {
     try {
       let param = {
@@ -296,6 +282,15 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     }
+  }
+  // 判断是否是PC
+  get isPC() {
+    return SettingsModule.isPC
+  }
+  mounted() {
+    this.routePage = (this.$route.name) as string
+    this.id = (this.$route.query.id) as string
+    this.getDetail(this.id)
   }
 }
 </script>
