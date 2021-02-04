@@ -8,6 +8,7 @@ export default {
     clueTitle: '线索管理',
     publicClue: '公海池(待分配)',
     privateClue: '私海池',
+    privateDetail: '线索详情',
     driverTitle: '司机管理',
     driverAccount: '司机梧桐账户',
     refundList: '退费管理',

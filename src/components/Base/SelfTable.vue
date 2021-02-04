@@ -10,10 +10,10 @@
       :row-style="{height: '20px'}"
       :cell-style="{padding: '5px 0'}"
       :data="tableData"
-      :border="isPC"
+      :border="isPC && $attrs.border !== false"
       size="mini"
       fit
-      stripe
+      :stripe="$attrs.stripe === undefined ? true : $attrs.stripe"
       highlight-current-row
       v-bind="$attrs"
       style="width: 100%; "

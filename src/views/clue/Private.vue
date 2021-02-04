@@ -129,10 +129,7 @@ import { HandlePages, lock } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
-import {
-  marketClue,
-  allocationClue
-} from '@/api/driver-cloud'
+import { marketClue, allocationClue } from '@/api/driver-cloud'
 import {
   today,
   yesterday,
@@ -158,8 +155,8 @@ interface formItem {
   tagAttrs?: object;
   listeners?: object;
   options?: IState[];
-  slot?:boolean,
-  w?:string
+  slot?: boolean;
+  w?: string;
 }
 @Component({
   name: 'PublicClue',
@@ -169,15 +166,15 @@ interface formItem {
   }
 })
 export default class extends Vue {
-  times:number = 10;
+  times: number = 10;
   private listLoading: boolean = false;
-  private clueArr:IState[] = [
+  private clueArr: IState[] = [
     { name: '梧桐专车', code: 0 },
     { name: '梧桐共享', code: 1 },
     { name: '雷鸟供给C', code: 2 },
     { name: '雷鸟租赁C', code: 3 },
     { name: '雷鸟租赁B', code: 4 }
-  ]
+  ];
   private listQuery: IState = {
     clueType: 0,
     phone: '',
@@ -197,7 +194,7 @@ export default class extends Vue {
     limit: 30,
     total: 0
   };
-  private btns:any[] = [
+  private btns: any[] = [
     {
       name: '',
       text: '全部',
@@ -228,7 +225,7 @@ export default class extends Vue {
       text: '已成交',
       num: 0
     }
-  ]
+  ];
   private formItem: formItem[] = [
     {
       type: 'tabGroup',
@@ -458,7 +455,7 @@ export default class extends Vue {
     // this.rowData.push(...this.multipleSelection)
   }
 
-  private handleSelectionChange(val:any) {
+  private handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
 
@@ -492,7 +489,7 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
-        this.btns.forEach(item => {
+        this.btns.forEach((item) => {
           let key = item.name
           key = +key
           item.num = res.title[key]
@@ -515,8 +512,8 @@ export default class extends Vue {
 </script>
 <style lang="scss" scope>
 .PublicClue {
-  .el-radio-group{
-    margin-bottom: 0!important;
+  .el-radio-group {
+    margin-bottom: 0 !important;
   }
   .btnPc {
     width: 100%;
