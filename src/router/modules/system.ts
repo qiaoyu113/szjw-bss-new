@@ -106,6 +106,17 @@ const systemRouter: RouteConfig = {
       }
     },
     {
+      path: 'seatmanage', /* 坐席管理 */
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/SeatManage.vue'),
+      name: 'SeatManage',
+      meta: {
+        title: 'seatManage',
+        noCache: false,
+        icon: '',
+        apiUrl: 'root'
+      }
+    },
+    {
       path: 'createrole',
       component: () => import(/* webpackChunkName: "driver" */ '@/views/system/CreateRole.vue'),
       name: 'CreateRole',
