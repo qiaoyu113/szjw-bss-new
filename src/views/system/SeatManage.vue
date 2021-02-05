@@ -587,16 +587,3 @@ export default class extends Vue {
     border-bottom: none;
   }
 </style>
-
-      wx.checkSession({
-        success: function() {
-
-        },
-        fail: function() {
-          wx.showToast({
-            title: '请重新操作',
-          });
-          that.wxlogin(); //重新登录
-        }
-      })
-
