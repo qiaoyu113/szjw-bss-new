@@ -44,6 +44,16 @@
         v-bind="item.attrs"
       >
         <template
+          v-if="item.header && item.slot"
+          slot="header"
+        >
+          <slot
+            v-if="item.slot && item.header"
+            :name="item.key"
+            :header="true"
+          />
+        </template>
+        <template
           slot-scope="scope"
         >
           <template v-if="item.moreOp && item.moreOp.length > 0">

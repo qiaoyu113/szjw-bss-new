@@ -1,11 +1,5 @@
 <template>
-  <div
-    v-loading="listLoading"
-    class="PublicClue"
-    :class="{
-      p15: isPC
-    }"
-  >
+  <div>
     <self-form
       ref="suggestForm"
       :list-query="listQuery"
@@ -16,18 +10,7 @@
       :pc-col="6"
     >
       <div slot="tabGroup">
-        <el-radio-group
-          v-model="listQuery.clueType"
-          style="margin-bottom: 30px;"
-        >
-          <el-radio-button
-            v-for="item in clueArr"
-            :key="item.code"
-            :label="item.code"
-          >
-            {{ item.name }}
-          </el-radio-button>
-        </el-radio-group>
+        <slot name="header" />
       </div>
       <div
         slot="mulBtn"
@@ -122,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { HandlePages, lock } from '@/utils/index'
@@ -139,7 +122,7 @@ import {
   month,
   lastmonth,
   threemonth
-} from '../driver-freight/components/date'
+} from '@/views/driver-freight/components/date'
 interface PageObj {
   page: number;
   limit: number;
@@ -162,7 +145,7 @@ interface formItem {
   w?:string
 }
 @Component({
-  name: 'PublicClue',
+  name: 'PublicShared',
   components: {
     SelfTable,
     SelfForm
@@ -246,15 +229,6 @@ export default class extends Vue {
         clearable: true
       },
       options: this.hasCarList
-    },
-    {
-      type: 1,
-      label: '姓名',
-      key: 'name',
-      tagAttrs: {
-        placeholder: '请输入',
-        clearable: true
-      }
     },
     {
       type: 1,
@@ -438,7 +412,6 @@ export default class extends Vue {
       document.documentElement.offsetHeight - otherHeight
     )
   }
-
   // 查询
   private handleFilterClick() {
     (this.$refs.PublicClueTable as any).toggleRowSelection()

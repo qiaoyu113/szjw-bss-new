@@ -1,11 +1,5 @@
 <template>
-  <div
-    v-loading="listLoading"
-    class="PublicClue"
-    :class="{
-      p15: isPC
-    }"
-  >
+  <div class="PublicCar">
     <self-form
       ref="suggestForm"
       :list-query="listQuery"
@@ -13,21 +7,10 @@
       size="small"
       label-width="80px"
       class="p15 SuggestForm"
-      :pc-col="6"
+      :pc-col="8"
     >
       <div slot="tabGroup">
-        <el-radio-group
-          v-model="listQuery.clueType"
-          style="margin-bottom: 30px;"
-        >
-          <el-radio-button
-            v-for="item in clueArr"
-            :key="item.code"
-            :label="item.code"
-          >
-            {{ item.name }}
-          </el-radio-button>
-        </el-radio-group>
+        <slot name="header" />
       </div>
       <div
         slot="mulBtn"
@@ -70,26 +53,6 @@
     </self-form>
 
     <div class="table_box">
-      <div>
-        <el-badge
-          v-for="item in btns"
-          :key="item.text"
-          :value="item.num"
-          :max="9999"
-          :hidden="item.num === 0"
-        >
-          <el-button
-            type="primary"
-            :plain="item.name !== listQuery.status"
-            @click="() => {
-              listQuery.status = item.name
-              handleFilterClick()
-            }"
-          >
-            {{ item.text }}
-          </el-button>
-        </el-badge>
-      </div>
       <self-table
         ref="PublicClueTable"
         :height="tableHeight"
@@ -105,6 +68,16 @@
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
+        <template v-slot:num="scope">
+          <template v-if="scope.header">
+            <div style="line-height:1.2">
+              入池次数<br>(该线索类型){{ scope }}
+            </div>
+          </template>
+          <template v-else>
+            {{ scope.row.createDate }}
+          </template>
+        </template>
         <template v-slot:createDate="scope">
           {{ scope.row.createDate }}
         </template>
@@ -122,24 +95,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import { HandlePages, lock } from '@/utils/index'
+import { HandlePages, lock, showWork } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { delayTime } from '@/settings'
-import { exportFileTip } from '@/utils/exportTip'
-import {
-  marketClue,
-  allocationClue
-} from '@/api/driver-cloud'
-import {
-  today,
-  yesterday,
-  month,
-  lastmonth,
-  threemonth
-} from '../driver-freight/components/date'
+import { marketClue, allocationClue } from '@/api/driver-cloud'
+
 interface PageObj {
   page: number;
   limit: number;
@@ -162,22 +124,16 @@ interface formItem {
   w?:string
 }
 @Component({
-  name: 'PublicClue',
+  name: 'PublicCar',
   components: {
     SelfTable,
     SelfForm
   }
 })
 export default class extends Vue {
+  @Prop({ default: [] }) public shortcuts!:any[]
   times:number = 10;
   private listLoading: boolean = false;
-  private clueArr:IState[] = [
-    { name: '梧桐专车', code: 0 },
-    { name: '梧桐共享', code: 1 },
-    { name: '雷鸟供给C', code: 2 },
-    { name: '雷鸟租赁C', code: 3 },
-    { name: '雷鸟租赁B', code: 4 }
-  ]
   private listQuery: IState = {
     clueType: 0,
     phone: '',
@@ -197,38 +153,6 @@ export default class extends Vue {
     limit: 30,
     total: 0
   };
-  private btns:any[] = [
-    {
-      name: '',
-      text: '全部',
-      num: 0
-    },
-    {
-      name: '10',
-      text: '待跟进',
-      num: 0
-    },
-    {
-      name: '30',
-      text: '跟进中',
-      num: 0
-    },
-    {
-      name: '40',
-      text: '邀约成功',
-      num: 0
-    },
-    {
-      name: '50',
-      text: '已面试',
-      num: 0
-    },
-    {
-      name: '60',
-      text: '已成交',
-      num: 0
-    }
-  ]
   private formItem: formItem[] = [
     {
       type: 'tabGroup',
@@ -237,23 +161,21 @@ export default class extends Vue {
       w: '0px'
     },
     {
-      type: 2,
+      type: 8,
+      key: 'workCity',
+      col: 8,
+      // w: '80px',
       label: '所属城市',
-      key: 'haveCar',
       tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 1,
-      label: '姓名',
-      key: 'name',
-      tagAttrs: {
-        placeholder: '请输入',
-        clearable: true
+        placeholder: '请选择所属城市',
+        clearable: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'workCity',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
       }
     },
     {
@@ -283,95 +205,6 @@ export default class extends Vue {
       options: this.hasCarList
     },
     {
-      type: 2,
-      label: '车型',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '加盟小组',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '跟进人',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '渠道',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '邀约情况',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '意向度',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 2,
-      label: '邀约失败原因',
-      w: '120px',
-      key: 'haveCar',
-      tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
-        clearable: true
-      },
-      options: this.hasCarList
-    },
-    {
-      type: 5,
-      label: '只看自己',
-      key: 'onlyMe',
-      options: [
-        {
-          label: '',
-          value: 1
-        }
-      ]
-    },
-    {
       type: 3,
       col: 12,
       tagAttrs: {
@@ -379,7 +212,7 @@ export default class extends Vue {
         clearable: true,
         'default-time': ['00:00:00', '23:59:59'],
         pickerOptions: {
-          shortcuts: [today, yesterday, month, lastmonth, threemonth]
+          shortcuts: this.shortcuts
         }
       },
       label: '创建日期',
@@ -395,9 +228,12 @@ export default class extends Vue {
 
   private columns: any[] = [
     {
+      key: 'busiTypeName',
+      label: '线路类型'
+    },
+    {
       key: 'phone',
-      label: '手机号',
-      width: '120px'
+      label: '手机号'
     },
     {
       key: 'haveCar',
@@ -408,15 +244,15 @@ export default class extends Vue {
       label: '城市'
     },
     {
-      key: 'busiTypeName',
-      label: '业务线',
-      width: '100px'
-    },
-    {
       key: 'createDate',
       label: '创建时间',
       slot: true,
       width: '150px'
+    },
+    {
+      key: 'num',
+      slot: true,
+      header: true
     },
     {
       key: 'op',
@@ -438,7 +274,6 @@ export default class extends Vue {
       document.documentElement.offsetHeight - otherHeight
     )
   }
-
   // 查询
   private handleFilterClick() {
     (this.$refs.PublicClueTable as any).toggleRowSelection()
@@ -493,11 +328,6 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
-        this.btns.forEach(item => {
-          let key = item.name
-          key = +key
-          item.num = res.title[key]
-        })
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -510,12 +340,13 @@ export default class extends Vue {
   }
 
   mounted() {
+    console.log(this.shortcuts)
     this.getLists()
   }
 }
 </script>
 <style lang="scss" scope>
-.PublicClue {
+.PublicCar {
   .el-radio-group{
     margin-bottom: 0!important;
   }
@@ -543,7 +374,7 @@ export default class extends Vue {
     box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
   }
   .table_box {
-    padding: 10px 30px;
+    padding: 30px;
     background: #ffffff;
     -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
     box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
