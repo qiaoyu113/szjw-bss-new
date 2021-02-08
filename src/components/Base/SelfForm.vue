@@ -184,6 +184,7 @@
           />
         </el-form-item>
       </el-col>
+      <slot name="other" />
       <div class="clearfix" />
     </el-form>
     <slot name="btn" />

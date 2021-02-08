@@ -189,6 +189,13 @@
         </template>
         <template v-slot:op="scope">
           <el-button
+            type="text"
+            size="small"
+            @click="handleCallClick(scope.row)"
+          >
+            呼叫
+          </el-button>
+          <el-button
             v-permission="['/v2/clueH5/detail']"
             type="text"
             size="small"
@@ -228,6 +235,7 @@
         @onPass="handlePassClick"
       />
     </SelfDialog>
+    <outbound-dialog ref="showOutbound" />
   </div>
 </template>
 <script lang="ts">
@@ -240,6 +248,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDriverClueList, ExportDriverClue, allocationClue1 } from '@/api/driver-cloud'
 import { delayTime } from '@/settings'
 import { HandlePages, lock, parseTime, showCityGroupPerson, showWork, DataIsNull } from '@/utils/index'
+import OutboundDialog from '@/components/OutboundDialog/index.vue'
 import {
   today,
   yesterday,
@@ -262,7 +271,8 @@ interface IState {
   components: {
     SelfForm,
     SelfTable,
-    SelfDialog
+    SelfDialog,
+    OutboundDialog
   }
 })
 export default class extends Vue {
@@ -447,6 +457,32 @@ export default class extends Vue {
       },
       label: '创建日期',
       key: 'createTime'
+    },
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        multiple: true,
+        'collapse-tags': true
+      },
+      label: '是否邀约成功',
+      key: 'isInvite',
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '是',
+          value: true
+        },
+        {
+          label: '否',
+          value: false
+        }
+      ]
     },
     {
       type: 'status',
@@ -922,6 +958,10 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     }
+  }
+  // 外呼
+  handleCallClick(row:IState) {
+    (this.$refs.showOutbound as any).showDialog = true
   }
   init() {
     this.getLists()
