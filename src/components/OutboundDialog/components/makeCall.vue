@@ -63,6 +63,7 @@ export default class extends Vue {
   private callTime:string = '' // 通话时长的展示文案
   private anwserTime:number = 0 // 接通的时间戳
   private timer:null | any = null // 定时器
+  private idx:number = 0 // 当前拨打的是第几个人
 
   // 呼叫
   handleCallClick() {
@@ -73,24 +74,40 @@ export default class extends Vue {
   }
   // 挂断
   handleHangUp() {
-    // 挂机
-    (window.frames as any).szjwCall.document.getElementById('HangupEnable').click()
+    if (this.status !== 1) {
+      // 挂机
+      (window.frames as any).szjwCall.document.getElementById('HangupEnable').click()
+    }
   }
-  // 开始拨打电话
+  // 拨打下一位
+  handleCallNextClick() {
+    let str:string | null = window.sessionStorage.getItem('phoneLists')
+    if (str) {
+      let lists:[] = JSON.parse(str)
+      this.idx = this.idx + 1
+      if (this.idx < lists.length) {
+        this.phone = lists[this.idx]
+        this.handleCallClick()
+      } else {
+        this.$message.error('请点击查询下一页的数据')
+      }
+    }
+  }
+  // 开始拨打电话触发的事件
   handleStartStatus() {
     this.status = 2
   }
-  // 接听电话
+  // 接听电话触发的事件
   handlePlayStatus() {
     this.status = 3
     this.anwserTime = Date.now()
     this.startRecordTime()
   }
-  // 挂断电话
+  // 挂断电话触发的事件
   handleHangUpStatus() {
     this.status = 1
   }
-  // 开始计时
+  // 电话拨通后开始计时
   startRecordTime() {
     this.timer = setInterval(() => {
       let now:number = Date.now()
@@ -107,9 +124,6 @@ export default class extends Vue {
       return `0${num}`
     }
     return num
-  }
-  mounted() {
-
   }
 }
 </script>

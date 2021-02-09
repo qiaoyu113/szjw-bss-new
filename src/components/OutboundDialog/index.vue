@@ -15,27 +15,28 @@
       :destroy-on-close="false"
       @closed="handleDialogClosed"
     >
-      <make-call />
-      <h4>基础信息:</h4>
-      <baseInfo1 />
-      <h4>备注信息:</h4>
-      <remark1 />
+      <make-call ref="callPhone" />
+      <!-- 司机线索、司机梧桐账户 -->
+      <!-- <driver-clue /> -->
+      <!-- 雷鸟线索、雷鸟租车、雷鸟售车列表 -->
+      <thunder-birds />
     </SelfDialog>
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import BaseInfo1 from './components/BaseInfo1.vue'
-import Remark1 from './components/Remark1.vue'
+import DriverClue from './components/DriverClue.vue'
 import MakeCall from './components/makeCall.vue'
+import ThunderBirds from './components/Thunderbirds.vue'
+import { lock } from '@/utils'
 @Component({
   name: 'OutboundDialog',
   components: {
     MakeCall,
     SelfDialog,
-    BaseInfo1,
-    Remark1
+    DriverClue,
+    ThunderBirds
   }
 })
 
@@ -45,9 +46,12 @@ export default class extends Vue {
   @Watch('showDialog')
   handleDialogChange(val:boolean) {
     if (val) {
-      this.handleAddDom()
+      let makePhoneDom = document.getElementById('makePhone')
+      if (!makePhoneDom) {
+        this.handleAddDom()
+      }
     } else {
-      this.handleDeleteDom()
+      // this.handleDeleteDom()
     }
   }
   // 弹框关闭
@@ -56,15 +60,25 @@ export default class extends Vue {
   }
   // 保存
   handleSaveClick(done:Function) {
-    done()
+    this.handleSaveInfoClick(done)
   }
   // 挂断并保存
   handleHangUpAndSaveClick(done:Function) {
-    done()
+    // 挂断电话
+    (this.$refs.callPhone as any).handleHangUp()
+    setTimeout(() => {
+      this.handleSaveInfoClick(done)
+    }, 100)
   }
   // 保存并拨打下一位
   handlePlayAndNextClick(done:Function) {
-    done()
+    // 挂断电话
+    (this.$refs.callPhone as any).handleHangUp()
+    setTimeout(async() => {
+      await this.handleSaveInfoClick();
+      // 呼叫下一位
+      (this.$refs.handleCallNextClick as any).handleCallClick()
+    }, 100)
   }
   // 删除dom
   handleDeleteDom() {
@@ -81,6 +95,26 @@ export default class extends Vue {
     iframe.name = 'szjwCall'
     iframe.src = url;
     (makePhone as HTMLHtmlElement).appendChild(iframe)
+  }
+  // 保存信息
+  @lock
+  async handleSaveInfoClick(done?:Function) {
+    try {
+      // api
+      let { data: res } = await { data: { errorMsg: '', success: true } }
+      if (res.success) {
+        if (typeof done === 'function') {
+          done()
+        }
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`save fail:${err}`)
+    } finally {
+      // nothing
+    }
+    //
   }
 }
 </script>

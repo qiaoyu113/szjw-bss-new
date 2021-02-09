@@ -72,7 +72,7 @@
             <el-input
               v-model.trim="listQuery.remark"
               placeholder="请填写本次通话意向如何..."
-              maxlength="50"
+              maxlength="200"
               show-word-limit
               type="textarea"
               :rows="3"
