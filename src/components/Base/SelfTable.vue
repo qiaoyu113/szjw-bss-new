@@ -41,6 +41,7 @@
         :min-width="item.width || 100"
         :label="item.label"
         :fixed="item.fixed"
+        :prop="item.key"
         v-bind="item.attrs"
       >
         <template

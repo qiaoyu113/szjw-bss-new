@@ -1,7 +1,7 @@
 <template>
   <div
     v-loading="listLoading"
-    class="PublicClue"
+    class="PrivateClue"
     :class="{
       p15: isPC
     }"
@@ -9,11 +9,11 @@
     <self-form
       ref="suggestForm"
       :list-query="listQuery"
-      :form-item="formItem"
+      :form-item="formItems"
       size="small"
-      label-width="80px"
+      label-width="7em"
       class="p15 SuggestForm"
-      :pc-col="6"
+      :pc-col="8"
     >
       <div slot="tabGroup">
         <el-radio-group
@@ -56,55 +56,34 @@
         >
           批量分配
         </el-button>
-        <el-button
-          size="small"
-          :class="isPC ? '' : 'btnMobile'"
-          :disabled="times === 10 ? false :true"
-          @click="_exportFile"
-        >
-          导出<template v-if="times !== 10">
-            {{ times }} s
-          </template>
-        </el-button>
       </div>
     </self-form>
-
     <div class="table_box">
-      <div>
-        <el-badge
-          v-for="item in btns"
-          :key="item.text"
-          :value="item.num"
-          :max="9999"
-          :hidden="item.num === 0"
-        >
-          <el-button
-            type="primary"
-            :plain="item.name !== listQuery.status"
-            @click="() => {
-              listQuery.status = item.name
-              handleFilterClick()
-            }"
-          >
-            {{ item.text }}
-          </el-button>
-        </el-badge>
-      </div>
       <self-table
-        ref="PublicClueTable"
-        :height="tableHeight"
+        ref="PrivateClueTable"
         :is-p30="false"
         :operation-list="[]"
         :table-data="tableData"
-        :columns="columns"
+        :columns="tableColumns"
         :index="true"
         :page="page"
         row-key="marketClueId"
         style="overflow: initial;"
         :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
+        :default-sort="{prop: 'createDate', order: 'descending'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
+        <template v-slot:num="scope">
+          <template v-if="scope.header">
+            <div style="line-height:1.2">
+              入池次数<br>(该线索类型)
+            </div>
+          </template>
+          <template v-else>
+            {{ scope.row.createDate }}
+          </template>
+        </template>
         <template v-slot:createDate="scope">
           {{ scope.row.createDate }}
         </template>
@@ -122,35 +101,24 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
+import { HandlePages, lock, showWork } from '@/utils/index'
+import { marketClue } from '@/api/driver-cloud'
+import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import { HandlePages, lock } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { delayTime } from '@/settings'
-import { exportFileTip } from '@/utils/exportTip'
-import {
-  marketClue,
-  allocationClue
-} from '@/api/driver-cloud'
-import {
-  today,
-  yesterday,
-  month,
-  lastmonth,
-  threemonth
-} from '../driver-freight/components/date'
+
+interface IState {
+  [key: string]: any;
+}
 interface PageObj {
   page: number;
   limit: number;
   total?: number;
 }
-
-interface IState {
-  [key: string]: any;
-}
-
 interface formItem {
+  [key: string]: any;
   type?: number | string;
   label?: string;
   key?: string;
@@ -162,7 +130,7 @@ interface formItem {
   w?:string
 }
 @Component({
-  name: 'PublicClue',
+  name: 'PrivateClue',
   components: {
     SelfTable,
     SelfForm
@@ -171,13 +139,6 @@ interface formItem {
 export default class extends Vue {
   times:number = 10;
   private listLoading: boolean = false;
-  private clueArr:IState[] = [
-    { name: '梧桐专车', code: 0 },
-    { name: '梧桐共享', code: 1 },
-    { name: '雷鸟供给C', code: 2 },
-    { name: '雷鸟租赁C', code: 3 },
-    { name: '雷鸟租赁B', code: 4 }
-  ]
   private listQuery: IState = {
     clueType: 0,
     phone: '',
@@ -192,67 +153,131 @@ export default class extends Vue {
     { label: '有', value: 1 },
     { label: '无', value: 0 }
   ];
+  private clueArr:IState[] = [
+    { name: '梧桐专车', code: 0 },
+    { name: '梧桐共享', code: 1 },
+    { name: '雷鸟车池', code: 2 },
+    { name: '雷鸟租赁C', code: 3 },
+    { name: '雷鸟租赁B', code: 4 }
+  ]
   private page: PageObj = {
     page: 1,
     limit: 30,
     total: 0
   };
-  private btns:any[] = [
-    {
-      name: '',
-      text: '全部',
-      num: 0
-    },
-    {
-      name: '10',
-      text: '待跟进',
-      num: 0
-    },
-    {
-      name: '30',
-      text: '跟进中',
-      num: 0
-    },
-    {
-      name: '40',
-      text: '邀约成功',
-      num: 0
-    },
-    {
-      name: '50',
-      text: '已面试',
-      num: 0
-    },
-    {
-      name: '60',
-      text: '已成交',
-      num: 0
-    }
+  private shortcuts = [
+    today,
+    yesterday,
+    sevenday,
+    thirtyday
   ]
+  /**
+   * rules: []
+   * root 为全局显示
+   * */
   private formItem: formItem[] = [
     {
       type: 'tabGroup',
       col: 24,
       slot: true,
-      w: '0px'
+      w: '0px',
+      rules: ['root']
+    },
+    {
+      type: 8,
+      key: 'workCity',
+      label: '所属城市',
+      rules: [0, 1],
+      tagAttrs: {
+        placeholder: '请选择所属城市',
+        clearable: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'workCity',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
+      }
+    },
+    {
+      type: 8,
+      key: 'workCity',
+      label: '车辆所在城市',
+      rules: [2],
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'workCity',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
+      }
+    },
+    {
+      type: 8,
+      key: 'workCity',
+      label: '所在城市',
+      rules: [3, 4],
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'workCity',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
+      }
     },
     {
       type: 2,
-      label: '所属城市',
+      label: '意向车型',
       key: 'haveCar',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
+      rules: [3, 4],
+      options: this.hasCarList
+    },
+    {
+      type: 2,
+      label: '需求类型',
+      key: 'haveCar',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      rules: [2],
+      options: this.hasCarList
+    },
+    {
+      type: 2,
+      label: '车型',
+      key: 'haveCar',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      rules: [2],
       options: this.hasCarList
     },
     {
       type: 1,
       label: '姓名',
-      key: 'name',
+      key: 'phone',
+      rules: ['root'],
       tagAttrs: {
         placeholder: '请输入',
+        'show-word-limit': true,
         clearable: true
       }
     },
@@ -260,6 +285,7 @@ export default class extends Vue {
       type: 1,
       label: '手机号',
       key: 'phone',
+      rules: ['root'],
       tagAttrs: {
         type: 'tel',
         placeholder: '请输入',
@@ -280,17 +306,19 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: [0, 1],
       options: this.hasCarList
     },
     {
       type: 2,
-      label: '车型',
+      label: '小组',
       key: 'haveCar',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
+      rules: [2, 3, 4],
       options: this.hasCarList
     },
     {
@@ -302,6 +330,7 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: [0, 1],
       options: this.hasCarList
     },
     {
@@ -313,6 +342,7 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: ['root'],
       options: this.hasCarList
     },
     {
@@ -324,6 +354,19 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: ['root'],
+      options: this.hasCarList
+    },
+    {
+      type: 2,
+      label: '线索归属',
+      key: 'haveCar',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      rules: ['root'],
       options: this.hasCarList
     },
     {
@@ -335,6 +378,7 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: [0, 1],
       options: this.hasCarList
     },
     {
@@ -346,18 +390,43 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      rules: [0, 1],
       options: this.hasCarList
     },
     {
       type: 2,
       label: '邀约失败原因',
-      w: '120px',
       key: 'haveCar',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
+      rules: [0, 1],
+      options: this.hasCarList
+    },
+    {
+      type: 2,
+      label: '跟进情况',
+      key: 'haveCar',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      rules: [2, 3, 4],
+      options: this.hasCarList
+    },
+    {
+      type: 2,
+      label: '未跟进天数',
+      key: 'haveCar',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      rules: ['root'],
       options: this.hasCarList
     },
     {
@@ -369,79 +438,144 @@ export default class extends Vue {
           label: '',
           value: 1
         }
-      ]
+      ],
+      rules: ['root']
     },
     {
       type: 3,
-      col: 12,
+      rules: ['root'],
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
         'default-time': ['00:00:00', '23:59:59'],
         pickerOptions: {
-          shortcuts: [today, yesterday, month, lastmonth, threemonth]
+          shortcuts: this.shortcuts
         }
       },
       label: '创建日期',
       key: 'time'
     },
     {
+      col: 20,
+      label: '状态',
+      key: 'checkStatus',
+      type: 'checkStatus',
+      rules: [2, 3, 4],
+      slot: true
+    },
+    {
       type: 'mulBtn',
-      col: 12,
+      col: 24,
       slot: true,
-      w: '0px'
+      w: '0px',
+      rules: ['root']
     }
   ];
-
   private columns: any[] = [
     {
-      key: 'phone',
-      label: '手机号',
-      width: '120px'
-    },
-    {
-      key: 'haveCar',
-      label: '是否有车'
-    },
-    {
-      key: 'cityName',
-      label: '城市'
+      key: 'marketClueId',
+      label: '线路ID',
+      rules: ['root']
     },
     {
       key: 'busiTypeName',
-      label: '业务线',
-      width: '100px'
+      label: '线路类型',
+      rules: ['root']
+    },
+    {
+      key: 'name',
+      label: '姓名',
+      rules: [2, 3, 4]
+    },
+    {
+      key: 'phone',
+      label: '手机号',
+      rules: ['root']
+    },
+    {
+      key: 'haveCar',
+      label: '是否有车',
+      rules: [0, 1]
+    },
+    {
+      key: 'cityName',
+      label: '城市',
+      rules: [0, 1]
+    },
+    {
+      key: 'cityName',
+      label: '车辆所在城市',
+      rules: [2]
+    },
+    {
+      key: 'cityName',
+      label: '所在城市',
+      rules: [3, 4]
+    },
+    {
+      key: 'carTypeName',
+      label: '意向车型',
+      rules: [3, 4]
+    },
+    {
+      key: 'carTypeName1',
+      label: '备注',
+      rules: [3, 4]
+    },
+    {
+      key: 'cityName1',
+      label: '渠道',
+      rules: ['root']
+    },
+    {
+      key: 'cityName2',
+      label: '创建人',
+      rules: ['root']
     },
     {
       key: 'createDate',
       label: '创建时间',
       slot: true,
-      width: '150px'
+      attrs: {
+        sortable: true
+      },
+      width: '150px',
+      rules: ['root']
+    },
+    {
+      key: 'num',
+      slot: true,
+      header: true,
+      rules: ['root']
     },
     {
       key: 'op',
       label: '操作',
       fixed: 'right',
       slot: true,
-      'min-width': this.isPC ? '200px' : '50px'
+      'min-width': this.isPC ? '200px' : '50px',
+      rules: ['root']
     }
   ];
-
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
   }
-  get tableHeight() {
-    let otherHeight = 400
-    return (
-      document.body.offsetHeight - otherHeight ||
-      document.documentElement.offsetHeight - otherHeight
-    )
+  // formitem 筛选
+  get formItems() {
+    return this.formItem.filter((item: any) => {
+      return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
+    })
   }
-
+  // formitem 筛选
+  get tableColumns() {
+    return this.columns.filter((item: any) => {
+      return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
+    })
+  }
   // 查询
   private handleFilterClick() {
-    (this.$refs.PublicClueTable as any).toggleRowSelection()
+    // (this.$refs.PrivateClueTable as any).toggleRowSelection()
     this.page.page = 1
     this.getLists()
   }
@@ -450,7 +584,6 @@ export default class extends Vue {
     // (this.$refs['suggestForm'] as any).resetForm()
     // this.getLists()
   }
-
   // 批量分配
   private handleallAllotClick() {
     // this.dialogTit = '批量分配'
@@ -493,11 +626,6 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
-        this.btns.forEach(item => {
-          let key = item.name
-          key = +key
-          item.num = res.title[key]
-        })
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -514,8 +642,8 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scope>
-.PublicClue {
+<style lang="scss" scoped>
+.PrivateClue {
   .el-radio-group{
     margin-bottom: 0!important;
   }
@@ -540,10 +668,11 @@ export default class extends Vue {
     margin-bottom: 10px;
     margin-left: 0px !important;
     margin-right: 0px !important;
+    padding-bottom: 0;
     box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
   }
   .table_box {
-    padding: 10px 30px;
+    padding: 30px 30px 0px;
     background: #ffffff;
     -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
     box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
