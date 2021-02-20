@@ -41,8 +41,19 @@
         :min-width="item.width || 100"
         :label="item.label"
         :fixed="item.fixed"
+        :prop="item.key"
         v-bind="item.attrs"
       >
+        <template
+          v-if="item.header && item.slot"
+          slot="header"
+        >
+          <slot
+            v-if="item.slot && item.header"
+            :name="item.key"
+            :header="true"
+          />
+        </template>
         <template
           slot-scope="scope"
         >
