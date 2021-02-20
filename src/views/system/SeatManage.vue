@@ -11,13 +11,22 @@
       :form-item="formItem"
       size="small"
       :pc-col="8"
-      label-width="45px"
+      label-width="55px"
       class="p15 SuggestForm"
     >
       <div
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
+        <el-button
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+          type="success"
+          name="driverclue_filter_btn"
+          @click="bindingClick"
+        >
+          绑定
+        </el-button>
         <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
@@ -41,26 +50,12 @@
     <table-header
       :tab="[
         {
-          name: '用户管理',
-          label: '用户管理'
+          name: '坐席管理',
+          label: '坐席管理'
         }
       ]"
-      active-name="用户管理"
-    >
-      <div class="subTitle">
-        <router-link :to="{path: '/system/addUser'}">
-          <el-button
-            v-permission="['/v2/base/user/create']"
-            class="createUser"
-            icon="el-icon-plus"
-            type="primary"
-            size="small"
-          >
-            新建用户
-          </el-button>
-        </router-link>
-      </div>
-    </table-header>
+      active-name="坐席管理"
+    />
     <self-table
       v-loading="listLoading"
       :operation-list="[]"
@@ -71,69 +66,181 @@
       :page="page"
       @onPageSize="handlePageSize"
     >
-      <template v-slot:status="scope">
-        <span v-if="scope.row.status ===1">启用</span>
-        <span v-else>禁用</span>
-      </template>
       <template v-slot:op="scope">
-        <el-dropdown
-          :trigger="isPC ? 'hover' : 'click'"
-          name="driverclue_moreMenu_dropdown"
-          @command="(e) => handleCommandChange(e,scope.row)"
+        <el-button
+          type="text"
+          size="small"
+          @click="changeSeatNumber(scope.row)"
         >
-          <span
-            v-if="isPC"
-            class="el-dropdown-link"
-          >
-            更多操作<i
-              v-if="isPC"
-              class="el-icon-arrow-down el-icon--right"
-            />
-          </span>
-          <span
-            v-else
-            style="font-size: 18px;"
-            class="el-dropdown-link"
-          >
-            <i class="el-icon-setting el-icon--right" />
-          </span>
-
-          <el-dropdown-menu
-            slot="dropdown"
-          >
-            <el-dropdown-item
-              v-permission="['/v2/base/user/enableOrDisable']"
-              command="status"
-            >
-              <template v-if="scope.row.status ===1">
-                禁用
-              </template>
-              <template v-else>
-                启用
-              </template>
-            </el-dropdown-item>
-            <el-dropdown-item
-              v-permission="['/v1/base/user/password/reset']"
-              command="resetPwd"
-            >
-              重置密码
-            </el-dropdown-item>
-            <el-dropdown-item
-              v-permission="['/v2/base/user/update']"
-              command="edit"
-            >
-              编辑
-            </el-dropdown-item>
-            <el-dropdown-item
-              v-if="scope.row.syncPermission"
-              command="crm"
-            >
-              同步CRM账号
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+          更换绑定
+        </el-button>
       </template>
     </self-table>
+    <!--座席号改绑-->
+    <el-dialog
+      title="坐席号改绑"
+      :visible.sync="dialogFormVisible"
+    >
+      <el-form :model="changeSeatForm">
+        <DetailItem
+          name="绑定人"
+          :value="changeSeatForm.nickName"
+        />
+        <DetailItem
+          name="绑定人坐席号"
+          :value="changeSeatForm.nickName"
+        />
+        <DetailItem
+          name="更改绑定"
+          value=""
+          style="border-top: 1px solid #dfdfdf;padding-top:10px;"
+        />
+        <el-form-item
+          label="更改后的绑定人"
+          label-width="120px"
+          style="font-size:13px !important"
+        >
+          <el-select
+            v-model="changeSeatForm.nickName"
+            filterable
+            name="freightlist_gmId_input"
+            placeholder="请选择"
+            size="small"
+            clearable
+          >
+            <el-option
+              v-for="item in optionsBind"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <div v-if="changeSeatForm.nickName">
+          <DetailItem
+            name="确定更改绑定人信息:"
+            value=""
+            style="border-top: 1px solid #dfdfdf;padding-top:10px;"
+          />
+          <DetailItem
+            name="角色"
+            :value="changeSeatForm.nickName + '12'"
+          />
+          <DetailItem
+            name="组织架构"
+            :value="changeSeatForm.nickName + '12'"
+          />
+        </div>
+      </el-form>
+      <div
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="dialogFormVisible = false">
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="dialogFormVisible = false"
+        >
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
+    <!--座席号新建-->
+    <el-dialog
+      title="坐席号绑定"
+      :visible.sync="bindFormVisible"
+    >
+      <el-form :model="newSeatForm">
+        <el-form-item
+          label="绑定人"
+          label-width="120px"
+        >
+          <el-input
+            v-model="newSeatForm.nickName"
+            maxlength="10"
+            placeholder="请输入绑定人姓名"
+            clearable
+            size="small"
+          />
+        </el-form-item>
+        <el-form-item
+          label="绑定人手机号"
+          prop="phone"
+          label-width="120px"
+        >
+          <el-input
+            v-model="newSeatForm.phone"
+            placeholder="请输入绑定人手机号"
+            maxlength="11"
+            clearable
+          />
+        </el-form-item>
+        <el-form-item
+          label="勾选坐席号"
+          label-width="120px"
+          style="font-size:13px !important"
+        >
+          <el-select
+            v-model="newSeatForm.seatNumber"
+            filterable
+            name="freightlist_gmId_input"
+            placeholder="请选择"
+            size="small"
+            clearable
+          >
+            <el-option
+              v-for="item in optionsBindNumber"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <div v-if="newSeatForm.nickName && newSeatForm.seatNumber && newSeatForm.phone">
+          <DetailItem
+            name="确定更改绑定人信息:"
+            value=""
+            style="border-top: 1px solid #dfdfdf;padding-top:10px;"
+          />
+          <DetailItem
+            name="姓名"
+            :value="newSeatForm.nickName + '12'"
+          />
+          <DetailItem
+            name="绑定人手机号"
+            :value="newSeatForm.phone + '12'"
+          />
+          <DetailItem
+            name="绑定人坐席号"
+            :value="newSeatForm.nickName + '12'"
+          />
+          <DetailItem
+            name="角色"
+            :value="newSeatForm.nickName + '12'"
+          />
+          <DetailItem
+            name="组织架构"
+            :value="newSeatForm.nickName + '12'"
+          />
+        </div>
+      </el-form>
+      <div
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="bindFormVisible = false">
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="bindFormVisible = false"
+        >
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -144,6 +251,7 @@ import { getUserManagerList, enableOrDisableUser, resetPassword, pushUserToCRM }
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { getLabel, phoneReg } from '@/utils/index.ts'
 import { HandlePages } from '@/utils/index'
+import DetailItem from '@/components/DetailItem/index.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
 interface PageObj {
   page:Number,
@@ -189,7 +297,8 @@ interface IState {
   components: {
     SelfTable,
     SelfForm,
-    TableHeader
+    TableHeader,
+    DetailItem
   }
 })
 export default class extends Vue {
@@ -214,11 +323,18 @@ export default class extends Vue {
       num: 0
     }
   ]
+  private dialogFormVisible:any = false
+  private bindFormVisible:any = false
   private tags:any[] = []// 顶部查询按钮回显的数组
   private listLoading:boolean = false
   private tableData:tableObj[] = []
   // 渲染表格的列表
   private columns:ColumnsObj[] = [
+    {
+      key: 'seatNumber',
+      label: '坐席号',
+      'min-width': '140px'
+    },
     {
       key: 'nickName',
       label: '姓名',
@@ -236,14 +352,8 @@ export default class extends Vue {
     },
     {
       key: 'mobile',
-      label: '电话',
+      label: '手机号',
       'min-width': '140px'
-    },
-    {
-      key: 'status',
-      label: '状态',
-      'min-width': '140px',
-      slot: true
     },
     {
       key: 'op',
@@ -253,6 +363,15 @@ export default class extends Vue {
       'min-width': this.isPC ? '200px' : '50px'
     }
   ]
+  private changeSeatForm: any = {
+    nickName: '', // 绑定人
+    seatNumber: '', // 绑定人坐席号
+    changeName: '', // 更改后的绑定人
+    roleName: '', // 角色
+    officeName: '' // 组织架构
+  }
+  // 新建绑定
+  private newSeatForm: any = {}
   // 分页
   private page :PageObj= {
     page: 1,
@@ -284,34 +403,22 @@ export default class extends Vue {
         maxlength: 11,
         clearable: true
       },
-      label: '电话',
-      key: 'mobile'
+      label: '坐席号',
+      key: 'seatNumber'
     },
     {
-      type: 2,
+      type: 1,
       tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
+        placeholder: '请输入',
+        maxlength: 11,
+        clearable: true
       },
-      label: '状态',
-      key: 'status',
-      options: [
-        {
-          label: '全部',
-          value: ''
-        },
-        {
-          label: '启用',
-          value: 1
-        },
-        {
-          label: '禁用',
-          value: 2
-        }
-      ]
+      label: '手机号',
+      key: 'mobile'
     }
   ]
+  private optionsBind: any = []
+  private optionsBindNumber: any = []
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -536,6 +643,14 @@ export default class extends Vue {
     } catch (err) {
       console.log(`reset password fail:${err}`)
     }
+  }
+  // 坐席号改绑
+  async changeSeatNumber(row: any) {
+    this.dialogFormVisible = true
+  }
+  // 新建绑定
+  bindingClick() {
+    this.bindFormVisible = true
   }
 }
 </script>
