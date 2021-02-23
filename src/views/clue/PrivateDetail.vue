@@ -28,9 +28,9 @@
             slot="rightBox"
             :class="isPC ? 'rightBox' : 'rightBox_min'"
           >
-            <span>拨打电话</span>
-            <span>添加线下跟进</span>
-            <span>返回公海池</span>
+            <span>打电话</span>
+            <span @click="followUpDio = true">添加线下跟进</span>
+            <span @click="messageDio = true">发送短信</span>
             <span>标记爽约</span>
           </div>
           <div style="borderTop:1px solid #dfe6ec">
@@ -51,12 +51,20 @@
                 {{ scope.row.createDate }}
               </template>
               <template v-slot:op="scope">
-                <el-button
-                  type="text"
-                  @click="handleUpdataClick(scope.row)"
-                >
-                  更改
-                </el-button>
+                <div class="FollowUpOpBox">
+                  <el-button
+                    type="text"
+                    @click="handleInterviewClick(scope.row,1)"
+                  >
+                    取消面试
+                  </el-button>
+                  <el-button
+                    type="text"
+                    @click="handleInterviewClick(scope.row,0)"
+                  >
+                    标记爽约
+                  </el-button>
+                </div>
               </template>
             </self-table>
             <span :class="isPC ? 'seeMore' : 'seeMore-m'">查看更多</span>
@@ -70,7 +78,9 @@
             slot="rightBox"
             class="rightBox"
           >
-            <span>编辑</span>
+            <span
+              @click="editDio = true"
+            >编辑</span>
           </div>
           <div>
             <el-row>
@@ -235,6 +245,16 @@
         </SectionContainer>
       </el-card>
     </div>
+    <FollowUpDiolog
+      :show-dialog.sync="followUpDio"
+      :clue-status="clueStatus"
+    />
+    <send-message :show-dialog.sync="messageDio" />
+
+    <InfoEditDio
+      :show-dialog.sync="editDio"
+      :clue-status="clueStatus"
+    />
   </div>
 </template>
 
@@ -244,6 +264,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
+import { FollowUpDiolog, SendMessage, InfoEditDio } from './components/index'
 interface PageObj {
   page: number;
   limit: number;
@@ -259,15 +280,21 @@ interface IState {
   components: {
     DetailItem,
     SectionContainer,
-    SelfTable
+    SelfTable,
+    FollowUpDiolog,
+    SendMessage,
+    InfoEditDio
   }
 })
 export default class extends Vue {
   private clueStatus: string = '0';
+  private followUpDio:boolean = false
+  private messageDio:boolean = false
+  private editDio:boolean = false
   private clueArr: IState[] = [
     { name: '梧桐专车', code: '0' },
     { name: '梧桐共享', code: '1' },
-    { name: '雷鸟供给C', code: '2' },
+    { name: '雷鸟车池', code: '2' },
     { name: '雷鸟租赁C', code: '3' },
     { name: '雷鸟租赁B', code: '4' }
   ];
@@ -312,7 +339,8 @@ export default class extends Vue {
       label: '操作',
       fixed: 'right',
       slot: true,
-      'min-width': this.isPC ? '200px' : '50px'
+      'min-width': this.isPC ? '200px' : '50px',
+      width: '200px'
     }
   ];
 
@@ -393,8 +421,28 @@ export default class extends Vue {
     console.log(tab, event)
   }
 
-  private handleUpdataClick(row: any) {
+  private handleInterviewClick(row: object, type:number) {
     console.log(row)
+    // if (type) {
+
+    // } else {
+
+    // }
+    //     this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+    //   confirmButtonText: '确定',
+    //   cancelButtonText: '取消',
+    //   type: 'warning'
+    // }).then(() => {
+    //   this.$message({
+    //     type: 'success',
+    //     message: '删除成功!'
+    //   })
+    // }).catch(() => {
+    //   this.$message({
+    //     type: 'info',
+    //     message: '已取消删除'
+    //   })
+    // })
   }
 
   // 分页
