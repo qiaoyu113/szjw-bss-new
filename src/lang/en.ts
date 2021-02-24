@@ -6,6 +6,7 @@ export default {
     clueTitle: 'Clue',
     publicClue: 'PublicClue',
     privateClue: 'PrivateClue',
+    Configuration: 'Configuration',
     driverAccount: 'DriverAccount',
     refundDetail: 'RefundDetail',
     refundApply: 'RefundApply',

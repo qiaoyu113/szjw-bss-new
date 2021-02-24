@@ -43,6 +43,16 @@ const clueRouter: RouteConfig = {
         hidden: true,
         noCache: false
       }
+    },
+    {
+      path: 'config', /* 私海池 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Configuration.vue'),
+      name: 'Configuration',
+      meta: {
+        apiUrl: 'root',
+        title: 'Configuration',
+        noCache: false
+      }
     }
   ]
 }
