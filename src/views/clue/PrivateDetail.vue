@@ -30,8 +30,10 @@
           >
             <span>打电话</span>
             <span @click="followUpDio = true">添加线下跟进</span>
-            <span @click="messageDio = true">发送短信</span>
-            <span>标记爽约</span>
+            <span
+              v-if="Number(clueStatus) < 2"
+              @click="messageDio = true"
+            >发送短信</span>
           </div>
           <div style="borderTop:1px solid #dfe6ec">
             <self-table
@@ -41,11 +43,12 @@
               :stripe="false"
               :border="false"
               :operation-list="[]"
-              :table-data="clueArr"
-              :columns="columnsFollowUp"
+              :table-data="followUpLog.listData"
+              :columns="followUpLog.columns"
               row-key="id"
               :index="false"
               style="overflow: initial;"
+              max-height="520px"
             >
               <template v-slot:createDate="scope">
                 {{ scope.row.createDate }}
@@ -67,7 +70,11 @@
                 </div>
               </template>
             </self-table>
-            <span :class="isPC ? 'seeMore' : 'seeMore-m'">查看更多</span>
+            <span
+              v-if="followUpLog.isMore"
+              :class="isPC ? 'seeMore' : 'seeMore-m'"
+              @click="showMore()"
+            >查看更多</span>
           </div>
         </SectionContainer>
         <SectionContainer
@@ -78,9 +85,7 @@
             slot="rightBox"
             class="rightBox"
           >
-            <span
-              @click="editDio = true"
-            >编辑</span>
+            <span @click="editDio = true">编辑</span>
           </div>
           <div>
             <el-row>
@@ -198,6 +203,26 @@
           </div>
         </SectionContainer>
         <SectionContainer
+          title="其他信息"
+          :md="true"
+        >
+          <div style="borderTop:1px solid #dfe6ec">
+            <self-table
+              ref="OtherTable"
+              class="OtherTable"
+              :is-p30="false"
+              :stripe="false"
+              :border="false"
+              :operation-list="[]"
+              :table-data="clueArr"
+              :columns="columnsOther"
+              row-key="id"
+              :index="false"
+              style="overflow: initial;"
+            />
+          </div>
+        </SectionContainer>
+        <SectionContainer
           title="重复进入线索"
           :md="true"
         >
@@ -288,9 +313,9 @@ interface IState {
 })
 export default class extends Vue {
   private clueStatus: string = '0';
-  private followUpDio:boolean = false
-  private messageDio:boolean = false
-  private editDio:boolean = false
+  private followUpDio: boolean = false;
+  private messageDio: boolean = false;
+  private editDio: boolean = false;
   private clueArr: IState[] = [
     { name: '梧桐专车', code: '0' },
     { name: '梧桐共享', code: '1' },
@@ -299,49 +324,60 @@ export default class extends Vue {
     { name: '雷鸟租赁B', code: '4' }
   ];
 
-  private columnsFollowUp: IState[] = [
+  private followUpLogArr: IState[] = [
     {
-      key: 'phone',
-      label: '跟进方式',
-      width: '120px'
+      code: 0,
+      listData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      page: 1,
+      columns: [
+        {
+          key: 'phone',
+          label: '跟进方式',
+          width: '120px'
+        },
+        {
+          key: 'haveCar',
+          label: '邀约情况'
+        },
+        {
+          key: 'cityName',
+          label: '邀约失败原因'
+        },
+        {
+          key: 'cityName',
+          label: '跟进备注',
+          width: '100px'
+        },
+        {
+          key: 'createDate',
+          label: '邀约面试时间',
+          slot: true,
+          width: '150px'
+        },
+        {
+          key: 'cityName',
+          label: '邀约人',
+          width: '100px'
+        },
+        {
+          key: 'cityName',
+          label: '跟进时间',
+          width: '100px'
+        },
+        {
+          key: 'op',
+          label: '操作',
+          fixed: 'right',
+          slot: true,
+          'min-width': this.isPC ? '200px' : '50px',
+          width: '200px'
+        }
+      ]
     },
-    {
-      key: 'haveCar',
-      label: '邀约情况'
-    },
-    {
-      key: 'cityName',
-      label: '邀约失败原因'
-    },
-    {
-      key: 'cityName',
-      label: '跟进备注',
-      width: '100px'
-    },
-    {
-      key: 'createDate',
-      label: '邀约面试时间',
-      slot: true,
-      width: '150px'
-    },
-    {
-      key: 'cityName',
-      label: '邀约人',
-      width: '100px'
-    },
-    {
-      key: 'cityName',
-      label: '跟进时间',
-      width: '100px'
-    },
-    {
-      key: 'op',
-      label: '操作',
-      fixed: 'right',
-      slot: true,
-      'min-width': this.isPC ? '200px' : '50px',
-      width: '200px'
-    }
+    { code: 1, listData: [], page: 1, columns: [] },
+    { code: 2, listData: [], page: 1, columns: [] },
+    { code: 3, listData: [], page: 1, columns: [] },
+    { code: 4, listData: [], page: 1, columns: [] }
   ];
 
   private columnsBack: IState[] = [
@@ -372,6 +408,25 @@ export default class extends Vue {
     {
       key: 'cityName',
       label: '创建人'
+    }
+  ];
+
+  private otherInfoColumns: IState[] = [
+    {
+      key: 'phone',
+      label: '邀请语'
+    },
+    {
+      key: 'haveCar',
+      label: '面试语'
+    },
+    {
+      key: 'cityName',
+      label: '投发物料'
+    },
+    {
+      key: '落地页',
+      label: '城市'
     }
   ];
 
@@ -417,11 +472,49 @@ export default class extends Vue {
     return SettingsModule.isPC
   }
 
+  get followUpLog() {
+    let stateItem = this.followUpLogArr[Number(this.clueStatus)]
+    let pageArr = this.group(stateItem.listData)
+    let listData:any[] = []
+    let index = 0
+    if (pageArr.length !== 0) {
+      while (index < stateItem.page) {
+        listData = listData.concat(pageArr[index])
+        index++
+      }
+      return { columns: stateItem.columns, listData: listData, isMore: listData < stateItem.listData }
+    } else {
+      return { columns: stateItem.columns, listData: [], isMore: false }
+    }
+  }
+
+  get columnsOther() {
+    if (Number(this.clueStatus) === 2) {
+      let newArr = this.otherInfoColumns.slice(2)
+      return newArr
+    } else {
+      return this.otherInfoColumns
+    }
+  }
+
+  private showMore() {
+    this.followUpLogArr[Number(this.clueStatus)].page++
+  }
+
+  private group(array:any[]) {
+    let index = 0
+    let newArray = []
+    while (index < array.length) {
+      newArray.push(array.slice(index, index += 5))
+    }
+    return newArray
+  }
+
   private handleClick(tab: any, event: any) {
     console.log(tab, event)
   }
 
-  private handleInterviewClick(row: object, type:number) {
+  private handleInterviewClick(row: object, type: number) {
     console.log(row)
     // if (type) {
 
@@ -462,11 +555,11 @@ export default class extends Vue {
   }
 
   .detailContent {
-    .rightBox_min{
+    .rightBox_min {
       width: 170px;
-       overflow-x: scroll;
-       white-space: nowrap;
-       span {
+      overflow-x: scroll;
+      white-space: nowrap;
+      span {
         color: #649cee;
         font-size: 12px;
         margin-right: 5px;
@@ -490,7 +583,7 @@ export default class extends Vue {
         text-align: right;
         margin-top: 15px;
       }
-       .seeMore-m {
+      .seeMore-m {
         display: block;
         color: rgb(138, 133, 133);
         font-size: 12px;

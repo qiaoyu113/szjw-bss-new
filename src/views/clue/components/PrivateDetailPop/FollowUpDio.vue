@@ -188,10 +188,13 @@ export default class extends Vue {
   ];
   private popSuccessItem: IState[] = [
     {
-      type: 6,
+      type: 9,
       key: 'inviteTime',
       label: '邀约面试时间',
-      col: 24
+      col: 24,
+      tagAttrs: {
+        placeholder: '请选择面试时间'
+      }
     }
   ];
 

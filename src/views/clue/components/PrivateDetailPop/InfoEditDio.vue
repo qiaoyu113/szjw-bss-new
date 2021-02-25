@@ -494,8 +494,6 @@ export default class extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.InfoEditDio {
-}
 .InfoEditDio ::v-deep .carTypeItem .el-form-item__content {
   margin-left: 0 !important;
 }
