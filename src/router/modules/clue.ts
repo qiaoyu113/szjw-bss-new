@@ -45,7 +45,7 @@ const clueRouter: RouteConfig = {
       }
     },
     {
-      path: 'config', /* 私海池 */
+      path: 'config', /* 配置管理 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Configuration.vue'),
       name: 'Configuration',
       meta: {
