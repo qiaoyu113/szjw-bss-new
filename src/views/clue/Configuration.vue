@@ -18,7 +18,10 @@
         </ul>
       </template>
       <template #btnc>
-        <el-button type="primary">
+        <el-button
+          type="primary"
+          @click="handleFilterClick"
+        >
           查询
         </el-button>
         <el-button> 重置 </el-button>
@@ -42,13 +45,14 @@
           <el-button
             type="text"
             size="small"
-            @click="handleClick(scope.row)"
+            @click="handleInterveneClick(scope.row)"
           >
             调整干涉人
           </el-button>
           <el-button
             type="text"
             size="small"
+            @click="handleAllotClick(scope.row)"
           >
             调整分配人
           </el-button>
@@ -67,6 +71,74 @@
         </template>
       </self-table>
     </div>
+    <SelfDialog
+      :class="'distributionDialog'"
+      :visible.sync="showDialog"
+      :confirm="confirm"
+      :show-other-button="false"
+      title="调整干涉人"
+      width="500px"
+      :destroy-on-close="true"
+      @closed="() => {
+        row = {}
+      }"
+    >
+      <p>
+        <el-form
+          ref="form"
+          :model="form"
+          label-width="80px"
+        >
+          <el-form-item label="角色">
+            <el-select
+              v-model="listQuery.role"
+              placeholder="请选择角色"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </p>
+    </SelfDialog>
+    <SelfDialog
+      :class="'distributionDialog'"
+      :visible.sync="showDialog"
+      :confirm="confirm"
+      :show-other-button="false"
+      title="调整分配人"
+      width="500px"
+      :destroy-on-close="true"
+      @closed="() => {
+        row = {}
+      }"
+    >
+      <p>
+        <el-form
+          ref="form"
+          :model="form"
+          label-width="80px"
+        >
+          <el-form-item label="角色">
+            <el-select
+              v-model="listQuery.role"
+              placeholder="请选择角色"
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </p>
+    </SelfDialog>
   </div>
 </template>
 
@@ -75,8 +147,10 @@ import { Component, Vue } from 'vue-property-decorator'
 
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
-
+import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
+import { HandlePages, lock } from '@/utils/index'
+import { configurationManagementList } from '@/api/clue.ts'
 interface PageObj {
   page: number
   limit: number
@@ -89,7 +163,8 @@ interface IState {
   name: 'Configuration',
   components: {
     SelfTable,
-    SelfFrom
+    SelfFrom,
+    SelfDialog
   }
 })
 export default class extends Vue {
@@ -201,39 +276,40 @@ export default class extends Vue {
 
   private tableData: any[] = []
   private multipleSelection: any[] = []
+  private listLoading:boolean = false;
   private columns: any[] = [
     {
-      key: 'city',
+      key: 'cityName',
       label: '城市'
     },
     {
-      key: 'customerSegmentNumber',
+      key: 'id',
       label: '客群细分编号/业务线/客群类型',
       width: '120px'
     },
     {
-      key: 'targetPortraitTag',
+      key: 'portraitLabel',
       label: '目标画像标签'
     },
     {
-      key: 'distributionMechanism',
+      key: 'distributionTypeName',
       label: '分配机制'
     },
     {
-      key: 'distributionMechanismAdmin',
+      key: 'distributionManageName',
       label: '分配机制管理员',
       width: '120px'
     },
     {
-      key: 'policyInterloper',
+      key: 'policyName',
       label: 'policy干涉人'
     },
     {
-      key: 'assigner',
+      key: 'distributionName',
       label: '分配人'
     },
     {
-      key: 'superintendent',
+      key: 'supervisorName',
       label: '监督人'
     },
     {
@@ -241,11 +317,11 @@ export default class extends Vue {
       label: '备注'
     },
     {
-      key: 'creator',
+      key: 'createName',
       label: '创建人'
     },
     {
-      key: 'creationTime',
+      key: 'createDate',
       label: '创建时间'
     },
     {
@@ -260,41 +336,87 @@ export default class extends Vue {
       fixed: 'right'
     }
   ]
+  private showDialog: boolean = false
   private page: PageObj = {
     page: 1,
     limit: 30,
     total: 0
   }
+  // 查询
+  handleFilterClick() {
+    this.page.page = 1
+    this.getList()
+  }
   // 分页
   handlePageSize(page: PageObj) {
     this.page.page = page.page
     this.page.limit = page.limit
-    // this.getLists()
+    this.getList()
   }
   handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
-  private handleClick(row: IState) {}
+  // 调整干涉人
+  private async handleInterveneClick(row:any) {
+    this.showDialog = true
+  }
+  private async confirm(done: any) {
+    try {
+      let params = {
+
+      }
+      // if (success) {
+      //   this.$message.success('调整成功')
+      // }
+    } catch (err) {
+      console.log('11')
+    } finally {
+      console.log('22')
+    }
+  }
+  // 调整分配人
+  private async handleAllotClick(row:any) {
+  }
+  // 获取列表
+  private async getList(this:any) {
+    try {
+      this.listLoading = true
+      let params:IState = {
+        page: this.page.page,
+        limit: this.page.limit
+      }
+      if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
+        params.cityName = this.listQuery.cityName[1]
+      }
+      let { data: res } = await configurationManagementList(params)
+      if (res.success) {
+        this.tableData = res.data || []
+        this.$refs['ConfigurationForm'].toggleRowSelection()
+        res.page = await HandlePages(res.page)
+        this.page.total = res.page.total
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get list fail:${err}`)
+    } finally {
+      this.listLoading = false
+    }
+  }
 
   data() {
     return {
-      tableData: [
-        {
-          city: '1',
-          customerSegmentNumber: '2',
-          targetPortraitTag: '3',
-          distributionMechanism: '4',
-          distributionMechanismAdmin: '5',
-          policyInterloper: '6',
-          assigner: '7',
-          superintendent: '8',
-          remark: '9',
-          creator: '10',
-          creationTime: '11',
-          recentNews: '12'
-        }
-      ]
+      form: {
+        role: ''
+      },
+      options: [{
+        value: '选项1',
+        label: '角色'
+      }]
     }
+  }
+  mounted() {
+    this.getList()
   }
 }
 </script>
