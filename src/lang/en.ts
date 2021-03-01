@@ -162,7 +162,8 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    campaignList: 'campaignListMa'
   },
   navbar: {
     logOut: 'Log Out',

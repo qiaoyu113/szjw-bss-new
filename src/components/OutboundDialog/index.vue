@@ -47,7 +47,7 @@ export default class extends Vue {
   handleDialogChange(val:boolean) {
     if (val) {
       let makePhoneDom = document.getElementById('makePhone')
-      if (!makePhoneDom) {
+      if (!(makePhoneDom as HTMLElement).hasChildNodes()) {
         this.handleAddDom()
       }
     } else {

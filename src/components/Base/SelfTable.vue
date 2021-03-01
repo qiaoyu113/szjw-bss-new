@@ -81,6 +81,7 @@
               v-if="item.slot"
               :name="item.key"
               :row="scope.row"
+              :index="scope.$index"
             />
             <template v-else>
               {{ scope.row[item.key] | DataIsNull }}

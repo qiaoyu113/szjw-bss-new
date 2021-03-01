@@ -61,11 +61,6 @@ export default class extends Vue {
     },
     {
       type: 7,
-      label: '手机号',
-      key: 'phone'
-    },
-    {
-      type: 7,
       label: '意向车型',
       key: 'carType'
     },

@@ -961,6 +961,7 @@ export default class extends Vue {
   }
   // 外呼
   handleCallClick(row:IState) {
+    localStorage.setItem('callId', row.marketClueId);
     (this.$refs.showOutbound as any).showDialog = true
   }
   init() {

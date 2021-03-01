@@ -15,7 +15,7 @@
       </div>
       <div class="btn">
         <el-button
-          v-if="status === 3"
+          v-if="[2,3].includes(status)"
           type="danger"
           @click="handleHangUp"
         >
@@ -59,7 +59,7 @@ export default class extends Vue {
    *3:接通了
   */
   private status:number = 1 // 电话状态
-  private phone:string = '13295040858' // 电话
+  private phone:string = '17537188139' // 电话
   private callTime:string = '' // 通话时长的展示文案
   private anwserTime:number = 0 // 接通的时间戳
   private timer:null | any = null // 定时器
