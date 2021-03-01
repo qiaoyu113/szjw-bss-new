@@ -268,7 +268,7 @@ export const pushUserToCRM = (params:any) =>
 // 获取坐席管理列表
 export const getAgentList = (params:any) =>
   request({
-    url: `${baseURL}/v3/base/agent/list`,
+    url: `${baseURL2}/auth/v2/agent/list`,
     method: 'get',
     params
   })
@@ -276,7 +276,7 @@ export const getAgentList = (params:any) =>
 // 获取所有可用的坐席号
 export const getEnableAgentNums = () =>
   request({
-    url: `${baseURL}/v3/base/agent/getEnableAgentNums`,
+    url: `${baseURL2}/auth/v2/agent/getEnableAgentNums`,
     method: 'get'
   })
 
