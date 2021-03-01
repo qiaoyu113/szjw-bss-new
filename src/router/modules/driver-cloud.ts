@@ -52,27 +52,6 @@ const driverCloud: RouteConfig = {
         title: 'DriverClueDetail',
         noCache: false
       }
-    },
-    {
-      path: 'campaignList',
-      component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/CampaignMa/List/index.vue'),
-      name: 'CampaignList',
-      meta: {
-        apiUrl: 'root',
-        title: 'campaignList',
-        noCache: false
-      }
-    },
-    {
-      path: 'campaignDetail',
-      component: () => import(/* webpackChunkName: "driverCloud" */ '@/views/driver-cloud/CampaignMa/Detail/index.vue'),
-      name: 'CampaignDetail',
-      meta: {
-        apiUrl: 'root',
-        hidden: true,
-        title: 'campaignList',
-        noCache: false
-      }
     }
   ]
 }
