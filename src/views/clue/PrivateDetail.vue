@@ -88,115 +88,15 @@
             <span @click="editDio = true">编辑</span>
           </div>
           <div>
-            <el-row>
-              <el-col :span="6">
+            <el-row :gutter="20">
+              <el-col
+                v-for="(item,index) in infoBase"
+                :key="index"
+                :span="6"
+              >
                 <DetailItem
-                  name="姓名"
-                  value="formData.balance"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="手机号"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="是否有车"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="货运经验"
-                  value="formData.canExtract"
-                />
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6">
-                <DetailItem
-                  name="年龄"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="现住址"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="当前职业"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="期望工作区域"
-                  value="formData.canExtract"
-                />
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6">
-                <DetailItem
-                  name="状态"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="跟进人"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="线索编号"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="前跟进人"
-                  value="formData.canExtract"
-                />
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6">
-                <DetailItem
-                  name="线索类型"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="所属城市"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="线索归属"
-                  value="formData.canExtract"
-                />
-              </el-col>
-              <el-col :span="6">
-                <DetailItem
-                  name="渠道"
-                  value="formData.canExtract"
-                />
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6">
-                <DetailItem
-                  name="画像标签"
-                  value="formData.canExtract"
+                  :name="item.name"
+                  :value="item.value"
                 />
               </el-col>
             </el-row>
@@ -263,7 +163,7 @@
               :index="false"
               style="overflow: initial;"
               :style="logData.length ===0 ? 'margin-bottom: 30px;':''"
-              :page="page"
+              :page="logPage"
               @onPageSize="handlePageSize"
             />
           </div>
@@ -332,8 +232,7 @@ export default class extends Vue {
       columns: [
         {
           key: 'phone',
-          label: '跟进方式',
-          width: '120px'
+          label: '跟进方式'
         },
         {
           key: 'haveCar',
@@ -345,24 +244,20 @@ export default class extends Vue {
         },
         {
           key: 'cityName',
-          label: '跟进备注',
-          width: '100px'
+          label: '跟进备注'
         },
         {
           key: 'createDate',
           label: '邀约面试时间',
-          slot: true,
-          width: '150px'
+          slot: true
         },
         {
           key: 'cityName',
-          label: '邀约人',
-          width: '100px'
+          label: '邀约人'
         },
         {
           key: 'cityName',
-          label: '跟进时间',
-          width: '100px'
+          label: '跟进时间'
         },
         {
           key: 'op',
@@ -378,6 +273,15 @@ export default class extends Vue {
     { code: 2, listData: [], page: 1, columns: [] },
     { code: 3, listData: [], page: 1, columns: [] },
     { code: 4, listData: [], page: 1, columns: [] }
+  ];
+
+  private infoBase: IState = [
+    { name: '威山', value: '' },
+    { name: '爽爽', value: '13' },
+    { name: '智博', value: '13' },
+    { name: '义杰', value: '13' },
+    { name: '钱磊', value: '13' },
+    { name: '佳琳', value: '13' }
   ];
 
   private columnsBack: IState[] = [
@@ -441,7 +345,7 @@ export default class extends Vue {
     }
   ];
 
-  private page: PageObj = {
+  private logPage: PageObj = {
     page: 1,
     limit: 30,
     total: 10
@@ -475,14 +379,18 @@ export default class extends Vue {
   get followUpLog() {
     let stateItem = this.followUpLogArr[Number(this.clueStatus)]
     let pageArr = this.group(stateItem.listData)
-    let listData:any[] = []
+    let listData: any[] = []
     let index = 0
     if (pageArr.length !== 0) {
       while (index < stateItem.page) {
         listData = listData.concat(pageArr[index])
         index++
       }
-      return { columns: stateItem.columns, listData: listData, isMore: listData < stateItem.listData }
+      return {
+        columns: stateItem.columns,
+        listData: listData,
+        isMore: listData < stateItem.listData
+      }
     } else {
       return { columns: stateItem.columns, listData: [], isMore: false }
     }
@@ -501,11 +409,11 @@ export default class extends Vue {
     this.followUpLogArr[Number(this.clueStatus)].page++
   }
 
-  private group(array:any[]) {
+  private group(array: any[]) {
     let index = 0
     let newArray = []
     while (index < array.length) {
-      newArray.push(array.slice(index, index += 5))
+      newArray.push(array.slice(index, (index += 5)))
     }
     return newArray
   }
@@ -540,8 +448,8 @@ export default class extends Vue {
 
   // 分页
   private handlePageSize(page: PageObj) {
-    this.page.page = page.page
-    this.page.limit = page.limit
+    this.logPage.page = page.page
+    this.logPage.limit = page.limit
     // this.getLists()
   }
 }
