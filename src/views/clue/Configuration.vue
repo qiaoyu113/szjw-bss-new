@@ -61,18 +61,20 @@
           <el-button
             type="text"
             size="small"
+            @click="showPolicy = true"
           >
             设置policy
           </el-button>
         </template>
       </self-table>
     </div>
+    <SetUpPolicy :visible.sync="showPolicy" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-
+import SetUpPolicy from './components/SetUpPolicy.vue'
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 
@@ -89,7 +91,8 @@ interface IState {
   name: 'Configuration',
   components: {
     SelfTable,
-    SelfFrom
+    SelfFrom,
+    SetUpPolicy
   }
 })
 export default class extends Vue {
@@ -134,7 +137,7 @@ export default class extends Vue {
           lazyLoad: this.showWork
         }
       },
-      col: 8,
+      col: 4,
       label: '司机城市',
       key: 'driverCity'
     },
@@ -275,7 +278,7 @@ export default class extends Vue {
     this.multipleSelection = val
   }
   private handleClick(row: IState) {}
-
+  showPolicy:boolean = true
   data() {
     return {
       tableData: [
