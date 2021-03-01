@@ -832,6 +832,7 @@ export default class extends Vue {
       let { data: res } = await GetDriverClueList(params)
       if (res.success) {
         this.tableData = res.data || []
+        // eslint-disable-next-line
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.btns.forEach(item => {

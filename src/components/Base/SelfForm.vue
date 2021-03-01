@@ -18,6 +18,7 @@
         v-for="item in formItem"
         :key="item.label || item.key"
         :span="isPC ? item.col || pcCol : 24"
+        :offset="item.offset|| 0"
       >
         <el-form-item
           :label="item.label"
