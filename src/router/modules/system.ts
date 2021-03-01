@@ -113,7 +113,7 @@ const systemRouter: RouteConfig = {
         title: 'seatManage',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: '/v3/base/agent/list'
       }
     },
     {
