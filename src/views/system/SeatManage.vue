@@ -89,11 +89,11 @@
         :rules="ruleChangeSeatForm"
       >
         <DetailItem
-          name="绑定人"
+          name="当前绑定人"
           :value="beforeSeatForm.nickName"
         />
         <DetailItem
-          name="绑定人坐席号"
+          name="当前坐席号"
           :value="beforeSeatForm.seatNumber"
         />
         <DetailItem
@@ -118,6 +118,14 @@
             name="确定更改绑定人信息:"
             value=""
             style="border-top: 1px solid #dfdfdf;padding-top:10px;"
+          />
+          <DetailItem
+            name="姓名"
+            :value="changeSeatForm.nickName"
+          />
+          <DetailItem
+            name="绑定人手机号"
+            :value="changeSeatForm.mobile"
           />
           <DetailItem
             name="角色"

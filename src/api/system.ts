@@ -268,7 +268,7 @@ export const pushUserToCRM = (params:any) =>
 // 获取坐席管理列表
 export const getAgentList = (params:any) =>
   request({
-    url: `${baseURL2}/auth/v2/agent/list`,
+    url: `${baseURL2}/auth/v3/agent/list`,
     method: 'get',
     params
   })
@@ -276,14 +276,14 @@ export const getAgentList = (params:any) =>
 // 获取所有可用的坐席号
 export const getEnableAgentNums = () =>
   request({
-    url: `${baseURL2}/auth/v2/agent/getEnableAgentNums`,
+    url: `${baseURL2}/auth/v3/agent/getEnableAgentNums`,
     method: 'get'
   })
 
 // 查询绑定人
 export const getQueryGM = (params: any) =>
   request({
-    url: `${baseURL2}/auth/v2/agent/queryGM`,
+    url: `${baseURL2}/auth/v3/agent/queryGM`,
     method: 'get',
     params,
     paramsSerializer: params => {
@@ -294,7 +294,7 @@ export const getQueryGM = (params: any) =>
 // 绑定坐席号
 export const agentBundling = (data:any) =>
   request({
-    url: `${baseURL2}/auth/v2/agent/bundling`,
+    url: `${baseURL2}/auth/v3/agent/bundling`,
     method: 'post',
     data
   })
@@ -302,7 +302,7 @@ export const agentBundling = (data:any) =>
 // 更换绑定坐席号
 export const agentChangeBundling = (data:any) =>
   request({
-    url: `${baseURL2}/auth/v2/agent/change`,
+    url: `${baseURL2}/auth/v3/agent/change`,
     method: 'post',
     data
   })
@@ -310,7 +310,7 @@ export const agentChangeBundling = (data:any) =>
 // 根据用户ID获取坐席信息详情
 export const getInfoByUserId = (params: any) =>
   request({
-    url: `${baseURL2}/auth/v2/agent/getInfoByUserId`,
+    url: `${baseURL2}/auth/v3/agent/getInfoByUserId`,
     method: 'get',
     params
   })
