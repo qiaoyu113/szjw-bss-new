@@ -65,14 +65,18 @@
           <el-button
             type="text"
             size="small"
-            @click="showPolicy = true"
+            @click="setPolicyAuto(scope.row)"
           >
             设置policy
           </el-button>
         </template>
       </self-table>
     </div>
-    <SetUpPolicy :visible.sync="showPolicy" />
+    <SetUpPolicy
+      :visible.sync="showPolicy"
+      :policy-data="policyData"
+      @success="getList"
+    />
     <SelfDialog
       :class="'distributionDialog'"
       :visible.sync="showDialog"
@@ -360,7 +364,7 @@ export default class extends Vue {
     this.multipleSelection = val
   }
   private handleClick(row: IState) {}
-  showPolicy:boolean = true
+  // showPolicy:boolean = false
   // 调整干涉人
   private async handleInterveneClick(row:any) {
     this.showDialog = true
@@ -381,6 +385,20 @@ export default class extends Vue {
   }
   // 调整分配人
   private async handleAllotClick(row:any) {
+  }
+  // 设置policy
+  private showPolicy:boolean = false // has 设置policy弹框
+  private policyData:any = {}
+  setPolicyAuto(item:any) {
+    console.log(item.distributionType)
+    const object = {
+      distributionType: item.distributionType,
+      id: item.id
+    }
+    this.policyData = object
+    this.showPolicy = true
+
+    // this.showPolicy = true
   }
   // 获取列表
   private async getList(this:any) {
