@@ -406,7 +406,8 @@ export default class extends Vue {
       this.listLoading = true
       let params:IState = {
         page: this.page.page,
-        limit: this.page.limit
+        limit: this.page.limit,
+        lineType: this.activeLineType
       }
       if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
         params.cityName = this.listQuery.cityName[1]
