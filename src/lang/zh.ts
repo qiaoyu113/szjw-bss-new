@@ -6,7 +6,7 @@ export default {
     freightDetail: '运费详情',
     freightLog: '运费日志',
     clueTitle: '线索管理',
-    publicClue: '公海池(待分配)',
+    publicClue: '待分配线索',
     privateClue: '私海池',
     driverTitle: '司机管理',
     driverAccount: '司机梧桐账户',

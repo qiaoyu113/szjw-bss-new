@@ -22,13 +22,30 @@
         >
           <el-radio-button
             v-for="item in clueArr"
-            :key="item.code"
-            :label="item.code"
+            :key="item.value"
+            :label="item.value"
           >
-            {{ item.name }}
+            {{ item.label }}
           </el-radio-button>
         </el-radio-group>
       </div>
+      <template slot="status">
+        <el-badge
+          v-for="item in btns"
+          :key="item.name"
+          :value="item.value"
+          :max="99999"
+        >
+          <el-button
+            size="small"
+            type="primary"
+            :plain="item.name !== listQuery.status"
+            @click="listQuery.status =item.name;handleFilterClick()"
+          >
+            {{ item.text }}
+          </el-button>
+        </el-badge>
+      </template>
       <div
         slot="mulBtn"
         :class="isPC ? 'btnPc' : 'mobile'"
@@ -54,11 +71,52 @@
           :disabled="multipleSelection.length > 0 ? false :true"
           @click="handleallAllotClick"
         >
-          批量分配
+          批量转线索
+        </el-button>
+        <el-button
+          type="primary"
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+        >
+          导入线索
+        </el-button>
+        <el-button
+          type="primary"
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+        >
+          导出
         </el-button>
       </div>
     </self-form>
     <div class="table_box">
+      <div class="table_top">
+        <el-badge
+          :value="toDoValue"
+          :max="99999"
+        >
+          <el-checkbox-group
+            v-model="listQuery.sort"
+            size="small"
+          >
+            <el-checkbox-button :label="true">
+              代办事项
+            </el-checkbox-button>
+          </el-checkbox-group>
+        </el-badge>
+        <el-select
+          v-model="listQuery.sort"
+          placeholder="排序方式"
+          size="small"
+        >
+          <el-option
+            v-for="item in sortOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
       <self-table
         ref="PrivateClueTable"
         :is-p30="false"
@@ -74,14 +132,38 @@
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
-        <template v-slot:num="scope">
+        <template v-slot:intoPoolNum="scope">
           <template v-if="scope.header">
             <div style="line-height:1.2">
               入池次数<br>(该线索类型)
             </div>
           </template>
           <template v-else>
-            {{ scope.row.createDate }}
+            {{ scope.row.intoPoolNum }}
+          </template>
+        </template>
+        <template v-slot:namePhone="{row}">
+          {{ row.name }}<br>{{ row.phone }}
+        </template>
+        <template v-slot:followerName="{row}">
+          {{ row.followerName }}<br>{{ row.followerPhone }}
+        </template>
+        <template v-slot:followDate="{row}">
+          {{ row.followDate }}<br>{{ row.allocateDate }}
+        </template>
+        <template v-slot:hasCar="{row}">
+          {{ row.hasCar ? '有；' : '无' }}
+        </template>
+        <template v-slot:notFollowDay="{row}">
+          <el-link
+            v-if="row.notFollowDay >= 2"
+            :underline="false"
+            type="danger"
+          >
+            {{ row.notFollowDay }}
+          </el-link>
+          <template v-else>
+            {{ row.notFollowDay }}
           </template>
         </template>
         <template v-slot:createDate="scope">
@@ -90,9 +172,18 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
-            @click="handleAllotClick(scope.row)"
           >
-            分配
+            打电话
+          </el-button>
+          <el-button
+            type="text"
+          >
+            详情
+          </el-button>
+          <el-button
+            type="text"
+          >
+            转线索
           </el-button>
         </template>
       </self-table>
@@ -104,10 +195,11 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showWork } from '@/utils/index'
-import { marketClue } from '@/api/driver-cloud'
+import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import { GetDictionaryList, GetSpecifiedRoleList } from '@/api/common'
 
 interface IState {
   [key: string]: any;
@@ -139,27 +231,43 @@ interface formItem {
 export default class extends Vue {
   times:number = 10;
   private listLoading: boolean = false;
+  private toDoValue: number = 0;
   private listQuery: IState = {
-    clueType: 0,
-    phone: '',
-    haveCar: '',
-    time: [],
-    onlyMe: ''
+    carType: '', // 车型
+    cityCode: '', // 所属城市
+    name: '', // 姓名
+    phone: '', // 手机号
+    hasCar: '', // 是否有车
+    gmGroupId: '', // 加盟小组
+    followerId: '', // 跟进人
+    sourceChannel: '', // 渠道
+    clueAttribution: '', // 线索归属
+    inviteStatus: '', // 邀约情况
+    intentDegree: '', // 意向度
+    inviteFailReason: '', // 邀约失败原因
+    notFollowDay: '', // 未跟进天数
+    onlyMe: 0, // 只看自己
+    status: '', // 状态
+    toDo: false, // 代办事项
+    sort: '', // 排序方式
+    clueType: 0
   };
   private tableData: any[] = [];
   private multipleSelection: any[] = []; // 当前页选中的数据
+  // options
   private hasCarList: IState[] = [
     { label: '全部', value: '' },
     { label: '有', value: 1 },
     { label: '无', value: 0 }
   ];
-  private clueArr:IState[] = [
-    { name: '梧桐专车', code: 0 },
-    { name: '梧桐共享', code: 1 },
-    { name: '雷鸟车池', code: 2 },
-    { name: '雷鸟租赁C', code: 3 },
-    { name: '雷鸟租赁B', code: 4 }
-  ]
+  private sortOptions: IState[] = []
+  private followerListOptions: IState[] = [] // 跟进人
+  private sourceOptions:any[] = [] // 来源渠道列表
+  private clueOptions:any[] = [] // 线索归属
+  private inviteStatusOptions: any[] = [] // 邀约情况
+  private intentDegreeOptions: any[] = [] // 意向度
+  private inviteFailReasonOptions: any[] = [] // 邀约失败原因
+  private clueArr:IState[] = []
   private page: PageObj = {
     page: 1,
     limit: 30,
@@ -170,6 +278,38 @@ export default class extends Vue {
     yesterday,
     sevenday,
     thirtyday
+  ]
+  private btns:any[] = [
+    {
+      name: '',
+      text: '全部',
+      value: 999
+    },
+    {
+      name: '0',
+      text: '待跟进',
+      value: 9999999
+    },
+    {
+      name: '1',
+      text: '跟进中',
+      value: 9999999
+    },
+    {
+      name: '2',
+      text: '邀约成功',
+      value: 9999999
+    },
+    {
+      name: '3',
+      text: '已面试',
+      value: 9999999
+    },
+    {
+      name: '4',
+      text: '已成交',
+      value: 9999999
+    }
   ]
   /**
    * rules: []
@@ -185,7 +325,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      key: 'workCity',
+      key: 'cityCode',
       label: '所属城市',
       rules: [0, 1],
       tagAttrs: {
@@ -193,7 +333,7 @@ export default class extends Vue {
         clearable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'workCity',
+        'node-key': 'id',
         props: {
           lazy: true,
           lazyLoad: showWork
@@ -273,7 +413,7 @@ export default class extends Vue {
     {
       type: 1,
       label: '姓名',
-      key: 'phone',
+      key: 'name',
       rules: ['root'],
       tagAttrs: {
         placeholder: '请输入',
@@ -300,7 +440,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '是否有车',
-      key: 'haveCar',
+      key: 'hasCar',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -324,7 +464,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '加盟小组',
-      key: 'haveCar',
+      key: 'gmGroupId',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -336,74 +476,74 @@ export default class extends Vue {
     {
       type: 2,
       label: '跟进人',
-      key: 'haveCar',
+      key: 'followerId',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: ['root'],
-      options: this.hasCarList
+      options: this.followerListOptions
     },
     {
       type: 2,
       label: '渠道',
-      key: 'haveCar',
+      key: 'sourceChannel',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: ['root'],
-      options: this.hasCarList
+      options: this.sourceOptions
     },
     {
       type: 2,
       label: '线索归属',
-      key: 'haveCar',
+      key: 'clueAttribution',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: ['root'],
-      options: this.hasCarList
+      options: this.clueOptions
     },
     {
       type: 2,
       label: '邀约情况',
-      key: 'haveCar',
+      key: 'inviteStatus',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: [0, 1],
-      options: this.hasCarList
+      options: this.inviteStatusOptions
     },
     {
       type: 2,
       label: '意向度',
-      key: 'haveCar',
+      key: 'intentDegree',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: [0, 1],
-      options: this.hasCarList
+      options: this.intentDegreeOptions
     },
     {
       type: 2,
       label: '邀约失败原因',
-      key: 'haveCar',
+      key: 'inviteFailReason',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
       },
       rules: [0, 1],
-      options: this.hasCarList
+      options: this.inviteFailReasonOptions
     },
     {
       type: 2,
@@ -420,7 +560,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '未跟进天数',
-      key: 'haveCar',
+      key: 'notFollowDay',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -436,10 +576,14 @@ export default class extends Vue {
       options: [
         {
           label: '',
-          value: 1
+          value: false
         }
       ],
-      rules: ['root']
+      rules: ['root'],
+      tagAttrs: {
+        'true-label': 1,
+        'false-label': 0
+      }
     },
     {
       type: 3,
@@ -458,9 +602,9 @@ export default class extends Vue {
     {
       col: 20,
       label: '状态',
-      key: 'checkStatus',
-      type: 'checkStatus',
-      rules: [2, 3, 4],
+      key: 'status',
+      type: 'status',
+      rules: ['root'],
       slot: true
     },
     {
@@ -473,44 +617,41 @@ export default class extends Vue {
   ];
   private columns: any[] = [
     {
-      key: 'marketClueId',
-      label: '线路ID',
+      key: 'clueId',
+      label: '线索ID',
       rules: ['root']
     },
     {
-      key: 'busiTypeName',
-      label: '线路类型',
+      key: 'namePhone',
+      slot: true,
+      label: '姓名/手机号',
       rules: ['root']
     },
     {
-      key: 'name',
-      label: '姓名',
-      rules: [2, 3, 4]
+      key: 'hasCar',
+      label: '是否有车/车型',
+      rules: [0, 1],
+      slot: true
     },
     {
-      key: 'phone',
-      label: '手机号',
-      rules: ['root']
-    },
-    {
-      key: 'haveCar',
-      label: '是否有车',
+      key: 'experience',
+      label: '货运经验（月）',
       rules: [0, 1]
     },
     {
-      key: 'cityName',
-      label: '城市',
+      key: 'contactSituationName',
+      label: '邀约情况',
       rules: [0, 1]
     },
     {
-      key: 'cityName',
-      label: '车辆所在城市',
+      key: 'name1',
+      label: '需求类型',
       rules: [2]
     },
     {
-      key: 'cityName',
-      label: '所在城市',
-      rules: [3, 4]
+      key: 'carTypeName',
+      label: '车型',
+      rules: [2]
     },
     {
       key: 'carTypeName',
@@ -519,31 +660,69 @@ export default class extends Vue {
     },
     {
       key: 'carTypeName1',
-      label: '备注',
-      rules: [3, 4]
+      label: '是否交意向金',
+      rules: [2]
     },
     {
-      key: 'cityName1',
+      key: 'remark',
+      label: '跟进备注',
+      rules: ['root']
+    },
+    {
+      key: 'notFollowDay',
+      label: '未跟进天数',
+      rules: ['root'],
+      slot: true
+    },
+    {
+      key: 'followNum',
+      label: '跟进次数',
+      rules: ['root']
+    },
+    {
+      key: 'statusName',
+      label: '状态',
+      rules: ['root']
+    },
+    {
+      key: 'followerName',
+      label: '跟进人',
+      rules: ['root'],
+      slot: true
+    },
+    {
+      key: 'followDate',
+      label: '最近跟进时间/分配时间',
+      rules: ['root'],
+      slot: true
+    },
+    {
+      key: 'sourceChannelName',
       label: '渠道',
       rules: ['root']
     },
     {
-      key: 'cityName2',
-      label: '创建人',
+      key: 'clueTypeName',
+      label: '线索类型',
       rules: ['root']
     },
     {
-      key: 'createDate',
-      label: '创建时间',
-      slot: true,
-      attrs: {
-        sortable: true
-      },
-      width: '150px',
-      rules: ['root']
+      key: 'cityName',
+      label: '城市',
+      rules: [0, 1]
     },
     {
-      key: 'num',
+      key: 'haveCar12',
+      label: '车辆所在城市',
+      rules: [2]
+    },
+    {
+      key: 'haveCar12',
+      label: '所在城市',
+      rules: [3, 4]
+    },
+    {
+      key: 'intoPoolNum',
       slot: true,
       header: true,
       rules: ['root']
@@ -553,10 +732,11 @@ export default class extends Vue {
       label: '操作',
       fixed: 'right',
       slot: true,
-      'min-width': this.isPC ? '200px' : '50px',
+      width: this.isPC ? '180px' : '50px',
       rules: ['root']
     }
   ];
+
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -617,10 +797,15 @@ export default class extends Vue {
     try {
       this.listLoading = true
       let params: IState = {
+        clueType: this.listQuery.clueType,
         page: this.page.page,
         limit: this.page.limit
       }
-      let { data: res } = await marketClue(params)
+      const submitForm = this.clueArr.find((item: any) => {
+        return item.value === this.listQuery.clueType
+      }) || {}
+      if (!submitForm.searchUrl) return
+      let { data: res } = await submitForm.searchUrl(params)
       if (res.success) {
         // eslint-disable-next-line
         res.page = await HandlePages(res.page)
@@ -636,9 +821,104 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
+  // 获取跟进人列表
+  async getGmOptions() {
+    try {
+      if (this.followerListOptions.length > 0) {
+        return false
+      }
+      let params:any = {
+        roleTypes: [1, 4],
+        uri: '/v2/clueH5/list/queryFollowerList'
+      }
+      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+        params.cityCode = this.listQuery.workCity[1]
+      }
 
+      let { data: res } = await GetSpecifiedRoleList(params)
+      if (res.success) {
+        let arr = res.data.map(function(item: any) {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+        this.followerListOptions.push(...arr)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  /**
+   *获取基础信息
+   */
+  async getBaseInfo() {
+    try {
+      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList]
+        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason } = res.data
+
+        let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+        let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+        let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+        let intentDegreeOptions = intentDegree.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+        let inviteFailReasonOptions = inviteFailReason.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index] }))
+
+        this.clueArr.push(...clueType)
+        this.listQuery.clueType = clueType[0].value
+        this.clueOptions.push(...[
+          {
+            label: '全部',
+            value: ''
+          },
+          ...clue
+        ])
+        this.sourceOptions.push(...[
+          {
+            label: '全部',
+            value: ''
+          },
+          ...sources
+        ])
+        this.inviteStatusOptions.push(...[
+          {
+            label: '全部',
+            value: ''
+          },
+          ...inviteStatusOptions
+        ])
+        this.intentDegreeOptions.push(...[
+          {
+            label: '全部',
+            value: ''
+          },
+          ...intentDegreeOptions
+        ])
+        this.inviteFailReasonOptions.push(...[
+          {
+            label: '全部',
+            value: ''
+          },
+          ...inviteFailReasonOptions
+        ])
+
+        this.getLists()
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
   mounted() {
-    this.getLists()
+    this.getBaseInfo()
+    this.getGmOptions()
   }
 }
 </script>
@@ -680,5 +960,23 @@ export default class extends Vue {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
+  .table_top{
+    display: flex;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+  }
+}
+</style>
+<style scoped>
+.PrivateClue >>> .el-badge {
+  margin-right: 30px;
+}
+.PrivateClue >>> .el-badge .el-badge__content{
+  right: 0;
+  transform: translateY(-50%) translateX(50%);
+  z-index: 10;
+}
+.PrivateClue .table_top >>> .el-checkbox-button__inner{
+  border-radius: 4px!important;
 }
 </style>
