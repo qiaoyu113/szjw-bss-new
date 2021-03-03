@@ -1,7 +1,8 @@
 import request from '@/utils/request'
 import qs from 'qs'
 const baseURL = '/base'
-const baseURL2 = '/base_center'
+// const baseURL2 = '/base_center'
+const baseURL2 = '/mock/231'
 // 用户管理-账号查询
 export const getUserList = (params: any) =>
   request({
