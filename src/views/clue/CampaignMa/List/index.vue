@@ -86,6 +86,7 @@
         :columns="columns"
         :default-sort="{prop: 'createDate', order: 'descending'}"
         :page="page"
+        @sort-change="handleSortChange"
         @onPageSize="handlePageSize"
       >
         <template v-slot:userGroupId="{row}">
@@ -199,7 +200,8 @@ export default class extends Vue {
     cityCode: '',
     launchPlatformCoe: '',
     dropTime: [],
-    time: []
+    time: [],
+    sort: 1 // 1: 降序,0:升序
   }
   // 新建Campaign
   private showDialog:boolean = false;
@@ -398,7 +400,7 @@ export default class extends Vue {
       label: '创建时间',
       'width': '160px',
       attrs: {
-        sortable: true
+        sortable: 'custom'
       }
     },
     {
@@ -432,7 +434,8 @@ export default class extends Vue {
       cityCode: '',
       launchPlatformCoe: '',
       dropTime: [],
-      time: []
+      time: [],
+      sort: 1
     }
   }
   // 新建Campaign
@@ -475,7 +478,9 @@ export default class extends Vue {
   }
   // 组装获取列表和导出的条件
   generateParams() {
-    let obj:IState = {}
+    let obj:IState = {
+      sort: this.listQuery.sort
+    }
     this.listQuery.clueType !== '' && (obj.clueType = this.listQuery.clueType)
     this.listQuery.userGroupId && (obj.userGroupId = this.listQuery.userGroupId)
     this.listQuery.areCity && (obj.areCity = this.listQuery.areCity)
@@ -635,13 +640,26 @@ export default class extends Vue {
   private async getDictionaryContract() {
     const { data } = await GetDictionary({ dictType: 'busi_type' })
     if (data.success) {
-      this.platformList = data.data.map((item:IState) => ({
+      let result:IState[] = data.data.map((item:IState) => ({
         label: item.dictLabel,
-        value: item.dictValue
+        value: item.dictLabel
       }))
+      this.platformList.push(...result)
     } else {
       this.$message.error(data)
     }
+  }
+  // 根据创建时间排序
+  handleSortChange(row:IState) {
+    if (row.order === null) {
+      this.listQuery.sort === 0 ? row.order = 'ascending' : row.order = 'descending'
+    }
+    if (row.order === 'ascending') { // 降序
+      this.listQuery.sort = 1
+    } else {
+      this.listQuery.sort = 0
+    }
+    this.getLists()
   }
   // 初始化公共列表
   init() {

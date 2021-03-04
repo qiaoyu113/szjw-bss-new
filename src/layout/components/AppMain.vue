@@ -59,10 +59,12 @@ export default class extends Vue {
     iframe.name = 'szjwCall'
     iframe.src = url;
     (makePhone as HTMLHtmlElement).appendChild(iframe)
+    console.log(url)
   }
   // 根据用户id获取坐席号
   async getInfoByUserId() {
     try {
+      this.handleAddDom({ account: `8001@yunniao`, password: '2_kHzxLREx8001', appId: 'T00000019075', secret: 'dbfecf80-677b-11eb-a7ab-13b8c3cc732e' })
       let userId = localStorage.getItem('userId')
       let params = {
         userId
@@ -78,7 +80,7 @@ export default class extends Vue {
         // T00000019075
         // dbfecf80-677b-11eb-a7ab-13b8c3cc732e
 
-        this.handleAddDom({ account: `${loginName}@yunniao`, password, appId, secret })
+        // this.handleAddDom({ account: `${loginName}@yunniao`, password, appId, secret })
       } else {
         this.$message.error(res.message)
       }
@@ -88,12 +90,12 @@ export default class extends Vue {
       //
     }
   }
-  mounted() {
-    let makePhoneDom = document.getElementById('makePhone')
-    if (!(makePhoneDom as HTMLElement).hasChildNodes()) {
-      this.getInfoByUserId()
-    }
-  }
+  // mounted() {
+  //   let makePhoneDom = document.getElementById('makePhone')
+  //   if (!(makePhoneDom as HTMLElement).hasChildNodes()) {
+  //     this.getInfoByUserId()
+  //   }
+  // }
   created() {
     if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
       this.isPC = false

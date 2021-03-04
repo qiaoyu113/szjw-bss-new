@@ -26,7 +26,7 @@ interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'CallLog1',
+  name: 'CallLog',
   components: {
     SelfTable
   }
@@ -38,7 +38,7 @@ export default class extends Vue {
   private columns:IState[] = [
     {
       key: 'a',
-      label: '邀约人',
+      label: '拨打人',
       'width': '140px'
     },
     {
@@ -53,27 +53,17 @@ export default class extends Vue {
     },
     {
       key: 'd',
-      label: '接通/挂断时间',
+      label: '接通时间',
+      'width': '140px'
+    },
+    {
+      key: 'f',
+      label: '挂断时间',
       'width': '140px'
     },
     {
       key: 'e',
       label: '通话录音文件',
-      'width': '140px'
-    },
-    {
-      key: 'f',
-      label: '跟进情况',
-      'width': '140px'
-    },
-    {
-      key: 'g',
-      label: '意向车型',
-      'width': '140px'
-    },
-    {
-      key: 'h',
-      label: '备注',
       'width': '140px'
     }
   ];

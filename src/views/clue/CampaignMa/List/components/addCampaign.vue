@@ -19,6 +19,14 @@
           clearable
         />
       </template>
+      <template #launchPlatform>
+        <el-autocomplete
+          v-model="listQuery.launchPlatform"
+          class="inline-input"
+          :fetch-suggestions="querySearch"
+          placeholder="请输入"
+        />
+      </template>
     </self-form>
   </div>
 </template>
@@ -91,15 +99,10 @@ export default class extends Vue {
       options: this.cityList
     },
     {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
+      type: 'launchPlatform',
       label: '投放平台',
       key: 'launchPlatform',
-      options: this.platformList
+      slot: true
     },
     {
       type: 9,
@@ -185,7 +188,7 @@ export default class extends Vue {
       { required: true, message: '请选择', trigger: 'blur' }
     ],
     launchPlatform: [
-      { required: true, message: '请选择', trigger: 'blur' }
+      { required: true, message: '请选择', trigger: ['change', 'blur'] }
     ],
     dropStarTime: [
       { required: true, message: '请选择', trigger: 'blur' }
@@ -199,6 +202,11 @@ export default class extends Vue {
     budget: [
       { required: true, message: '请输入', trigger: 'blur' }
     ]
+  }
+  // 搜索投放平台
+  querySearch(queryString:string, cb:Function) {
+    let result:string[] = queryString ? this.platformList.filter((item:IState) => item.label === queryString) : this.platformList
+    cb(result)
   }
   // 表单校验通过
   handlePass() {

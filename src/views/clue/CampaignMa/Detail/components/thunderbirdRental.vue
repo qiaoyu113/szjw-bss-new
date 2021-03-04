@@ -196,9 +196,9 @@ export default class extends Vue {
       let percentArr:number[] = []
       let costArr:number[] = []
 
-      const sumCols:string[] = ['showNum', 'clickNum', 'clueNum', 'intentionNum', 'toFancyNum', 'dealNum'] // 存数字求和
+      const sumCols:string[] = ['showNum', 'clickNum', 'clueNum', 'intentionNum', 'toFancyNum', 'dealNum', 'actualCost'] // 存数字求和
       const percentCols:string[] = ['clickConversionRate', 'clickClueConversionRate', 'interviewDealRate'] // %求平均数
-      const costCols:string[] = ['actualCost', 'clickCost', 'clueCost', 'dealCost'] // 成本求平均数
+      const costCols:string[] = ['clickCost', 'clueCost', 'dealCost'] // 成本求平均数
 
       data.forEach((item:IState) => {
         if (sumCols.includes(column.property)) {
@@ -211,12 +211,13 @@ export default class extends Vue {
       })
       if (sumArr.length > 0) {
         sums[index] = this.sumFunc(sumArr)
+        sums[column.property] = this.sumFunc(sumArr)
       } else if (percentArr.length > 0) {
-        let len:number = this.tableData.length
-        sums[index] = this.sumFunc(percentArr, len) + '%'
+        let percent:number = this.percentFunc(sums, column.property)
+        sums[index] = (percent * 100) + '%'
       } else if (costArr.length > 0) {
-        let len:number = this.tableData.length
-        sums[index] = this.sumFunc(costArr, len)
+        let coast:number = this.coastFunc(sums, column.property)
+        sums[index] = coast
       } else {
         sums[index] = ''
       }
@@ -224,7 +225,7 @@ export default class extends Vue {
     return sums
   }
   // 求和函数
-  sumFunc(values:number[], len:number = 0) {
+  sumFunc(values:number[]) {
     let sums:number = 0
     if (!values.every(value => isNaN(value))) {
       sums = values.reduce((prev, curr) => {
@@ -235,15 +236,51 @@ export default class extends Vue {
           return prev
         }
       }, 0)
-      if (len > 0) {
-        let num:number = sums / len
-        if (parseInt(String(num), 10) === num) {
-          return num
-        }
-        return num.toFixed(2)
-      } else {
-        return sums
-      }
+      return this.isInteger(sums)
+    }
+  }
+  // 是否为整数，否则保留2位
+  isInteger(num:number) {
+    if (parseInt(String(num), 10) === num) {
+      return num
+    }
+    return +num.toFixed(2)
+  }
+  // 除法
+  divisionFunc(values:number, value:number) {
+    let num:number = values / value
+    return this.isInteger(num)
+  }
+  // 计算转化率
+  percentFunc(sums:any, prop:string) {
+    switch (prop) {
+      // 展示-点击转化率
+      case 'clickConversionRate':
+        return this.divisionFunc(sums['clickNum'], sums['showNum'])
+        // 点击-线索转化率
+      case 'clickClueConversionRate':
+        return this.divisionFunc(sums['clueNum'], sums['clickNum'])
+        // 线索-成交转化率
+      case 'interviewDealRate':
+        return this.divisionFunc(sums['dealNum'], sums['clueNum'])
+      default:
+        return 0
+    }
+  }
+  // 计算成本
+  coastFunc(sums:any, prop:string) {
+    switch (prop) {
+      // 点击成本
+      case 'clickCost':
+        return this.divisionFunc(sums['actualCost'], sums['clickNum'])
+        // 线索成本
+      case 'clueCost':
+        return this.divisionFunc(sums['actualCost'], sums['clueNum'])
+        // 成交成本
+      case 'dealCost':
+        return this.divisionFunc(sums['actualCost'], sums['dealNum'])
+      default:
+        return 0
     }
   }
 }

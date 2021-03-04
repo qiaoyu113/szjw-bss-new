@@ -14,13 +14,14 @@
         <el-upload
           ref="upload"
           drag
-          :show-file-list="false"
+          :show-file-list="true"
           :limit="1"
           action="/121"
           :before-upload="beforeFileUpload"
           :auto-upload="false"
           :file-list="fileList"
           :http-request="uploadFile"
+          @before-upload="handleExcelChange"
         >
           <i class="el-icon-upload" />
           <div class="el-upload__text">
@@ -74,10 +75,17 @@ export default class extends Vue {
       slot: true
     }
   ];
+  handleExcelChange() {
+    console.log('xxxx')
+  }
   // 上传前的校验
   beforeFileUpload(file:File) {
-    const isJPG = file.type
-    return true
+    const type = file.type
+    if (['application/vnd.ms-excel', 'application/x-xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(type)) {
+      return true
+    }
+    this.$message.warning('请选择excel文件')
+    return false
   }
   // 验证表单
   handleValidateForm() {
