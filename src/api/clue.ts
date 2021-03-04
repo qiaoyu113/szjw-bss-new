@@ -106,7 +106,7 @@ export const EditCampaignData = (data: any) =>
  */
 export const getClueLCXDetail = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueLCXDetail`,
+    url: `${baseUrl}/v2/market-clue/getClueLCXDetail`,
     method: 'get',
     params
   })
@@ -117,7 +117,7 @@ export const getClueLCXDetail = (params: any) =>
  */
 export const getClueWSXDetail = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueWSXDetail`,
+    url: `${baseUrl}/v2/market-clue/getClueWSXDetail`,
     method: 'get',
     params
   })
@@ -128,7 +128,7 @@ export const getClueWSXDetail = (params: any) =>
  */
 export const getClueLZXDetail = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueLZXDetail`,
+    url: `${baseUrl}/v2/market-clue/getClueLZXDetail`,
     method: 'get',
     params
   })
@@ -139,7 +139,7 @@ export const getClueLZXDetail = (params: any) =>
  */
 export const getClueDetailLogs = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueDetailLogs`,
+    url: `${baseUrl}/v2/market-clue/getClueDetailLogs`,
     method: 'post',
     data
   })
@@ -150,7 +150,7 @@ export const getClueDetailLogs = (data: any) =>
  */
 export const cancelInterview = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/cancelInterview`,
+    url: `${baseUrl}/v2/market-clue/cancelInterview`,
     method: 'post',
     data
   })
@@ -161,7 +161,7 @@ export const cancelInterview = (data: any) =>
  */
 export const clueBreakAnAppointment = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/clueBreakAnAppointment`,
+    url: `${baseUrl}/v2/market-clue/clueBreakAnAppointment`,
     method: 'post',
     data
   })
@@ -172,7 +172,7 @@ export const clueBreakAnAppointment = (data: any) =>
  */
 export const sendMessageApi = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/sendMessage`,
+    url: `${baseUrl}/v2/market-clue/sendMessage`,
     method: 'post',
     data
   })
@@ -183,7 +183,7 @@ export const sendMessageApi = (data: any) =>
  */
 export const followClueToFirmiana = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/followClueToFirmiana`,
+    url: `${baseUrl}/v2/market-clue/followClueToFirmiana`,
     method: 'post',
     data
   })
@@ -194,7 +194,7 @@ export const followClueToFirmiana = (data: any) =>
  */
 export const followClueToThunderBirdTruckPool = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/followClueToThunderBirdTruckPool`,
+    url: `${baseUrl}/v2/market-clue/followClueToThunderBirdTruckPool`,
     method: 'post',
     data
   })
@@ -205,7 +205,7 @@ export const followClueToThunderBirdTruckPool = (data: any) =>
  */
 export const followClueToThunderBirdRental = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/followClueToThunderBirdRental`,
+    url: `${baseUrl}/v2/market-clue/followClueToThunderBirdRental`,
     method: 'post',
     data
   })
@@ -216,7 +216,7 @@ export const followClueToThunderBirdRental = (data: any) =>
  */
 export const editClue = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/editClue`,
+    url: `${baseUrl}/v2/market-clue/editClue`,
     method: 'post',
     data
   })
