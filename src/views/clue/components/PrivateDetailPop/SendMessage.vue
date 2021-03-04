@@ -1,4 +1,4 @@
-/* eslint-disable vue/no-v-html */
+
 <template>
   <div class="SendMessage">
     <SelfDialog
@@ -36,6 +36,7 @@
         class="previewMessage"
       >
         <span style="color:#242020">预览：</span>
+        <!-- eslint-disable vue/no-v-html -->
         <span
           class="messageTitle"
           v-html="messageText"
