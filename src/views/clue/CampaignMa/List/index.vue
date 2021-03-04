@@ -16,11 +16,11 @@
       :pc-col="8"
     >
       <div
-        slot="busiType"
+        slot="clueType"
         :class="isPC ? 'btnPc left' : 'mobile'"
       >
         <el-radio-group
-          v-model="listQuery.type"
+          v-model="listQuery.clueType"
           size="small"
         >
           <el-radio-button
@@ -84,9 +84,18 @@
         :table-data="tableData"
         :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
         :columns="columns"
+        :default-sort="{prop: 'createDate', order: 'descending'}"
         :page="page"
         @onPageSize="handlePageSize"
       >
+        <template v-slot:userGroupId="{row}">
+          <template v-if="row.userGroupId || row.busiTypeName || row.groupTypeName">
+            {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupTypeName }}
+          </template>
+          <template v-else>
+            暂无数据
+          </template>
+        </template>
         <template v-slot:op="scope">
           <el-button
             type="text"
@@ -118,6 +127,7 @@
         ref="addCampaign"
         :region-list="regionList"
         :city-list="cityList"
+        :city-detail="cityDetail"
         :platform-list="platformList"
         @onPass="handlePass"
       />
@@ -148,6 +158,7 @@ import { exportFileTip } from '@/utils/exportTip'
 import { HandlePages, lock } from '@/utils/index'
 import AddCampaign from './components/addCampaign.vue'
 import ImportClue from './components/impotClue.vue'
+import { delayTime } from '@/settings'
 import {
   today,
   yesterday,
@@ -155,6 +166,7 @@ import {
   thirtyday
 } from '../../../driver-freight/components/date'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
+import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -181,9 +193,13 @@ export default class extends Vue {
   private platformList:IState[] = []; // 平台列表
   private listLoading:boolean = false;
   private listQuery:IState = {
-    type: 1,
-    b: '',
-    c: ''
+    clueType: 1,
+    userGroupId: '',
+    areCity: '',
+    cityCode: '',
+    launchPlatformCoe: '',
+    dropTime: [],
+    time: []
   }
   // 新建Campaign
   private showDialog:boolean = false;
@@ -210,8 +226,8 @@ export default class extends Vue {
   ]
   private formItem:any[] = [
     {
-      type: 'busiType',
-      key: 'busiType',
+      type: 'clueType',
+      key: 'clueType',
       label: '',
       w: '0px',
       col: 24,
@@ -225,7 +241,7 @@ export default class extends Vue {
         maxlength: 10
       },
       label: '客群细分ID',
-      key: 'a'
+      key: 'userGroupId'
     },
     {
       type: 2,
@@ -235,10 +251,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '所属区域',
-      key: 'b',
+      key: 'areCity',
       options: this.regionList,
       listeners: {
-        'change': this.cityDetail
+        'change': () => {
+          this.cityDetail(this.listQuery.areCity)
+        }
       }
     },
     {
@@ -249,7 +267,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '城市',
-      key: 'c',
+      key: 'cityCode',
       options: this.cityList
     },
     {
@@ -260,7 +278,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '投放平台',
-      key: 'd',
+      key: 'launchPlatformCoe',
       options: this.platformList
     },
     {
@@ -275,7 +293,7 @@ export default class extends Vue {
         }
       },
       label: '投放时间',
-      key: 'time'
+      key: 'dropTime'
     },
     {
       type: 3,
@@ -289,7 +307,7 @@ export default class extends Vue {
         }
       },
       label: '创建时间',
-      key: 'time1'
+      key: 'time'
     },
     {
       type: 'btnGroup',
@@ -298,78 +316,90 @@ export default class extends Vue {
       w: '0px'
     }
   ]
-  private tableData:any[] = [{}]
+  private tableData:any[] = []
   private columns:IState[] = [
     {
-      key: 'a',
+      key: 'campaignId',
       label: 'Campaign ID',
-      'width': '140px'
+      'width': '100px'
     },
     {
-      key: 'b',
+      key: 'userGroupId',
       label: '客群细分ID/业务线/客群类型',
       'width': '220px',
       slot: true
     },
     {
-      key: 'c',
+      key: 'areCityName',
       label: '所属区域',
-      'width': '140px'
+      'width': '80px'
     },
     {
-      key: 'd',
+      key: 'cityName',
       label: '城市',
-      'width': '140px'
+      'width': '80px'
     },
     {
-      key: 'e',
+      key: 'launchPlatform',
       label: '投放平台',
-      'width': '140px'
+      'width': '100px'
     },
     {
-      key: 'f',
+      key: 'dropMaterials',
       label: '投放物料',
       'width': '140px'
     },
     {
-      key: 'g',
+      key: 'dropStarTime',
       label: '投放起始时间',
-      'width': '120px'
+      'width': '160px'
     },
     {
-      key: 'h',
+      key: 'dropEndTime',
       label: '投放终止时间',
-      'width': '120px'
+      'width': '160px'
     },
     {
-      key: 'i',
+      key: 'landingPage',
       label: '落地页',
-      'width': '180px'
+      'width': '180px',
+      attrs: {
+        'show-overflow-tooltip': true
+      }
     },
     {
-      key: 'j',
+      key: 'appeal',
       label: '诉求',
-      'width': '140px'
+      'width': '140px',
+      attrs: {
+        'show-overflow-tooltip': true
+      }
     },
     {
-      key: 'k',
+      key: 'budget',
       label: '预算 (元)',
-      'width': '140px'
+      'width': '80px'
     },
     {
-      key: 'remark',
+      key: 'remarks',
       label: '备注',
-      'width': '200px'
+      'width': '200px',
+      attrs: {
+        'show-overflow-tooltip': true
+      }
     },
     {
-      key: 'created',
+      key: 'createUserName',
       label: '创建人',
-      'width': '140px'
+      'width': '80px'
     },
     {
-      key: 'createTime',
+      key: 'createDate',
       label: '创建时间',
-      'width': '140px'
+      'width': '160px',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'op',
@@ -383,7 +413,7 @@ export default class extends Vue {
   private page :PageObj= {
     page: 1,
     limit: 30,
-    total: 100
+    total: 0
   }
   // 判断是否是PC
   get isPC() {
@@ -391,11 +421,19 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-
+    this.getLists()
   }
   // 重置
   handleResetClick() {
-
+    this.listQuery = {
+      clueType: 1,
+      userGroupId: '',
+      areCity: '',
+      cityCode: '',
+      launchPlatformCoe: '',
+      dropTime: [],
+      time: []
+    }
   }
   // 新建Campaign
   handleAddClick() {
@@ -408,11 +446,15 @@ export default class extends Vue {
   @lock
   async handleExportClick(sucFun:Function) {
     try {
-      let { data: res } = await { data: {
-        success: true,
-        message: ''
+      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
+      let obj:IState = {
+        1: FirmianaExport,
+        2: FirmianaExport,
+        3: ThunderBirdTruckPoolExport,
+        4: ThunderBirdRentalExport
       }
-      }
+      let params:IState = this.generateParams()
+      let { data: res } = await obj[this.listQuery.clueType](params)
       if (res.success) {
         sucFun()
         this.$message.success('操作成功')
@@ -431,11 +473,44 @@ export default class extends Vue {
     this.page.limit = page.limit
     this.getLists()
   }
+  // 组装获取列表和导出的条件
+  generateParams() {
+    let obj:IState = {}
+    this.listQuery.clueType !== '' && (obj.clueType = this.listQuery.clueType)
+    this.listQuery.userGroupId && (obj.userGroupId = this.listQuery.userGroupId)
+    this.listQuery.areCity && (obj.areCity = this.listQuery.areCity)
+    this.listQuery.cityCode && (obj.cityCode = this.listQuery.cityCode)
+    this.listQuery.launchPlatformCoe !== '' && (obj.launchPlatformCoe = this.listQuery.launchPlatformCoe)
+    if (this.listQuery.dropTime && this.listQuery.dropTime.length > 0) {
+      obj.dropStarTime = new Date(this.listQuery.dropTime[0]).setHours(0, 0, 0)
+      obj.dropEndTime = new Date(this.listQuery.dropTime[1]).setHours(23, 59, 59)
+    }
+    if (this.listQuery.time && this.listQuery.time.length > 0) {
+      obj.startDate = new Date(this.listQuery.time[0]).setHours(0, 0, 0)
+      obj.endDate = new Date(this.listQuery.time[1]).setHours(23, 59, 59)
+    }
+    return obj
+  }
   // 获取列表
   @lock
   async getLists() {
     try {
+      let obj:IState = this.generateParams()
+      let params:IState = {
+        page: this.page.page,
+        limit: this.page.limit,
+        ...obj
+      }
+
       this.listLoading = true
+      let { data: res } = await GetClueCampaignList(params)
+      if (res.success) {
+        this.tableData = res.data
+        res.page = await HandlePages(res.page)
+        this.page.total = res.page.total
+      } else {
+        this.$message.error(res.message)
+      }
     } catch (err) {
       console.log(`get list fail:${err}`)
     } finally {
@@ -445,9 +520,10 @@ export default class extends Vue {
   // 详情
   handleDetailClick(row:IState) {
     this.$router.push({
-      path: '/driverClond/campaignDetail',
+      path: '/clue/campaignDetail',
       query: {
-        id: row.id
+        campaignId: row.campaignId,
+        busiType: row.busiType
       }
     })
   }
@@ -461,27 +537,60 @@ export default class extends Vue {
   }
   // 新建 关闭弹框后
   handleDialogClosed() {
-
+    ((this.$refs.addCampaign) as any).resetForm()
   }
-  // 验证通过
-  handlePass() {
-    //
+  // 新建Campaign
+  @lock
+  async handlePass(params:IState) {
+    try {
+      let { data: res } = await AddCampaignApi(params)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.showDialog = true
+        setTimeout(() => {
+          this.getLists()
+        }, delayTime)
+      } else {
+        this.$message.error(res.message)
+      }
+    } catch (err) {
+      console.log(`add form fail:${err}`)
+    } finally {
+      //
+    }
     console.log('pass')
     this.showDialog = false
   }
   // 导入线索 确定按钮
   confirm1() {
-    ((this.$refs.importClue) as any).handleValidateForm()
+    ((this.$refs.importClue) as any).handlePass()
   }
   // 导入线索 关闭弹框后
   handleDialogClosed1() {
 
   }
-  // 导入验证通过
-  handlePass1() {
-    //
-    console.log('pass')
-    this.showDialog1 = false
+  // 上传excel
+  async handlePass1(formData:FormData) {
+    try {
+      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
+      let obj:IState = {
+        1: FirmianaImport,
+        2: FirmianaImport,
+        3: ThunderBirdTruckPoolImport,
+        4: ThunderBirdRentalImport
+      }
+      let { data: res } = await obj[this.listQuery.clueType](formData)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.showDialog1 = false
+      } else {
+        this.$message.error(res.message)
+      }
+    } catch (err) {
+      console.log(`upload file fail:${err}`)
+    } finally {
+      //
+    }
   }
   // 获取大区列表
   private async areaAddress() {
@@ -502,14 +611,14 @@ export default class extends Vue {
     }
   }
   // 根据大区获取城市列表
-  private async cityDetail() {
+  async cityDetail(parentId:number) {
     let len = this.cityList.length
     if (len > 0) {
       this.cityList.splice(0, len)
     }
-    this.listQuery.c = ''
+    this.listQuery.cityCode = ''
     let params:IState = {
-      parentId: this.listQuery.b
+      parentId
     }
     let { data: city } = await getOfficeByTypeAndOfficeId(params)
     if (city.success) {
@@ -526,17 +635,25 @@ export default class extends Vue {
   private async getDictionaryContract() {
     const { data } = await GetDictionary({ dictType: 'busi_type' })
     if (data.success) {
-      // this.optionsBusi = data.data
+      this.platformList = data.data.map((item:IState) => ({
+        label: item.dictLabel,
+        value: item.dictValue
+      }))
     } else {
       this.$message.error(data)
     }
   }
-
+  // 初始化公共列表
   init() {
     this.areaAddress()
+    this.getDictionaryContract()
+  }
+  activated() {
+    this.getLists()
   }
   mounted() {
     this.init()
+    this.getLists()
   }
 }
 </script>

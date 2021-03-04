@@ -106,6 +106,7 @@
           <el-date-picker
             v-else-if="item.type ===6"
             v-model="listQuery[item.key]"
+            v-bind="item.tagAttrs || {}"
             :editable="false"
             type="date"
             value-format="timestamp"

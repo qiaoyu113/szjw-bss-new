@@ -5,7 +5,10 @@
         title="基础信息"
         :md="true"
       >
-        <ShowForm :list-query="listQuery" />
+        <ShowForm
+          ref="showForm"
+          :campaign-id="campaignId"
+        />
       </SectionContainer>
     </div>
     <SectionContainer
@@ -13,18 +16,21 @@
       :md="true"
     >
       <WuTong
-        v-if="type === 1"
-        :table-data="tableData"
+        v-if="[1,2].includes(busiType)"
+        ref="wutong"
+        :campaign-id="campaignId"
         :is-edit="isEdit"
       />
       <ThunderbirdPool
-        v-else-if="type === 2"
-        :table-data="tableData"
+        v-else-if="busiType === 3"
+        ref="pool"
+        :campaign-id="campaignId"
         :is-edit="isEdit"
       />
       <ThunderbirdRental
-        v-else-if="type === 3"
-        :table-data="tableData"
+        v-else-if="busiType === 4"
+        ref="rental"
+        :campaign-id="campaignId"
         :is-edit="isEdit"
       />
       <template #rightBox>
@@ -61,6 +67,7 @@ import ShowForm from './components/showForm.vue'
 import WuTong from './components/wutong.vue'
 import ThunderbirdPool from './components/thunderbirdPool.vue'
 import ThunderbirdRental from './components/thunderbirdRental.vue'
+import { EditCampaignData } from '@/api/clue'
 interface IState {
   [key: string]: any;
 }
@@ -75,10 +82,9 @@ interface IState {
   }
 })
 export default class extends Vue {
+  private campaignId:string = '' // campaignId
   private isEdit:boolean = false;
-  private listQuery:IState = {};
-  private tableData:IState[] = [{}, {}];
-  private type:number = 3 // 数据统计类型
+  private busiType:number = 1 // 业务线类型
 
   // 编辑
   handleEditClick() {
@@ -91,6 +97,57 @@ export default class extends Vue {
   // 完成
   handleFinishClick() {
     this.isEdit = false
+    this.editCampaignData()
+  }
+  // 编辑数据统计
+  async editCampaignData() {
+    try {
+      let params:IState[] = []
+      let arrs:IState[] = []
+      if ([1, 2].includes(this.busiType)) {
+        arrs = (this.$refs.wutong as any).tableData
+      } else if (this.busiType === 3) {
+        arrs = (this.$refs.pool as any).tableData
+      } else if (this.busiType === 4) {
+        arrs = (this.$refs.rental as any).tableData
+      }
+      params = arrs.map((item:IState) => ({
+        statisticsId: item.statisticsId,
+        campaignId: this.campaignId,
+        actualCost: +item.actualCost1,
+        clickNum: +item.clickNum1,
+        showNum: +item.showNum1
+      }))
+      let { data: res } = await EditCampaignData(params)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.getTable()
+      } else {
+        this.$message.error(res.message)
+      }
+    } catch (err) {
+      console.log(`edit campaign fail:${err}`)
+    } finally {
+      //
+    }
+  }
+  // 获取数据统计的表格数据
+  getTable() {
+    if ([1, 2].includes(this.busiType)) {
+      (this.$refs.wutong as any).getTableData()
+    } else if (this.busiType === 3) {
+      (this.$refs.pool as any).getTableData()
+    } else if (this.busiType === 4) {
+      (this.$refs.rental as any).getTableData()
+    }
+  }
+  mounted() {
+    this.campaignId = (this.$route.query.campaignId as string)
+    this.busiType = +(this.$route.query.busiType as string)
+    setTimeout(() => {
+      (this.$refs.showForm as any).getDetail()
+      this.getTable()
+    }, 20)
   }
 }
 </script>

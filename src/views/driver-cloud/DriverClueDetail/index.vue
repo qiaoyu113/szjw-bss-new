@@ -240,7 +240,6 @@
       @fresh="getDriverClueDetail"
     />
     <log-list ref="logs" />
-    <call-log1 />
   </div>
 </template>
 <script lang="ts">
@@ -254,7 +253,6 @@ import LogList from './components/opLogs.vue'
 import { lock, DataIsNull, parseTime } from '@/utils/index'
 import { delayTime } from '@/settings'
 import { GetDictionaryList } from '@/api/common'
-import CallLog1 from '@/components/OutboundDialog/CallLog1.vue'
 interface IState {
   [key: string]: any;
 }
@@ -264,8 +262,7 @@ interface IState {
     SelfForm,
     SelfDialog,
     SelfEdit,
-    LogList,
-    CallLog1
+    LogList
   }
 })
 export default class extends Vue {

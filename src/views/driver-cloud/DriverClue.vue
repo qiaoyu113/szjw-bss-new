@@ -189,13 +189,6 @@
         </template>
         <template v-slot:op="scope">
           <el-button
-            type="text"
-            size="small"
-            @click="handleCallClick(scope.row)"
-          >
-            呼叫
-          </el-button>
-          <el-button
             v-permission="['/v2/clueH5/detail']"
             type="text"
             size="small"
@@ -235,7 +228,6 @@
         @onPass="handlePassClick"
       />
     </SelfDialog>
-    <outbound-dialog ref="showOutbound" />
   </div>
 </template>
 <script lang="ts">
@@ -248,7 +240,6 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDriverClueList, ExportDriverClue, allocationClue1 } from '@/api/driver-cloud'
 import { delayTime } from '@/settings'
 import { HandlePages, lock, parseTime, showCityGroupPerson, showWork, DataIsNull } from '@/utils/index'
-import OutboundDialog from '@/components/OutboundDialog/index.vue'
 import {
   today,
   yesterday,
@@ -271,8 +262,7 @@ interface IState {
   components: {
     SelfForm,
     SelfTable,
-    SelfDialog,
-    OutboundDialog
+    SelfDialog
   }
 })
 export default class extends Vue {
@@ -959,11 +949,6 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     }
-  }
-  // 外呼
-  handleCallClick(row:IState) {
-    localStorage.setItem('callId', row.marketClueId);
-    (this.$refs.showOutbound as any).showDialog = true
   }
   init() {
     this.getLists()

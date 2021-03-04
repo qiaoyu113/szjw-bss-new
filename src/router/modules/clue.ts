@@ -74,6 +74,17 @@ const clueRouter: RouteConfig = {
         title: 'campaignList',
         noCache: false
       }
+    },
+    {
+      path: 'phoneDemo', /* CamPaign详情 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/PhoneDemo.vue'),
+      name: 'phoneDemo',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'campaignList',
+        noCache: false
+      }
     }
   ]
 }

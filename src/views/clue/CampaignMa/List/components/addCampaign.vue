@@ -11,9 +11,9 @@
       :rules="rules"
       @onPass="handlePass"
     >
-      <template #h>
+      <template #budget>
         <el-input
-          v-model="listQuery.h"
+          v-model="listQuery.budget"
           v-only-number="{min: 0, max: 999999.99, precision: 2}"
           placeholder="请输入"
           clearable
@@ -39,7 +39,19 @@ export default class extends Vue {
   @Prop({ default: () => {} }) regionList!:IState;
   @Prop({ default: () => {} }) cityList!:IState;
   @Prop({ default: () => {} }) platformList!:IState;
-  private listQuery:IState = {}
+  @Prop({ default: () => {} }) cityDetail!:Function;
+  private listQuery:IState = {
+    userGroupId: '',
+    areCity: '',
+    city: '',
+    launchPlatform: '',
+    dropStarTime: '',
+    dropEndTime: '',
+    landingPage: '',
+    budget: '',
+    appeal: '',
+    remarks: ''
+  }
   private formItem:any[] = [
     {
       type: 1,
@@ -49,7 +61,7 @@ export default class extends Vue {
         maxlength: 10
       },
       label: '客群细分ID',
-      key: 'a'
+      key: 'userGroupId'
     },
     {
       type: 2,
@@ -59,8 +71,13 @@ export default class extends Vue {
         filterable: true
       },
       label: '所属区域',
-      key: 'b',
-      options: this.regionList
+      key: 'areCity',
+      options: this.regionList,
+      listeners: {
+        'change': () => {
+          this.cityDetail(this.listQuery.areCity)
+        }
+      }
     },
     {
       type: 2,
@@ -70,7 +87,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '城市',
-      key: 'c',
+      key: 'city',
       options: this.cityList
     },
     {
@@ -81,29 +98,39 @@ export default class extends Vue {
         filterable: true
       },
       label: '投放平台',
-      key: 'd',
+      key: 'launchPlatform',
       options: this.platformList
     },
     {
-      type: 6,
+      type: 9,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        'default-time': ['00:00:00', '23:59:59']
+        format: 'yyyy-MM-dd HH:mm',
+        'value-format': 'yyyy-MM-dd HH:mm'
       },
       label: '投放起始时间',
-      key: 'startTime'
+      key: 'dropStarTime'
     },
     {
-      type: 6,
+      type: 9,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        'default-time': ['00:00:00', '23:59:59']
+        format: 'yyyy-MM-dd HH:mm',
+        'value-format': 'yyyy-MM-dd HH:mm',
+        'picker-options': {
+          disabledDate: (time:Date) => {
+            if (!this.listQuery.dropStarTime) {
+              return true
+            }
+            return time.getTime() < new Date(this.listQuery.dropStarTime).getTime()
+          }
+        }
 
       },
       label: '投放终止时间',
-      key: 'endTime'
+      key: 'dropEndTime'
     },
     {
       type: 1,
@@ -113,12 +140,12 @@ export default class extends Vue {
         maxlength: 10
       },
       label: '落地页',
-      key: 'g'
+      key: 'landingPage'
     },
     {
-      type: 'h',
+      type: 'budget',
       label: '预算(元)',
-      key: 'h',
+      key: 'budget',
       slot: true
     },
     {
@@ -131,7 +158,7 @@ export default class extends Vue {
         rows: 3
       },
       label: '诉求',
-      key: 'i'
+      key: 'appeal'
     },
     {
       type: 1,
@@ -143,42 +170,47 @@ export default class extends Vue {
         rows: 3
       },
       label: '备注',
-      key: 'j'
+      key: 'remarks'
     }
   ]
   // 表单校验规则
   private rules:IState ={
-    a: [
+    userGroupId: [
       { required: true, message: '请输入客群细分ID', trigger: 'blur' }
     ],
-    b: [
+    areCity: [
       { required: true, message: '请选择', trigger: 'blur' }
     ],
-    c: [
+    city: [
       { required: true, message: '请选择', trigger: 'blur' }
     ],
-    d: [
+    launchPlatform: [
       { required: true, message: '请选择', trigger: 'blur' }
     ],
-    startTime: [
+    dropStarTime: [
       { required: true, message: '请选择', trigger: 'blur' }
     ],
-    endTime: [
+    dropEndTime: [
       { required: true, message: '请选择', trigger: 'blur' }
     ],
-    g: [
+    landingPage: [
       { required: true, message: '请输入', trigger: 'blur' }
     ],
-    h: [
+    budget: [
       { required: true, message: '请输入', trigger: 'blur' }
     ]
   }
+  // 表单校验通过
   handlePass() {
-    this.$emit('onPass')
+    this.$emit('onPass', this.listQuery)
   }
   // 验证表单
   handleValidateForm() {
     ((this.$refs.form) as any).submitForm()
+  }
+  // 重置表单
+  resetForm() {
+    ((this.$refs.form) as any).resetForm()
   }
 }
 </script>

@@ -9,15 +9,18 @@
       label-position="top"
       class="p15"
       :pc-col="24"
-      :rules="rules"
-      @onPass="handlePass"
     >
       <template #file>
         <el-upload
+          ref="upload"
           drag
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-success="handleFileSuccess"
+          :show-file-list="false"
+          :limit="1"
+          action="/121"
           :before-upload="beforeFileUpload"
+          :auto-upload="false"
+          :file-list="fileList"
+          :http-request="uploadFile"
         >
           <i class="el-icon-upload" />
           <div class="el-upload__text">
@@ -55,6 +58,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  fileList:any[] = [];
   private listQuery:IState = {};
   private formItem:any[] = [
     {
@@ -70,26 +74,24 @@ export default class extends Vue {
       slot: true
     }
   ];
-  private rules:IState = {
-    file: [
-      { required: true, message: '请选择导入文件', trigger: 'blur' }
-    ]
-  }
   // 上传前的校验
   beforeFileUpload(file:File) {
     const isJPG = file.type
     return true
   }
-  // 上传成功的校验
-  handleFileSuccess(res:IState) {
-
-  }
   // 验证表单
   handleValidateForm() {
     ((this.$refs.form1) as any).submitForm()
   }
+  // 调用上传
   handlePass() {
-    this.$emit('onPass')
+    (this.$refs.upload as any).submit()
+  }
+  uploadFile(file:any) {
+    let formData = new FormData()
+    formData.append('file', file.file)
+    this.$emit('onPass', formData)
+    this.fileList = []
   }
   // 下载模板
   handleDownloadClick() {

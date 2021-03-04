@@ -159,3 +159,10 @@ export const getGroupInfoByCityCodeAndProductLine = (params:any) =>
     method: 'get',
     params
   })
+// 获取用户信息
+export const GetInfoByUserId = (params: any) =>
+  request({
+    url: `/base_center/auth/v3/agent/getInfoByUserId`,
+    method: 'get',
+    params
+  })
