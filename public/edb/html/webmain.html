@@ -102,7 +102,12 @@
                    onclick="softphoneBar.dialout(m7$('#moorCall-dialout-input').val(), '')">外呼
                     <span class="icon outcallIcon"></span>
                 </a>
-               
+                <!-- <a href="#" class="DialEnable" id="DialEnable">外呼
+                    <span class="icon outcallIcon"></span>
+                </a>
+                <a href="#" class="DialDisable disable" id="DialDisable" style="display: none">外呼
+                    <span class="icon outcallIcon"></span>
+                </a> -->
             </li>
             <li>
                 <a href="#" class="DialEnable" id="smallDialEnable" style="width: 102px;"
@@ -500,7 +505,6 @@
         })
         let isDTMF = false
         window.webPhone.onMessage(function(msg){
-          console.log(`错误信息:${msg}`)
           if (msg === 'incomingcall' || msg === 'Outbound') {
             m7$('#toggleMute').show() //显示静音按钮  
             isDTMF = true
@@ -513,6 +517,7 @@
             if (m7$('#autoAnswer').is(':checked')) {
                 webPhone.Outbound()
            } else {
+                window.parent.document.getElementById('szjw_answer_btn').click()
                 m7$('#incomingcall').show()
             }
           } else if (msg === 'hangup') {  
@@ -532,7 +537,6 @@
           }
         })
         window.webPhone.onError(function(error){
-          
             if (error && error.type !== 'socket') {
                 console.log('janusError:', error)
                 m7$('#webrtc_status').css({color:'red'}).text('连接失败')
