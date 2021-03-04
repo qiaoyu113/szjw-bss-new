@@ -32,7 +32,10 @@
               v-permission="['/root']"
               v-permission="['/root']" -->
             <span />
-            <el-button type="text">
+            <el-button
+              type="text"
+              @click="callPhoneDio = true"
+            >
               打电话
             </el-button>
             <el-button
@@ -199,6 +202,12 @@
       :clue-status="clueStatus"
       :base-info="baseInfoEdio"
     />
+
+    <CallPhone
+      :show-dialog.sync="callPhoneDio"
+      :clue-status="+clueStatus"
+      :phone="baseInfoEdio.phone"
+    />
   </div>
 </template>
 
@@ -208,7 +217,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
-import { FollowUpDiolog, SendMessage, InfoEditDio } from './components/index'
+import { FollowUpDiolog, SendMessage, InfoEditDio, CallPhone } from './components/index'
 import {
   getClueWSXDetail,
   getClueLCXDetail,
@@ -235,7 +244,8 @@ interface IState {
     SelfTable,
     FollowUpDiolog,
     SendMessage,
-    InfoEditDio
+    InfoEditDio,
+    CallPhone
   }
 })
 export default class extends Vue {
@@ -243,6 +253,7 @@ export default class extends Vue {
   private clueStatus: string = '0';
   private followUpDio: boolean = false;
   private messageDio: boolean = false;
+  private callPhoneDio: boolean = false;
   private editDio: boolean = false;
   private clueArr: IState[] = [
     { name: '梧桐专车', code: '0' },

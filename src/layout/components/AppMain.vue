@@ -77,8 +77,8 @@ export default class extends Vue {
         // 2_kHzxLREx8001
         // T00000019075
         // dbfecf80-677b-11eb-a7ab-13b8c3cc732e
-
-        this.handleAddDom({ account: `${loginName}@yunniao`, password, appId, secret })
+        this.handleAddDom({ account: `8001@yunniao`, password: '2_kHzxLREx8001', appId: 'T00000019075', secret: 'dbfecf80-677b-11eb-a7ab-13b8c3cc732e' })
+        // this.handleAddDom({ account: `${loginName}@yunniao`, password, appId, secret })
       } else {
         this.$message.error(res.message)
       }

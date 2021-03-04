@@ -246,14 +246,14 @@ export default class extends Vue {
       }
     },
     {
-      type: 2,
+      type: 1,
       key: 'nowProfession',
       label: '当前职业',
-      col: 24,
       tagAttrs: {
-        placeholder: '请填写'
-      },
-      option: []
+        placeholder: '请填写',
+        maxlength: '10',
+        showWordLimit: true
+      }
     },
     {
       type: 1,
