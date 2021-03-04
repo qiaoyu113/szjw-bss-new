@@ -1,5 +1,6 @@
 <template>
   <div>
+    <FollowForm />
     <SelfDialog
       :visible.sync="show"
       title="跟进情况"
@@ -122,6 +123,7 @@ import {
   followClueToThunderBirdRental
 } from '@/api/clue'
 import { GetDictionaryList } from '@/api/common'
+import { FollowForm } from '../index'
 interface IState {
   [key: string]: any;
 }
@@ -129,7 +131,8 @@ interface IState {
   name: 'FollowUpDio',
   components: {
     SelfDialog,
-    SelfForm
+    SelfForm,
+    FollowForm
   }
 })
 export default class extends Vue {
@@ -141,13 +144,13 @@ export default class extends Vue {
   private inviteFailReasonOptions: object[] = [];
   private intentDegreeOptions: object[] = [];
   private demandTypeOptions: object[] = [];
-  private carOptions:object[] = [
+  private carOptions: object[] = [
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
     { label: '面包', value: 35 },
     { label: '其他', value: 45 }
-  ]
+  ];
 
   // 梧桐
   private followUpArrWT: IState[] = [
@@ -737,13 +740,7 @@ export default class extends Vue {
   async sendBirdCarFollow(value: IState) {
     try {
       let params: IState = {}
-      let {
-        markStatus,
-        demandType,
-        remark,
-        contact,
-        hasIntentionGold
-      } = value
+      let { markStatus, demandType, remark, contact, hasIntentionGold } = value
       switch (value.markStatus) {
         case 1:
           params.demandType = demandType

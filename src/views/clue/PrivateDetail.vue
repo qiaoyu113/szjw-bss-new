@@ -587,7 +587,7 @@ export default class extends Vue {
 
   private logData: IState[] = [];
 
-  private baseInfoEdio:IState = {}
+  private baseInfoEdio: IState = {};
 
   // 判断是否是PC
   get isPC() {
@@ -615,7 +615,7 @@ export default class extends Vue {
   }
 
   get infoBase() {
-    let arr:object[] = []
+    let arr: object[] = []
     if (Number(this.clueStatus) < 2) {
       arr = this.infoBaseWT
     } else if (Number(this.clueStatus) === 2) {
@@ -628,11 +628,14 @@ export default class extends Vue {
     baseInfoArr.forEach((ele: any) => {
       arr.forEach((item: any) => {
         if (item.key === 'intentWorkAddress') {
-          item.value = this.baseInfoEdio.expectAddressCityName + this.baseInfoEdio.expectAddressCountyName
+          item.value =
+            this.baseInfoEdio.expectAddressCityName +
+            this.baseInfoEdio.expectAddressCountyName
         }
         if (item.key !== undefined && ele[0] === item.key) {
           if (item.key === 'hasCar') {
-            item.value = (ele[1] ? '有' : '否') + ';' + this.baseInfoEdio.carTypeName
+            item.value =
+              (ele[1] ? '有' : '否') + ';' + this.baseInfoEdio.carTypeName
           } else {
             item.value = ele[1]
           }
@@ -674,7 +677,7 @@ export default class extends Vue {
     return newArray
   }
 
-  private setOther(value:object) {
+  private setOther(value: object) {
     let otherInfoArr = Object.entries(value)
     otherInfoArr.forEach((ele: any) => {
       this.otherInfoColumns.forEach((item: any) => {

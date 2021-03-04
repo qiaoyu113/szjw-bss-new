@@ -77,13 +77,13 @@ export default class extends Vue {
 
   private submitLoading: boolean = false;
 
-  private typeArr:object[] = [
+  private typeArr: object[] = [
     { name: '邀约成功', code: 0 },
     { name: '邀约失败', code: 1 },
     { name: '首邀未联系上', code: 2 }
-  ]
+  ];
 
-  private checkPhone = (rule:any, value:any, callback:any) => {
+  private checkPhone = (rule: any, value: any, callback: any) => {
     if (phoneRegExp.test(value)) {
       callback()
     } else {
@@ -97,7 +97,10 @@ export default class extends Vue {
     interviewAddress: [{ required: true, message: '请输入面试地址' }],
     interviewDate: [{ required: true, message: '请选择面试时间' }],
     userName: [{ required: true, message: '请输入联系人' }],
-    userPhone: [{ type: 'string', required: true, message: '请输入联系电话' }, { validator: this.checkPhone, trigger: 'blur' }]
+    userPhone: [
+      { type: 'string', required: true, message: '请输入联系电话' },
+      { validator: this.checkPhone, trigger: 'blur' }
+    ]
   };
 
   private dialogPopQuery: IState = {
@@ -107,9 +110,9 @@ export default class extends Vue {
     interviewDate: '',
     userName: '',
     userPhone: ''
-  }
+  };
 
-  private dialogFormItem :IState[] = [
+  private dialogFormItem: IState[] = [
     {
       slot: true,
       type: 'type',
@@ -168,28 +171,28 @@ export default class extends Vue {
         placeholder: '请输入联系电话'
       }
     }
-  ]
+  ];
 
-  private canPreview:boolean = false;
+  private canPreview: boolean = false;
 
-  private messageText:string = ''
+  private messageText: string = '';
 
-  private itemData:object[] = []
+  private itemData: object[] = [];
 
   get sendFormItem() {
-    let arr:object[] = []
-    let noneArr:string[] = ['userName', 'interviewAddress', 'interviewDate']
+    let arr: object[] = []
+    let noneArr: string[] = ['userName', 'interviewAddress', 'interviewDate']
     switch (this.dialogPopQuery.messageType) {
       case 0:
         arr = [...this.dialogFormItem]
         break
       case 1:
-        arr = this.dialogFormItem.filter((ele:any) => {
+        arr = this.dialogFormItem.filter((ele: any) => {
           return ele.key !== 'interviewDate'
         })
         break
       case 2:
-        arr = this.dialogFormItem.filter((ele:any) => {
+        arr = this.dialogFormItem.filter((ele: any) => {
           let log = noneArr.includes(ele.key)
           return !log
         })
@@ -210,7 +213,7 @@ export default class extends Vue {
   }
 
   @Watch('dialogPopQuery.messageType')
-  changeType(val:any) {
+  changeType(val: any) {
     this.defineData(val);
     (this.$refs['dialogSendMessage'] as any).clearValidate()
   }
@@ -218,18 +221,20 @@ export default class extends Vue {
   // 短信模板预览
   @Watch('dialogPopQuery', { deep: true })
   changeQuery(val: any, oldVal: any) {
-    let arr:string[] = []
-    this.sendFormItem.forEach((ele:any) => {
+    let arr: string[] = []
+    this.sendFormItem.forEach((ele: any) => {
       if (ele.key) {
         arr.push(ele.key)
       }
     })
 
-    this.canPreview = !Object.entries(val).filter(ele => {
-      return arr.includes(ele[0])
-    }).some(item => {
-      return item[1] === '' || item[1] === null || item[1] === undefined
-    })
+    this.canPreview = !Object.entries(val)
+      .filter((ele) => {
+        return arr.includes(ele[0])
+      })
+      .some((item) => {
+        return item[1] === '' || item[1] === null || item[1] === undefined
+      })
 
     if (!phoneRegExp.test(val.userPhone)) {
       this.canPreview = false
@@ -240,7 +245,7 @@ export default class extends Vue {
     }
   }
 
-  private defineData(val:number) {
+  private defineData(val: number) {
     if (val === 0 && this.baseInfo.inviteDate) {
       this.dialogPopQuery.interviewDate = this.baseInfo.inviteDate
     }
@@ -248,22 +253,30 @@ export default class extends Vue {
   }
 
   // 短信预览是否显示
-  private showPreview(val:any) {
+  private showPreview(val: any) {
     if (val.messageType === 0) {
       this.messageText = `<span>  
-      【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅您好，已成功为您预约云鸟面试，现场已有专业的加盟经理等待您的到来。请您携带本人身份证，驾驶证，行驶证准时参加。路上注意安全，期待与您的会面！
+      【云鸟配送】<span style="color:#242020">${this.dealWithName(
+    val.driverName
+  )}</span>师傅您好，已成功为您预约云鸟面试，现场已有专业的加盟经理等待您的到来。请您携带本人身份证，驾驶证，行驶证准时参加。路上注意安全，期待与您的会面！
       </span>`
     } else if (val.messageType === 1) {
-      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅，您好，感谢您的接听，非常期待师傅您的加入。云鸟线路实时更新，更多更新的线路等待与您的匹配。</span>`
+      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(
+        val.driverName
+      )}</span>师傅，您好，感谢您的接听，非常期待师傅您的加入。云鸟线路实时更新，更多更新的线路等待与您的匹配。</span>`
     } else {
-      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅您好，您的信息已审核。诚邀您加入云鸟，不需要抢单，货源充足，有多条线路可以任你选择，详情请联系：<span style="color:#242020">${val.userPhone}</span>（微信同号）。回T退订。</span>`
+      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(
+        val.driverName
+      )}</span>师傅您好，您的信息已审核。诚邀您加入云鸟，不需要抢单，货源充足，有多条线路可以任你选择，详情请联系：<span style="color:#242020">${
+        val.userPhone
+      }</span>（微信同号）。回T退订。</span>`
     }
 
     this.itemData = []
 
-    this.sendFormItem.forEach((ele:any) => {
+    this.sendFormItem.forEach((ele: any) => {
       if (!ele.slot && val.messageType !== 2) {
-        let item:IState = {
+        let item: IState = {
           label: ele.label,
           key: ele.key
         }
@@ -271,7 +284,9 @@ export default class extends Vue {
           if (key === ele.key) {
             if (key === 'interviewDate') {
               let timeArr = Timestamp(val[key]).split(' ')[0].split('-')
-              item.value = `${timeArr[0]}年${timeArr[1]}月${timeArr[2]}日  ${Timestamp(val[key]).split(' ')[1]}`
+              item.value = `${timeArr[0]}年${timeArr[1]}月${timeArr[2]}日  ${
+                Timestamp(val[key]).split(' ')[1]
+              }`
             } else {
               item.value = val[key]
             }
@@ -282,7 +297,7 @@ export default class extends Vue {
     })
   }
 
-  private dealWithName(val:string) {
+  private dealWithName(val: string) {
     return val.indexOf('师傅') !== -1 ? val.replace('师傅', '') : val
   }
 
@@ -332,17 +347,22 @@ export default class extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.SendMessage{
-  .previewMessage{
+.SendMessage {
+  .previewMessage {
     padding: 15px 30px;
     box-sizing: border-box;
-    word-wrap:break-word;
-    color: #9e9e9e ;
+    word-wrap: break-word;
+    color: #9e9e9e;
     line-height: 20px;
-    ul,li{ padding:0;margin:0;list-style:none}
+    ul,
+    li {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
   }
 }
-  .messageTitle >>> .nameText{
-    color: #242020;
-  }
+.messageTitle >>> .nameText {
+  color: #242020;
+}
 </style>

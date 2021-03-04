@@ -132,7 +132,11 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { lock } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { GetCityByCode, GetDictionaryList, GetDictionaryCity } from '@/api/common'
+import {
+  GetCityByCode,
+  GetDictionaryList,
+  GetDictionaryCity
+} from '@/api/common'
 import { editClue } from '@/api/clue'
 
 interface IState {
@@ -150,14 +154,14 @@ export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
   @Prop({ default: '0' }) private clueStatus!: string;
   @Prop({ default: {} }) private baseInfo!: object;
-  private demandTypeOptions:object[] = []
-  private carOptions:object[] = [
+  private demandTypeOptions: object[] = [];
+  private carOptions: object[] = [
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
     { label: '面包', value: 35 },
     { label: '其他', value: 45 }
-  ]
+  ];
   private submitLoading: boolean = false;
   // 梧桐
   private optionsCarType: object[] = [];
@@ -224,7 +228,7 @@ export default class extends Vue {
         maxlength: '3'
       },
       listeners: {
-        'input': this.handleValidateExperience
+        input: this.handleValidateExperience
       }
     },
     {
@@ -238,7 +242,7 @@ export default class extends Vue {
         maxlength: '2'
       },
       listeners: {
-        'input': this.handleValidateAge
+        input: this.handleValidateAge
       }
     },
     {
@@ -466,7 +470,7 @@ export default class extends Vue {
   }
 
   get formStatus() {
-    let ref:IState = {}
+    let ref: IState = {}
     switch (Number(this.clueStatus)) {
       case 0:
         ref.form = 'editFormWt'
@@ -493,17 +497,22 @@ export default class extends Vue {
   }
 
   @Watch('showDialog')
-  onShowDialog(val:boolean) {
+  onShowDialog(val: boolean) {
     if (val) {
-      if (this.showDialog) { this.setQuerys(this.baseInfo) }
+      if (this.showDialog) {
+        this.setQuerys(this.baseInfo)
+      }
       this.getOptions()
     }
   }
 
-  private setQuerys(value:IState) {
+  private setQuerys(value: IState) {
     if (Number(this.clueStatus) < 2) {
       this.WTQuery = { ...this.WTQuery, ...value }
-      this.WTQuery.intentWork = [value.expectAddressCity, value.expectAddressCounty]
+      this.WTQuery.intentWork = [
+        value.expectAddressCity,
+        value.expectAddressCounty
+      ]
       if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
         this.WTQuery.intentWork.pop()
         this.WTQuery.intentWork.push(this.countryValue)
@@ -517,9 +526,9 @@ export default class extends Vue {
     }
   }
 
-  private countryValue = '' // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区
+  private countryValue = ''; // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区
 
-  validateCity = (rule:any, value:any, callback:any) => {
+  validateCity = (rule: any, value: any, callback: any) => {
     if (value && value.length === 2) {
       callback()
     } else {
@@ -527,143 +536,143 @@ export default class extends Vue {
     }
   };
 
-   private rulesWT: IState = {
-     intentWork: [
-       { required: true, message: '请选择期望工作区域', trigger: 'blur' },
-       { validator: this.validateCity, trigger: 'blur' }
-     ]
-   };
+  private rulesWT: IState = {
+    intentWork: [
+      { required: true, message: '请选择期望工作区域', trigger: 'blur' },
+      { validator: this.validateCity, trigger: 'blur' }
+    ]
+  };
 
-   /**
-     * 期望工作区域
-     */
-   async loadWorkCity(node:any, resolve:any) {
-     let params:string[] = []
-     if (node.level === 0) {
-       let nodes = await this.getOpenCity()
-       resolve(nodes)
-     } else if (node.level === 1) {
-       params = ['100000']
-       params.push(node.value.toString().slice(0, 2) + '0000')
-       params.push(node.value)
-       let nodes = await this.loadCityByCode(params)
-       this.countryValue = nodes[1].value
-       resolve(nodes)
-     }
-   }
-   // 获取开通城市
-   async getOpenCity() {
-     try {
-       let { data: res } = await GetDictionaryCity()
-       if (res.success) {
-         let arr = res.data.map((item:any) => ({
-           value: item.code,
-           label: item.name
-         }))
-         return arr
-       } else {
-         this.$message.error(res.errorMsg)
-       }
-     } catch (err) {
-       console.log(`get open city list fail:${err}`)
-     } finally {
-       //
-     }
-   }
+  /**
+   * 期望工作区域
+   */
+  async loadWorkCity(node: any, resolve: any) {
+    let params: string[] = []
+    if (node.level === 0) {
+      let nodes = await this.getOpenCity()
+      resolve(nodes)
+    } else if (node.level === 1) {
+      params = ['100000']
+      params.push(node.value.toString().slice(0, 2) + '0000')
+      params.push(node.value)
+      let nodes = await this.loadCityByCode(params)
+      this.countryValue = nodes[1].value
+      resolve(nodes)
+    }
+  }
+  // 获取开通城市
+  async getOpenCity() {
+    try {
+      let { data: res } = await GetDictionaryCity()
+      if (res.success) {
+        let arr = res.data.map((item: any) => ({
+          value: item.code,
+          label: item.name
+        }))
+        return arr
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get open city list fail:${err}`)
+    } finally {
+      //
+    }
+  }
 
-   /**
-     * 加载城市
-     */
-   async loadCityByCode(params:string[]) {
-     try {
-       let { data: res } = await GetCityByCode(params)
-       if (res.success) {
-         const nodes = res.data.map(function(item:any) {
-           return {
-             value: item.code,
-             label: item.name,
-             leaf: params.length > 1
-           }
-         })
-         return nodes
-       }
-     } catch (err) {
-       console.log(`load city by code fail:${err}`)
-     }
-   }
+  /**
+   * 加载城市
+   */
+  async loadCityByCode(params: string[]) {
+    try {
+      let { data: res } = await GetCityByCode(params)
+      if (res.success) {
+        const nodes = res.data.map(function(item: any) {
+          return {
+            value: item.code,
+            label: item.name,
+            leaf: params.length > 1
+          }
+        })
+        return nodes
+      }
+    } catch (err) {
+      console.log(`load city by code fail:${err}`)
+    }
+  }
 
-   // 获取车型
-   async getOptions() {
-     try {
-       let params = ['Intentional_compartment', 'demand_type']
-       let { data: res } = await GetDictionaryList(params)
-       if (res.success) {
-         let cars = res.data.Intentional_compartment.map(function(item:any) {
-           return { label: item.dictLabel, value: +item.dictValue }
-         })
+  // 获取车型
+  async getOptions() {
+    try {
+      let params = ['Intentional_compartment', 'demand_type']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        let cars = res.data.Intentional_compartment.map(function(item: any) {
+          return { label: item.dictLabel, value: +item.dictValue }
+        })
 
-         let demandTypeOptions = res.data.demand_type.map((item:any) => {
-           return { label: item.dictLabel, value: +item.dictValue }
-         })
+        let demandTypeOptions = res.data.demand_type.map((item: any) => {
+          return { label: item.dictLabel, value: +item.dictValue }
+        })
 
-         this.demandTypeOptions.push(...demandTypeOptions)
-         this.optionsCarType.push(...cars)
-       } else {
-         this.$message.error(res.errorMsg)
-       }
-     } catch (err) {
-       console.log(`get base info fail:${err}`)
-     }
-   }
+        this.demandTypeOptions.push(...demandTypeOptions)
+        this.optionsCarType.push(...cars)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
 
-   // 校验数字-工作经验
-   handleValidateExperience(value:string) {
-     if (value) {
-       let experience:number = Number(value.replace(/[^\d]/g, ''))
-       if (experience || experience === 0) {
-         this.WTQuery.experience = experience
-       } else {
-         this.WTQuery.experience = ''
-       }
-     } else {
-       return false
-     }
-   }
-   // 校验数字-年龄
-   handleValidateAge(value:string) {
-     if (value) {
-       let age:number = Number(value.replace(/[^\d]/g, ''))
-       if (age || age === 0) {
-         this.WTQuery.age = age
-       } else {
-         this.WTQuery.age = ''
-       }
-     } else {
-       return false
-     }
-   }
+  // 校验数字-工作经验
+  handleValidateExperience(value: string) {
+    if (value) {
+      let experience: number = Number(value.replace(/[^\d]/g, ''))
+      if (experience || experience === 0) {
+        this.WTQuery.experience = experience
+      } else {
+        this.WTQuery.experience = ''
+      }
+    } else {
+      return false
+    }
+  }
+  // 校验数字-年龄
+  handleValidateAge(value: string) {
+    if (value) {
+      let age: number = Number(value.replace(/[^\d]/g, ''))
+      if (age || age === 0) {
+        this.WTQuery.age = age
+      } else {
+        this.WTQuery.age = ''
+      }
+    } else {
+      return false
+    }
+  }
 
-   // 弹框确认
-   private confirm() {
-     (this.$refs[this.formStatus.form] as any).submitForm()
-   }
+  // 弹框确认
+  private confirm() {
+    (this.$refs[this.formStatus.form] as any).submitForm()
+  }
 
-   // 弹窗关闭
-   private handleDialogClosed() {
-     setTimeout(() => {
-       (this.$refs[this.formStatus.form] as any).resetForm();
-       (this.$refs[this.formStatus.form] as any).clearValidate()
-       this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
-       this.optionsCarType.splice(0, this.optionsCarType.length)
-     }, 100)
-   }
+  // 弹窗关闭
+  private handleDialogClosed() {
+    setTimeout(() => {
+      (this.$refs[this.formStatus.form] as any).resetForm();
+      (this.$refs[this.formStatus.form] as any).clearValidate()
+      this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
+      this.optionsCarType.splice(0, this.optionsCarType.length)
+    }, 100)
+  }
   // 验证通过
   @lock
-   private async handlePassClick(this:any, val: boolean) {
-     this.editDio(this[(this.formStatus.query)])
-   }
+  private async handlePassClick(this: any, val: boolean) {
+    this.editDio(this[this.formStatus.query])
+  }
 
-  async editDio(val:IState) {
+  async editDio(val: IState) {
     try {
       if (+this.clueStatus < 2) {
         val.expectAddressCity = val.intentWork[0]
