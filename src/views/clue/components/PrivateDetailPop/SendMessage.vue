@@ -59,6 +59,8 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { lock, Timestamp, phoneRegExp } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
+import { sendMessageApi } from '@/api/clue'
+
 interface IState {
   [key: string]: any;
 }
@@ -71,6 +73,7 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
+  @Prop({ default: {} }) private baseInfo!: IState;
 
   private submitLoading: boolean = false;
 
@@ -90,20 +93,20 @@ export default class extends Vue {
 
   private rules: IState = {
     messageType: [{ required: true, message: '请选择短信模板类型' }],
-    name: [{ required: true, message: '请输入司机姓名' }],
-    inviteAddress: [{ required: true, message: '请输入面试地址' }],
-    inviteTime: [{ required: true, message: '请选择面试时间' }],
-    linkman: [{ required: true, message: '请输入联系人' }],
-    phone: [{ type: 'string', required: true, message: '请输入联系电话' }, { validator: this.checkPhone, trigger: 'blur' }]
+    driverName: [{ required: true, message: '请输入司机姓名' }],
+    interviewAddress: [{ required: true, message: '请输入面试地址' }],
+    interviewDate: [{ required: true, message: '请选择面试时间' }],
+    userName: [{ required: true, message: '请输入联系人' }],
+    userPhone: [{ type: 'string', required: true, message: '请输入联系电话' }, { validator: this.checkPhone, trigger: 'blur' }]
   };
 
   private dialogPopQuery: IState = {
     messageType: 0,
-    name: '',
-    inviteAddress: '',
-    inviteTime: '',
-    linkman: '',
-    phone: ''
+    driverName: '',
+    interviewAddress: '',
+    interviewDate: '',
+    userName: '',
+    userPhone: ''
   }
 
   private dialogFormItem :IState[] = [
@@ -116,7 +119,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'name',
+      key: 'driverName',
       label: '司机姓名',
       col: 24,
       tagAttrs: {
@@ -127,7 +130,7 @@ export default class extends Vue {
     },
     {
       type: 9,
-      key: 'inviteTime',
+      key: 'interviewDate',
       label: '面试时间',
       col: 24,
       tagAttrs: {
@@ -136,7 +139,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'inviteAddress',
+      key: 'interviewAddress',
       label: '面试地址',
       col: 24,
       tagAttrs: {
@@ -147,7 +150,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'linkman',
+      key: 'userName',
       label: '联系人',
       col: 24,
       tagAttrs: {
@@ -158,7 +161,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'phone',
+      key: 'userPhone',
       label: '联系电话',
       col: 24,
       tagAttrs: {
@@ -175,14 +178,14 @@ export default class extends Vue {
 
   get sendFormItem() {
     let arr:object[] = []
-    let noneArr:string[] = ['linkman', 'inviteAddress', 'inviteTime']
+    let noneArr:string[] = ['userName', 'interviewAddress', 'interviewDate']
     switch (this.dialogPopQuery.messageType) {
       case 0:
         arr = [...this.dialogFormItem]
         break
       case 1:
         arr = this.dialogFormItem.filter((ele:any) => {
-          return ele.key !== 'inviteTime'
+          return ele.key !== 'interviewDate'
         })
         break
       case 2:
@@ -196,6 +199,9 @@ export default class extends Vue {
   }
 
   get show() {
+    if (this.showDialog) {
+      this.defineData(this.dialogPopQuery.messageType)
+    }
     return this.showDialog
   }
 
@@ -205,6 +211,7 @@ export default class extends Vue {
 
   @Watch('dialogPopQuery.messageType')
   changeType(val:any) {
+    this.defineData(val);
     (this.$refs['dialogSendMessage'] as any).clearValidate()
   }
 
@@ -224,7 +231,7 @@ export default class extends Vue {
       return item[1] === '' || item[1] === null || item[1] === undefined
     })
 
-    if (!phoneRegExp.test(val.phone)) {
+    if (!phoneRegExp.test(val.userPhone)) {
       this.canPreview = false
     }
 
@@ -233,16 +240,23 @@ export default class extends Vue {
     }
   }
 
+  private defineData(val:number) {
+    if (val === 0 && this.baseInfo.inviteDate) {
+      this.dialogPopQuery.interviewDate = this.baseInfo.inviteDate
+    }
+    this.dialogPopQuery.driverName = this.baseInfo.name
+  }
+
   // 短信预览是否显示
   private showPreview(val:any) {
     if (val.messageType === 0) {
       this.messageText = `<span>  
-      【云鸟配送】<span style="color:#242020">${this.dealWithName(val.name)}</span>师傅您好，已成功为您预约云鸟面试，现场已有专业的加盟经理等待您的到来。请您携带本人身份证，驾驶证，行驶证准时参加。路上注意安全，期待与您的会面！
+      【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅您好，已成功为您预约云鸟面试，现场已有专业的加盟经理等待您的到来。请您携带本人身份证，驾驶证，行驶证准时参加。路上注意安全，期待与您的会面！
       </span>`
     } else if (val.messageType === 1) {
-      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.name)}</span>师傅，您好，感谢您的接听，非常期待师傅您的加入。云鸟线路实时更新，更多更新的线路等待与您的匹配。</span>`
+      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅，您好，感谢您的接听，非常期待师傅您的加入。云鸟线路实时更新，更多更新的线路等待与您的匹配。</span>`
     } else {
-      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.name)}</span>师傅您好，您的信息已审核。诚邀您加入云鸟，不需要抢单，货源充足，有多条线路可以任你选择，详情请联系：<span style="color:#242020">${val.phone}</span>（微信同号）。回T退订。</span>`
+      this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(val.driverName)}</span>师傅您好，您的信息已审核。诚邀您加入云鸟，不需要抢单，货源充足，有多条线路可以任你选择，详情请联系：<span style="color:#242020">${val.userPhone}</span>（微信同号）。回T退订。</span>`
     }
 
     this.itemData = []
@@ -255,7 +269,7 @@ export default class extends Vue {
         }
         for (let key in val) {
           if (key === ele.key) {
-            if (key === 'inviteTime') {
+            if (key === 'interviewDate') {
               let timeArr = Timestamp(val[key]).split(' ')[0].split('-')
               item.value = `${timeArr[0]}年${timeArr[1]}月${timeArr[2]}日  ${Timestamp(val[key]).split(' ')[1]}`
             } else {
@@ -273,7 +287,9 @@ export default class extends Vue {
   }
 
   // 弹框确认
-  private confirm() {}
+  private confirm() {
+    (this.$refs['dialogSendMessage'] as any).submitForm()
+  }
 
   // 弹窗关闭
   private handleDialogClosed() {
@@ -285,7 +301,34 @@ export default class extends Vue {
 
   // 验证通过
   @lock
-  private async handlePassClick(val: boolean) {}
+  private async handlePassClick(val: boolean) {
+    try {
+      let params: IState = { ...this.dialogPopQuery }
+      switch (params.messageType) {
+        case 1:
+          Reflect.deleteProperty(params, 'interviewDate')
+          break
+        case 2:
+          Reflect.deleteProperty(params, 'interviewAddress')
+          Reflect.deleteProperty(params, 'userName')
+          Reflect.deleteProperty(params, 'interviewDate')
+          break
+      }
+      let { data: res } = await sendMessageApi(params)
+      if (res.success) {
+        this.show = false
+        this.$message({
+          type: 'success',
+          message: '发送短信成功'
+        });
+        (this.$parent as any).getDetailApi()
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>

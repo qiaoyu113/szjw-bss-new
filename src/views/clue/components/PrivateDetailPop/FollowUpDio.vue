@@ -25,8 +25,8 @@
           <el-button
             v-for="(item,index) in followUpArrWT"
             :key="index"
-            :type="dialogPopQuery.inviteCaseSuccessOrFail === item.code ? 'primary' : ''"
-            @click="dialogPopQuery.inviteCaseSuccessOrFail = item.code"
+            :type="dialogPopQuery.inviteStatus === item.code ? 'primary' : ''"
+            @click="dialogPopQuery.inviteStatus = item.code"
           >
             {{ item.name }}
           </el-button>
@@ -50,8 +50,8 @@
           <el-button
             v-for="(item,index) in followUpArrBirdCar"
             :key="index"
-            :type="dialogPopQueryBirdCar.tagStatus === item.code ? 'primary' : ''"
-            @click="dialogPopQueryBirdCar.tagStatus = item.code"
+            :type="dialogPopQueryBirdCar.markStatus === item.code ? 'primary' : ''"
+            @click="dialogPopQueryBirdCar.markStatus = item.code"
           >
             {{ item.name }}
           </el-button>
@@ -75,8 +75,8 @@
           <el-button
             v-for="(item,index) in followUpArrBirdC"
             :key="index"
-            :type="dialogPopQueryBirdC.tagStatus === item.code ? 'primary' : ''"
-            @click="dialogPopQueryBirdC.tagStatus = item.code"
+            :type="dialogPopQueryBirdC.markStatus === item.code ? 'primary' : ''"
+            @click="dialogPopQueryBirdC.markStatus = item.code"
           >
             {{ item.name }}
           </el-button>
@@ -100,8 +100,8 @@
           <el-button
             v-for="(item,index) in followUpArrBirdC"
             :key="index"
-            :type="dialogPopQueryBirdB.tagStatus === item.code ? 'primary' : ''"
-            @click="dialogPopQueryBirdB.tagStatus = item.code"
+            :type="dialogPopQueryBirdB.markStatus === item.code ? 'primary' : ''"
+            @click="dialogPopQueryBirdB.markStatus = item.code"
           >
             {{ item.name }}
           </el-button>
@@ -116,6 +116,12 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { lock } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import {
+  followClueToFirmiana,
+  followClueToThunderBirdTruckPool,
+  followClueToThunderBirdRental
+} from '@/api/clue'
+import { GetDictionaryList } from '@/api/common'
 interface IState {
   [key: string]: any;
 }
@@ -131,28 +137,40 @@ export default class extends Vue {
   @Prop({ default: '0' }) private clueStatus!: string;
   private submitLoading: boolean = false;
 
+  // 字典数组
+  private inviteFailReasonOptions: object[] = [];
+  private intentDegreeOptions: object[] = [];
+  private demandTypeOptions: object[] = [];
+  private carOptions:object[] = [
+    { label: '金杯', value: 1 },
+    { label: '依维柯', value: 10 },
+    { label: '4.2米厢货', value: 2 },
+    { label: '面包', value: 35 },
+    { label: '其他', value: 45 }
+  ]
+
   // 梧桐
   private followUpArrWT: IState[] = [
     { name: '成功', code: 1 },
     { name: '失败', code: 0 }
   ];
   private rulesWT: IState = {
-    inviteCaseSuccessOrFail: [{ required: true, message: '请选择跟进情况' }],
-    inviteTime: [{ required: true, message: '请选择邀约面试时间' }],
-    intentionNum: [{ required: true, message: '请选择意向度' }],
+    inviteStatus: [{ required: true, message: '请选择跟进情况' }],
+    inviteDate: [{ required: true, message: '请选择邀约面试时间' }],
+    intentDegree: [{ required: true, message: '请选择意向度' }],
     inviteFailReason: [{ required: true, message: '请选择邀约失败原因' }]
   };
   private dialogFormItem: IState[] = [
     {
       slot: true,
       type: 'inviteCase',
-      key: 'inviteCaseSuccessOrFail',
-      label: '跟进情况',
+      key: 'inviteStatus',
+      label: '邀约情况',
       col: 24
     },
     {
       type: 1,
-      key: 'inviteRemark',
+      key: 'remark',
       label: '跟进备注',
       col: 24,
       tagAttrs: {
@@ -164,11 +182,11 @@ export default class extends Vue {
     }
   ];
   private dialogPopQuery: IState = {
-    inviteCaseSuccessOrFail: '',
-    inviteRemark: '',
-    inviteTime: '',
+    inviteStatus: '',
+    remark: '',
+    inviteDate: '',
     inviteFailReason: '',
-    intentionNum: ''
+    intentDegree: ''
   };
   private popFailItem: IState[] = [
     {
@@ -176,20 +194,20 @@ export default class extends Vue {
       key: 'inviteFailReason',
       label: '邀约失败原因',
       col: 24,
-      options: []
+      options: this.inviteFailReasonOptions
     },
     {
       type: 2,
-      key: 'intentionNum',
+      key: 'intentDegree',
       label: '意向度',
       col: 24,
-      options: []
+      options: this.intentDegreeOptions
     }
   ];
   private popSuccessItem: IState[] = [
     {
       type: 9,
-      key: 'inviteTime',
+      key: 'inviteDate',
       label: '邀约面试时间',
       col: 24,
       tagAttrs: {
@@ -200,34 +218,34 @@ export default class extends Vue {
 
   // 雷鸟车池
   private followUpArrBirdCar: IState[] = [
-    { name: '可入池', code: 0 },
-    { name: '不可入池', code: 1 },
-    { name: '待入池', code: 2 },
-    { name: '已入池', code: 3 }
+    { name: '可入池', code: 1 },
+    { name: '不可入池', code: 2 },
+    { name: '待入池', code: 3 },
+    { name: '已入池', code: 4 }
   ];
   private rulesBirdCar: IState = {
-    tagStatus: [{ required: true, message: '请选择标记状态' }],
-    needType: [{ required: true, message: '请选择需求类型' }],
-    followRemark: [{ required: false, message: '请填写跟进备注', trigger: 'blur' }]
+    markStatus: [{ required: true, message: '请选择标记状态' }],
+    demandType: [{ required: true, message: '请选择需求类型' }],
+    remark: [{ required: false, message: '请填写跟进备注', trigger: 'blur' }]
   };
   private dialogPopQueryBirdCar: IState = {
-    tagStatus: '',
-    needType: '',
-    followRemark: '',
-    wantGiveMoney: '',
-    canContact: ''
+    markStatus: '',
+    demandType: '',
+    remark: '',
+    hasIntentionGold: '',
+    contact: ''
   };
   private dialogFormItemBirdCar: IState[] = [
     {
       slot: true,
       type: 'inviteCase',
-      key: 'tagStatus',
+      key: 'markStatus',
       label: '标记状态',
       col: 24
     },
     {
       type: 1,
-      key: 'followRemark',
+      key: 'remark',
       label: '跟进备注',
       col: 24,
       tagAttrs: {
@@ -241,68 +259,68 @@ export default class extends Vue {
   private poptabBirdCar0: IState[] = [
     {
       type: 2,
-      key: 'needType',
+      key: 'demandType',
       label: '需求类型',
       col: 24,
-      options: []
+      options: this.demandTypeOptions
     }
   ];
   private poptabBirdCar1: IState[] = [
     {
       type: 4,
-      key: 'canContact',
+      key: 'contact',
       label: '是否联系上',
       col: 24,
       options: [
-        { label: '是', value: 1 },
-        { label: '否', value: 0 }
+        { label: '是', value: true },
+        { label: '否', value: false }
       ]
     }
   ];
   private poptabBirdCar3: IState[] = [
     {
       type: 4,
-      key: 'wantGiveMoney',
+      key: 'hasIntentionGold',
       label: '是否交意向金',
       col: 24,
       options: [
-        { label: '是', value: 1 },
-        { label: '否', value: 0 }
+        { label: '是', value: true },
+        { label: '否', value: false }
       ]
     }
   ];
 
   // 雷鸟租赁C
   private followUpArrBirdC: IState[] = [
-    { name: '有意向', code: 0 },
-    { name: '无意向', code: 1 },
-    { name: '已看中', code: 2 },
-    { name: '已成交', code: 3 }
+    { name: '有意向', code: 5 },
+    { name: '无意向', code: 6 },
+    { name: '已看中', code: 7 },
+    { name: '已成交', code: 8 }
   ];
   private rulesBirdC: IState = {
-    tagStatus: [{ required: true, message: '请选择标记状态' }],
-    inviteCarType: [{ required: true, message: '请选择意向车型' }],
-    followRemark: [{ required: false, message: '请选择跟进备注' }],
-    likeCar: [{ required: true, message: '请选择看中车型' }]
+    markStatus: [{ required: true, message: '请选择标记状态' }],
+    intentModel: [{ required: true, message: '请选择意向车型' }],
+    remark: [{ required: false, message: '请选择跟进备注' }],
+    fancyCar: [{ required: true, message: '请选择看中车型' }]
   };
   private dialogPopQueryBirdC: IState = {
-    tagStatus: '',
-    inviteCarType: '',
-    followRemark: '',
-    likeCar: '',
-    canContact: ''
+    markStatus: '',
+    intentModel: '',
+    remark: '',
+    fancyCar: '',
+    contact: ''
   };
   private dialogFormItemBirdC: IState[] = [
     {
       slot: true,
       type: 'inviteCase',
-      key: 'tagStatus',
+      key: 'markStatus',
       label: '标记状态',
       col: 24
     },
     {
       type: 1,
-      key: 'followRemark',
+      key: 'remark',
       label: '跟进备注',
       col: 24,
       tagAttrs: {
@@ -316,59 +334,59 @@ export default class extends Vue {
   private poptabBirdC0: IState[] = [
     {
       type: 2,
-      key: 'inviteCarType',
+      key: 'intentModel',
       label: '意向车型',
       col: 24,
-      options: []
+      options: this.carOptions
     }
   ];
   private poptabBirdC1: IState[] = [
     {
       type: 4,
-      key: 'canContact',
+      key: 'contact',
       label: '是否联系上',
       col: 24,
       options: [
-        { label: '是', value: 1 },
-        { label: '否', value: 0 }
+        { label: '是', value: true },
+        { label: '否', value: false }
       ]
     }
   ];
   private poptabBirdC2: IState[] = [
     {
       type: 2,
-      key: 'likeCar',
+      key: 'fancyCar',
       label: '看中车型',
       col: 24,
-      options: []
+      options: this.carOptions
     }
   ];
 
   // 雷鸟租赁B
   private rulesBirdB: IState = {
-    tagStatus: [{ required: true, message: '请选择标记状态' }],
-    inviteCarType: [{ required: true, message: '请选择意向车型' }],
-    followRemark: [{ required: false, message: '请选择跟进备注' }],
-    likeCar: [{ required: true, message: '请选择看中车型' }]
+    markStatus: [{ required: true, message: '请选择标记状态' }],
+    intentModel: [{ required: true, message: '请选择意向车型' }],
+    remark: [{ required: false, message: '请选择跟进备注' }],
+    fancyCar: [{ required: true, message: '请选择看中车型' }]
   };
   private dialogPopQueryBirdB: IState = {
-    tagStatus: '',
-    inviteCarType: [],
-    followRemark: '',
-    likeCar: [],
-    canContact: ''
+    markStatus: '',
+    intentModel: [],
+    remark: '',
+    fancyCar: [],
+    contact: ''
   };
   private dialogFormItemBirdB: IState[] = [
     {
       slot: true,
       type: 'inviteCase',
-      key: 'tagStatus',
+      key: 'markStatus',
       label: '标记状态',
       col: 24
     },
     {
       type: 1,
-      key: 'followRemark',
+      key: 'remark',
       label: '跟进备注',
       col: 24,
       tagAttrs: {
@@ -382,43 +400,31 @@ export default class extends Vue {
   private poptabBirdB0: IState[] = [
     {
       type: 5,
-      key: 'inviteCarType',
+      key: 'intentModel',
       label: '意向车型',
       col: 24,
-      options: [
-        { label: '金杯', value: '0' },
-        { label: '依维柯', value: '1' },
-        { label: '4.2米厢货', value: '2' },
-        { label: '面包', value: '3' },
-        { label: '其他', value: '4' }
-      ]
+      options: this.carOptions
     }
   ];
   private poptabBirdB1: IState[] = [
     {
       type: 4,
-      key: 'canContact',
+      key: 'contact',
       label: '是否联系上',
       col: 24,
       options: [
-        { label: '是', value: 1 },
-        { label: '否', value: 0 }
+        { label: '是', value: true },
+        { label: '否', value: false }
       ]
     }
   ];
   private poptabBirdB2: IState[] = [
     {
       type: 5,
-      key: 'likeCar',
+      key: 'fancyCar',
       label: '看中车型',
       col: 24,
-      options: [
-        { label: '金杯', value: '0' },
-        { label: '依维柯', value: '1' },
-        { label: '4.2米厢货', value: '2' },
-        { label: '面包', value: '3' },
-        { label: '其他', value: '4' }
-      ]
+      options: this.carOptions
     }
   ];
 
@@ -430,8 +436,8 @@ export default class extends Vue {
   }
 
   get WTItem() {
-    let arr:object[] = [...this.dialogFormItem]
-    switch (this.dialogPopQuery.inviteCaseSuccessOrFail) {
+    let arr: object[] = [...this.dialogFormItem]
+    switch (this.dialogPopQuery.inviteStatus) {
       case 0:
         arr.splice(1, 0, ...this.popFailItem)
         break
@@ -445,15 +451,15 @@ export default class extends Vue {
   }
 
   get BirdCarItem() {
-    let arr:object[] = [...this.dialogFormItemBirdCar]
-    switch (this.dialogPopQueryBirdCar.tagStatus) {
-      case 0:
+    let arr: object[] = [...this.dialogFormItemBirdCar]
+    switch (this.dialogPopQueryBirdCar.markStatus) {
+      case 1:
         arr.splice(1, 0, ...this.poptabBirdCar0)
         break
-      case 1:
+      case 2:
         arr.splice(1, 0, ...this.poptabBirdCar1)
         break
-      case 3:
+      case 4:
         arr.splice(1, 0, ...this.poptabBirdCar3)
         break
       case '':
@@ -463,64 +469,95 @@ export default class extends Vue {
   }
 
   get BirdCItem() {
-    let arr:object[] = [...this.dialogFormItemBirdC]
-    switch (this.dialogPopQueryBirdC.tagStatus) {
-      case 0:
+    let arr: object[] = [...this.dialogFormItemBirdC]
+    switch (this.dialogPopQueryBirdC.markStatus) {
+      case 5:
         arr.splice(1, 0, ...this.poptabBirdC0)
         break
-      case 1:
+      case 6:
         arr.splice(1, 0, ...this.poptabBirdC1)
         break
-      case 3:
+      case 8:
         arr.splice(1, 0, ...this.poptabBirdC2)
         break
     }
     return arr
   }
 
-  get BirdBItem() {
-    let arr:object[] = [...this.dialogFormItemBirdB]
-    switch (this.dialogPopQueryBirdB.tagStatus) {
+  get formStatus() {
+    let ref = ''
+    switch (Number(this.clueStatus)) {
       case 0:
-        arr.splice(1, 0, ...this.poptabBirdB0)
+        ref = 'editFormWt'
         break
       case 1:
-        arr.splice(1, 0, ...this.poptabBirdB1)
+        ref = 'editFormWt'
         break
       case 2:
+        ref = 'editFormBirdCar'
+        break
+      case 3:
+        ref = 'editFormBirdC'
+        break
+      case 4:
+        ref = 'editFormBirdB'
+        break
+    }
+    return ref
+  }
+
+  get BirdBItem() {
+    let arr: object[] = [...this.dialogFormItemBirdB]
+    switch (this.dialogPopQueryBirdB.markStatus) {
+      case 5:
+        arr.splice(1, 0, ...this.poptabBirdB0)
+        break
+      case 6:
+        arr.splice(1, 0, ...this.poptabBirdB1)
+        break
+      case 7:
         arr.splice(1, 0, ...this.poptabBirdB2)
         break
     }
     return arr
   }
 
-  @Watch('dialogPopQuery.inviteCaseSuccessOrFail')
+  @Watch('showDialog')
+  onShowDialog(val: boolean) {
+    if (val) {
+      if (this.showDialog) {
+        this.getOptionInfo()
+      }
+    }
+  }
+
+  @Watch('dialogPopQuery.inviteStatus')
   chooseInvite(val: number | string, oldVal: number | string) {
     if (val !== '') {
       if (oldVal !== '') {
         this.dialogPopQuery = {
           ...this.dialogPopQuery,
-          inviteRemark: ''
+          remark: ''
         }
       }
     }
   }
 
-  @Watch('dialogPopQueryBirdCar.tagStatus')
+  @Watch('dialogPopQueryBirdCar.markStatus')
   chooseBirdCar(val: number | string, oldVal: number | string) {
     if (val !== '') {
       if (oldVal !== '') {
         this.dialogPopQueryBirdCar = {
           ...this.dialogPopQueryBirdCar,
-          followRemark: ''
+          remark: ''
         }
       }
-      if (val !== 1) {
-        Reflect.set(this.rulesBirdCar, 'followRemark', [
+      if (val !== 2) {
+        Reflect.set(this.rulesBirdCar, 'remark', [
           { required: false, message: '请填写跟进备注' }
         ])
       } else {
-        Reflect.set(this.rulesBirdCar, 'followRemark', [
+        Reflect.set(this.rulesBirdCar, 'remark', [
           { required: true, message: '请填写跟进备注' }
         ])
       }
@@ -530,21 +567,21 @@ export default class extends Vue {
     }
   }
 
-  @Watch('dialogPopQueryBirdC.tagStatus')
+  @Watch('dialogPopQueryBirdC.markStatus')
   chooseBirdC(val: number | string, oldVal: number | string) {
     if (val !== '') {
       if (oldVal !== '') {
         this.dialogPopQueryBirdC = {
           ...this.dialogPopQueryBirdC,
-          followRemark: ''
+          remark: ''
         }
       }
-      if (val !== 1) {
-        Reflect.set(this.rulesBirdC, 'followRemark', [
+      if (val !== 6) {
+        Reflect.set(this.rulesBirdC, 'remark', [
           { required: false, message: '请填写跟进备注' }
         ])
       } else {
-        Reflect.set(this.rulesBirdC, 'followRemark', [
+        Reflect.set(this.rulesBirdC, 'remark', [
           { required: true, message: '请填写跟进备注' }
         ])
       }
@@ -555,21 +592,21 @@ export default class extends Vue {
     }
   }
 
-  @Watch('dialogPopQueryBirdB.tagStatus')
+  @Watch('dialogPopQueryBirdB.markStatus')
   chooseBirdB(val: number | string, oldVal: number | string) {
     if (val !== '') {
       if (oldVal !== '') {
         this.dialogPopQueryBirdB = {
           ...this.dialogPopQueryBirdB,
-          followRemark: ''
+          remark: ''
         }
       }
-      if (val !== 1) {
-        Reflect.set(this.rulesBirdB, 'followRemark', [
+      if (val !== 6) {
+        Reflect.set(this.rulesBirdB, 'remark', [
           { required: false, message: '请填写跟进备注' }
         ])
       } else {
-        Reflect.set(this.rulesBirdB, 'followRemark', [
+        Reflect.set(this.rulesBirdB, 'remark', [
           { required: true, message: '请填写跟进备注' }
         ])
       }
@@ -580,50 +617,34 @@ export default class extends Vue {
   }
   // 弹窗关闭
   private handleDialogClosed() {
-    if (Number(this.clueStatus) < 2) {
-      this.dialogFormItem.splice(1, this.dialogFormItem.length - 2)
-      this.dialogPopQuery = {
-        inviteCaseSuccessOrFail: '',
-        inviteRemark: '',
-        inviteTime: '',
-        inviteFailReason: '',
-        intentionNum: ''
-      };
-      (this.$refs['dialogFollowUpFirmiana'] as any).clearValidate()
-    } else if (Number(this.clueStatus) === 2) {
-      this.dialogFormItemBirdCar.splice(
-        1,
-        this.dialogFormItemBirdCar.length - 2
+    setTimeout(() => {
+      if (Number(this.clueStatus) < 2) {
+        this.dialogFormItem.splice(1, this.dialogFormItem.length - 2);
+        (this.$refs['dialogFollowUpFirmiana'] as any).resetForm();
+        (this.$refs['dialogFollowUpFirmiana'] as any).clearValidate()
+      } else if (Number(this.clueStatus) === 2) {
+        this.dialogFormItemBirdCar.splice(
+          1,
+          this.dialogFormItemBirdCar.length - 2
+        );
+        (this.$refs['dialogFollowUpBirdCar'] as any).resetForm();
+        (this.$refs['dialogFollowUpBirdCar'] as any).clearValidate()
+      } else if (Number(this.clueStatus) === 3) {
+        this.dialogFormItemBirdC.splice(1, this.dialogFormItemBirdC.length - 2);
+        (this.$refs['dialogFollowUpBirdC'] as any).resetForm();
+        (this.$refs['dialogFollowUpBirdC'] as any).clearValidate()
+      } else {
+        this.dialogFormItemBirdB.splice(1, this.dialogFormItemBirdB.length - 2);
+        (this.$refs['dialogFollowUpBirdB'] as any).resetForm();
+        (this.$refs['dialogFollowUpBirdB'] as any).clearValidate()
+      }
+      this.inviteFailReasonOptions.splice(
+        0,
+        this.inviteFailReasonOptions.length
       )
-      this.dialogPopQueryBirdCar = {
-        tagStatus: '',
-        needType: '',
-        followRemark: '',
-        wantGiveMoney: '',
-        canContact: ''
-      };
-      (this.$refs['dialogFollowUpBirdCar'] as any).clearValidate()
-    } else if (Number(this.clueStatus) === 3) {
-      this.dialogFormItemBirdC.splice(1, this.dialogFormItemBirdC.length - 2)
-      this.dialogPopQueryBirdC = {
-        tagStatus: '',
-        inviteCarType: '',
-        followRemark: '',
-        likeCar: '',
-        canContact: ''
-      };
-      (this.$refs['dialogFollowUpBirdC'] as any).clearValidate()
-    } else {
-      this.dialogFormItemBirdB.splice(1, this.dialogFormItemBirdB.length - 2)
-      this.dialogPopQueryBirdB = {
-        tagStatus: '',
-        inviteCarType: [],
-        followRemark: '',
-        likeCar: [],
-        canContact: ''
-      };
-      (this.$refs['dialogFollowUpBirdB'] as any).clearValidate()
-    }
+      this.intentDegreeOptions.splice(0, this.intentDegreeOptions.length)
+      this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
+    }, 10)
   }
   // 弹框确认
   private confirm() {
@@ -637,8 +658,163 @@ export default class extends Vue {
       (this.$refs['dialogFollowUpBirdB'] as any).submitForm()
     }
   }
+
+  private codeChange(arr: IState[]) {
+    let newArr = arr.map(function(item: any) {
+      return { label: item.dictLabel, value: +item.dictValue }
+    })
+    return newArr
+  }
+
+  async getOptionInfo() {
+    try {
+      let params = ['invite_fail_reason', 'intent_degree', 'demand_type']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        let {
+          invite_fail_reason: inviteFailReasonOptions,
+          intent_degree: intentDegreeOptions,
+          demand_type: demandTypeOptions
+        } = res.data
+        this.inviteFailReasonOptions.push(
+          ...this.codeChange(inviteFailReasonOptions)
+        )
+        this.intentDegreeOptions.push(...this.codeChange(intentDegreeOptions))
+        this.demandTypeOptions.push(...this.codeChange(demandTypeOptions))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
+
   // 验证通过
   @lock
-  private async handlePassClick(val: boolean) {}
+  private async handlePassClick(val: boolean) {
+    if (Number(this.clueStatus) < 2) {
+      this.sendWtFollow(this.dialogPopQuery)
+    } else if (Number(this.clueStatus) === 2) {
+      this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
+    } else if (Number(this.clueStatus) === 3) {
+      this.sendRentalFollow(this.dialogPopQueryBirdC)
+    } else {
+      this.sendRentalFollow(this.dialogPopQueryBirdB)
+    }
+    this.show = false
+  }
+
+  async sendWtFollow(value: IState) {
+    try {
+      let params: IState = {}
+      if (value.inviteStatus) {
+        let { inviteStatus, inviteDate, remark } = value
+        params.inviteStatus = inviteStatus
+        params.inviteDate = inviteDate
+        remark !== '' && (params.remark = remark)
+      } else {
+        let { inviteStatus, inviteFailReason, intentDegree, remark } = value
+        params.inviteStatus = inviteStatus
+        params.inviteFailReason = inviteFailReason
+        params.intentDegree = intentDegree
+        remark !== '' && (params.remark = remark)
+      }
+      let { data: res } = await followClueToFirmiana(params)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: '添加线下跟进成功!'
+        });
+        (this.$parent as any).getDetailApi()
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('fail:', err)
+    }
+  }
+
+  async sendBirdCarFollow(value: IState) {
+    try {
+      let params: IState = {}
+      let {
+        markStatus,
+        demandType,
+        remark,
+        contact,
+        hasIntentionGold
+      } = value
+      switch (value.markStatus) {
+        case 1:
+          params.demandType = demandType
+          remark !== '' && (params.remark = remark)
+          break
+        case 2:
+          contact !== '' && (params.contact = contact)
+          params.remark = remark
+          break
+        case 3:
+          remark !== '' && (params.remark = remark)
+          break
+        case 4:
+          hasIntentionGold !== '' &&
+            (params.hasIntentionGold = hasIntentionGold)
+          remark !== '' && (params.remark = remark)
+          break
+      }
+      params.markStatus = markStatus
+      let { data: res } = await followClueToThunderBirdTruckPool(params)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: '添加线下跟进成功!'
+        });
+        (this.$parent as any).getDetailApi()
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('fail:', err)
+    }
+  }
+
+  async sendRentalFollow(value: IState) {
+    try {
+      let params: IState = {}
+      let { markStatus, intentModel, remark, contact, fancyCar } = value
+      switch (value.markStatus) {
+        case 5:
+          params.intentModel =
+            intentModel instanceof Array ? String(intentModel) : intentModel
+          remark !== '' && (params.remark = remark)
+          break
+        case 6:
+          contact !== '' && (params.contact = contact)
+          params.remark = remark
+          break
+        case 7:
+          params.fancyCar =
+            fancyCar instanceof Array ? String(fancyCar) : fancyCar
+          remark !== '' && (params.remark = remark)
+          break
+        case 8:
+          remark !== '' && (params.remark = remark)
+          break
+      }
+      params.markStatus = markStatus
+      let { data: res } = await followClueToThunderBirdRental(params)
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: '添加线下跟进成功!'
+        });
+        (this.$parent as any).getDetailApi()
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('fail:', err)
+    }
+  }
 }
 </script>
