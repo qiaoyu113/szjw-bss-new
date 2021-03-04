@@ -32,15 +32,18 @@
       <template slot="status">
         <el-badge
           v-for="item in btns"
-          :key="item.name"
-          :value="item.value"
-          :max="99999"
+          :key="item.text"
+          :value="item.num"
+          :max="9999"
+          :hidden="item.num === 0"
         >
           <el-button
-            size="small"
             type="primary"
             :plain="item.name !== listQuery.status"
-            @click="listQuery.status =item.name;handleFilterClick()"
+            @click="() => {
+              listQuery.status = item.name
+              handleFilterClick()
+            }"
           >
             {{ item.text }}
           </el-button>
@@ -96,7 +99,7 @@
           :max="99999"
         >
           <el-checkbox-group
-            v-model="listQuery.sort"
+            v-model="listQuery.toDo"
             size="small"
           >
             <el-checkbox-button :label="true">
@@ -283,32 +286,37 @@ export default class extends Vue {
     {
       name: '',
       text: '全部',
-      value: 999
+      num: 0
     },
     {
-      name: '0',
-      text: '待跟进',
-      value: 9999999
+      name: '10',
+      text: '待分配',
+      num: 0
     },
     {
-      name: '1',
+      name: '20',
+      text: '待跟进', // 审核通过
+      num: 0
+    },
+    {
+      name: '30',
       text: '跟进中',
-      value: 9999999
+      num: 0
     },
     {
-      name: '2',
-      text: '邀约成功',
-      value: 9999999
+      name: '40',
+      text: '待面试',
+      num: 0
     },
     {
-      name: '3',
+      name: '50',
       text: '已面试',
-      value: 9999999
+      num: 0
     },
     {
-      name: '4',
+      name: '60',
       text: '已成交',
-      value: 9999999
+      num: 0
     }
   ]
   /**
