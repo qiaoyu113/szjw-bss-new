@@ -32,7 +32,14 @@
             v-model.trim="listQuery[item.key]"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
-          />
+          >
+            <template
+              v-if="item.tag"
+              :slot="item.tag.type"
+            >
+              {{ item.tag.name }}
+            </template>
+          </el-input>
           <el-input-number
             v-if="item.type === 14"
             v-model.number="listQuery[item.key]"
