@@ -162,7 +162,10 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    lineShelf: 'Line shelf maintenance',
+    complete: 'completed',
+    agent: 'agent'
   },
   navbar: {
     logOut: 'Log Out',

@@ -22,6 +22,7 @@ import freightRouter from './modules/freight'
 import driverAccountRouter from './modules/driver-account'
 import driverCloudRouter from './modules/driver-cloud'
 // import customerRouter from './modules/customer'
+import lineShelf from './modules/line-shelf'
 
 Vue.use(Router)
 
@@ -230,6 +231,7 @@ export const asyncRoutes: RouteConfig[] = [
   // 运力中心
   // deliveryRouter,
   // transportRouter,
+  lineShelf, // 线路货架维护
   // 司机运费账户
   driverFreight,
   // 客户运费账户
