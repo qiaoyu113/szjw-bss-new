@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="thunderbirdRental">
     <self-table
       :index="false"
       :is-p30="false"
@@ -80,7 +80,7 @@ export default class extends Vue {
     {
       key: 'importDate',
       label: '线索导入时间',
-      'width': '160px'
+      'width': '180px'
     },
     {
       key: 'importUserName',
@@ -248,5 +248,14 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="css" scoped>
+.thunderbirdRental >>> .el-table {
+  display: flex;
+  flex-direction: column;
+}
+
+/* order默认值为0，只需将表体order置为1即可移到最后，这样合计行就上移到表体上方 */
+.thunderbirdRental >>> .el-table__body-wrapper {
+  order: 1;
+}
 </style>

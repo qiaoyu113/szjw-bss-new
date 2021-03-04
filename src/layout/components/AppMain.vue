@@ -56,7 +56,6 @@ export default class extends Vue {
     iframe.style.display = 'none'
     // 8011@yunniao  1234Abcd
     const url:string = `./edb/html/webmain.html?loginName=${obj.account}&password=${obj.password}&loginType=sip&agentStatus=0&appId=${obj.appId}&secret=${obj.secret}`
-    console.log('xxx:', url)
     iframe.name = 'szjwCall'
     iframe.src = url;
     (makePhone as HTMLHtmlElement).appendChild(iframe)
@@ -64,7 +63,6 @@ export default class extends Vue {
   // 根据用户id获取坐席号
   async getInfoByUserId() {
     try {
-      // this.handleAddDom({ account: '8001@yunniao', password: '2_kHzxLREx8001', appId: 'appId', secret: 'dbfecf80-677b-11eb-a7ab-13b8c3cc732e' })
       let userId = localStorage.getItem('userId')
       let params = {
         userId
