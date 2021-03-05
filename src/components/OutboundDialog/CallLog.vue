@@ -11,12 +11,18 @@
       :columns="columns"
       :page="page"
       @onPageSize="handlePageSize"
-    />
+    >
+      <template v-slot:callStatus="{row}">
+        {{ row.callStatus === 0 ? '未接通' :row.callStatus === 1 ? '接通':'暂无数据' }}
+      </template>
+    </self-table>
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
+import { GetListByBusinessId } from '@/api/clue'
+import { HandlePages } from '@/utils/index'
 interface PageObj {
   page:number,
   limit:number,
@@ -32,39 +38,39 @@ interface IState {
   }
 })
 export default class extends Vue {
-  private tableData:IState[] = [
-    {}, {}
-  ];
+  @Prop({ default: '' }) businessId!:string|number
+  private tableData:IState[] = [];
   private columns:IState[] = [
     {
-      key: 'a',
+      key: 'inviteName',
       label: '拨打人',
-      'width': '140px'
+      'width': '100px'
     },
     {
-      key: 'b',
+      key: 'callStatus',
       label: '拨打状态',
-      'width': '140px'
+      'width': '100px',
+      slot: true
     },
     {
-      key: 'c',
+      key: 'callDuration1',
       label: '拨打时长',
-      'width': '140px'
+      'width': '100px'
     },
     {
-      key: 'd',
+      key: 'beginTime',
       label: '接通时间',
       'width': '140px'
     },
     {
-      key: 'f',
+      key: 'endTime',
       label: '挂断时间',
       'width': '140px'
     },
     {
-      key: 'e',
+      key: 'recordFileAddress',
       label: '通话录音文件',
-      'width': '140px'
+      'width': '240px'
     }
   ];
   // 表格分页
@@ -77,6 +83,59 @@ export default class extends Vue {
   handlePageSize(page:PageObj) {
     this.page.page = page.page
     this.page.limit = page.limit
+    this.getLists()
+  }
+  @Watch('businessId', { immediate: true })
+  handleBusinessIdChange() {
+    this.getLists()
+  }
+  // 获取列表
+  async getLists() {
+    try {
+      let params:IState = {
+        businessId: this.businessId,
+        page: this.page.page,
+        limit: this.page.limit
+      }
+      let { data: res } = await GetListByBusinessId(params)
+      if (res.success) {
+        this.tableData = res.data.map((item:IState) => {
+          item.callDuration1 = this.parseTime(+item.callDuration)
+          return item
+        })
+        res.page = await HandlePages(res.page)
+        this.page.total = res.page.total
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get log lists fail:${err}`)
+    } finally {
+      //
+    }
+  }
+  parseTime(time:number) {
+    if (parseInt(String(time), 10) !== time) {
+      return ''
+    } else {
+      let str:string = ''
+      if (time > 86400) {
+        str = `${parseInt(String(time / 86400))}天`
+        time = parseInt(String(time % 86400))
+      }
+      if (time > 3600) {
+        str += `${parseInt(String(time / 3600))}小时`
+        time = parseInt(String(time % 3600))
+      }
+      if (time > 60) {
+        str += `${parseInt(String(time / 60))}分钟`
+        time = parseInt(String(time % 60))
+      }
+      if (time > 0) {
+        str += `${parseInt(String(time))}秒`
+      }
+      return str
+    }
   }
 }
 </script>

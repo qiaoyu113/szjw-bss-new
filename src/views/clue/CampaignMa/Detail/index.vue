@@ -68,6 +68,7 @@ import WuTong from './components/wutong.vue'
 import ThunderbirdPool from './components/thunderbirdPool.vue'
 import ThunderbirdRental from './components/thunderbirdRental.vue'
 import { EditCampaignData } from '@/api/clue'
+import CallLog from '@/components/OutboundDialog/CallLog.vue'
 interface IState {
   [key: string]: any;
 }
@@ -78,7 +79,8 @@ interface IState {
     ShowForm,
     WuTong,
     ThunderbirdPool,
-    ThunderbirdRental
+    ThunderbirdRental,
+    CallLog
   }
 })
 export default class extends Vue {

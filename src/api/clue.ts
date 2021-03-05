@@ -220,3 +220,17 @@ export const editClue = (data: any) =>
     method: 'post',
     data
   })
+  // 通过业务id查询对应的通话日志列表
+export const GetListByBusinessId = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/call-log/getListByBusinessId`,
+    method: 'post',
+    data
+  })
+// 根据客群id获取客群细分选择项列表
+export const GetUserGroupSelectList = (params: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getUserGroupSelectList`,
+    method: 'get',
+    params
+  })

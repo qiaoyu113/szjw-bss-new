@@ -55,7 +55,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 interface IState {
   [key: string]: any;
@@ -67,6 +67,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  @Prop({ default: '' }) busiType!:string|number;
   fileList:any[] = [];
   private listQuery:IState = {};
   private selectFile:boolean = false // 是否选择文件
@@ -115,7 +116,17 @@ export default class extends Vue {
   }
   // 下载模板
   handleDownloadClick() {
-
+    let url:string = ''
+    if (this.busiType === 0) {
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/7f29dcd2006d4e56821bc154a034efa3'
+    } else if (this.busiType === 1) {
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/1f9649663617406b9413f1d3496fbfbf'
+    } else if (this.busiType === 2) {
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/84f5f3686f5849699d896cd57807c049'
+    } else if (this.busiType === 3) {
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/ad24027b505644849e653a9f09f61c90'
+    }
+    window.location.href = url
   }
 }
 </script>

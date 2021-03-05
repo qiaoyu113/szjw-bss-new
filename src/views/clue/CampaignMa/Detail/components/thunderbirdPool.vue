@@ -59,6 +59,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { CampaignDataGroupToThunderBirdTruckPool } from '@/api/clue'
+import { sumFunc, divisionFunc } from './index'
 interface IState {
   [key: string]: any;
 }
@@ -210,8 +211,8 @@ export default class extends Vue {
         }
       })
       if (sumArr.length > 0) {
-        sums[index] = this.sumFunc(sumArr)
-        sums[column.property] = this.sumFunc(sumArr)
+        sums[index] = sumFunc(sumArr)
+        sums[column.property] = sumFunc(sumArr)
       } else if (percentArr.length > 0) {
         let percent:number = this.percentFunc(sums, column.property)
         sums[index] = (percent * 100) + '%'
@@ -224,45 +225,19 @@ export default class extends Vue {
     })
     return sums
   }
-  // 求和函数
-  sumFunc(values:number[]) {
-    let sums:number = 0
-    if (!values.every(value => isNaN(value))) {
-      sums = values.reduce((prev, curr) => {
-        const value = Number(curr)
-        if (!isNaN(value)) {
-          return prev + curr
-        } else {
-          return prev
-        }
-      }, 0)
-      return this.isInteger(sums)
-    }
-  }
-  // 是否为整数，否则保留2位
-  isInteger(num:number) {
-    if (parseInt(String(num), 10) === num) {
-      return num
-    }
-    return +num.toFixed(2)
-  }
-  // 除法
-  divisionFunc(values:number, value:number) {
-    let num:number = values / value
-    return this.isInteger(num)
-  }
+
   // 计算转化率
   percentFunc(sums:any, prop:string) {
     switch (prop) {
       // 展示-点击转化率
       case 'clickConversionRate':
-        return this.divisionFunc(sums['clickNum'], sums['showNum'])
+        return divisionFunc(sums['clickNum'], sums['showNum'])
         // 点击-线索转化率
       case 'clickClueConversionRate':
-        return this.divisionFunc(sums['clueNum'], sums['clickNum'])
+        return divisionFunc(sums['clueNum'], sums['clickNum'])
         // 线索-已入池转化率
       case 'clueAlreadyPoolRate':
-        return this.divisionFunc(sums['alreadyPoolNum'], sums['clueNum'])
+        return divisionFunc(sums['alreadyPoolNum'], sums['clueNum'])
       default:
         return 0
     }
@@ -272,13 +247,13 @@ export default class extends Vue {
     switch (prop) {
       // 点击成本
       case 'clickCost':
-        return this.divisionFunc(sums['actualCost'], sums['clickNum'])
+        return divisionFunc(sums['actualCost'], sums['clickNum'])
         // 线索成本
       case 'clueCost':
-        return this.divisionFunc(sums['actualCost'], sums['clueNum'])
+        return divisionFunc(sums['actualCost'], sums['clueNum'])
         // 面试成本
       case 'alreadyPoolCost':
-        return this.divisionFunc(sums['actualCost'], sums['alreadyPoolNum'])
+        return divisionFunc(sums['actualCost'], sums['alreadyPoolNum'])
       default:
         return 0
     }

@@ -24,7 +24,7 @@
           v-model="listQuery.launchPlatform"
           class="inline-input"
           :fetch-suggestions="querySearch"
-          maxlength="20"
+          :maxlength="20"
           placeholder="请输入"
         />
       </template>
@@ -49,6 +49,7 @@ export default class extends Vue {
   @Prop({ default: () => {} }) cityList!:IState;
   @Prop({ default: () => {} }) platformList!:IState;
   @Prop({ default: () => {} }) cityDetail!:Function;
+  @Prop({ default: () => [] }) addUserlist!:IState[];
   private listQuery:IState = {
     userGroupId: '',
     areCity: '',
@@ -64,14 +65,15 @@ export default class extends Vue {
   }
   private formItem:any[] = [
     {
-      type: 1,
+      type: 2,
       tagAttrs: {
         placeholder: '请输入客群细分ID',
         clearable: true,
-        maxlength: 10
+        filterable: true
       },
       label: '客群细分ID',
-      key: 'userGroupId'
+      key: 'userGroupId',
+      options: this.addUserlist
     },
     {
       type: 2,

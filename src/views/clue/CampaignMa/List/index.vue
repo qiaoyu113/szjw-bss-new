@@ -127,6 +127,7 @@
       <AddCampaign
         ref="addCampaign"
         :region-list="regionList"
+        :add-userlist="addUserGroup"
         :city-list="cityList"
         :city-detail="cityDetail"
         :platform-list="platformList"
@@ -144,6 +145,7 @@
     >
       <ImportClue
         ref="importClue"
+        :busi-type="busiType"
         @onPass="handlePass1"
       />
     </SelfDialog>
@@ -167,7 +169,7 @@ import {
   thirtyday
 } from '../../../driver-freight/components/date'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
-import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport } from '@/api/clue'
+import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -189,6 +191,7 @@ interface IState {
 })
 export default class extends Vue {
   times:number = 10;
+  private busiType:number|string = ''
   private regionList:IState[] = []; // 区域列表
   private cityList:IState[] = []; // 城市列表
   private platformList:IState[] = []; // 平台列表
@@ -203,6 +206,8 @@ export default class extends Vue {
     time: [],
     sort: 1 // 1: 降序,0:升序
   }
+  private userGroupOptions:IState[] = []; // 客群细分id
+  private addUserGroup:IState[] = []; // 新增客群细分id
   // 新建Campaign
   private showDialog:boolean = false;
   // 导入线索
@@ -211,19 +216,19 @@ export default class extends Vue {
   private busiTypeArrs:any[] = [
     {
       label: '梧桐专车',
-      value: 1
+      value: 0
     },
     {
       label: '梧桐共享',
-      value: 2
+      value: 1
     },
     {
       label: '雷鸟车池',
-      value: 3
+      value: 2
     },
     {
       label: '雷鸟租赁',
-      value: 4
+      value: 3
     }
   ]
   private formItem:any[] = [
@@ -236,14 +241,14 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 1,
+      type: 2,
       tagAttrs: {
         placeholder: '请输入客群细分ID',
-        clearable: true,
-        maxlength: 10
+        clearable: true
       },
       label: '客群细分ID',
-      key: 'userGroupId'
+      key: 'userGroupId',
+      options: this.userGroupOptions
     },
     {
       type: 2,
@@ -440,6 +445,9 @@ export default class extends Vue {
   }
   // 新建Campaign
   handleAddClick() {
+    if (this.addUserGroup.length === 0) {
+      this.getUserGroupSelectList('')
+    }
     this.showDialog = true
   }
   // 导出
@@ -451,10 +459,10 @@ export default class extends Vue {
     try {
       // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
       let obj:IState = {
+        0: FirmianaExport,
         1: FirmianaExport,
-        2: FirmianaExport,
-        3: ThunderBirdTruckPoolExport,
-        4: ThunderBirdRentalExport
+        2: ThunderBirdTruckPoolExport,
+        3: ThunderBirdRentalExport
       }
       let params:IState = this.generateParams()
       let { data: res } = await obj[this.listQuery.clueType](params)
@@ -534,6 +542,7 @@ export default class extends Vue {
   }
   // 导入线索
   handleImportClick(row:IState) {
+    this.busiType = row.busiType
     this.showDialog1 = true
   }
   // 新建 确定按钮
@@ -646,7 +655,7 @@ export default class extends Vue {
       }))
       this.platformList.push(...result)
     } else {
-      this.$message.error(data)
+      this.$message.error(data.message)
     }
   }
   // 根据创建时间排序
@@ -661,10 +670,36 @@ export default class extends Vue {
     }
     this.getLists()
   }
+  // 获取客群id
+  async getUserGroupSelectList(clueType:number|string) {
+    try {
+      let params:IState = {}
+      if (clueType !== '') {
+        params.clueType = clueType
+      }
+      let { data: res } = await GetUserGroupSelectList(params)
+      if (res.success) {
+        let result:IState[] = res.data.map((item:IState) => ({
+          label: item.label,
+          value: item.groupId
+        }))
+        if (clueType !== '') {
+          this.userGroupOptions.push(...result)
+        } else {
+          this.addUserGroup.push(...result)
+        }
+      } else {
+        this.$message.error(res.message)
+      }
+    } catch (err) {
+      console.log(`get user groupId fail:${err}`)
+    }
+  }
   // 初始化公共列表
   init() {
     this.areaAddress()
     this.getDictionaryContract()
+    this.getUserGroupSelectList(this.listQuery.clueType)
   }
   activated() {
     this.getLists()
