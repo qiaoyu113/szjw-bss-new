@@ -45,26 +45,6 @@
           <el-button
             type="text"
             size="small"
-            @click="handleInterveneClick(scope.row)"
-          >
-            调整干涉人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-            @click="handleAllotClick(scope.row)"
-          >
-            调整分配人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-          >
-            调整监督人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
             @click="setPolicyAuto(scope.row)"
           >
             设置policy
@@ -77,74 +57,6 @@
       :policy-data="policyData"
       @success="getList"
     />
-    <SelfDialog
-      :class="'distributionDialog'"
-      :visible.sync="showDialog"
-      :confirm="confirm"
-      :show-other-button="false"
-      title="调整干涉人"
-      width="500px"
-      :destroy-on-close="true"
-      @closed="() => {
-        row = {}
-      }"
-    >
-      <p>
-        <el-form
-          ref="form"
-          :model="form"
-          label-width="80px"
-        >
-          <el-form-item label="角色">
-            <el-select
-              v-model="listQuery.role"
-              placeholder="请选择角色"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </p>
-    </SelfDialog>
-    <SelfDialog
-      :class="'distributionDialog'"
-      :visible.sync="showDialog"
-      :confirm="confirm"
-      :show-other-button="false"
-      title="调整分配人"
-      width="500px"
-      :destroy-on-close="true"
-      @closed="() => {
-        row = {}
-      }"
-    >
-      <p>
-        <el-form
-          ref="form"
-          :model="form"
-          label-width="80px"
-        >
-          <el-form-item label="角色">
-            <el-select
-              v-model="listQuery.role"
-              placeholder="请选择角色"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </p>
-    </SelfDialog>
   </div>
 </template>
 
@@ -291,7 +203,7 @@ export default class extends Vue {
     },
     {
       key: 'id',
-      label: '客群细分编号/业务线/客群类型',
+      label: '客群细分ID/业务线/客群类型',
       width: '120px'
     },
     {
@@ -303,43 +215,22 @@ export default class extends Vue {
       label: '分配机制'
     },
     {
-      key: 'distributionManageName',
-      label: '分配机制管理员',
+      key: 'cluesAmount',
+      label: '线索量',
       width: '120px'
     },
     {
-      key: 'policyName',
-      label: 'policy干涉人'
+      key: 'setPerson',
+      label: '设置人'
     },
     {
-      key: 'distributionName',
-      label: '分配人'
-    },
-    {
-      key: 'supervisorName',
-      label: '监督人'
-    },
-    {
-      key: 'remark',
-      label: '备注'
-    },
-    {
-      key: 'createName',
-      label: '创建人'
-    },
-    {
-      key: 'createDate',
-      label: '创建时间'
-    },
-    {
-      key: 'recentNews',
-      label: '最新动态'
+      key: 'setDate',
+      label: '设置时间'
     },
     {
       key: 'op',
       label: '操作',
       slot: true,
-      width: '300px',
       fixed: 'right'
     }
   ]
@@ -363,29 +254,6 @@ export default class extends Vue {
   handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
-  private handleClick(row: IState) {}
-  // showPolicy:boolean = false
-  // 调整干涉人
-  private async handleInterveneClick(row:any) {
-    this.showDialog = true
-  }
-  private async confirm(done: any) {
-    try {
-      let params = {
-
-      }
-      // if (success) {
-      //   this.$message.success('调整成功')
-      // }
-    } catch (err) {
-      console.log('11')
-    } finally {
-      console.log('22')
-    }
-  }
-  // 调整分配人
-  private async handleAllotClick(row:any) {
-  }
   // 设置policy
   private showPolicy:boolean = false // has 设置policy弹框
   private policyData:any = {}
@@ -397,8 +265,6 @@ export default class extends Vue {
     }
     this.policyData = object
     this.showPolicy = true
-
-    // this.showPolicy = true
   }
   // 获取列表
   private async getList(this:any) {
@@ -430,13 +296,6 @@ export default class extends Vue {
 
   data() {
     return {
-      form: {
-        role: ''
-      },
-      options: [{
-        value: '选项1',
-        label: '角色'
-      }]
     }
   }
   mounted() {
