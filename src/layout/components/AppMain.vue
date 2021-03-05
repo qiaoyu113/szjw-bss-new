@@ -11,6 +11,7 @@
         <router-view :key="key" />
       </keep-alive>
     </transition>
+    <init-phone />
   </section>
 </template>
 
@@ -18,12 +19,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { TagsViewModule } from '@/store/modules/tags-view'
 import { SettingsModule } from '@/store/modules/settings'
-import { GetInfoByUserId } from '@/api/common'
-interface IState {
-  [key: string]: any;
-}
+import InitPhone from '@/components/OutboundDialog/InitPhone.vue'
+
 @Component({
-  name: 'AppMain'
+  name: 'AppMain',
+  components: {
+    InitPhone
+  }
 })
 export default class extends Vue {
   get cachedViews() {
@@ -49,47 +51,6 @@ export default class extends Vue {
     SettingsModule.ChangeIsPC({ key: 'tableHeight', value })
   }
 
-  // 添加iframe到dom上
-  handleAddDom(obj:IState) {
-    const makePhone = document.getElementById('makePhone')
-    const iframe = document.createElement('iframe')
-    iframe.style.display = 'none'
-    // 8011@yunniao  1234Abcd
-    const url:string = `./edb/html/webmain.html?loginName=${obj.account}&password=${obj.password}&loginType=sip&agentStatus=0&appId=${obj.appId}&secret=${obj.secret}`
-    iframe.name = 'szjwCall'
-    iframe.src = url;
-    (makePhone as HTMLHtmlElement).appendChild(iframe)
-    console.log(url)
-  }
-  // 根据用户id获取坐席号
-  async getInfoByUserId() {
-    try {
-      this.handleAddDom({ account: `8001@yunniao`, password: '2_kHzxLREx8001', appId: 'T00000019075', secret: 'dbfecf80-677b-11eb-a7ab-13b8c3cc732e' })
-      let userId = localStorage.getItem('userId')
-      let params = {
-        userId
-      }
-      let { data: res } = await GetInfoByUserId(params)
-      if (res.success) {
-        let { loginName, password, appId, secret } = res.data
-        if (!loginName || !password || !appId || !secret) {
-          return this.$message.error('当前用户没有配置坐席号')
-        }
-        // '8001@yunniao'
-        // 2_kHzxLREx8001
-        // T00000019075
-        // dbfecf80-677b-11eb-a7ab-13b8c3cc732e
-
-        // this.handleAddDom({ account: `${loginName}@yunniao`, password, appId, secret })
-      } else {
-        this.$message.error(res.message)
-      }
-    } catch (err) {
-      console.log(`get user fail:${err}`)
-    } finally {
-      //
-    }
-  }
   // mounted() {
   //   let makePhoneDom = document.getElementById('makePhone')
   //   if (!(makePhoneDom as HTMLElement).hasChildNodes()) {

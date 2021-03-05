@@ -14,19 +14,27 @@
         <el-upload
           ref="upload"
           drag
-          :show-file-list="true"
+          :show-file-list="false"
           :limit="1"
           action="/121"
-          :before-upload="beforeFileUpload"
           :auto-upload="false"
           :file-list="fileList"
           :http-request="uploadFile"
-          @before-upload="handleExcelChange"
+          :on-change="handleExcelChange"
+          :class="selectFile ? 'uploadSuc':''"
         >
-          <i class="el-icon-upload" />
-          <div class="el-upload__text">
-            选择导入文件
-          </div>
+          <template v-if="selectFile">
+            <i class="el-icon-document" />
+            <div class="tipText">
+              {{ filename }}
+            </div>
+          </template>
+          <template v-else>
+            <i class="el-icon-upload" />
+            <div class="el-upload__text">
+              选择导入文件
+            </div>
+          </template>
           <div
             slot="tip"
             class="el-upload__tip"
@@ -61,6 +69,8 @@ interface IState {
 export default class extends Vue {
   fileList:any[] = [];
   private listQuery:IState = {};
+  private selectFile:boolean = false // 是否选择文件
+  private filename:string = ''// 文件名
   private formItem:any[] = [
     {
       type: 'file',
@@ -75,31 +85,33 @@ export default class extends Vue {
       slot: true
     }
   ];
-  handleExcelChange() {
-    console.log('xxxx')
-  }
-  // 上传前的校验
-  beforeFileUpload(file:File) {
-    const type = file.type
+  handleExcelChange({ raw }:{raw:File}) {
+    const type = raw.type
+    this.filename = raw.name
     if (['application/vnd.ms-excel', 'application/x-xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(type)) {
+      this.selectFile = true
       return true
     }
+    this.handleResetFile()
     this.$message.warning('请选择excel文件')
     return false
   }
-  // 验证表单
-  handleValidateForm() {
-    ((this.$refs.form1) as any).submitForm()
+  // 重置文件
+  handleResetFile() {
+    this.selectFile = false
+    this.fileList = []
   }
   // 调用上传
   handlePass() {
+    if (!this.selectFile) {
+      return this.$message.warning('请选择要导入的excel文件')
+    }
     (this.$refs.upload as any).submit()
   }
   uploadFile(file:any) {
     let formData = new FormData()
     formData.append('file', file.file)
     this.$emit('onPass', formData)
-    this.fileList = []
   }
   // 下载模板
   handleDownloadClick() {
@@ -109,6 +121,22 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .impotClueContainer {
+    .tipText {
+      color: #1f2d3d;
+      font-size: 14px;
+      text-align: center;
+    }
+    .el-icon-document {
+      color: #C0C4CC;
+      font-size:50px;
+    }
+  }
+</style>
 
+<style scoped>
+  .uploadSuc >>> .el-upload-dragger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 </style>

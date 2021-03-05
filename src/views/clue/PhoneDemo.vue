@@ -11,7 +11,10 @@
         />
       </el-form-item>
     </el-form>
-    <makeCall :phone="phone" />
+    <makeCall
+      :phone="phone"
+      @random="handleRandomChange"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -25,6 +28,9 @@ import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 })
 export default class extends Vue {
   private phone:string = ''
+  handleRandomChange(val:string) {
+    console.log('返回的随机数:', val)
+  }
 }
 </script>
 <style lang="scss" scoped>

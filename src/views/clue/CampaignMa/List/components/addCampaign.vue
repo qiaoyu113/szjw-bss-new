@@ -14,7 +14,7 @@
       <template #budget>
         <el-input
           v-model="listQuery.budget"
-          v-only-number="{min: 0, max: 999999.99, precision: 2}"
+          v-only-number="{min: 0, max: 9999999.99, precision: 2}"
           placeholder="请输入"
           clearable
         />
@@ -24,6 +24,7 @@
           v-model="listQuery.launchPlatform"
           class="inline-input"
           :fetch-suggestions="querySearch"
+          maxlength="20"
           placeholder="请输入"
         />
       </template>
@@ -53,6 +54,7 @@ export default class extends Vue {
     areCity: '',
     city: '',
     launchPlatform: '',
+    dropMaterials: '',
     dropStarTime: '',
     dropEndTime: '',
     landingPage: '',
@@ -105,6 +107,19 @@ export default class extends Vue {
       slot: true
     },
     {
+      type: 1,
+      label: '投放物料',
+      key: 'dropMaterials',
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true,
+        maxlength: 200,
+        'show-word-limit': true,
+        type: 'textarea',
+        rows: 3
+      }
+    },
+    {
       type: 9,
       tagAttrs: {
         placeholder: '请选择',
@@ -120,8 +135,8 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        format: 'yyyy-MM-dd HH:mm',
-        'value-format': 'yyyy-MM-dd HH:mm',
+        format: 'yyyy-MM-dd HH',
+        'value-format': 'yyyy-MM-dd HH',
         'picker-options': {
           disabledDate: (time:Date) => {
             if (!this.listQuery.dropStarTime) {
@@ -140,7 +155,7 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请输入',
         clearable: true,
-        maxlength: 10
+        maxlength: 200
       },
       label: '落地页',
       key: 'landingPage'
@@ -189,6 +204,9 @@ export default class extends Vue {
     ],
     launchPlatform: [
       { required: true, message: '请选择', trigger: ['change', 'blur'] }
+    ],
+    dropMaterials: [
+      { required: true, message: '请输入', trigger: 'blur' }
     ],
     dropStarTime: [
       { required: true, message: '请选择', trigger: 'blur' }

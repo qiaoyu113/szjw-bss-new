@@ -572,7 +572,7 @@ export default class extends Vue {
   }
   // 导入线索 关闭弹框后
   handleDialogClosed1() {
-
+    ((this.$refs.importClue) as any).handleResetFile()
   }
   // 上传excel
   async handlePass1(formData:FormData) {
