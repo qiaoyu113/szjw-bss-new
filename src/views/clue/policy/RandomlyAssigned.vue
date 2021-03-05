@@ -47,12 +47,12 @@
             size="small"
             @click="setPolicyAuto(scope.row)"
           >
-            设置policy
+            设置分配policy
           </el-button>
         </template>
       </self-table>
     </div>
-    <SetUpPolicy
+    <SetUpDistributionPolicy
       :visible.sync="showPolicy"
       :policy-data="policyData"
       @success="getList"
@@ -62,7 +62,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SetUpPolicy from '../components/SetUpPolicy.vue'
+import SetUpDistributionPolicy from '../components/SetUpDistributionPolicy.vue'
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
@@ -82,7 +82,7 @@ interface IState {
   components: {
     SelfTable,
     SelfFrom,
-    SetUpPolicy,
+    SetUpDistributionPolicy,
     SelfDialog
   }
 })
@@ -258,7 +258,6 @@ export default class extends Vue {
   private showPolicy:boolean = false // has 设置policy弹框
   private policyData:any = {}
   setPolicyAuto(item:any) {
-    console.log(item.distributionType)
     const object = {
       distributionType: item.distributionType,
       id: item.id

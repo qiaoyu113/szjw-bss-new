@@ -8,53 +8,30 @@
     :confirm="onConfirm"
     v-on="$listeners"
     @close="resetForm"
-    @open="getUserGroupList"
   >
     <el-form
       :model="queryInfo"
       label-width="80px"
       label-position="left"
     >
-      <template v-if="isAutoSetpolicy">
-        <h3>不可接受线索人员</h3>
-        <el-form-item label="小组">
-          <el-select
-            v-model="queryInfo.group"
-            placeholder="请选择活动区域"
-            @change="usreGroupChange"
-          >
-            <el-option
-              v-for="item in userGroupList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="人员">
-          <el-checkbox-group
-            v-model="queryInfo.notReceiveId"
-          >
-            <el-checkbox
-              v-for="item in teamMemberList"
-              :key="item.id"
-              :label="item.id"
-              name="type"
-            >
-              {{ item.name }}
-            </el-checkbox>
-          </el-checkbox-group>
-        </el-form-item>
-        <p class="setup-title">
-          设置成功后，随机分配线索时，选中的人员将不能接收到线索
-        </p>
-      </template>
+      <el-tabs
+        v-model="activeTab"
+        style="margin-top: 20px"
+        @tab-click="handleClick"
+      >
+        <el-tab-pane
+          v-for="(item, index) in lineTypeTab"
+          :key="index"
+          :label="item.name"
+          :name="item.value"
+        />
+      </el-tabs>
       <h3>设置线索回流时间</h3>
       <el-form-item label="待跟进">
         <el-input-number
           v-model="queryInfo.followDayNum"
           :min="1"
-          :max="10"
+          :max="99"
           class="num-input-setup-clue"
         />
       </el-form-item>
@@ -62,12 +39,16 @@
         <el-input-number
           v-model="queryInfo.followingDayNum"
           :min="1"
-          :max="10"
+          :max="99"
           class="num-input-setup-clue"
         />
       </el-form-item>
       <p class="setup-title">
-        设置成功后，该状态的线索在设置的天数没有被跟进时，该线索会依据随机分配规则重新分配跟进人
+        人工分配: &nbsp;设置成功后，该状态的线索在设置的天数没有被跟进时,该线索会被退回待分配线索池
+      </p>
+      <p class="setup-title">
+        随机分配+policy: &nbsp;设置成功后，该状态的线索在设置的天数没有被跟
+        进时，该线索会依据随机分配规则重新分配跟进人
       </p>
     </el-form>
   </SelfDialog>
@@ -86,53 +67,67 @@ export default class extends Vue {
   @Prop({ default: () => {} }) policyData: any
   private queryInfo: any = {
     group: '',
-    notReceiveId: [],
-    toFollowed: [],
-    followDayNum: undefined,
-    followingDayNum: undefined
+    followDayNum: 3,
+    followingDayNum: 15
   }
-  get isAutoSetpolicy() {
-    return this.policyData.distributionType === 0
+  activeTab = '0'
+  // 梧桐专车、梧桐共享、雷鸟车池、雷鸟租赁
+  private lineTypeTab = [
+    {
+      name: '梧桐专车',
+      value: '0'
+    },
+    {
+      name: '梧桐共享',
+      value: '1'
+    },
+    {
+      name: '雷鸟车池',
+      value: '2'
+    },
+    {
+      name: '雷鸟租赁C',
+      value: '4'
+    },
+    {
+      name: '雷鸟租赁B',
+      value: '3'
+    }
+  ]
+  defalutDate = {
+    '0': {
+      followDayNum: 3,
+      followingDayNum: 15
+    },
+    '1': {
+      followDayNum: 1,
+      followingDayNum: 7
+    },
+    '2': {
+      followDayNum: 1,
+      followingDayNum: 7
+    },
+    '4': {
+      followDayNum: 1,
+      followingDayNum: 3
+    },
+    '3': {
+      followDayNum: 1,
+      followingDayNum: 7
+    }
   }
   private userGroupList: any = []
-  // 获取小组
-  async getUserGroupList() {
-    try {
-      const { data } = await getUserGroup({})
-      this.userGroupList = data.data
-      console.log(data)
-    } catch (error) {
-      return error
-    }
-  }
-  usreGroupChange(item:any) {
-    this.getTeamMember(item)
-  }
-  // 小组人员改变
-  private teamMemberList:any = []
-  async getTeamMember(groudID:string) {
-    try {
-      const { data } = await getUserGroup({
-        groudID
-      })
-      this.teamMemberList = data.data
-      console.log(data)
-    } catch (error) {
-      return error
-    }
-  }
+
   resetForm() {
     this.$nextTick(() => {
       this.queryInfo = {
-        group: '',
-        notReceiveId: [],
-        toFollowed: [],
-        followDayNum: undefined,
-        followingDayNum: undefined
+        followDayNum: 3,
+        followingDayNum: 15
       }
+      this.activeTab = '0'
     })
   }
-  async setPolicyConfirm(callback:Function) {
+  async setPolicyConfirm(callback: Function) {
     try {
       const { notReceiveId, id, followingDayNum, followDayNum } = this.queryInfo
       let params = {
@@ -160,8 +155,13 @@ export default class extends Vue {
       console.log(err)
     }
   }
-  onConfirm(callback:Function) {
+  onConfirm(callback: Function) {
     this.setPolicyConfirm(callback)
+  }
+  handleClick(this:any, { name }: any) {
+    const { followDayNum, followingDayNum } = this.defalutDate[name]
+    this.queryInfo.followDayNum = followDayNum
+    this.queryInfo.followingDayNum = followingDayNum
   }
 }
 </script>
@@ -173,7 +173,7 @@ export default class extends Vue {
     padding: 0px 30px 40px;
   }
   h3 {
-    margin: 40px 0;
+    margin: 20px 0 40px 0;
   }
   .el-input-number {
     width: 140px !important;
@@ -183,9 +183,8 @@ export default class extends Vue {
     }
     input {
       border: none !important;
-      text-align: left !important;
-      padding: 0 24px;
-      padding-left: 51px;
+      padding-left: 39px;
+      padding-right: 62px;
       font-size: 17px;
     }
     span {
@@ -222,6 +221,12 @@ export default class extends Vue {
     color: #999;
     font-size: 16px;
     margin: 18px 0 22px 0;
+  }
+  .el-tabs__nav-wrap{
+    &::after{
+      content: '';
+      background-color:transparent;
+    }
   }
 }
 </style>
