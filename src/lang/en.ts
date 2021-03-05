@@ -166,7 +166,9 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    RandomlyAssigned: 'Randomly assign policy settings',
+    BackflowPolicy: 'Backflow policy settings'
   },
   navbar: {
     logOut: 'Log Out',

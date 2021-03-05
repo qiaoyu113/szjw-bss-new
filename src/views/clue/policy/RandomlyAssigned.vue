@@ -150,13 +150,13 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SetUpPolicy from './components/SetUpPolicy.vue'
+import SetUpPolicy from '../components/SetUpPolicy.vue'
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
 import { HandlePages, lock } from '@/utils/index'
-import { configurationManagementList } from '@/api/clue.ts'
+import { configurationManagementList } from '@/api/clue'
 interface PageObj {
   page: number
   limit: number

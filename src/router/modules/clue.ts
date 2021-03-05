@@ -45,12 +45,22 @@ const clueRouter: RouteConfig = {
       }
     },
     {
-      path: 'config', /* 配置管理 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Configuration.vue'),
-      name: 'Configuration',
+      path: 'backflowPolicy', /* 配置管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
+      name: 'BackflowPolicy',
       meta: {
         apiUrl: 'root',
-        title: 'Configuration',
+        title: 'BackflowPolicy',
+        noCache: false
+      }
+    },
+    {
+      path: 'randomlyAssigned', /* 配置管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
+      name: 'RandomlyAssigned',
+      meta: {
+        apiUrl: 'root',
+        title: 'RandomlyAssigned',
         noCache: false
       }
     }
