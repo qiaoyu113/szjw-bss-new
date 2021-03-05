@@ -12,6 +12,7 @@
         ref="followform"
         :clue-status="+clueStatus"
         @success="successSend"
+        @followPass="followPass"
       />
     </SelfDialog>
   </div>
@@ -35,6 +36,7 @@ export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
   @Prop({ default: '0' }) private clueStatus!: string;
   private submitLoading: boolean = false;
+  private errMsg:IState = {}
 
   get show() {
     return this.showDialog
@@ -64,11 +66,26 @@ export default class extends Vue {
     (this.$refs['followform'] as any).submitForms()
   }
 
-  private successSend(val:boolean) {
+  private followPass(val:boolean) {
     if (val) {
-      (this.$parent as any).getDetailApi()
-      this.show = false
+      (this.$refs['followform'] as any).followType()
     }
+  }
+
+  private successSend(val:IState) {
+    if (val.state) {
+      this.$message({
+        type: 'success',
+        message: '添加线下跟进成功!'
+      });
+      (this.$parent as any).getDetailApi()
+    } else {
+      this.$message({
+        type: 'warning',
+        message: this.errMsg.state
+      })
+    }
+    this.show = false
   }
 }
 </script>

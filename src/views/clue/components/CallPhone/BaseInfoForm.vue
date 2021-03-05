@@ -1,8 +1,8 @@
 <template>
   <div class="baseInfoForm">
-    <span>基本信息</span>
+    <h5>基本信息</h5>
     <SelfForm
-      v-if="clueStatus < 2"
+      ref="baseInfoForm"
       :rules="rulesWT"
       :list-query="queryAndItem.query"
       :form-item="queryAndItem.formItem"
@@ -12,11 +12,11 @@
     >
       <div
         slot="hasCar"
-        style="display:flex"
+        style="display:flex;width: 100%;"
       >
         <el-select
           v-model="WTQuery.hasCar"
-          class="carBox"
+          :class="WTQuery.hasCar !== false ? 'carBox' : 'carNone'"
           placeholder="是否有车"
         >
           <el-option
@@ -27,9 +27,9 @@
           />
         </el-select>
         <el-select
+          v-if="WTQuery.hasCar === true"
           v-model="WTQuery.carType"
           placeholder="请选择车型"
-          :disabled="!WTQuery.hasCar"
         >
           <el-option
             v-for="item in optionsCarType"
@@ -40,13 +40,11 @@
         </el-select>
       </div>
     </SelfForm>
-    <span>其他信息</span>
+    <h5>其他信息</h5>
     <SelfForm
       :list-query="otherQuery"
       :form-item="columnsOther"
-    >
-      123
-    </SelfForm>
+    />
   </div>
 </template>
 
@@ -56,7 +54,8 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import {
   getClueWSXDetail,
   getClueLCXDetail,
-  getClueLZXDetail
+  getClueLZXDetail,
+  editClue
 } from '@/api/clue'
 
 import {
@@ -77,6 +76,7 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: 0 }) private clueStatus!: number;
+  @Prop({ default: '' }) private clueId!: string;
 
   private countryValue = ''; // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区
   private optionsHasCar:object[] =[
@@ -84,13 +84,30 @@ export default class extends Vue {
     { label: '否', value: false }
   ]
 
+  private optionsCarType:object[] =[]
+  private demandTypeOptions:object[] =[]
+  private carOptions:object[] = [
+    { label: '金杯', value: 1 },
+    { label: '依维柯', value: 10 },
+    { label: '4.2米厢货', value: 2 },
+    { label: '面包', value: 35 },
+    { label: '其他', value: 45 }
+  ];
+
   get queryAndItem() {
     let item:IState = {}
     if (this.clueStatus < 2) {
       item.formItem = this.WTItem
       item.query = this.WTQuery
+    } else if (this.clueStatus === 2) {
+      item.formItem = this.BirdCarItem
+      item.query = this.BirdCarQuery
     } else if (this.clueStatus === 3) {
-      //
+      item.formItem = this.BirdItem
+      item.query = this.BirdQuery
+    } else {
+      item.formItem = this.BirdItem
+      item.query = this.BirdQuery
     }
     return item
   }
@@ -101,6 +118,18 @@ export default class extends Vue {
       return newArr
     } else {
       return this.otherItem
+    }
+  }
+
+  get BirdItem() {
+    if (this.clueStatus === 3) {
+      let arr = JSON.parse(JSON.stringify(this.BirdCarItem))
+      arr.splice(2, 3, ...this.BirdCItemSome)
+      return arr
+    } else {
+      let arr = JSON.parse(JSON.stringify(this.BirdCarItem))
+      arr.splice(2, 3, ...this.BirdBItemSome)
+      return arr
     }
   }
 
@@ -256,6 +285,161 @@ export default class extends Vue {
       label: '渠道'
     }
   ]
+
+  private BirdCarQuery:IState = {
+    name: '',
+    phone: '',
+    demandType: '',
+    carType: '',
+    carCityName: '',
+    statusName: '',
+    clueId: '',
+    clueTypeName: '',
+    followerName: '',
+    beforeFollowerName: '',
+    clueAttributionName: '',
+    sourceChannelName: '',
+    remark: ''
+  }
+  private BirdCarItem:IState[] = [
+    {
+      type: 1,
+      key: 'name',
+      label: '姓名',
+      tagAttrs: {
+        placeholder: '请填写司机姓名，例司机姓名+“师傅”',
+        maxlength: '10',
+        showWordLimit: true
+      }
+    },
+    {
+      type: 7,
+      key: 'phone',
+      label: '手机号'
+    },
+    {
+      type: 2,
+      key: 'demandType',
+      label: '需求类型',
+      tagAttrs: {
+        placeholder: '请选择'
+      },
+      options: this.demandTypeOptions
+    },
+    {
+      type: 2,
+      key: 'carType',
+      label: '车型',
+      tagAttrs: {
+        placeholder: '请选择'
+      },
+      options: this.optionsCarType
+    },
+    {
+      type: 7,
+      key: 'carCityName',
+      label: '车辆所在城市'
+    },
+    {
+      type: 7,
+      key: 'statusName',
+      label: '状态'
+    },
+    {
+      type: 7,
+      key: 'clueId',
+      label: '线索ID'
+    },
+    {
+      type: 7,
+      key: 'clueTypeName',
+      label: '线索类型'
+    },
+    {
+      type: 7,
+      key: 'followerName',
+      label: '跟进人'
+    },
+    {
+      type: 7,
+      key: 'beforeFollowerName',
+      label: '前跟进人'
+    },
+    {
+      type: 7,
+      key: 'clueAttributionName',
+      label: '线索归属'
+    },
+    {
+      type: 7,
+      key: 'sourceChannelName',
+      label: '渠道'
+    },
+    {
+      type: 1,
+      key: 'remark',
+      label: '备注',
+      col: 24,
+      tagAttrs: {
+        type: 'textarea',
+        placeholder: '选填，最多输入100个字',
+        maxlength: '50',
+        showWordLimit: true
+      }
+    }
+  ]
+
+  private BirdCItemSome:IState[] = [
+    {
+      type: 2,
+      key: 'intentModel',
+      label: '意向车型',
+      tagAttrs: {
+        placeholder: '请选择'
+      },
+      options: this.carOptions
+    },
+    {
+      type: 2,
+      key: 'fancyModel',
+      label: '看中车型',
+      tagAttrs: {
+        placeholder: '请选择'
+      },
+      options: this.carOptions
+    },
+    {
+      key: 'cityName',
+      label: '所在城市',
+      type: 7
+    }
+  ]
+
+  private BirdQuery:IState = {
+    intentModel: '',
+    fancyModel: '',
+    cityName: ''
+  }
+  private BirdBItemSome:IState[] = [
+    {
+      type: 5,
+      key: 'intentModel',
+      label: '意向车型',
+      options: this.carOptions
+    },
+    {
+      type: 5,
+      key: 'fancyModel',
+      label: '看中车型',
+      options: this.carOptions
+    },
+    {
+      key: 'cityName',
+      label: '所在城市',
+      type: 7
+    }
+  ]
+
   private otherQuery:IState = {
     inviteWord: '',
     interviewWord: '',
@@ -371,29 +555,79 @@ export default class extends Vue {
     }
   }
 
+  // 获取车型
+  async getOptions() {
+    try {
+      let params = ['Intentional_compartment']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        let cars = res.data.Intentional_compartment.map(function(item: any) {
+          return { label: item.dictLabel, value: +item.dictValue }
+        })
+
+        this.optionsCarType.push(...cars)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
+
+  private setQuerys(value: IState) {
+    if (this.clueStatus < 2) {
+      this.WTQuery = { ...this.WTQuery, ...value }
+      this.WTQuery.intentWork = [
+        value.expectAddressCity,
+        value.expectAddressCounty
+      ]
+      if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
+        this.WTQuery.intentWork.pop()
+        this.WTQuery.intentWork.push(this.countryValue)
+      }
+    } else if (this.clueStatus === 2) {
+      this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
+    } else if (this.clueStatus === 3) {
+      this.BirdQuery = { ...this.BirdQuery, ...value }
+    } else {
+      value.intentModel = '1,2,10'
+      value.fancyModel = '25,35,1'
+      value.intentModel = value.intentModel.split(',').map((ele:any) => {
+        return +ele
+      })
+      value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
+        return +ele
+      })
+      this.BirdQuery.intentModel = []
+      this.BirdQuery.fancyModel = []
+      this.BirdQuery = { ...this.BirdQuery, ...value }
+    }
+  }
+
+  // 详情获取
   async getDetailApi() {
     try {
       if (Number(this.clueStatus) < 2) {
-        let { data: res } = await getClueWSXDetail({ clueId: 'this.clueId' })
+        let { data: res } = await getClueWSXDetail({ clueId: this.clueId })
         if (res.success) {
           let {
             marketClueWSXDetailBaseInfoVO,
-            marketClueWSXDetailFollowInfoVOList,
-            marketClueWSXDetailOtherInfoVO,
-            marketClueWSXDetailRepeatedInfoVOList
+            marketClueWSXDetailOtherInfoVO
           } = res.data
+          this.setQuerys(marketClueWSXDetailBaseInfoVO)
+          this.otherQuery = marketClueWSXDetailOtherInfoVO
         } else {
           this.$message.warning(res.errorMsg)
         }
       } else if (Number(this.clueStatus) === 2) {
-        let { data: res } = await getClueLCXDetail({ clueId: 'this.clueId' })
+        let { data: res } = await getClueLCXDetail({ clueId: this.clueId })
         if (res.success) {
           let {
             marketClueLCXDetailBaseInfoVO,
-            marketClueLCXDetailFollowInfoVOList,
-            marketClueLCXDetailOtherInfoVO,
-            marketClueLCXDetailRepeatedInfoVOList
+            marketClueLCXDetailOtherInfoVO
           } = res.data
+          this.setQuerys(marketClueLCXDetailBaseInfoVO)
+          this.otherQuery = marketClueLCXDetailOtherInfoVO
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -402,10 +636,10 @@ export default class extends Vue {
         if (res.success) {
           let {
             marketClueLZXDetailBaseInfoVO,
-            marketClueLZXDetailFollowInfoVOList,
-            marketClueLZXDetailOtherInfoVO,
-            marketClueLZXDetailRepeatedInfoVOList
+            marketClueLZXDetailOtherInfoVO
           } = res.data
+          this.setQuerys(marketClueLZXDetailBaseInfoVO)
+          this.otherQuery = marketClueLZXDetailOtherInfoVO
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -413,6 +647,54 @@ export default class extends Vue {
     } catch (err) {
       console.log(err)
     }
+  }
+  // 表单提交
+  handlePassClick(val: boolean) {
+    this.$emit('basePass', val)
+  }
+
+  // 接口发送
+  async sendBase() {
+    try {
+      let val = this.queryAndItem.query
+      if (this.clueStatus < 2) {
+        val.expectAddressCity = val.intentWork[0]
+        val.expectAddressCounty = val.intentWork[1]
+      } else if (+this.clueStatus === 4) {
+        val.intentModel = String(val.intentModel)
+        val.fancyModel = String(val.fancyModel)
+      }
+      let { data: res } = await editClue(val)
+      if (res.success) {
+        this.$emit('success', true)
+        return Promise.resolve(true)
+      } else {
+        console.log('fail', res.errorMsg)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  submitsForm() {
+    (this.$refs['baseInfoForm'] as any).submitForm()
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      this.$on('show', (val:boolean) => {
+        if (val) {
+          this.getOptions()
+          this.getDetailApi()
+        } else {
+          (this.$refs['baseInfoForm'] as any).resetForm()
+          setTimeout(() => {
+            (this.$refs['baseInfoForm'] as any).clearValidate()
+          }, 10)
+          this.optionsCarType.splice(0, this.optionsCarType.length)
+        }
+      })
+    })
   }
 }
 </script>
@@ -429,15 +711,21 @@ export default class extends Vue {
 .baseInfoForm ::v-deep .el-input {
   display: table;
 }
-
-.baseInfoForm ::v-deep .el-col {
-  min-height: 100px!important;
+.baseInfoForm ::v-deep .address{
+  margin-bottom: 0;
 }
 .baseInfoForm{
   .carBox {
     padding-right: 10px;
     box-sizing: border-box;
     flex:.4;
+  }
+  h5{
+    border-bottom: 1px solid lightgrey;
+    margin: 0;
+    line-height: 25px;
+    padding-left: 10px;
+    box-sizing: border-box;
   }
 }
 

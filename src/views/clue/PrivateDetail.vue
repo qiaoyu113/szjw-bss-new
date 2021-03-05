@@ -207,6 +207,7 @@
       :show-dialog.sync="callPhoneDio"
       :clue-status="+clueStatus"
       :phone="baseInfoEdio.phone"
+      :clue-id="13"
     />
   </div>
 </template>
