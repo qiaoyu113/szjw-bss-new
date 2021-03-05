@@ -457,6 +457,11 @@
 </div>
 </body>
 <script type="text/javascript">
+    // 子向父传递消息
+    var szjwSendMessage = function (msg) {
+        // msg必须为string
+        window.parent.postMessage(msg, '*');
+    };
     var m7$=$.noConflict()
     m7$(window).load(function(){
         var loginName = moorCall.moortools.m7getUrlVal("loginName");
@@ -517,7 +522,6 @@
             if (m7$('#autoAnswer').is(':checked')) {
                 webPhone.Outbound()
            } else {
-                window.parent.document.getElementById('szjw_answer_btn').click()
                 m7$('#incomingcall').show()
             }
           } else if (msg === 'hangup') {  
