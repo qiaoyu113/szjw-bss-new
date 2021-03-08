@@ -1,10 +1,12 @@
 <template>
   <div class="PrivateDetail">
     <div class="tabHeader">
-      <el-card class="box-card">
+      <el-card
+        v-if="clueArray"
+        class="box-card"
+      >
         <template>
           <el-tabs
-            v-if="clueArray"
             v-model="clueStatus"
             @tab-click="handleClick"
           >
