@@ -193,6 +193,7 @@ export default class extends Vue {
   }
   switchLineType(val: number) {
     this.activeLineType = val
+    this.getList()
   }
 
   private tableData: any[] = []
