@@ -8,13 +8,14 @@
     :confirm="onConfirm"
     v-on="$listeners"
     @close="resetForm"
+    @open="getdefaultDate"
   >
     <el-form
       :model="queryInfo"
       label-width="80px"
       label-position="left"
     >
-      <el-tabs
+      <!-- <el-tabs
         v-model="activeTab"
         style="margin-top: 20px"
         @tab-click="handleClick"
@@ -25,7 +26,7 @@
           :label="item.name"
           :name="item.value"
         />
-      </el-tabs>
+      </el-tabs> -->
       <h3>设置线索回流时间</h3>
       <el-form-item label="待跟进">
         <el-input-number
@@ -56,7 +57,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { getUserGroup, getGroupUser, setPolicy } from '@/api/clue'
+import { getBackFlowDeflutDate, setPolicy } from '@/api/clue'
 @Component({
   name: 'SetUpPolicy',
   components: {
@@ -66,75 +67,96 @@ import { getUserGroup, getGroupUser, setPolicy } from '@/api/clue'
 export default class extends Vue {
   @Prop({ default: () => {} }) policyData: any
   private queryInfo: any = {
-    group: '',
-    followDayNum: 3,
-    followingDayNum: 15
+    followDayNum: 0,
+    followingDayNum: 0
   }
-  activeTab = '0'
+  // activeTab = '0'
   // 梧桐专车、梧桐共享、雷鸟车池、雷鸟租赁
-  private lineTypeTab = [
-    {
-      name: '梧桐专车',
-      value: '0'
-    },
-    {
-      name: '梧桐共享',
-      value: '1'
-    },
-    {
-      name: '雷鸟车池',
-      value: '2'
-    },
-    {
-      name: '雷鸟租赁C',
-      value: '4'
-    },
-    {
-      name: '雷鸟租赁B',
-      value: '3'
-    }
-  ]
-  defalutDate = {
-    '0': {
-      followDayNum: 3,
-      followingDayNum: 15
-    },
-    '1': {
-      followDayNum: 1,
-      followingDayNum: 7
-    },
-    '2': {
-      followDayNum: 1,
-      followingDayNum: 7
-    },
-    '4': {
-      followDayNum: 1,
-      followingDayNum: 3
-    },
-    '3': {
-      followDayNum: 1,
-      followingDayNum: 7
+  // private lineTypeTab = [
+  //   {
+  //     name: '梧桐专车',
+  //     value: '0'
+  //   },
+  //   {
+  //     name: '梧桐共享',
+  //     value: '1'
+  //   },
+  //   {
+  //     name: '雷鸟车池',
+  //     value: '2'
+  //   },
+  //   {
+  //     name: '雷鸟租赁C',
+  //     value: '4'
+  //   },
+  //   {
+  //     name: '雷鸟租赁B',
+  //     value: '3'
+  //   }
+  // ]
+  // defalutDate = {
+  //   '0': {
+  //     followDayNum: 3,
+  //     followingDayNum: 15
+  //   },
+  //   '1': {
+  //     followDayNum: 1,
+  //     followingDayNum: 7
+  //   },
+  //   '2': {
+  //     followDayNum: 1,
+  //     followingDayNum: 7
+  //   },
+  //   '4': {
+  //     followDayNum: 1,
+  //     followingDayNum: 3
+  //   },
+  //   '3': {
+  //     followDayNum: 1,
+  //     followingDayNum: 7
+  //   }
+  // }
+  private userGroupList: any = []
+  async getdefaultDate() {
+    const { busiType, cityCode, id } = this.policyData
+    try {
+      const { data } = await getBackFlowDeflutDate({
+        id,
+        cityCode,
+        busiType
+      })
+      console.log(data)
+      if (data.success) {
+        this.queryInfo = data.data
+      } else {
+        this.$message({
+          type: 'error',
+          message: data.errorMsg
+        })
+      }
+    } catch (error) {
+      return error
     }
   }
-  private userGroupList: any = []
-
   resetForm() {
     this.$nextTick(() => {
       this.queryInfo = {
-        followDayNum: 3,
-        followingDayNum: 15
+        followDayNum: 0,
+        followingDayNum: 0
       }
-      this.activeTab = '0'
     })
   }
   async setPolicyConfirm(callback: Function) {
     try {
-      const { notReceiveId, id, followingDayNum, followDayNum } = this.queryInfo
+      const { followingDayNum, followDayNum } = this.queryInfo
+      const { busiType, cityCode, id } = this.policyData
+
       let params = {
-        notReceiveId: notReceiveId.join(','),
-        id: this.policyData.id,
-        followingDayNum: followingDayNum || '',
-        followDayNum: followingDayNum || ''
+        id,
+        followingDayNum: followingDayNum || 0,
+        followDayNum: followingDayNum || 0,
+        busiType,
+        cityCode
       }
       const { data } = await setPolicy(params)
       if (data.success) {
@@ -158,11 +180,11 @@ export default class extends Vue {
   onConfirm(callback: Function) {
     this.setPolicyConfirm(callback)
   }
-  handleClick(this:any, { name }: any) {
-    const { followDayNum, followingDayNum } = this.defalutDate[name]
-    this.queryInfo.followDayNum = followDayNum
-    this.queryInfo.followingDayNum = followingDayNum
-  }
+  // handleClick(this:any, { name }: any) {
+  //   const { followDayNum, followingDayNum } = this.defalutDate[name]
+  //   this.queryInfo.followDayNum = followDayNum
+  //   this.queryInfo.followingDayNum = followingDayNum
+  // }
 }
 </script>
 

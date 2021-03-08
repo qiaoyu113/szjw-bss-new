@@ -162,17 +162,16 @@ export default class extends Vue {
         notReceiveId: []
       }
       this.chosenList = []
+      this.teamMemberList = []
     })
   }
   // 提交表单
   async setPolicyConfirm(callback: Function) {
     try {
-      const { notReceiveId, id, followingDayNum, followDayNum } = this.queryInfo
+      const { notReceiveId } = this.queryInfo
       let params = {
         notReceiveId: notReceiveId.join(','),
-        id: this.policyData.id,
-        followingDayNum: followingDayNum || '',
-        followDayNum: followingDayNum || ''
+        id: this.policyData.id
       }
       const { data } = await setPolicy(params)
       if (data.success) {

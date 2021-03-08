@@ -11,6 +11,11 @@
         :table-data="tableData"
         :columns="columns"
         row-key="id"
+        :page="page"
+        :operation-list="[]"
+        :default-sort="{prop: 'setDate', order: 'default'}"
+        @onPageSize="handlePageSize"
+        @sort-change="sortDate"
       >
         <template v-slot:op="scope">
           <el-button
@@ -35,7 +40,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SetUpPolicy from '../components/SetUpPolicy.vue'
-
+import { getBackFlowPolicyList } from '@/api/clue'
+import { OrderExport } from '@/api/join'
 @Component({
   name: 'BackflowPolicy',
   components: {
@@ -44,32 +50,7 @@ import SetUpPolicy from '../components/SetUpPolicy.vue'
   }
 })
 export default class extends Vue {
-  tableData = [
-    {
-      cityName: '11',
-      id: '11',
-      portraitLabel: '11',
-      distributionManageName: '11',
-      createName: '11',
-      createDate: '11'
-    },
-    {
-      cityName: '112',
-      id: '112',
-      portraitLabel: '11',
-      distributionManageName: '11',
-      createName: '11',
-      createDate: '11'
-    },
-    {
-      cityName: '11',
-      id: '12121',
-      portraitLabel: '11',
-      distributionManageName: '11',
-      createName: '11',
-      createDate: '11'
-    }
-  ]
+  tableData = []
   private page = {
     page: 1,
     limit: 30,
@@ -81,13 +62,20 @@ export default class extends Vue {
       label: '城市'
     },
     {
-      key: 'id',
+      key: 'busiTypeName',
+      label: '线索类型'
+    },
+    {
+      key: 'setPerson',
       label: '设置人',
       width: '120px'
     },
     {
-      key: 'createDate',
-      label: '设置时间'
+      key: 'setDate',
+      label: '设置时间',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'op',
@@ -105,7 +93,46 @@ export default class extends Vue {
     this.showPolicy = true
     // this.showPolicy = true
   }
-  getList() {}
+  mounted() {
+    this.getList()
+  }
+  sortDate({ order }:any) {
+    if (order) {
+      order = order === 'ascending' ? '1' : '2'
+    } else {
+      order = ''
+    }
+    this.getList(undefined, order)
+  }
+  async getList(isReload?:boolean, order?:string) {
+    if (isReload) {
+      this.page.page = 1
+      this.page.limit = 30
+    }
+    const params = {
+      page: this.page.page,
+      limit: this.page.limit,
+      order: order || ''
+    }
+    try {
+      const { data } = await getBackFlowPolicyList(params)
+      if (!data.success) {
+        return this.$message({
+          type: 'error',
+          message: data.errorMsg
+        })
+      }
+      this.tableData = data.data
+      this.page.total = data.page.total
+    } catch (error) {
+      return error
+    }
+  }
+  handlePageSize(page:any) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    this.getList()
+  }
 }
 </script>
 

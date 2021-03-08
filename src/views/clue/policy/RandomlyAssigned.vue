@@ -38,8 +38,10 @@
         :columns="columns"
         row-key="id"
         :page="page"
+        :default-sort="{prop: 'setDate', order: 'default'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
+        @sort-change="sortDate"
       >
         <template v-slot:op="scope">
           <el-button
@@ -225,7 +227,10 @@ export default class extends Vue {
     },
     {
       key: 'setDate',
-      label: '设置时间'
+      label: '设置时间',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'op',
@@ -239,6 +244,14 @@ export default class extends Vue {
     page: 1,
     limit: 30,
     total: 0
+  }
+  sortDate({ order }:any) {
+    if (order) {
+      order = order === 'ascending' ? '1' : '2'
+    } else {
+      order = ''
+    }
+    this.getList(order)
   }
   // 查询
   handleFilterClick() {
@@ -257,22 +270,24 @@ export default class extends Vue {
   // 设置policy
   private showPolicy:boolean = false // has 设置policy弹框
   private policyData:any = {}
-  setPolicyAuto(item:any) {
+  setPolicyAuto({ busiType, cityCode, id }:any) {
     const object = {
-      distributionType: item.distributionType,
-      id: item.id
+      busiType,
+      cityCode,
+      id
     }
     this.policyData = object
     this.showPolicy = true
   }
   // 获取列表
-  private async getList(this:any) {
+  private async getList(this:any, order?:string) {
     try {
       this.listLoading = true
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
-        lineType: this.activeLineType
+        lineType: this.activeLineType,
+        order: order || ''
       }
       if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
         params.cityName = this.listQuery.cityName[1]

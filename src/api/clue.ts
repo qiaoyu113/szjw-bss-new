@@ -25,3 +25,17 @@ export const setPolicy = (data:any) => request({
   method: 'post',
   data
 })
+
+// 获取回流policy 列表
+
+export const getBackFlowPolicyList = (params:any) => request({
+  url: `${prefix}/v2/market-clue/update/policy/list`,
+  params
+})
+
+// 获取默认时间
+
+export const getBackFlowDeflutDate = (params:any) => request({
+  url: `${prefix}/v2/clue/config/backflow/date`,
+  params
+})
