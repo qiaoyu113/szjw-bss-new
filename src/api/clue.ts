@@ -60,3 +60,44 @@ export const UpdateFollowerByPrivateSeas = (data: any) =>
     method: 'post',
     data
   })
+// 私海池 梧桐线索导入
+export const UploadExcelFirmiana = (data: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/privatePool/firmiana/import`,
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data
+  })
+// 私海池 梧桐线索导入
+export const UploadExcelBird = (data: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/import`,
+    method: 'post',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    data
+  })
+// 私海池 梧桐线索导出（梧桐共享/梧桐专车）
+export const ExportFirmiana = (params: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/privatePool/firmiana/export`,
+    method: 'get',
+    params
+  })
+  // 私海池 雷鸟车池线索导出
+export const ExportBirdTruck = (params: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/privatePool/thunderBirdTruckPool/export`,
+    method: 'get',
+    params
+  })
+  // 私海池 雷鸟租赁线索导出
+export const ExportBirdRental = (params: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/export`,
+    method: 'get',
+    params
+  })
