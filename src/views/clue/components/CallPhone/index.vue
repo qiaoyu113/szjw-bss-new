@@ -4,22 +4,26 @@
       center
       :visible.sync="show"
       title="用户信息表单"
-      :confirm="confirm"
+      :show-close="false"
+      :confirm="other()"
       width="1200px"
       :show-cancel-button="false"
       :sumbit-again="submitLoading"
+      :show-confirm-button="true"
       confirm-button-text="保存"
-      show-other-button="true"
-      other-button-text="保存并挂断"
+      :show-other-button="showOtherBtn"
+      other-button-text="挂断并保存"
       other-type="danger"
-      :other="other"
+      :other="other(true)"
       top="5vh"
       @closed="handleDialogClosed"
     >
       <!-- fullscreen -->
       <makeCall
+        ref="callPhone"
         :phone="phone"
         :clue-id="clueId"
+        @random="random"
       />
       <div>
         <div>
@@ -52,6 +56,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { FollowForm, baseInfoForm } from '../index'
+import { PhoneModule } from '@/store/modules/phone'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 interface IState {
   [key: string]: any;
@@ -74,6 +79,7 @@ export default class extends Vue {
   @Prop({ default: 0 }) private clueStatus!: number;
   @Prop({ default: '' }) private clueId!: string;
 
+  private showOtherBtn:boolean = true
   private submitLoading: boolean = false;
   private passBase:boolean = false
   private passFollow:boolean = false
@@ -89,9 +95,28 @@ export default class extends Vue {
     this.$emit('update:showDialog', value)
   }
 
+  // 电话状态
+  get status() {
+    return PhoneModule.status
+  }
+
+  @Watch('status')
+  changePhone(val:number) {
+    if (val === 1) {
+      this.showOtherBtn = false
+    } else {
+      this.showOtherBtn = true
+    }
+  }
+
   // 弹窗打开请求接口
   @Watch('showDialog')
   changeDio(value: number) {
+    if (value) {
+      setTimeout(() => {
+        (this.$refs['callPhone'] as any).handleCallClick()
+      }, 10)
+    }
     setTimeout(() => {
       (this.$refs['baseInfo'] as any).$emit('show', value);
       (this.$refs['followform'] as any).$emit('show', value)
@@ -124,6 +149,10 @@ export default class extends Vue {
     (this.$parent as any).getDetailApi()
   }
 
+  random(val:string) {
+    console.log(val, 'val')
+  }
+
   // 弹框确认
   private confirm() {
     (this.$refs['baseInfo'] as any).submitsForm();
@@ -133,12 +162,17 @@ export default class extends Vue {
     }, 0)
   }
 
-  private other() {
-    (this.$refs['baseInfo'] as any).submitsForm();
-    (this.$refs['followform'] as any).submitForms()
-    setTimeout(() => {
-      this.canSend()
-    }, 0)
+  private other(type = false) {
+    return () => {
+      (this.$refs['baseInfo'] as any).submitsForm();
+      (this.$refs['followform'] as any).submitForms()
+      setTimeout(() => {
+        this.canSend()
+        if (type) {
+          (this.$refs['callPhone'] as any).handleHangUp()
+        }
+      }, 0)
+    }
   }
 
   private basePass(val:boolean) {

@@ -61,6 +61,7 @@ import { lock, Timestamp, phoneRegExp } from '@/utils/index'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { sendMessageApi } from '@/api/clue'
+import { GetDictionaryList } from '@/api/common'
 
 interface IState {
   [key: string]: any;
@@ -75,13 +76,14 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
   @Prop({ default: {} }) private baseInfo!: IState;
+  @Prop({ default: '' }) private phone!: string;
 
   private submitLoading: boolean = false;
 
   private typeArr: object[] = [
-    { name: '邀约成功', code: 0 },
-    { name: '邀约失败', code: 1 },
-    { name: '首邀未联系上', code: 2 }
+    { name: '邀约成功', code: 1 },
+    { name: '邀约失败', code: 2 },
+    { name: '首邀未联系上', code: 3 }
   ];
 
   private checkPhone = (rule: any, value: any, callback: any) => {
@@ -105,7 +107,7 @@ export default class extends Vue {
   };
 
   private dialogPopQuery: IState = {
-    messageType: 0,
+    messageType: 1,
     driverName: '',
     interviewAddress: '',
     interviewDate: '',
@@ -184,15 +186,15 @@ export default class extends Vue {
     let arr: object[] = []
     let noneArr: string[] = ['userName', 'interviewAddress', 'interviewDate']
     switch (this.dialogPopQuery.messageType) {
-      case 0:
+      case 1:
         arr = [...this.dialogFormItem]
         break
-      case 1:
+      case 2:
         arr = this.dialogFormItem.filter((ele: any) => {
           return ele.key !== 'interviewDate'
         })
         break
-      case 2:
+      case 3:
         arr = this.dialogFormItem.filter((ele: any) => {
           let log = noneArr.includes(ele.key)
           return !log
@@ -203,9 +205,6 @@ export default class extends Vue {
   }
 
   get show() {
-    if (this.showDialog) {
-      this.defineData(this.dialogPopQuery.messageType)
-    }
     return this.showDialog
   }
 
@@ -213,9 +212,16 @@ export default class extends Vue {
     this.$emit('update:showDialog', value)
   }
 
+  @Watch('showDialog')
+  changeDio(val: any) {
+    if (val) {
+      this.getOptionInfo()
+      this.defineData(this.dialogPopQuery.messageType)
+    }
+  }
+
   @Watch('dialogPopQuery.messageType')
   changeType(val: any) {
-    this.defineData(val);
     (this.$refs['dialogSendMessage'] as any).clearValidate()
   }
 
@@ -247,21 +253,19 @@ export default class extends Vue {
   }
 
   private defineData(val: number) {
-    if (val === 0 && this.baseInfo.inviteDate) {
-      this.dialogPopQuery.interviewDate = this.baseInfo.inviteDate
-    }
+    this.dialogPopQuery.interviewDate = this.baseInfo.inviteDate
     this.dialogPopQuery.driverName = this.baseInfo.name
   }
 
   // 短信预览是否显示
   private showPreview(val: any) {
-    if (val.messageType === 0) {
+    if (val.messageType === 1) {
       this.messageText = `<span>  
       【云鸟配送】<span style="color:#242020">${this.dealWithName(
     val.driverName
   )}</span>师傅您好，已成功为您预约云鸟面试，现场已有专业的加盟经理等待您的到来。请您携带本人身份证，驾驶证，行驶证准时参加。路上注意安全，期待与您的会面！
       </span>`
-    } else if (val.messageType === 1) {
+    } else if (val.messageType === 2) {
       this.messageText = `<span>【云鸟配送】<span style="color:#242020">${this.dealWithName(
         val.driverName
       )}</span>师傅，您好，感谢您的接听，非常期待师傅您的加入。云鸟线路实时更新，更多更新的线路等待与您的匹配。</span>`
@@ -276,14 +280,14 @@ export default class extends Vue {
     this.itemData = []
 
     this.sendFormItem.forEach((ele: any) => {
-      if (!ele.slot && val.messageType !== 2) {
+      if (!ele.slot && val.messageType !== 3) {
         let item: IState = {
           label: ele.label,
           key: ele.key
         }
         for (let key in val) {
           if (key === ele.key) {
-            if (key === 'interviewDate') {
+            if (key === 'interviewDate' && val.interviewDate) {
               let timeArr = Timestamp(val[key]).split(' ')[0].split('-')
               item.value = `${timeArr[0]}年${timeArr[1]}月${timeArr[2]}日  ${
                 Timestamp(val[key]).split(' ')[1]
@@ -302,6 +306,22 @@ export default class extends Vue {
     return val.indexOf('师傅') !== -1 ? val.replace('师傅', '') : val
   }
 
+  async getOptionInfo() {
+    try {
+      let params = ['market_clue_invite_message']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.typeArr = res.data.market_clue_invite_message.map((item:any) => {
+          return { name: item.dictLabel, code: +item.dictValue }
+        })
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
+
   // 弹框确认
   private confirm() {
     (this.$refs['dialogSendMessage'] as any).submitForm()
@@ -312,6 +332,7 @@ export default class extends Vue {
     (this.$refs['dialogSendMessage'] as any).resetForm()
     setTimeout(() => {
       (this.$refs['dialogSendMessage'] as any).clearValidate()
+      this.typeArr.splice(0, this.typeArr.length - 1)
     }, 10)
   }
 
@@ -321,15 +342,16 @@ export default class extends Vue {
     try {
       let params: IState = { ...this.dialogPopQuery }
       switch (params.messageType) {
-        case 1:
+        case 2:
           Reflect.deleteProperty(params, 'interviewDate')
           break
-        case 2:
+        case 3:
           Reflect.deleteProperty(params, 'interviewAddress')
           Reflect.deleteProperty(params, 'userName')
           Reflect.deleteProperty(params, 'interviewDate')
           break
       }
+      params.phone = this.phone
       let { data: res } = await sendMessageApi(params)
       if (res.success) {
         this.show = false

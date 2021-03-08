@@ -16,7 +16,7 @@
       >
         <el-select
           v-model="WTQuery.hasCar"
-          :class="WTQuery.hasCar !== false ? 'carBox' : 'carNone'"
+          :class="WTQuery.hasCar !== false ? 'carBox' : ''"
           placeholder="是否有车"
         >
           <el-option

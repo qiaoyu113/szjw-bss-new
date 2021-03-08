@@ -4,7 +4,7 @@
       :visible.sync="show"
       title="跟进情况"
       :confirm="confirm"
-      width="800px"
+      width="650px"
       :sumbit-again="submitLoading"
       @closed="handleDialogClosed"
     >

@@ -187,6 +187,15 @@
             />
           </div>
         </SectionContainer>
+        <SectionContainer
+          title="外呼日志"
+          :md="true"
+        >
+          <CallLog
+            class="CallLog"
+            :business-id="+clueStatus"
+          />
+        </SectionContainer>
       </el-card>
     </div>
     <FollowUpDiolog
@@ -196,11 +205,12 @@
     <send-message
       :show-dialog.sync="messageDio"
       :base-info="baseInfoEdio"
+      :phone="baseInfoEdio.phone"
     />
 
     <InfoEditDio
       :show-dialog.sync="editDio"
-      :clue-status="clueStatus"
+      :clue-status="+clueStatus"
       :base-info="baseInfoEdio"
     />
 
@@ -219,7 +229,13 @@ import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
-import { FollowUpDiolog, SendMessage, InfoEditDio, CallPhone } from './components/index'
+import CallLog from '@/components/OutboundDialog/CallLog.vue'
+import {
+  FollowUpDiolog,
+  SendMessage,
+  InfoEditDio,
+  CallPhone
+} from './components/index'
 import {
   getClueWSXDetail,
   getClueLCXDetail,
@@ -248,7 +264,8 @@ interface IState {
     FollowUpDiolog,
     SendMessage,
     InfoEditDio,
-    CallPhone
+    CallPhone,
+    CallLog
   }
 })
 export default class extends Vue {
@@ -259,7 +276,7 @@ export default class extends Vue {
   private messageDio: boolean = false;
   private callPhoneDio: boolean = false;
   private editDio: boolean = false;
-  private clueArray:IState[] = []
+  private clueArray: IState[] = [];
   private clueArr: IState[] = [
     { name: '梧桐专车', code: '0' },
     { name: '梧桐共享', code: '1' },
@@ -711,7 +728,7 @@ export default class extends Vue {
     this.getDoLog()
   }
 
-  private async getClueId(phone:string) {
+  private async getClueId(phone: string) {
     let params = { phone: phone }
     let { data: res } = await getClueTypeList(params)
     if (res.success) {
@@ -809,7 +826,7 @@ export default class extends Vue {
   private handlePageSize(page: PageObj) {
     this.logPage.page = page.page
     this.logPage.limit = page.limit
-    // this.getLists()
+    this.getDoLog()
   }
 
   async getDetailApi() {
@@ -823,7 +840,9 @@ export default class extends Vue {
             marketClueWSXDetailOtherInfoVO,
             marketClueWSXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[+this.clueStatus].listData = marketClueWSXDetailFollowInfoVOList
+          this.followUpLogArr[
+            (+this.clueStatus as number)
+          ].listData = marketClueWSXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueWSXDetailBaseInfoVO
           this.setOther(marketClueWSXDetailOtherInfoVO)
           this.backData = marketClueWSXDetailRepeatedInfoVOList
@@ -839,7 +858,9 @@ export default class extends Vue {
             marketClueLCXDetailOtherInfoVO,
             marketClueLCXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[+this.clueStatus].listData = marketClueLCXDetailFollowInfoVOList
+          this.followUpLogArr[
+            (+this.clueStatus as number)
+          ].listData = marketClueLCXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLCXDetailBaseInfoVO
           this.setOther(marketClueLCXDetailOtherInfoVO)
           this.backData = marketClueLCXDetailRepeatedInfoVOList
@@ -855,7 +876,9 @@ export default class extends Vue {
             marketClueLZXDetailOtherInfoVO,
             marketClueLZXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[+this.clueStatus].listData = marketClueLZXDetailFollowInfoVOList
+          this.followUpLogArr[
+            (+this.clueStatus as number)
+          ].listData = marketClueLZXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLZXDetailBaseInfoVO
           this.setOther(marketClueLZXDetailOtherInfoVO)
           this.backData = marketClueLZXDetailRepeatedInfoVOList
@@ -937,6 +960,9 @@ export default class extends Vue {
         margin: 10px 0;
       }
     }
+    .CallLog {
+      padding: 0;
+    }
   }
   .detailContent .rightBox span:last-child {
     margin: 0;
@@ -957,7 +983,8 @@ export default class extends Vue {
   background-color: antiquewhite !important;
 }
 .detailContent ::v-deep .SectionContainer,
-.detailContent ::v-deep .SectionContainer-m {
+.detailContent ::v-deep .SectionContainer-m,
+.detailContent ::v-deep .callLog1 {
   box-shadow: none;
   margin-bottom: 0px;
 }
