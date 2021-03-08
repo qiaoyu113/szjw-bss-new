@@ -33,10 +33,27 @@ export default class extends Vue {
   @Watch('status')
   handleStatusChange(val:number) {
     if (val === 1 && this.notification) { // 挂断电话
-      this.notification.close()
-      this.notification = null
-    } else if (val === 4) { // 接听电话
+      if (this.notification) {
+        this.notification.close()
+        this.notification = null
+      }
+      setTimeout(() => {
+        this.handleHangUp()
+      }, 310)
+    } else if (val === 4) { // 有电话呼入-接听电话
+      if (this.notification) {
+        this.notification.close()
+        this.notification = null
+      }
       this.handleAnwserStatus()
+    } else if (val === 3) { // 接通了
+      if (this.notification) {
+        this.notification.close()
+        this.notification = null
+      }
+      setTimeout(() => {
+        this.handleAcceptRing()
+      }, 310)
     }
   }
 
@@ -102,21 +119,53 @@ export default class extends Vue {
           'margin-top:': '10px'
         }
       }, [
-        this.status === 4 ? h('button', { style: {
-          color: 'rgb(255, 255, 255)',
-          background: '#67c23a',
-          'border-radius': '4px',
-          border: 'none',
-          padding: '3px 10px',
-          'margin-right': '10px'
-        },
-        on: {
-          'click': function(e:any) {
-            anwserPhone()
-            e.target.style.display = 'none'
+        h('button', {
+          style: {
+            color: 'rgb(255, 255, 255)',
+            background: '#67c23a',
+            'border-radius': '4px',
+            border: 'none',
+            padding: '3px 10px',
+            'margin-right': '10px'
+          },
+          on: {
+            'click': anwserPhone
           }
+        }, '接听'),
+        h('button', {
+          style: {
+            color: 'rgb(255, 255, 255)',
+            background: '#f56c6c',
+            'border-radius': '4px',
+            border: 'none',
+            padding: '3px 10px'
+          },
+          on: {
+            'click': hangUp
+          }
+        }, '挂断')
+      ])
+    })
+  }
+  // 接听电话
+  handleAcceptRing() {
+    const h = this.$createElement
+    this.notification = this.$notify({
+      title: '提示',
+      dangerouslyUseHTMLString: true,
+      duration: 0,
+      showClose: false,
+      message: h('div', {
+        style: {
+          'margin-top:': '30px',
+          'font-weight': 'bold'
         }
-        }, '接听') : null,
+      }, [
+        h('span', { style: {
+          color: '#333',
+          'margin-right': '10px'
+        }
+        }, '通话状态:正在通过中...'),
         h('button', { style: {
           color: 'rgb(255, 255, 255)',
           background: '#f56c6c',
@@ -130,6 +179,36 @@ export default class extends Vue {
         }, '挂断')
       ])
     })
+  }
+  // 已挂断
+  handleHangUp() {
+    const h = this.$createElement
+    this.notification = this.$notify({
+      title: '提示',
+      dangerouslyUseHTMLString: true,
+      duration: 0,
+      message: h('div', {
+        style: {
+          'margin-top:': '30px',
+          'font-weight': 'bold'
+        }
+      }, [
+        h('span', { style: {
+          color: '#333',
+          'font-weight': 'bold'
+        }
+        }, '通话状态:'),
+        h('span', { style: {
+          color: '#F56C6C',
+          'font-weight': 'bold'
+        }
+        }, '已挂断...')
+      ])
+    })
+    setTimeout(() => {
+      this.notification.close()
+      this.notification = null
+    }, 3000)
   }
   mounted() {
     this.getInfoByUserId()
