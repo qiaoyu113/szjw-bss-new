@@ -4,11 +4,12 @@
       <el-card class="box-card">
         <template>
           <el-tabs
+            v-if="clueArray"
             v-model="clueStatus"
             @tab-click="handleClick"
           >
             <el-tab-pane
-              v-for="(item,index) in clueArr"
+              v-for="(item,index) in clueArray"
               :key="index"
               :label="item.name"
               :name="item.code"
@@ -32,7 +33,10 @@
               v-permission="['/root']"
               v-permission="['/root']" -->
             <span />
-            <el-button type="text">
+            <el-button
+              type="text"
+              @click="callPhoneDio = true"
+            >
               打电话
             </el-button>
             <el-button
@@ -106,7 +110,7 @@
               <el-col
                 v-for="(item,index) in infoBase"
                 :key="index"
-                :span="6"
+                :span="item.key === 'remark' ? 24 : 6"
               >
                 <DetailItem
                   :name="item.name"
@@ -199,23 +203,31 @@
       :clue-status="clueStatus"
       :base-info="baseInfoEdio"
     />
+
+    <CallPhone
+      :show-dialog.sync="callPhoneDio"
+      :clue-status="+clueStatus"
+      :phone="baseInfoEdio.phone"
+      :clue-id="13"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
-import { FollowUpDiolog, SendMessage, InfoEditDio } from './components/index'
+import { FollowUpDiolog, SendMessage, InfoEditDio, CallPhone } from './components/index'
 import {
   getClueWSXDetail,
   getClueLCXDetail,
   getClueLZXDetail,
   getClueDetailLogs,
   clueBreakAnAppointment,
-  cancelInterview
+  cancelInterview,
+  getClueTypeList
 } from '@/api/clue'
 interface PageObj {
   page: number;
@@ -235,15 +247,19 @@ interface IState {
     SelfTable,
     FollowUpDiolog,
     SendMessage,
-    InfoEditDio
+    InfoEditDio,
+    CallPhone
   }
 })
 export default class extends Vue {
-  private clueId: string = '';
+  @Prop({ default: '' }) private phone!: string;
+  @Prop({ default: '' }) private clueId!: string;
   private clueStatus: string = '0';
   private followUpDio: boolean = false;
   private messageDio: boolean = false;
+  private callPhoneDio: boolean = false;
   private editDio: boolean = false;
+  private clueArray:IState[] = []
   private clueArr: IState[] = [
     { name: '梧桐专车', code: '0' },
     { name: '梧桐共享', code: '1' },
@@ -690,8 +706,31 @@ export default class extends Vue {
 
   // tab切换
   private handleClick(tab: any, event: any) {
+    this.clueId = ''
     this.getDetailApi()
     this.getDoLog()
+  }
+
+  private async getClueId(phone:string) {
+    let params = { phone: phone }
+    let { data: res } = await getClueTypeList(params)
+    if (res.success) {
+      // this.clueArr.forEach(ele => {
+      //   res.data.forEach((item:IState) => {
+      //     if (+ele.code === item.clueType) {
+      //       ele.clueId = item.clueId
+      //     }
+      //   })
+      // })
+      // this.clueArray = this.clueArr.filter((ele:any) => {
+      //   return ele.clueId
+      // })
+      // this.clueStatus = String(this.clueArray.findIndex((value) => value.clueId === this.clueId))
+      this.clueArray = this.clueArr // 测试degbug代码
+      this.clueStatus = String(this.clueArray[0].code) // 测试degbug代码
+    } else {
+      this.$message.warning(res.errorMsg)
+    }
   }
 
   // 取消面试
@@ -784,8 +823,7 @@ export default class extends Vue {
             marketClueWSXDetailOtherInfoVO,
             marketClueWSXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[0].listData = marketClueWSXDetailFollowInfoVOList
-          this.followUpLogArr[1].listData = marketClueWSXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus].listData = marketClueWSXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueWSXDetailBaseInfoVO
           this.setOther(marketClueWSXDetailOtherInfoVO)
           this.backData = marketClueWSXDetailRepeatedInfoVOList
@@ -801,7 +839,7 @@ export default class extends Vue {
             marketClueLCXDetailOtherInfoVO,
             marketClueLCXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[2].listData = marketClueLCXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus].listData = marketClueLCXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLCXDetailBaseInfoVO
           this.setOther(marketClueLCXDetailOtherInfoVO)
           this.backData = marketClueLCXDetailRepeatedInfoVOList
@@ -817,8 +855,7 @@ export default class extends Vue {
             marketClueLZXDetailOtherInfoVO,
             marketClueLZXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[3].listData = marketClueLZXDetailFollowInfoVOList
-          this.followUpLogArr[4].listData = marketClueLZXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus].listData = marketClueLZXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLZXDetailBaseInfoVO
           this.setOther(marketClueLZXDetailOtherInfoVO)
           this.backData = marketClueLZXDetailRepeatedInfoVOList
@@ -848,6 +885,7 @@ export default class extends Vue {
   }
 
   mounted() {
+    this.getClueId(this.phone)
     this.getDetailApi()
     this.getDoLog()
   }

@@ -146,6 +146,17 @@ export const getClueDetailLogs = (data: any) =>
 
 /**
  *
+ * 私海池 查询当前手机号存在的线索类型
+ */
+export const getClueTypeList = (params: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/getClueTypeList`,
+    method: 'get',
+    params
+  })
+
+/**
+ *
  * 私海池 线索详情-取消面试
  */
 export const cancelInterview = (data: any) =>
