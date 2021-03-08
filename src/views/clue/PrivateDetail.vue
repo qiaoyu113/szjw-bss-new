@@ -110,7 +110,7 @@
               <el-col
                 v-for="(item,index) in infoBase"
                 :key="index"
-                :span="6"
+                :span="item.key === 'remark' ? 24 : 6"
               >
                 <DetailItem
                   :name="item.name"
