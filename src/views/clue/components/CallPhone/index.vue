@@ -6,14 +6,21 @@
       title="用户信息表单"
       :confirm="confirm"
       width="1200px"
+      :show-cancel-button="false"
       :sumbit-again="submitLoading"
-      confirm-button-text="保存并挂断"
-      cancel-button-text="保存"
+      confirm-button-text="保存"
+      show-other-button="true"
+      other-button-text="保存并挂断"
+      other-type="danger"
+      :other="other"
       top="5vh"
       @closed="handleDialogClosed"
     >
       <!-- fullscreen -->
-      <makeCall :phone="phone" />
+      <makeCall
+        :phone="phone"
+        :clue-id="clueId"
+      />
       <div>
         <div>
           <h4>基础信息：</h4>
@@ -119,6 +126,14 @@ export default class extends Vue {
 
   // 弹框确认
   private confirm() {
+    (this.$refs['baseInfo'] as any).submitsForm();
+    (this.$refs['followform'] as any).submitForms()
+    setTimeout(() => {
+      this.canSend()
+    }, 0)
+  }
+
+  private other() {
     (this.$refs['baseInfo'] as any).submitsForm();
     (this.$refs['followform'] as any).submitForms()
     setTimeout(() => {
