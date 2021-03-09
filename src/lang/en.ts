@@ -56,6 +56,7 @@ export default {
     createUser: 'createUser',
     editUser: 'editUser',
     roleManage: 'RoleManage',
+    seatManage: 'SeatManage',
     createRole: 'createRole',
     editRole: 'editRole',
     roleDetails: 'roleDetails',

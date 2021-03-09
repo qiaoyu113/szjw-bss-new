@@ -1,5 +1,14 @@
 import request from '@/utils/request'
-let prefix = '/mock/81'
+// const prefix = '/base'
+  let prefix = '/mock/81'
+// 获取客群细分列表
+export const getClueUserGroupList = (params: any) =>
+  request({
+    url: `${prefix}/v2/market-clue/user-group/getClueUserGroupList`,
+    method: 'post',
+    params
+  })
+
 export const configurationManagementList = (data: any) =>
   request({
     url: `${prefix}/v2/market-clue/config/list`,

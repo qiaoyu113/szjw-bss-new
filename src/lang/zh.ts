@@ -86,6 +86,7 @@ export default {
     createUser: '创建账号',
     editUser: '编辑账号',
     roleManage: '角色管理',
+    seatManage: '坐席管理',
     createRole: '创建角色',
     editRole: '编辑角色',
     roleDetails: '角色详情',
