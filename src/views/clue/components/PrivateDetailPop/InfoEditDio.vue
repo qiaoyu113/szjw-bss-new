@@ -8,7 +8,65 @@
       :sumbit-again="submitLoading"
       @closed="handleDialogClosed"
     >
-      <!-- // 梧桐 -->
+      <SelfForm
+        ref="baseInfoForm"
+        :rules="rulesWT"
+        :list-query="queryAndItem.query"
+        :form-item="queryAndItem.formItem"
+        size="small"
+        :label-width="clueStatus < 2 ? '120px' : '80px'"
+        :pc-col="24"
+        @onPass="handlePassClick"
+      >
+        <div
+          slot="hasCar"
+          style="display:flex;width: 100%;"
+        >
+          <el-select
+            v-model="WTQuery.hasCar"
+            :class="WTQuery.hasCar !== false ? 'carBox' : ''"
+            placeholder="是否有车"
+          >
+            <el-option
+              v-for="item in optionsHasCar"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <el-select
+            v-if="WTQuery.hasCar === true"
+            v-model="WTQuery.carType"
+            placeholder="请选择车型"
+          >
+            <el-option
+              v-for="item in optionsCarType"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </div>
+        <div
+          slot="carType"
+          style="width:100%"
+        >
+          <template>
+            <el-select
+              v-model="BirdCarQuery.carType"
+              placeholder="请选择车型"
+            >
+              <el-option
+                v-for="item in optionsCarType"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </template>
+        </div>
+      </SelfForm>
+      <!-- // 梧桐
       <SelfForm
         v-if="Number(clueStatus) < 2"
         ref="editFormWt"
@@ -22,27 +80,37 @@
         @onPass="handlePassClick"
       >
         <div
-          slot="carType"
-          style="width:100%"
+          slot="hasCar"
+          style="display:flex;width: 100%;"
         >
-          <template>
-            <el-select
-              v-model="WTQuery.carType"
-              placeholder="请选择车型"
-              :disabled="!WTQuery.hasCar"
-            >
-              <el-option
-                v-for="item in optionsCarType"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
+          <el-select
+            v-model="WTQuery.hasCar"
+            :class="WTQuery.hasCar !== false ? 'carBox' : ''"
+            placeholder="是否有车"
+          >
+            <el-option
+              v-for="item in optionsHasCar"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+          <el-select
+            v-if="WTQuery.hasCar === true"
+            v-model="WTQuery.carType"
+            placeholder="请选择车型"
+          >
+            <el-option
+              v-for="item in optionsCarType"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
         </div>
       </SelfForm>
 
-      <!-- // 雷鸟车池 -->
+      // 雷鸟车池
       <SelfForm
         v-if="Number(clueStatus) === 2"
         ref="editFormBirdCar"
@@ -54,29 +122,9 @@
         label-width="120px"
         :pc-col="24"
         @onPass="handlePassClick"
-      >
-        <div
-          slot="carType"
-          style="width:100%"
-        >
-          <template>
-            <el-select
-              v-model="BirdCarQuery.carType"
-              placeholder="请选择车型"
-              :disabled="!BirdCarQuery.hasCar"
-            >
-              <el-option
-                v-for="item in optionsCarType"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
-        </div>
-      </SelfForm>
+      />
 
-      <!-- // 雷鸟租赁C -->
+      // 雷鸟租赁C
       <SelfForm
         v-if="Number(clueStatus) === 3"
         ref="editFormBirdC"
@@ -88,29 +136,9 @@
         label-width="120px"
         :pc-col="24"
         @onPass="handlePassClick"
-      >
-        <div
-          slot="carType"
-          style="width:100%"
-        >
-          <template>
-            <el-select
-              v-model="BirdCQuery.carType"
-              placeholder="请选择车型"
-              :disabled="!BirdCQuery.hasCar"
-            >
-              <el-option
-                v-for="item in optionsCarType"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </template>
-        </div>
-      </SelfForm>
+      />
 
-      <!-- // 雷鸟租赁B -->
+      // 雷鸟租赁B
       <SelfForm
         v-if="Number(clueStatus) === 4"
         ref="editFormBirdB"
@@ -122,7 +150,7 @@
         label-width="120px"
         :pc-col="24"
         @onPass="handlePassClick"
-      />
+      /> -->
     </SelfDialog>
   </div>
 </template>
@@ -152,9 +180,13 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
-  @Prop({ default: '0' }) private clueStatus!: string;
+  @Prop({ default: 0 }) private clueStatus!: number;
   @Prop({ default: {} }) private baseInfo!: object;
   private demandTypeOptions: object[] = [];
+  private optionsHasCar:object[] =[
+    { label: '是', value: true },
+    { label: '否', value: false }
+  ]
   private carOptions: object[] = [
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
@@ -200,22 +232,10 @@ export default class extends Vue {
       }
     },
     {
-      type: 2,
-      key: 'hasCar',
-      label: '是否有车',
-      col: 10,
-      options: [
-        { label: '是', value: true },
-        { label: '否', value: false }
-      ]
-    },
-    {
       slot: true,
-      type: 'carType',
-      key: 'carType',
-      col: 14,
-      w: '0',
-      class: 'carTypeItem'
+      type: 'hasCar',
+      key: 'hasCar',
+      label: '是否有车'
     },
     {
       type: 1,
@@ -246,14 +266,14 @@ export default class extends Vue {
       }
     },
     {
-      type: 2,
+      type: 1,
       key: 'nowProfession',
       label: '当前职业',
-      col: 24,
       tagAttrs: {
-        placeholder: '请填写'
-      },
-      option: []
+        placeholder: '请填写',
+        maxlength: '10',
+        showWordLimit: true
+      }
     },
     {
       type: 1,
@@ -462,6 +482,12 @@ export default class extends Vue {
     }
   ];
 
+  private BirdQuery:IState = {
+    intentModel: '',
+    fancyModel: '',
+    cityName: ''
+  }
+
   get show() {
     return this.showDialog
   }
@@ -469,31 +495,22 @@ export default class extends Vue {
     this.$emit('update:showDialog', value)
   }
 
-  get formStatus() {
-    let ref: IState = {}
-    switch (Number(this.clueStatus)) {
-      case 0:
-        ref.form = 'editFormWt'
-        ref.query = 'WTQuery'
-        break
-      case 1:
-        ref.form = 'editFormWt'
-        ref.query = 'WTQuery'
-        break
-      case 2:
-        ref.form = 'editFormBirdCar'
-        ref.query = 'BirdCarQuery'
-        break
-      case 3:
-        ref.form = 'editFormBirdC'
-        ref.query = 'BirdCQuery'
-        break
-      case 4:
-        ref.form = 'editFormBirdB'
-        ref.query = 'BirdBQuery'
-        break
+  get queryAndItem() {
+    let item:IState = {}
+    if (this.clueStatus < 2) {
+      item.formItem = this.WTItem
+      item.query = this.WTQuery
+    } else if (this.clueStatus === 2) {
+      item.formItem = this.BirdCarItem
+      item.query = this.BirdCarQuery
+    } else if (this.clueStatus === 3) {
+      item.formItem = this.BirdCItem
+      item.query = this.BirdQuery
+    } else {
+      item.formItem = this.BirdBItem
+      item.query = this.BirdQuery
     }
-    return ref
+    return item
   }
 
   @Watch('showDialog')
@@ -507,7 +524,7 @@ export default class extends Vue {
   }
 
   private setQuerys(value: IState) {
-    if (Number(this.clueStatus) < 2) {
+    if (this.clueStatus < 2) {
       this.WTQuery = { ...this.WTQuery, ...value }
       this.WTQuery.intentWork = [
         value.expectAddressCity,
@@ -517,12 +534,22 @@ export default class extends Vue {
         this.WTQuery.intentWork.pop()
         this.WTQuery.intentWork.push(this.countryValue)
       }
-    } else if (Number(this.clueStatus) === 2) {
+    } else if (this.clueStatus === 2) {
       this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
-    } else if (Number(this.clueStatus) === 3) {
-      this.BirdCQuery = { ...this.BirdCQuery, ...value }
+    } else if (this.clueStatus === 3) {
+      this.BirdQuery = { ...this.BirdQuery, ...value }
     } else {
-      this.BirdBQuery = { ...this.BirdBQuery, ...value }
+      value.intentModel = '1,2,10'
+      value.fancyModel = '25,35,1'
+      value.intentModel = value.intentModel.split(',').map((ele:any) => {
+        return +ele
+      })
+      value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
+        return +ele
+      })
+      this.BirdQuery.intentModel = []
+      this.BirdQuery.fancyModel = []
+      this.BirdQuery = { ...this.BirdQuery, ...value }
     }
   }
 
@@ -654,14 +681,14 @@ export default class extends Vue {
 
   // 弹框确认
   private confirm() {
-    (this.$refs[this.formStatus.form] as any).submitForm()
+    (this.$refs['baseInfoForm'] as any).submitForm()
   }
 
   // 弹窗关闭
   private handleDialogClosed() {
     setTimeout(() => {
-      (this.$refs[this.formStatus.form] as any).resetForm();
-      (this.$refs[this.formStatus.form] as any).clearValidate()
+      (this.$refs['baseInfoForm'] as any).resetForm();
+      (this.$refs['baseInfoForm'] as any).clearValidate()
       this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
       this.optionsCarType.splice(0, this.optionsCarType.length)
     }, 100)
@@ -669,12 +696,13 @@ export default class extends Vue {
   // 验证通过
   @lock
   private async handlePassClick(this: any, val: boolean) {
-    this.editDio(this[this.formStatus.query])
+    this.editDio(this.queryAndItem.query)
   }
 
   async editDio(val: IState) {
     try {
-      if (+this.clueStatus < 2) {
+      let val = this.queryAndItem.query
+      if (this.clueStatus < 2) {
         val.expectAddressCity = val.intentWork[0]
         val.expectAddressCounty = val.intentWork[1]
       } else if (+this.clueStatus === 4) {
@@ -690,7 +718,7 @@ export default class extends Vue {
         this.show = false;
         (this.$parent as any).getDetailApi()
       } else {
-        this.$message.warning(res.errorMsg)
+        console.log('fail', res.errorMsg)
       }
     } catch (err) {
       console.log(err)
@@ -704,5 +732,12 @@ export default class extends Vue {
 }
 .InfoEditDio ::v-deep .el-input {
   display: table;
+}
+.InfoEditDio {
+  .carBox {
+    padding-right: 10px;
+    box-sizing: border-box;
+    flex: 0.4;
+  }
 }
 </style>

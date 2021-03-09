@@ -2,7 +2,7 @@
   <div>
     <!-- 梧桐 -->
     <SelfForm
-      v-if="Number(clueStatus) < 2"
+      v-if="clueStatus < 2"
       ref="dialogFollowUpFirmiana"
       key="dialogFollowUpFirmiana"
       :rules="rulesWT"
@@ -27,7 +27,7 @@
 
     <!-- 雷鸟车池 -->
     <SelfForm
-      v-else-if="Number(clueStatus) === 2"
+      v-else-if="clueStatus === 2"
       ref="dialogFollowUpBirdCar"
       key="dialogFollowUpBirdCar"
       :rules="rulesBirdCar"
@@ -52,7 +52,7 @@
 
     <!-- 雷鸟租赁C -->
     <SelfForm
-      v-else-if="Number(clueStatus) === 3"
+      v-else-if="clueStatus === 3"
       ref="dialogFollowUpBirdC"
       key="dialogFollowUpBirdC"
       :rules="rulesBirdC"
@@ -123,7 +123,7 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: '0' }) private clueStatus!: string;
+  @Prop({ default: 0 }) private clueStatus!: number;
 
   // 字典数组
   private inviteFailReasonOptions: object[] = [];
@@ -143,7 +143,7 @@ export default class extends Vue {
     { name: '失败', code: 0 }
   ];
   private rulesWT: IState = {
-    inviteStatus: [{ required: true, message: '请选择跟进情况' }],
+    inviteStatus: [{ required: true, message: '请选择跟进情况', trigger: 'change' }],
     inviteDate: [{ required: true, message: '请选择邀约面试时间' }],
     intentDegree: [{ required: true, message: '请选择意向度' }],
     inviteFailReason: [{ required: true, message: '请选择邀约失败原因' }]
@@ -467,17 +467,20 @@ export default class extends Vue {
 
   get formStatus() {
     let ref = ''
-    switch (Number(this.clueStatus)) {
+    switch (this.clueStatus) {
       case 0:
         ref = 'dialogFollowUpFirmiana'
         break
       case 1:
-        ref = 'dialogFollowUpBirdCar'
+        ref = 'dialogFollowUpFirmiana'
         break
       case 2:
-        ref = 'dialogFollowUpBirdC'
+        ref = 'dialogFollowUpBirdCar'
         break
       case 3:
+        ref = 'dialogFollowUpBirdC'
+        break
+      case 4:
         ref = 'dialogFollowUpBirdB'
         break
     }
@@ -510,6 +513,9 @@ export default class extends Vue {
         }
       }
     }
+    setTimeout(() => {
+      (this.$refs['dialogFollowUpFirmiana'] as any).clearValidate()
+    }, 10)
   }
 
   @Watch('dialogPopQueryBirdCar.markStatus')
@@ -618,15 +624,7 @@ export default class extends Vue {
   // 验证通过
   @lock
   private async handlePassClick(val: boolean) {
-    if (Number(this.clueStatus) < 2) {
-      this.sendWtFollow(this.dialogPopQuery)
-    } else if (Number(this.clueStatus) === 2) {
-      this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
-    } else if (Number(this.clueStatus) === 3) {
-      this.sendRentalFollow(this.dialogPopQueryBirdC)
-    } else {
-      this.sendRentalFollow(this.dialogPopQueryBirdB)
-    }
+    this.$emit('followPass', val)
   }
 
   async sendWtFollow(value: IState) {
@@ -646,13 +644,11 @@ export default class extends Vue {
       }
       let { data: res } = await followClueToFirmiana(params)
       if (res.success) {
-        this.$message({
-          type: 'success',
-          message: '添加线下跟进成功!'
-        })
-        this.$emit('success', true)
+        this.$emit('success', { state: true })
+        return Promise.resolve(true)
       } else {
-        this.$message.warning(res.errorMsg)
+        this.$emit('success', { state: false, msg: res.errorMsg })
+        console.log('fail', res.errorMsg)
       }
     } catch (err) {
       console.log('fail:', err)
@@ -684,13 +680,11 @@ export default class extends Vue {
       params.markStatus = markStatus
       let { data: res } = await followClueToThunderBirdTruckPool(params)
       if (res.success) {
-        this.$message({
-          type: 'success',
-          message: '添加线下跟进成功!'
-        })
-        this.$emit('success', true)
+        this.$emit('success', { state: true })
+        return Promise.resolve(true)
       } else {
-        this.$message.warning(res.errorMsg)
+        this.$emit('success', { state: false, msg: res.errorMsg })
+        console.log('fail', res.errorMsg)
       }
     } catch (err) {
       console.log('fail:', err)
@@ -723,13 +717,11 @@ export default class extends Vue {
       params.markStatus = markStatus
       let { data: res } = await followClueToThunderBirdRental(params)
       if (res.success) {
-        this.$message({
-          type: 'success',
-          message: '添加线下跟进成功!'
-        })
-        this.$emit('success', true)
+        this.$emit('success', { state: true })
+        return Promise.resolve(true)
       } else {
-        this.$message.warning(res.errorMsg)
+        this.$emit('success', { state: false, msg: res.errorMsg })
+        console.log('fail', res.errorMsg)
       }
     } catch (err) {
       console.log('fail:', err)
@@ -737,15 +729,30 @@ export default class extends Vue {
   }
 
   submitForms() {
-    if (Number(this.clueStatus) < 2) {
-      (this.$refs['dialogFollowUpFirmiana'] as any).submitForm()
-    } else if (Number(this.clueStatus) === 2) {
-      (this.$refs['dialogFollowUpBirdCar'] as any).submitForm()
-    } else if (Number(this.clueStatus) === 3) {
-      (this.$refs['dialogFollowUpBirdC'] as any).submitForm()
+    (this.$refs[this.formStatus] as any).submitForm()
+  }
+
+  followType() {
+    if (this.clueStatus < 2) {
+      return this.sendWtFollow(this.dialogPopQuery)
+    } else if (this.clueStatus === 2) {
+      this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
+    } else if (this.clueStatus === 3) {
+      return this.sendRentalFollow(this.dialogPopQueryBirdC)
     } else {
-      (this.$refs['dialogFollowUpBirdB'] as any).submitForm()
+      return this.sendRentalFollow(this.dialogPopQueryBirdB)
     }
+  }
+
+  sendFollow() {
+    let obj:IState = {
+      0: followClueToFirmiana,
+      1: followClueToFirmiana,
+      2: followClueToThunderBirdTruckPool,
+      3: followClueToThunderBirdRental,
+      4: followClueToThunderBirdRental
+    }
+    return obj[this.clueStatus]
   }
 
   resetForms() {
@@ -755,6 +762,18 @@ export default class extends Vue {
       this.intentDegreeOptions.splice(0, this.intentDegreeOptions.length)
       this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
     }, 10)
+  }
+
+  mounted() {
+    this.$nextTick(() => {
+      this.$on('show', (val:boolean) => {
+        if (val) {
+          this.getOptionInfo()
+        } else {
+          this.resetForms()
+        }
+      })
+    })
   }
 }
 </script>

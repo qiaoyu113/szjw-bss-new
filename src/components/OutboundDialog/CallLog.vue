@@ -1,6 +1,5 @@
 <template>
   <div class="callLog1">
-    <h4>通话操作日志</h4>
     <self-table
       :indexes="true"
       :index="false"
