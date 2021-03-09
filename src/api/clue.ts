@@ -245,3 +245,9 @@ export const GetUserGroupSelectList = (params: any) =>
     method: 'get',
     params
   })
+// 获取投放平台列表
+export const GetLaunchPlatformList = () =>
+  request({
+    url: `${baseUrl}/v2/clue/campaign/getLaunchPlatformList`,
+    method: 'get'
+  })

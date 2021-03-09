@@ -169,7 +169,7 @@ import {
   thirtyday
 } from '../../../driver-freight/components/date'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
-import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList } from '@/api/clue'
+import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -647,11 +647,11 @@ export default class extends Vue {
   }
   // 查询投放平台
   private async getDictionaryContract() {
-    const { data } = await GetDictionary({ dictType: 'busi_type' })
+    const { data } = await GetLaunchPlatformList()
     if (data.success) {
       let result:IState[] = data.data.map((item:IState) => ({
-        label: item.dictLabel,
-        value: item.dictLabel
+        label: item.launchPlatform,
+        value: item.launchPlatform
       }))
       this.platformList.push(...result)
     } else {
