@@ -300,4 +300,3 @@ export const GetLaunchPlatformList = () =>
     url: `${baseUrl}/v2/clue/campaign/getLaunchPlatformList`,
     method: 'get'
   })
-  

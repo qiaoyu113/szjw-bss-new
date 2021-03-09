@@ -141,6 +141,33 @@ export default class extends Vue {
       label: '货运经验'
     },
     {
+      type: 2,
+      options: [
+        {
+          label: '是',
+          value: true
+        },
+        {
+          label: '否',
+          value: false
+        }
+      ],
+      label: '邀约是否成功',
+      key: 'invite'
+    },
+    {
+      type: 1,
+      label: '通话备注',
+      key: 'remark',
+      tagAttrs: {
+        placeholder: '请填写本次通话意向如何...',
+        maxlength: 200,
+        'show-word-limit': true,
+        type: 'textarea',
+        rows: 3
+      }
+    },
+    {
       type: 'age',
       slot: true,
       label: '年龄'
@@ -170,7 +197,7 @@ export default class extends Vue {
     {
       type: 8,
       key: 'city',
-      label: '期望工作区域:',
+      label: '期望工作区域',
       tagAttrs: {
         'default-expanded-keys': true,
         'default-checked-keys': true,
