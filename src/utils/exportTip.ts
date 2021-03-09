@@ -53,6 +53,7 @@ export function exportFileTip(vm:vm, cb:Function) {
         }
         await cb(sucFun)
       } catch (err) {
+        // eslint-disable-next-line
         vm.times = 10
       }
     }
