@@ -271,8 +271,8 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: '' }) private phone!: string;
-  @Prop({ default: '' }) private clueId!: string;
+  private phone: string = ''
+  private clueId: string = ''
   private clueStatus: string = '0';
   private followUpDio: boolean = false;
   private messageDio: boolean = false;
@@ -630,7 +630,7 @@ export default class extends Vue {
   }
 
   get followUpLog() {
-    let stateItem = this.followUpLogArr[Number(this.clueStatus)]
+    let stateItem = this.followUpLogArr[+this.clueStatus]
     let pageArr = this.group(stateItem.listData)
     let listData: any[] = []
     let index = 0
@@ -725,7 +725,7 @@ export default class extends Vue {
 
   // tab切换
   private handleClick(tab: any, event: any) {
-    this.clueId = ''
+    this.clueId = this.clueArray[+this.clueStatus].clueId || ''
     this.getDetailApi()
     this.getDoLog()
   }
@@ -910,6 +910,8 @@ export default class extends Vue {
   }
 
   mounted() {
+    this.phone = (this.$route as any).query.phone
+    this.clueId = (this.$route as any).query.clueId
     this.getClueId(this.phone)
     this.getDetailApi()
     this.getDoLog()

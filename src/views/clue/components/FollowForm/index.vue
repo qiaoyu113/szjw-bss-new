@@ -124,6 +124,7 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: 0 }) private clueStatus!: number;
+  @Prop({ default: '' }) private callId?: string;
 
   // 字典数组
   private inviteFailReasonOptions: object[] = [];
@@ -641,6 +642,9 @@ export default class extends Vue {
         params.inviteFailReason = inviteFailReason
         params.intentDegree = intentDegree
         remark !== '' && (params.remark = remark)
+      }
+      if (this.callId) {
+        params.callId = this.callId
       }
       let { data: res } = await followClueToFirmiana(params)
       if (res.success) {
