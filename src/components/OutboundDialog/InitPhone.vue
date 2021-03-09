@@ -79,11 +79,7 @@ export default class extends Vue {
   // 根据用户id获取坐席号
   async getInfoByUserId() {
     try {
-      let userId = localStorage.getItem('userId')
-      let params = {
-        userId
-      }
-      let { data: res } = await GetInfoByUserId(params)
+      let { data: res } = await GetInfoByUserId()
       if (res.success) {
         let { loginName, password, appId, secret } = res.data
         if (!loginName || !password || !appId || !secret) {
