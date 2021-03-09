@@ -34,10 +34,9 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          v-permission="['root']"
           type="primary"
           size="small"
-          @click="goRoute('addPay')"
+          @click="handleAddClick"
         >
           新建客群
         </el-button>
@@ -57,10 +56,10 @@
           重置
         </el-button>
         <el-button
-          v-permission="['root']"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="times === 10 ? false :true"
           name="driverlist_offout_btn"
+          type="primary"
           size="small"
           @click="_exportFile"
         >
@@ -85,30 +84,144 @@
         :default-sort="{prop: 'createDate', order: 'descending'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
-      >
-        <template v-slot:num="scope">
-          <template v-if="scope.header">
-            <div style="line-height:1.2">
-              入池次数<br>(该线索类型)
-            </div>
-          </template>
-          <template v-else>
-            {{ scope.row.createDate }}
-          </template>
-        </template>
-        <template v-slot:createDate="scope">
-          {{ scope.row.createDate }}
-        </template>
-        <template v-slot:op="scope">
-          <el-button
-            type="text"
-            @click="handleAllotClick(scope.row)"
-          >
-            分配
-          </el-button>
-        </template>
-      </self-table>
+      />
     </div>
+    <!--新建客群-->
+    <el-dialog
+      title="新建客群"
+      :visible.sync="dialogFormVisible"
+      :close-on-click-modal="false"
+      :show-close="false"
+    >
+      <el-form
+        ref="ruleAddForm"
+        :model="addForm"
+        :rules="ruleAddForm"
+        label-width="130px"
+      >
+        <el-form-item
+          label="业务线"
+          prop="busiType"
+        >
+          <el-select
+            v-model="addForm.busiType"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="(sub,index) in busiTypeArr"
+              :key="'select-'+sub.value+'-'+index"
+              :label="sub.label"
+              :value="sub.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="客群类型"
+          prop="type"
+        >
+          <el-col :span="16">
+            <el-input
+              v-model="addForm.type"
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item
+          label="目标画像标签"
+          prop="portraitLabel"
+        >
+          <el-col :span="16">
+            <el-input
+              v-model="addForm.portraitLabel"
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item
+          label="分配机制"
+          prop="distributionType"
+        >
+          <el-select
+            v-model="addForm.distributionType"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="(sub,index) in distributionTypeArr"
+              :key="'select-'+sub.value+'-'+index"
+              :label="sub.label"
+              :value="sub.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="分配机制管理员"
+          prop="distributionManageId"
+        >
+          <el-select
+            v-model="addForm.distributionManageId"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="(sub,index) in distributionManageArr"
+              :key="'select-'+sub.value+'-'+index"
+              :label="sub.label"
+              :value="sub.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          label="邀约语"
+          prop="inviteWord"
+        >
+          <el-col :span="16">
+            <el-input
+              v-model="addForm.inviteWord"
+              type="textarea"
+              maxlength="300"
+              show-word-limit
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item
+          label="面试语"
+          prop="interviewWord"
+        >
+          <el-col :span="16">
+            <el-input
+              v-model="addForm.interviewWord"
+              type="textarea"
+              maxlength="300"
+              show-word-limit
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item
+          label="备注"
+          prop="remark"
+        >
+          <el-col :span="16">
+            <el-input
+              v-model="addForm.remark"
+              type="textarea"
+              maxlength="300"
+              show-word-limit
+            />
+          </el-col>
+        </el-form-item>
+      </el-form>
+      <div
+        slot="footer"
+        class="dialog-footer"
+      >
+        <el-button @click="cancel('ruleAddForm')">
+          取 消
+        </el-button>
+        <el-button
+          type="primary"
+          @click="addCustomers('ruleAddForm')"
+        >
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,7 +229,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showWork } from '@/utils/index'
-import { marketClue } from '@/api/driver-cloud'
+import { getClueUserGroupList } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -149,17 +262,30 @@ interface formItem {
   }
 })
 export default class extends Vue {
+  @Watch('listQuery.clueType', { deep: true })
+  private onListQueryChange(value: any) {
+    this.getLists()
+  }
   times:number = 10;
   private listLoading: boolean = false;
+  private dialogFormVisible: boolean = false;
   private listQuery: IState = {
     clueType: 0,
-    phone: '',
-    haveCar: '',
+    distributionType: '',
+    limit: '',
+    page: '',
+    portraitLabel: '',
+    startDate: '',
+    endDate: '',
     time: [],
-    onlyMe: ''
+    type: ''
   };
-  private tableData: any[] = [];
-  private multipleSelection: any[] = []; // 当前页选中的数据
+  private showDialog: boolean = false;
+  private tableData: any = [];
+  private busiTypeArr: any = [];
+  private distributionTypeArr: any = [];
+  private distributionManageArr: any = [];
+
   private hasCarList: IState[] = [
     { label: '全部', value: '' },
     { label: '有', value: 1 },
@@ -182,6 +308,37 @@ export default class extends Vue {
     sevenday,
     thirtyday
   ]
+  // 新增表单校验
+  private ruleAddForm: any = {
+    type: [
+      { required: true, message: '请输入客群类型', trigger: 'blur' },
+      { min: 1, max: 20, message: '最多可输入20字', trigger: 'blur' }
+    ],
+    busiType: [
+      { required: true, message: '请选择业务线', trigger: 'change' }
+    ],
+    portraitLabel: [
+      { required: true, message: '请输入目标画像标签', trigger: 'blur' },
+      { min: 1, max: 20, message: '最多可输入20字', trigger: 'blur' }
+    ],
+    distributionType: [
+      { required: true, message: '请选择分配机制', trigger: 'change' }
+    ],
+    distributionManageId: [
+      { required: true, message: '请选择分配机制管理员', trigger: 'change' }
+    ]
+  }
+  // 表单addForm
+  private addForm: any = {
+    busiType: '',
+    type: '',
+    portraitLabel: '',
+    distributionType: '',
+    distributionManageId: '',
+    inviteWord: '',
+    interviewWord: '',
+    remark: ''
+  }
   /**
    * rules: []
    * root 为全局显示
@@ -197,34 +354,29 @@ export default class extends Vue {
     {
       type: 1,
       label: '客群类型',
-      key: 'phone',
+      key: 'type',
       rules: ['root'],
       tagAttrs: {
         placeholder: '请输入客群类型',
-        'show-word-limit': true,
+        maxlength: 20,
         clearable: true
       }
     },
     {
       type: 1,
       label: '目标画像标签',
-      key: 'phone',
+      key: 'portraitLabel',
       rules: ['root'],
       tagAttrs: {
-        type: 'tel',
         placeholder: '请输入',
-        maxlength: 11,
-        'show-word-limit': true,
+        maxlength: 20,
         clearable: true
-      },
-      listeners: {
-        input: this.oninputOnlyNum
       }
     },
     {
       type: 2,
       label: '分配机制',
-      key: 'haveCar',
+      key: 'distributionType',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -235,6 +387,7 @@ export default class extends Vue {
     },
     {
       type: 3,
+      col: 12,
       rules: ['root'],
       tagAttrs: {
         placeholder: '请选择',
@@ -249,7 +402,7 @@ export default class extends Vue {
     },
     {
       type: 'mulBtn',
-      col: 24,
+      col: 12,
       slot: true,
       w: '0px',
       rules: ['root']
@@ -257,7 +410,7 @@ export default class extends Vue {
   ];
   private columns: any[] = [
     {
-      key: 'marketClueId',
+      key: 'groupId',
       label: '客群细分ID',
       width: '150px',
       rules: ['root']
@@ -268,64 +421,49 @@ export default class extends Vue {
       rules: ['root']
     },
     {
-      key: 'name',
+      key: 'typeName',
       label: '客群类型',
       rules: ['root']
     },
     {
-      key: 'phone',
+      key: 'portraitLabel',
       label: '目标画像标签',
       width: '120px',
       rules: ['root']
     },
     {
-      key: 'haveCar',
+      key: 'distributionTypeName',
       label: '分配机制',
       rules: ['root']
     },
     {
-      key: 'cityName',
+      key: 'distributionManageName',
       label: '分配机制管理员',
       width: '130px',
       rules: ['root']
     },
     {
-      key: 'cityName1',
-      label: 'policy干涉人',
-      rules: ['root']
-    },
-    {
-      key: 'cityName2',
-      label: '分配人',
-      rules: ['root']
-    },
-    {
-      key: 'carTypeName',
-      label: '监督人',
-      rules: ['root']
-    },
-    {
-      key: 'carTypeName1',
+      key: 'remark',
       label: '备注',
       rules: ['root']
     },
     {
-      key: 'cityName3',
+      key: 'inviteWord',
       label: '邀约语',
       rules: ['root']
     },
     {
-      key: 'cityName4',
+      key: 'interviewWord',
       label: '面试语',
       rules: ['root']
     },
     {
-      key: 'cityName5',
+      key: 'campaignNum',
       label: 'Campaign数',
       rules: ['root']
     },
     {
-      key: 'cityName6',
+      key: 'createName',
       label: '创建人',
       rules: ['root']
     },
@@ -364,18 +502,11 @@ export default class extends Vue {
   }
   // 重置
   private async handleResetClick(row: IState) {
-    // (this.$refs['suggestForm'] as any).resetForm()
-    // this.getLists()
-  }
-  // 批量分配
-  private handleallAllotClick() {
-    // this.dialogTit = '批量分配'
-    // this.showDialog = true
-    // this.rowData.push(...this.multipleSelection)
+    (this.$refs['suggestForm'] as any).resetForm()
+    this.getLists()
   }
 
   private handleSelectionChange(val:any) {
-    this.multipleSelection = val
   }
 
   private oninputOnlyNum(value: string) {
@@ -401,9 +532,15 @@ export default class extends Vue {
       this.listLoading = true
       let params: IState = {
         page: this.page.page,
-        limit: this.page.limit
+        limit: this.page.limit,
+        clueType: this.listQuery.clueType,
+        distributionType: this.listQuery.distributionType,
+        portraitLabel: this.listQuery.portraitLabel,
+        startDate: this.listQuery.time[0],
+        endDate: this.listQuery.time[1],
+        type: this.listQuery.type
       }
-      let { data: res } = await marketClue(params)
+      let { data: res } = await getClueUserGroupList(params)
       if (res.success) {
         // eslint-disable-next-line
         res.page = await HandlePages(res.page)
@@ -418,6 +555,29 @@ export default class extends Vue {
     } finally {
       this.listLoading = false
     }
+  }
+
+  // 新增客群
+  handleAddClick() {
+    this.dialogFormVisible = true
+  }
+
+  // 确认新增
+  addCustomers(formName: any) {
+    (this.$refs[formName] as any).validate((valid: any) => {
+      if (valid) {
+        console.log(this.addForm)
+      } else {
+        console.log('error submit!!')
+        return false
+      }
+    })
+  }
+
+  // 取消新建
+  cancel(formName: any) {
+    this.dialogFormVisible = false;
+    (this.$refs[formName] as any).resetFields()
   }
 
   mounted() {
