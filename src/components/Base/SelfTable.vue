@@ -37,6 +37,7 @@
       <el-table-column
         v-for="item in columns"
         :key="item.key"
+        :prop="item.key"
         :align="item.align || 'center'"
         :min-width="item.width || 100"
         :label="item.label"
@@ -81,6 +82,7 @@
               v-if="item.slot"
               :name="item.key"
               :row="scope.row"
+              :index="scope.$index"
             />
             <template v-else>
               {{ scope.row[item.key] | DataIsNull }}

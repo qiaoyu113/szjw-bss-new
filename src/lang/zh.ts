@@ -191,7 +191,8 @@ export default {
     selfDriverTag: '自承运司机标签',
     marketClue: '待市场分配线索',
     RandomlyAssigned: '随机分配policy设置',
-    BackflowPolicy: '回流policy设置'
+    BackflowPolicy: '回流policy设置',
+    campaignList: 'Campaign管理'
   },
   navbar: {
     setPassword: '修改密码',

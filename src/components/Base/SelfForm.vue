@@ -32,7 +32,14 @@
             v-model.trim="listQuery[item.key]"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
-          />
+          >
+            <template
+              v-if="item.tag"
+              :slot="item.tag.type"
+            >
+              {{ item.tag.name }}
+            </template>
+          </el-input>
           <el-input-number
             v-if="item.type === 14"
             v-model.number="listQuery[item.key]"
@@ -106,6 +113,7 @@
           <el-date-picker
             v-else-if="item.type ===6"
             v-model="listQuery[item.key]"
+            v-bind="item.tagAttrs || {}"
             :editable="false"
             type="date"
             value-format="timestamp"
@@ -185,6 +193,7 @@
           />
         </el-form-item>
       </el-col>
+      <slot name="other" />
       <div class="clearfix" />
     </el-form>
     <slot name="btn" />

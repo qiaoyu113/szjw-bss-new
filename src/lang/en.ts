@@ -168,7 +168,8 @@ export default {
     driverClond: 'driverClond',
     selfDriverTag: 'selfDriverTag',
     RandomlyAssigned: 'Randomly assign policy settings',
-    BackflowPolicy: 'Backflow policy settings'
+    BackflowPolicy: 'Backflow policy settings',
+    campaignList: 'campaignListMa'
   },
   navbar: {
     logOut: 'Log Out',

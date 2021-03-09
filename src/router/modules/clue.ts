@@ -63,6 +63,38 @@ const clueRouter: RouteConfig = {
         title: 'RandomlyAssigned',
         noCache: false
       }
+    },
+    {
+      path: 'campaignList', /* CamPaign列表 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/List/index.vue'),
+      name: 'CampaignList',
+      meta: {
+        apiUrl: 'root',
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    {
+      path: 'campaignDetail', /* CamPaign详情 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/Detail/index.vue'),
+      name: 'CampaignDetail',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    {
+      path: 'phoneDemo', /* CamPaign详情 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/PhoneDemo.vue'),
+      name: 'phoneDemo',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'campaignList',
+        noCache: false
+      }
     }
   ]
 }
