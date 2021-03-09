@@ -315,3 +315,11 @@ export const getInfoByUserId = (params: any) =>
     method: 'get',
     params
   })
+
+// 解绑坐席号
+export const agentChangeUnBundling = (data:any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/unbundling`,
+    method: 'post',
+    data
+  })

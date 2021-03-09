@@ -11,23 +11,13 @@
       :form-item="formItem"
       size="small"
       :pc-col="8"
-      label-width="55px"
+      label-width="90px"
       class="p15 SuggestForm"
     >
       <div
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
-        <el-button
-          v-permission="['/v3/base/agent/bundling']"
-          size="small"
-          :class="isPC ? '' : 'btnMobile'"
-          type="success"
-          name="driverclue_filter_btn"
-          @click="bindingClick"
-        >
-          绑定
-        </el-button>
         <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
@@ -68,18 +58,39 @@
       @onPageSize="handlePageSize"
     >
       <template v-slot:op="scope">
-        <el-button
-          v-permission="['/v3/base/agent/change']"
-          type="text"
-          size="small"
-          @click="changeSeatNumber(scope.row)"
-        >
-          更换绑定
-        </el-button>
+        <div v-if="scope.row.userName">
+          <el-button
+            v-permission="['/v3/base/agent/change']"
+            type="text"
+            size="small"
+            @click="changeSeatNumber(scope.row)"
+          >
+            更换绑定
+          </el-button>
+          <el-button
+            v-permission="['/v3/base/agent/unbundling']"
+            type="text"
+            size="small"
+            @click="unbundlingClick(scope.row)"
+          >
+            解绑
+          </el-button>
+        </div>
+        <div v-else>
+          <el-button
+            v-permission="['/v3/base/agent/bundling']"
+            type="text"
+            size="small"
+            @click="bindingClick(scope.row)"
+          >
+            绑定
+          </el-button>
+        </div>
       </template>
     </self-table>
     <!--座席号改绑-->
     <el-dialog
+      v-loading="loadingDialog"
       title="坐席号改绑"
       :visible.sync="dialogFormVisible"
     >
@@ -154,6 +165,7 @@
     </el-dialog>
     <!--座席号新建-->
     <el-dialog
+      v-loading="loadingDialog"
       title="坐席号绑定"
       :visible.sync="bindFormVisible"
     >
@@ -163,36 +175,25 @@
         :rules="ruleNewSeatForm"
       >
         <el-form-item
-          label="绑定人"
+          label="坐席号"
+          label-width="120px"
+          style="font-size:13px !important"
+        >
+          <el-input
+            v-model="newSeatForm.seatNumber"
+            disabled
+          />
+        </el-form-item>
+        <el-form-item
+          label="选择用户"
           label-width="120px"
         >
           <el-autocomplete
             v-model="newSeatForm.value"
             :fetch-suggestions="querySearchAsync"
-            placeholder="请输入绑定人姓名或手机号"
+            placeholder="请输入绑定人姓名/手机号"
             @select="handleSelectUser"
           />
-        </el-form-item>
-        <el-form-item
-          label="勾选坐席号"
-          label-width="120px"
-          style="font-size:13px !important"
-        >
-          <el-select
-            v-model="newSeatForm.seatNumber"
-            filterable
-            name="freightlist_gmId_input"
-            placeholder="请选择"
-            size="small"
-            clearable
-          >
-            <el-option
-              v-for="item in optionsBindNumber"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
         </el-form-item>
         <div v-if="newSeatForm.nickName && newSeatForm.seatNumber">
           <DetailItem
@@ -243,7 +244,8 @@
 import { Vue, Component } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
-import { getAgentList, getEnableAgentNums, getQueryGM, agentBundling, agentChangeBundling } from '@/api/system'
+import { getAgentList, getEnableAgentNums, getQueryGM, agentBundling, agentChangeBundling, getDutyListByLevel, agentChangeUnBundling } from '@/api/system'
+import { showWork } from '@/utils'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { HandlePages } from '@/utils/index'
 import DetailItem from '@/components/DetailItem/index.vue'
@@ -331,9 +333,21 @@ export default class extends Vue {
   }
   private dialogFormVisible:any = false
   private bindFormVisible:any = false
+  private loadingDialog:any = false
   private tags:any[] = []// 顶部查询按钮回显的数组
   private listLoading:boolean = false
   private tableData:tableObj[] = []
+  private busiTypeOptions:any[] = []
+  private statusOptions:any[] = [{
+    label: '全部',
+    value: ''
+  }, {
+    label: '已绑定',
+    value: 1
+  }, {
+    label: '未绑定',
+    value: 0
+  }]
   // 渲染表格的列表
   private columns:ColumnsObj[] = [
     {
@@ -389,12 +403,57 @@ export default class extends Vue {
   }
   // 查询表单
   private listQuery:IState = {
+    cityCode: '',
+    status: '',
+    busiType: '',
     agentNum: '',
     mobile: '',
     userName: ''
   }
   // 渲染查询表单的列表
   private formItem:any[] = [
+    {
+      type: 8,
+      key: 'cityCode',
+      col: 8,
+      label: '所属城市',
+      tagAttrs: {
+        placeholder: '请选择所属城市',
+        clearable: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'cityCode',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
+      }
+    },
+    {
+      type: 2,
+      key: 'busiType',
+      col: 8,
+      label: '所属业务线',
+      tagAttrs: {
+        placeholder: '请选择',
+        name: 'busiType',
+        clearable: true
+      },
+      options: this.busiTypeOptions
+    },
+
+    {
+      type: 2,
+      key: 'status',
+      col: 8,
+      label: '绑定状态',
+      tagAttrs: {
+        placeholder: '请选择',
+        name: 'status',
+        clearable: true
+      },
+      options: this.statusOptions
+    },
     {
       type: 1,
       tagAttrs: {
@@ -437,6 +496,7 @@ export default class extends Vue {
   }
 
   mounted() {
+    this.getOffices()
     this.getLists()
   }
   // 获取列表数据
@@ -450,6 +510,9 @@ export default class extends Vue {
         agentNum?:string;
         mobile?:string|number;
         userName?:string|number;
+        cityCode: string|number;
+        status: string|number;
+        busiType: string|number;
       }
       let params:Params = {
         pageSize: +this.page.limit,
@@ -457,7 +520,10 @@ export default class extends Vue {
         userId: this.listQuery.userId,
         agentNum: this.listQuery.agentNum,
         mobile: this.listQuery.mobile,
-        userName: this.listQuery.userName
+        userName: this.listQuery.userName,
+        cityCode: this.listQuery.cityCode[1],
+        status: this.listQuery.status,
+        busiType: this.listQuery.busiType
       }
       let { data: res } = await getAgentList(params)
       if (res.success) {
@@ -495,7 +561,10 @@ export default class extends Vue {
       userId: '',
       agentNum: '',
       mobile: '',
-      userName: ''
+      userName: '',
+      cityCode: '',
+      status: '',
+      busiType: ''
     }
   }
   // 获取列表
@@ -504,12 +573,14 @@ export default class extends Vue {
   }
   // 坐席号改绑
   async changeSeatNumber(row: any) {
-    console.log(row)
     try {
       this.beforeSeatForm = {
         nickName: row.userName,
         seatNumber: row.agentNum
       }
+      this.changeSeatForm.id = ''
+      this.changeSeatForm.nickName = ''
+      this.changeSeatForm.value = ''
       this.dialogFormVisible = true
     } catch (err) {
       console.log(`get lists fail:${err}`)
@@ -517,14 +588,61 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
+  /**
+   * 获取组织
+   */
+  async getOffices() {
+    try {
+      let params = {
+        dutyLevel: 1
+      }
+      let { data: res } = await getDutyListByLevel(params)
+      if (res.success) {
+        let options = res.data.map((item:any) => ({
+          label: item.dutyName,
+          value: item.id
+        }))
+        this.busiTypeOptions.push({ label: '全部', value: '' }, ...options)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get duty list fail:${err}`)
+    }
+  }
   // 新建绑定
-  bindingClick() {
+  bindingClick(row: any) {
     this.newSeatForm.nickName = ''
-    this.newSeatForm.seatNumber = ''
+    this.newSeatForm.value = ''
+    this.newSeatForm.id = ''
+    this.newSeatForm.seatNumber = row.agentNum
     this.getEnableAgentNum()
+  }
+  // 解除绑定
+  unbundlingClick(row: any) {
+    this.$confirm('是否确定解绑该用户', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async() => {
+      let { data: res } = await agentChangeUnBundling({ agentNum: row.agentNum })
+      if (res.success) {
+        this.$message({
+          type: 'success',
+          message: '解绑成功!'
+        })
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    })
   }
   // 确认绑定
   async bindFormSubmit() {
+    if (!this.newSeatForm.id) {
+      this.$message.warning('请选择绑定人')
+      return false
+    }
+    this.loadingDialog = true
     try {
       let { data: res } = await agentBundling({
         agentNum: this.newSeatForm.seatNumber,
@@ -536,14 +654,17 @@ export default class extends Vue {
             message: '绑定成功!',
             type: 'success'
           })
+          this.loadingDialog = false
           this.bindFormVisible = false
           setTimeout(() => {
             this.getLists()
           }, 1000)
         } else {
+          this.loadingDialog = false
           this.$message.error(res.errorMsg)
         }
       } else {
+        this.loadingDialog = false
         this.$message.error(res.errorMsg)
       }
     } catch (err) {
@@ -554,7 +675,11 @@ export default class extends Vue {
   }
   // 更换绑定
   async changeFormSubmit() {
-    console.log(this.beforeSeatForm)
+    if (!this.changeSeatForm.id) {
+      this.$message.warning('请选择绑定人')
+      return false
+    }
+    this.loadingDialog = true
     try {
       let { data: res } = await agentChangeBundling({
         agentNum: this.beforeSeatForm.seatNumber,
@@ -566,14 +691,17 @@ export default class extends Vue {
             message: '更改成功!',
             type: 'success'
           })
+          this.loadingDialog = false
           this.dialogFormVisible = false
           setTimeout(() => {
             this.getLists()
           }, 1000)
         } else {
+          this.loadingDialog = false
           this.$message.error(res.errorMsg)
         }
       } else {
+        this.loadingDialog = false
         this.$message.error(res.errorMsg)
       }
     } catch (err) {
@@ -612,7 +740,6 @@ export default class extends Vue {
             element.value = element.nickName + element.mobile
           })
           let userList = res.data
-          console.log(userList)
           let results = queryString ? userList : []
           this.timeout = setTimeout(() => {
             cb(results)
@@ -640,7 +767,6 @@ export default class extends Vue {
   // 更换绑定人
   handleChangeUser(item: any) {
     this.changeSeatForm = Object.assign(this.changeSeatForm, item)
-    console.log(this.changeSeatForm)
   }
   // 手机号校验
   private oninputOnlyNum(value: string) {
