@@ -18,7 +18,10 @@
         </ul>
       </template>
       <template #btnc>
-        <el-button type="primary">
+        <el-button
+          type="primary"
+          @click="handleFilterClick"
+        >
           查询
         </el-button>
         <el-button> 重置 </el-button>
@@ -35,48 +38,39 @@
         :columns="columns"
         row-key="id"
         :page="page"
+        :default-sort="{prop: 'setDate', order: 'default'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
+        @sort-change="sortDate"
       >
         <template v-slot:op="scope">
           <el-button
             type="text"
             size="small"
-            @click="handleClick(scope.row)"
+            @click="setPolicyAuto(scope.row)"
           >
-            调整干涉人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-          >
-            调整分配人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-          >
-            调整监督人
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-          >
-            设置policy
+            设置分配policy
           </el-button>
         </template>
       </self-table>
     </div>
+    <SetUpDistributionPolicy
+      :visible.sync="showPolicy"
+      :policy-data="policyData"
+      @success="getList"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-
+import SetUpDistributionPolicy from '../components/SetUpDistributionPolicy.vue'
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
-
+import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
+import { HandlePages, lock } from '@/utils/index'
+import { configurationManagementList } from '@/api/clue'
 interface PageObj {
   page: number
   limit: number
@@ -89,7 +83,9 @@ interface IState {
   name: 'Configuration',
   components: {
     SelfTable,
-    SelfFrom
+    SelfFrom,
+    SetUpDistributionPolicy,
+    SelfDialog
   }
 })
 export default class extends Vue {
@@ -134,7 +130,7 @@ export default class extends Vue {
           lazyLoad: this.showWork
         }
       },
-      col: 8,
+      col: 4,
       label: '司机城市',
       key: 'driverCity'
     },
@@ -197,104 +193,128 @@ export default class extends Vue {
   }
   switchLineType(val: number) {
     this.activeLineType = val
+    this.getList()
   }
 
   private tableData: any[] = []
   private multipleSelection: any[] = []
+  private listLoading:boolean = false;
   private columns: any[] = [
     {
-      key: 'city',
+      key: 'cityName',
       label: '城市'
     },
     {
-      key: 'customerSegmentNumber',
-      label: '客群细分编号/业务线/客群类型',
+      key: 'id',
+      label: '客群细分ID/业务线/客群类型',
       width: '120px'
     },
     {
-      key: 'targetPortraitTag',
+      key: 'portraitLabel',
       label: '目标画像标签'
     },
     {
-      key: 'distributionMechanism',
+      key: 'distributionTypeName',
       label: '分配机制'
     },
     {
-      key: 'distributionMechanismAdmin',
-      label: '分配机制管理员',
+      key: 'cluesAmount',
+      label: '线索量',
       width: '120px'
     },
     {
-      key: 'policyInterloper',
-      label: 'policy干涉人'
+      key: 'setPerson',
+      label: '设置人'
     },
     {
-      key: 'assigner',
-      label: '分配人'
-    },
-    {
-      key: 'superintendent',
-      label: '监督人'
-    },
-    {
-      key: 'remark',
-      label: '备注'
-    },
-    {
-      key: 'creator',
-      label: '创建人'
-    },
-    {
-      key: 'creationTime',
-      label: '创建时间'
-    },
-    {
-      key: 'recentNews',
-      label: '最新动态'
+      key: 'setDate',
+      label: '设置时间',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'op',
       label: '操作',
       slot: true,
-      width: '300px',
       fixed: 'right'
     }
   ]
+  private showDialog: boolean = false
   private page: PageObj = {
     page: 1,
     limit: 30,
     total: 0
   }
+  sortDate({ order }:any) {
+    if (order) {
+      order = order === 'ascending' ? '1' : '2'
+    } else {
+      order = ''
+    }
+    this.getList(order)
+  }
+  // 查询
+  handleFilterClick() {
+    this.page.page = 1
+    this.getList()
+  }
   // 分页
   handlePageSize(page: PageObj) {
     this.page.page = page.page
     this.page.limit = page.limit
-    // this.getLists()
+    this.getList()
   }
   handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
-  private handleClick(row: IState) {}
+  // 设置policy
+  private showPolicy:boolean = false // has 设置policy弹框
+  private policyData:any = {}
+  setPolicyAuto({ busiType, cityCode, id }:any) {
+    const object = {
+      busiType,
+      cityCode,
+      id
+    }
+    this.policyData = object
+    this.showPolicy = true
+  }
+  // 获取列表
+  private async getList(this:any, order?:string) {
+    try {
+      this.listLoading = true
+      let params:IState = {
+        page: this.page.page,
+        limit: this.page.limit,
+        lineType: this.activeLineType,
+        order: order || ''
+      }
+      if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
+        params.cityName = this.listQuery.cityName[1]
+      }
+      let { data: res } = await configurationManagementList(params)
+      if (res.success) {
+        this.tableData = res.data || []
+        this.$refs['ConfigurationForm'].toggleRowSelection()
+        res.page = await HandlePages(res.page)
+        this.page.total = res.page.total
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get list fail:${err}`)
+    } finally {
+      this.listLoading = false
+    }
+  }
 
   data() {
     return {
-      tableData: [
-        {
-          city: '1',
-          customerSegmentNumber: '2',
-          targetPortraitTag: '3',
-          distributionMechanism: '4',
-          distributionMechanismAdmin: '5',
-          policyInterloper: '6',
-          assigner: '7',
-          superintendent: '8',
-          remark: '9',
-          creator: '10',
-          creationTime: '11',
-          recentNews: '12'
-        }
-      ]
     }
+  }
+  mounted() {
+    this.getList()
   }
 }
 </script>

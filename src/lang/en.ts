@@ -56,6 +56,7 @@ export default {
     createUser: 'createUser',
     editUser: 'editUser',
     roleManage: 'RoleManage',
+    seatManage: 'SeatManage',
     createRole: 'createRole',
     editRole: 'editRole',
     roleDetails: 'roleDetails',
@@ -167,6 +168,8 @@ export default {
     configManager: 'configManager',
     driverClond: 'driverClond',
     selfDriverTag: 'selfDriverTag',
+    RandomlyAssigned: 'Randomly assign policy settings',
+    BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa'
   },
   navbar: {

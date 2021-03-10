@@ -653,9 +653,10 @@ export default class extends Vue {
     try {
       const { data: res } = await GetDictionaryList(['pay_type'])
       if (res.success) {
+        const hidden = ['1', '5', '11', '6']
         this.payModelOptions = res.data.pay_type.map((ele: any) => {
           return { label: ele.dictLabel, value: ele.dictValue }
-        })
+        }).filter((item:any) => !hidden.includes(item.value))
       } else {
         this.$message.warning(res.errMsg)
       }
