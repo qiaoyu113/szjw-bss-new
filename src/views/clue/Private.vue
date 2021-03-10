@@ -3,7 +3,8 @@
     v-loading="listLoading"
     class="PrivateClue"
     :class="{
-      p15: isPC
+      p15: isPC,
+      PublicClue: true
     }"
   >
     <self-form
@@ -185,6 +186,7 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
+            @click="callPhone(scope.row)"
           >
             打电话
           </el-button>
@@ -274,6 +276,13 @@
         </el-link>
       </div>
     </SelfDialog>
+    <!-- phoneInfo.status -->
+    <CallPhone
+      :show-dialog.sync="hasCallPhone"
+      :clue-status="1"
+      :phone="phoneInfo.phone"
+      :clue-id="phoneInfo.clueId"
+    />
   </div>
 </template>
 
@@ -290,7 +299,9 @@ import { GetDictionaryList, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
 import { marketClue, allocationClue } from '@/api/driver-cloud'
-
+import {
+  CallPhone
+} from './components/index'
 interface IState {
   [key: string]: any;
 }
@@ -321,20 +332,15 @@ interface formItem {
   components: {
     SelfTable,
     SelfForm,
-    SelfDialog
+    SelfDialog,
+    CallPhone
   }
 })
 export default class extends Vue {
   times: number = 10;
   private listLoading: boolean = false;
   private toDoValue: number = 0;
-  private clueArr: IState[] = [
-    { name: '梧桐专车', code: 0 },
-    { name: '梧桐共享', code: 1 },
-    { name: '雷鸟供给C', code: 2 },
-    { name: '雷鸟租赁C', code: 3 },
-    { name: '雷鸟租赁B', code: 4 }
-  ];
+  private clueArr: IState[] = []
   private listQuery: IState = {
     carType: '', // 车型
     cityCode: '', // 所属城市
@@ -363,6 +369,20 @@ export default class extends Vue {
     { label: '有', value: 1 },
     { label: '无', value: 0 }
   ];
+  private hasCallPhone:Boolean = false
+  private phoneInfo = {
+    status: '',
+    phone: '',
+    clueId: ''
+  }
+  callPhone({ phone, status, clueId }:any) {
+    this.phoneInfo = {
+      status,
+      phone,
+      clueId
+    }
+    this.hasCallPhone = true
+  }
   private sortOptions: IState[] = [
     { label: '按照未跟进天数倒序', value: 'notFollowDay:desc' },
     { label: '按照未跟进天数正序', value: 'notFollowDay:asc' },

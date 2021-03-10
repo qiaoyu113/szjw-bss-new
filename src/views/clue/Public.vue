@@ -127,7 +127,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
+import { HandlePages, lock, showCityGroupPerson, showWork, validatorNumberRange } from '@/utils/index'
 import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByHighSeas } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
@@ -541,6 +541,8 @@ export default class extends Vue {
     try {
       let params = ['clue_attribution', 'source_channel', 'mkt_clue_type', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
+
+      console.log(res)
       if (res.success) {
         const searchArr = [GetToAllotWT, GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, GetToAllotLNLease]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType } = res.data
@@ -551,6 +553,8 @@ export default class extends Vue {
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
         this.carTypeOptions.push(...carTypeOptions)
+        debugger
+        console.log(clueType)
         this.clueArr.push(...clueType)
         this.listQuery.clueType = clueType[0].value
         this.clueOptions.push(...[
