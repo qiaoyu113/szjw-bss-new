@@ -15,7 +15,7 @@ const setcenterRouter: RouteConfig = {
   children: [
     {
       path: 'linelist', /* 线路列表 */
-      component: () => import('@/views/setcenter/linelist.vue'),
+      component: () => import('@/views/set-center/linelist.vue'),
       name: 'LineList',
       meta: {
         activeMenu: '/setcenter/linelist',
