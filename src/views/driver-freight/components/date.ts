@@ -19,7 +19,7 @@ export const yesterday = {
   }
 }
 export const threeday = {
-  text: '三天前',
+  text: '近三天',
   onClick(picker: any) {
     const date = new Date().setHours(0, 0, 0, 0)
     const start = +date - startTime * 3
@@ -33,6 +33,18 @@ export const sevenday = {
     const date = new Date().setHours(0, 0, 0, 0)
     const start = +date - startTime * 7
     const end = +date + endTime
+    picker.$emit('pick', [start, end])
+  }
+}
+export const thirtyday = {
+  text: '近30天',
+  onClick(picker: any) {
+    const date = new Date()
+    const y = date.getFullYear()
+    const m = date.getMonth()
+    const d = date.getDate()
+    const start = +new Date(y, m, d - 30)
+    const end = +new Date(y, m, d) + endTime
     picker.$emit('pick', [start, end])
   }
 }
@@ -70,12 +82,12 @@ export const threemonth = {
     picker.$emit('pick', [start, end])
   }
 }
-export const thirtyday = {
-  text: '近30天',
-  onClick(picker: any) {
-    const date = new Date().setHours(0, 0, 0, 0)
-    const start = +date - startTime * 30
-    const end = new Date().setHours(23, 59, 59)
-    picker.$emit('pick', [start, end])
-  }
-}
+// export const thirtyday = {
+//   text: '近30天',
+//   onClick(picker: any) {
+//     const date = new Date().setHours(0, 0, 0, 0)
+//     const start = +date - startTime * 30
+//     const end = new Date().setHours(23, 59, 59)
+//     picker.$emit('pick', [start, end])
+//   }
+// }

@@ -41,6 +41,7 @@
           <FollowForm
             ref="followform"
             :clue-status="clueStatus"
+            :call-id="callId"
             @success="successSend"
             @followPass="followPass"
           />
@@ -78,7 +79,7 @@ export default class extends Vue {
   @Prop({ default: '' }) private phone!: string;
   @Prop({ default: 0 }) private clueStatus!: number;
   @Prop({ default: '' }) private clueId!: string;
-
+  private callId:string = ''
   private showOtherBtn:boolean = true
   private submitLoading: boolean = false;
   private passBase:boolean = false
@@ -150,7 +151,7 @@ export default class extends Vue {
   }
 
   random(val:string) {
-    console.log(val, 'val')
+    this.callId = val
   }
 
   // 弹框确认

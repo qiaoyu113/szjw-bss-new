@@ -13,7 +13,7 @@ const clueRouter: RouteConfig = {
   },
   children: [
     {
-      path: 'public', /* 公海池 */
+      path: 'public', /* 待分配线索 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Public.vue'),
       name: 'PublicClue',
       meta: {
