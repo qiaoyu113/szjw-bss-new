@@ -58,6 +58,11 @@ export default class extends Vue {
       'width': '100px'
     },
     {
+      key: 'createDate',
+      label: '拨打时间',
+      'width': '100px'
+    },
+    {
       key: 'beginTime',
       label: '接通时间',
       'width': '140px'
