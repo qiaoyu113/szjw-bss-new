@@ -282,17 +282,23 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
 import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
-import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
+import { today, yesterday, sevenday, thirtyday, month, lastmonth, threemonth } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList, GetSpecifiedRoleList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
+import { marketClue, allocationClue } from '@/api/driver-cloud'
 
 interface IState {
   [key: string]: any;
 }
+// import {
+//   today,
+//   yesterday,
+//
+// } from '../driver-freight/components/date'
 interface PageObj {
   page: number;
   limit: number;
@@ -307,8 +313,8 @@ interface formItem {
   tagAttrs?: object;
   listeners?: object;
   options?: IState[];
-  slot?:boolean,
-  w?:string
+  slot?: boolean;
+  w?: string;
 }
 @Component({
   name: 'PrivateClue',
@@ -319,9 +325,16 @@ interface formItem {
   }
 })
 export default class extends Vue {
-  times:number = 10;
+  times: number = 10;
   private listLoading: boolean = false;
   private toDoValue: number = 0;
+  private clueArr: IState[] = [
+    { name: '梧桐专车', code: 0 },
+    { name: '梧桐共享', code: 1 },
+    { name: '雷鸟供给C', code: 2 },
+    { name: '雷鸟租赁C', code: 3 },
+    { name: '雷鸟租赁B', code: 4 }
+  ];
   private listQuery: IState = {
     carType: '', // 车型
     cityCode: '', // 所属城市
@@ -365,7 +378,7 @@ export default class extends Vue {
   private carTypeOptions: any[] = [] // 车型
   private followTypeOptins: any[] = [] // 跟进情况
   private inviteFailReasonOptions: any[] = [] // 邀约失败原因
-  private clueArr:IState[] = []
+  // private clueArr:IState[] = []
   private page: PageObj = {
     page: 1,
     limit: 30,
@@ -377,7 +390,7 @@ export default class extends Vue {
     sevenday,
     thirtyday
   ]
-  private btns:any[] = [
+  private btns: any[] = [
     {
       name: '',
       text: '全部',
@@ -413,11 +426,7 @@ export default class extends Vue {
       text: '已成交',
       num: 0
     }
-  ]
-  /**
-   * rules: []
-   * root 为全局显示
-   * */
+  ];
   private formItem: formItem[] = [
     {
       type: 'tabGroup',
@@ -920,6 +929,10 @@ export default class extends Vue {
     // this.rowData.push(...this.multipleSelection)
   }
 
+  // private handleSelectionChange(val: any) {
+  //   this.multipleSelection = val
+  // }
+
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -976,6 +989,11 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
+        this.btns.forEach((item) => {
+          let key = item.name
+          key = +key
+          item.num = res.title[key]
+        })
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -1244,10 +1262,10 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-.PrivateClue {
-  .el-radio-group{
-    margin-bottom: 0!important;
+<style lang="scss" scope>
+.PublicClue {
+  .el-radio-group {
+    margin-bottom: 0 !important;
   }
   .btnPc {
     width: 100%;

@@ -6,6 +6,7 @@ export default {
     clueTitle: 'Clue',
     publicClue: 'PublicClue',
     privateClue: 'PrivateClue',
+    Configuration: 'Configuration',
     driverAccount: 'DriverAccount',
     refundDetail: 'RefundDetail',
     refundApply: 'RefundApply',
@@ -165,7 +166,8 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    campaignList: 'campaignListMa'
   },
   navbar: {
     logOut: 'Log Out',
