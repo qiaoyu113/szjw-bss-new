@@ -633,6 +633,9 @@ export default class extends Vue {
           type: 'success',
           message: '解绑成功!'
         })
+        setTimeout(() => {
+          this.getLists()
+        }, 1000)
       } else {
         this.$message.error(res.errorMsg)
       }
