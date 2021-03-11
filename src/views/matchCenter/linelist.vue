@@ -11,9 +11,29 @@
         :list-query="listQuery"
         :form-item="formItem"
         size="small"
+        label-width="110px"
         class="p15 SuggestForm"
         :pc-col="6"
-      />
+      >
+        <template slot="status">
+          <el-badge
+            v-for="item in btns"
+            :key="item.text"
+          >
+            <el-button
+              type="primary"
+              margin-right="20px"
+              :plain="item.name !== listQuery.status"
+              @click="() => {
+                listQuery.status = item.name
+                handleFilterClick()
+              }"
+            >
+              {{ item.text }}
+            </el-button>
+          </el-badge>
+        </template>
+      </self-form>
     </div>
   </div>
 </template>
@@ -50,7 +70,8 @@ export default class extends Vue {
     warehouseLocation: '',
     distributionArea: '',
     stabilityTemporary: '',
-    lineName: ''
+    lineName: '',
+    Status: ''
   }
   private formItem:any[] = [
     {

@@ -1,24 +1,24 @@
 import { RouteConfig } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
-const setcenterRouter: RouteConfig = {
-  path: '/setcenter', /* 撮合中心 */
+const matchCenterRouter: RouteConfig = {
+  path: '/matchCenter', /* 撮合中心 */
   component: Layout,
-  redirect: '/setcenter/linelist',
-  name: 'setCenter',
+  redirect: '/matchCenter/linelist',
+  name: 'matchCenter',
   meta: {
-    title: 'setcenterTitle',
-    icon: 'setcenter',
+    title: 'matchCenterTitle',
+    icon: 'matchCenter',
     apiUrl: 'root',
     alwaysShow: true
   },
   children: [
     {
       path: 'linelist', /* 线路列表 */
-      component: () => import('@/views/set-center/linelist.vue'),
+      component: () => import('@/views/matchCenter/linelist.vue'),
       name: 'LineList',
       meta: {
-        activeMenu: '/setcenter/linelist',
+        activeMenu: '/matchCenter/linelist',
         title: 'lineList',
         icon: '',
         noCache: false,
@@ -26,4 +26,4 @@ const setcenterRouter: RouteConfig = {
       }
     }]
 }
-export default setcenterRouter
+export default matchCenterRouter

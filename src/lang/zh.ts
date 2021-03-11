@@ -185,7 +185,7 @@ export default {
     driverClond: '司机云',
     selfDriverTag: '自承运司机标签',
     marketClue: '待市场分配线索',
-    setcenterTitle: '撮合中心',
+    matchCenterTitle: '撮合中心',
     lineList: '线路列表'
   },
   navbar: {
