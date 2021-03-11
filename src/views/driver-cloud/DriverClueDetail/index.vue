@@ -239,7 +239,7 @@
       :list-query="form"
       @fresh="getDriverClueDetail"
     />
-    <LogList ref="logs" />
+    <log-list ref="logs" />
   </div>
 </template>
 <script lang="ts">
