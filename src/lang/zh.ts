@@ -186,6 +186,7 @@ export default {
     selfDriverTag: '自承运司机标签',
     marketClue: '待市场分配线索',
     matchCenterTitle: '撮合中心',
+    customerInvite: '客邀列表',
     lineList: '线路列表'
   },
   navbar: {
