@@ -15,7 +15,7 @@
         class="p15 SuggestForm"
         :pc-col="6"
       >
-        <template slot="status">
+        <template slot="customerStatus">
           <el-badge
             v-for="item in btns"
             :key="item.text"
@@ -23,9 +23,9 @@
             <el-button
               type="primary"
               margin-right="20px"
-              :plain="item.name !== listQuery.status"
+              :plain="item.name !== listQuery.customerStatus"
               @click="() => {
-                listQuery.status = item.name
+                listQuery.customerStatus = item.name
                 handleFilterClick()
               }"
             >
@@ -33,7 +33,70 @@
             </el-button>
           </el-badge>
         </template>
+        <div
+          slot="mulBtn"
+          :class="isPC ? 'btnPc' : 'mobile'"
+        >
+          <div>
+            <el-button>
+              批量发起客邀
+            </el-button>
+            <el-button>
+              批量取消客邀
+            </el-button>
+          </div>
+          <el-button
+            type="primary"
+            :class="isPC ? '' : 'btnMobile'"
+            @click="handleFilterClick"
+          >
+            查询
+          </el-button>
+          <el-button
+            :class="isPC ? '' : 'btnMobile'"
+            @click="handleResetClick"
+          >
+            重置
+          </el-button>
+        </div>
       </self-form>
+      <div class="table_box">
+        <div class="middle" />
+        <self-table
+          ref="RefundForm"
+          :index="listQuery.status === '3'"
+          :is-p30="false"
+          :operation-list="[]"
+          :table-data="tableData"
+          :columns="columns"
+          row-key="id"
+          :page="page"
+          @onPageSize="handlePageSize"
+          @selection-change="handleSelectionChange"
+        >
+          <template v-slot:op="scope">
+            <el-button
+              type="text"
+              size="small"
+              @click="handleClick(scope.row)"
+            >
+              发起客邀
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+            >
+              取消客邀
+            </el-button>
+            <el-button
+              type="text"
+              size="small"
+            >
+              查看详情
+            </el-button>
+          </template>
+        </self-table>
+      </div>
     </div>
   </div>
 </template>
@@ -60,6 +123,8 @@ interface IState {
 })
 export default class extends Vue {
   private listLoading:boolean = false;
+  private multipleSelection: any[] = []
+  private tableData:any[] = [];
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -163,11 +228,88 @@ export default class extends Vue {
         placeholder: '请选择',
         clearable: true
       }
+    },
+    {
+      col: 14,
+      label: '客邀状态',
+      type: 'customerStatus',
+      slot: true
+    },
+    {
+      type: 'mulBtn',
+      col: 10,
+      slot: true,
+      w: '0px'
     }
+  ]
+  private btns:any[] = [
+    {
+      name: '',
+      text: '全部'
+    },
+    {
+      name: '1',
+      text: '未发起客邀'
+    },
+    {
+      name: '3',
+      text: '已发起客邀'
+    },
+    {
+      name: '4',
+      text: '客邀成功'
+    },
+    {
+      name: '2',
+      text: '司推成功'
+    },
+    {
+      name: '5',
+      text: '无法发起客邀'
+    }
+  ]
+  private columns:any[] = [
+
   ]
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
+  }
+  private page :PageObj= {
+    page: 1,
+    limit: 30,
+    total: 0
+  }
+  // 分页
+  handlePageSize(page:PageObj) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+  }
+  handleSelectionChange(val:any) {
+    // console.log(val)
+    this.multipleSelection = val
+  }
+  // 查询
+  handleFilterClick() {
+  }
+  // 重置
+  handleResetClick() {
+    this.listQuery = {
+      workCity: [],
+      carType: '',
+      lineFineness: '',
+      handlingDifficulty: '',
+      freightSection: '',
+      workTime: [],
+      warehouseLocation: '',
+      distributionArea: '',
+      stabilityTemporary: '',
+      lineName: '',
+      Status: ''
+    }
+  }
+  // 发起客邀
+  private handleClick(row:IState) {
   }
 }
 </script>
@@ -178,6 +320,7 @@ export default class extends Vue {
       display: flex;
       align-items: center;
     }
+    min-width: 860px;
   .SuggestForm {
       width: 100%;
       background: #fff;
@@ -185,6 +328,25 @@ export default class extends Vue {
       margin-left:0px!important;
       margin-right:0px!important;
       box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+    }
+    .el-button{
+      margin-right: 8px;
+    }
+    .btnPc{
+       width: 100%;
+       padding: 0 10px;
+       display: flex;
+       flex-flow: row nowrap;
+       justify-content: flex-end;
+    }
+    .mobile {
+      width:100%;
+      text-align: center;
+      .btnMobile {
+        margin-left: 0;
+        margin-top: 10px;
+        width:80%;
+      }
     }
     .table_box {
       padding: 0px 20px 20px 20px;
