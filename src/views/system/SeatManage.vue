@@ -356,6 +356,16 @@ export default class extends Vue {
       'min-width': '140px'
     },
     {
+      key: 'busiType',
+      label: '所属业务线',
+      'min-width': '140px'
+    },
+    {
+      key: 'cityName',
+      label: '所属城市',
+      'min-width': '140px'
+    },
+    {
       key: 'userName',
       label: '姓名',
       'min-width': '140px'
