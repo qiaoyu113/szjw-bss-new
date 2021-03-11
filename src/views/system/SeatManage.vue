@@ -58,7 +58,7 @@
       @onPageSize="handlePageSize"
     >
       <template v-slot:op="scope">
-        <div v-if="scope.row.userName">
+        <div v-if="scope.row.status === 1">
           <el-button
             v-permission="['/v3/base/agent/change']"
             type="text"
@@ -346,7 +346,7 @@ export default class extends Vue {
     value: 1
   }, {
     label: '未绑定',
-    value: 0
+    value: 2
   }]
   // 渲染表格的列表
   private columns:ColumnsObj[] = [
