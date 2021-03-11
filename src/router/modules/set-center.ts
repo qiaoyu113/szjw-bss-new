@@ -24,6 +24,18 @@ const setcenterRouter: RouteConfig = {
         noCache: false,
         apiUrl: 'root'
       }
-    }]
+    },
+    {
+      path: 'customerInvite',
+      component: () => import( '@/views/set-center/CustomerInvite.vue'),
+      name: 'customerInvite',
+      meta: {
+        apiUrl: 'root',
+        hidden: false,
+        title: 'customerInvite',
+        noCache: false
+      }
+    }
+  ]
 }
 export default setcenterRouter
