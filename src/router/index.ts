@@ -21,7 +21,7 @@ import customerFreight from './modules/customer-freight'
 import freightRouter from './modules/freight'
 import driverAccountRouter from './modules/driver-account'
 import driverCloudRouter from './modules/driver-cloud'
-import setcenterRouter from './modules/set-center'
+import matchCenterRouter from './modules/match-center'
 // import customerRouter from './modules/customer'
 
 Vue.use(Router)
@@ -241,7 +241,7 @@ export const asyncRoutes: RouteConfig[] = [
   // 司机云
   driverCloudRouter,
   // 撮合中心
-  setcenterRouter,
+  matchCenterRouter,
   // 系统管理
   systemRouter,
   {
