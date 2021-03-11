@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-03-11 14:55:26
+ * @LastEditTime: 2021-03-11 15:18:35
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \szjw_bss_web\src\router\modules\set-center.ts
+ */
 import { RouteConfig } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
@@ -21,6 +29,16 @@ const setcenterRouter: RouteConfig = {
         activeMenu: '/setcenter/linelist',
         title: 'lineList',
         icon: '',
+        noCache: false,
+        apiUrl: 'root'
+      }
+    },
+    {
+      path: 'driverMatch', /* 司推列表 */
+      component: () => import('@/views/set-center/driverMatch.vue'),
+      name: 'DriverMatch',
+      meta: {
+        title: 'driverMatch',
         noCache: false,
         apiUrl: 'root'
       }
