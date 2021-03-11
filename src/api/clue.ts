@@ -1,6 +1,6 @@
 import request from '@/utils/request'
-// const prefix = '/base'
-  let prefix = '/mock/81'
+const prefix = '/base'
+// let prefix = '/mock/81'
 // 获取客群细分列表
 export const getClueUserGroupList = (params: any) =>
   request({
@@ -300,4 +300,3 @@ export const GetLaunchPlatformList = () =>
     url: `${baseUrl}/v2/clue/campaign/getLaunchPlatformList`,
     method: 'get'
   })
-  

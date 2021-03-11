@@ -384,6 +384,7 @@ export default class extends Vue {
     }
   ]
   private changeSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
     seatNumber: '', // 绑定人坐席号
     changeName: '', // 更改后的绑定人
@@ -392,6 +393,7 @@ export default class extends Vue {
   }
   // 新建绑定
   private newSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
     seatNumber: '' // 绑定人坐席号
   }
