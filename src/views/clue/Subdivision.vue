@@ -76,7 +76,7 @@
         :operation-list="[]"
         :table-data="tableData"
         :columns="tableColumns"
-        :index="true"
+        :index="false"
         :page="page"
         row-key="marketClueId"
         style="overflow: initial;"
@@ -88,6 +88,7 @@
     </div>
     <!--新建客群-->
     <el-dialog
+      v-loading="loadingDialog"
       title="新建客群"
       :visible.sync="dialogFormVisible"
       :close-on-click-modal="false"
@@ -110,8 +111,8 @@
             <el-option
               v-for="(sub,index) in busiTypeArr"
               :key="'select-'+sub.value+'-'+index"
-              :label="sub.label"
-              :value="sub.value"
+              :label="sub.dutyName"
+              :value="sub.id"
             />
           </el-select>
         </el-form-item>
@@ -122,6 +123,8 @@
           <el-col :span="16">
             <el-input
               v-model="addForm.type"
+              maxlength="20"
+              show-word-limit
             />
           </el-col>
         </el-form-item>
@@ -132,6 +135,8 @@
           <el-col :span="16">
             <el-input
               v-model="addForm.portraitLabel"
+              maxlength="20"
+              show-word-limit
             />
           </el-col>
         </el-form-item>
@@ -144,23 +149,7 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="(sub,index) in distributionTypeArr"
-              :key="'select-'+sub.value+'-'+index"
-              :label="sub.label"
-              :value="sub.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item
-          label="分配机制管理员"
-          prop="distributionManageId"
-        >
-          <el-select
-            v-model="addForm.distributionManageId"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="(sub,index) in distributionManageArr"
+              v-for="(sub,index) in distributionTypeArrFrom"
               :key="'select-'+sub.value+'-'+index"
               :label="sub.label"
               :value="sub.value"
@@ -173,7 +162,7 @@
         >
           <el-col :span="16">
             <el-input
-              v-model="addForm.inviteWord"
+              v-model="addForm.invitation"
               type="textarea"
               maxlength="300"
               show-word-limit
@@ -186,7 +175,7 @@
         >
           <el-col :span="16">
             <el-input
-              v-model="addForm.interviewWord"
+              v-model="addForm.interview"
               type="textarea"
               maxlength="300"
               show-word-limit
@@ -228,11 +217,13 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import { HandlePages, lock, showWork } from '@/utils/index'
-import { getClueUserGroupList } from '@/api/clue'
+import { HandlePages, lock } from '@/utils/index'
+import { getClueUserGroupList, UserGroupCreate, UserGroupExport } from '@/api/clue'
+import { GetDutyListByLevel, GetDictionaryList } from '@/api/common'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import { exportFileTip } from '@/utils/exportTip'
 
 interface IState {
   [key: string]: any;
@@ -280,10 +271,11 @@ export default class extends Vue {
     time: [],
     type: ''
   };
-  private showDialog: boolean = false;
+  private loadingDialog: boolean = false;
   private tableData: any = [];
   private busiTypeArr: any = [];
   private distributionTypeArr: any = [];
+  private distributionTypeArrFrom: any = [];
   private distributionManageArr: any = [];
 
   private hasCarList: IState[] = [
@@ -323,9 +315,6 @@ export default class extends Vue {
     ],
     distributionType: [
       { required: true, message: '请选择分配机制', trigger: 'change' }
-    ],
-    distributionManageId: [
-      { required: true, message: '请选择分配机制管理员', trigger: 'change' }
     ]
   }
   // 表单addForm
@@ -334,9 +323,8 @@ export default class extends Vue {
     type: '',
     portraitLabel: '',
     distributionType: '',
-    distributionManageId: '',
-    inviteWord: '',
-    interviewWord: '',
+    invitation: '',
+    interview: '',
     remark: ''
   }
   /**
@@ -383,7 +371,7 @@ export default class extends Vue {
         clearable: true
       },
       rules: ['root'],
-      options: this.hasCarList
+      options: this.distributionTypeArr
     },
     {
       type: 3,
@@ -494,6 +482,35 @@ export default class extends Vue {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
     })
   }
+  // 获取业务线
+  private async getDutyListByLevel() {
+    try {
+      let params = {
+        dutyLevel: 1
+      }
+      let { data: res } = await GetDutyListByLevel(params)
+      if (res.success) {
+        this.busiTypeArr = res.data
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get duty list fail:${err}`)
+    }
+  }
+  // 获取字典
+  private async getDictionary() {
+    const { data } = await GetDictionaryList(['allocation_type'])
+    if (data.success) {
+      this.distributionTypeArrFrom = data.data.allocation_type.map((item:any) => ({
+        label: item.dictLabel,
+        value: item.dictValue
+      }))
+      this.distributionTypeArr.push({ label: '全部', value: '' }, ...this.distributionTypeArrFrom)
+    } else {
+      this.$message.error(data)
+    }
+  }
   // 查询
   private handleFilterClick() {
     // (this.$refs.PublicClueTable as any).toggleRowSelection()
@@ -522,7 +539,35 @@ export default class extends Vue {
 
   // 导出文件
   _exportFile() {
-    // exportFileTip(this, this.)
+    exportFileTip(this, this.handleExportClick)
+  }
+
+  // 导出
+  @lock
+  private async handleExportClick(sucFun:Function) {
+    try {
+      let params: IState = {
+        page: this.page.page,
+        limit: this.page.limit,
+        clueType: this.listQuery.clueType,
+        distributionType: this.listQuery.distributionType,
+        portraitLabel: this.listQuery.portraitLabel,
+        startDate: this.listQuery.time[0],
+        endDate: this.listQuery.time[1],
+        type: this.listQuery.type
+      }
+      const { data } = await UserGroupExport(params)
+      if (data.success) {
+        sucFun()
+        this.$message.success('导出成功')
+      } else {
+        this.$message.error(data.errorMsg || data.message)
+      }
+    } catch (err) {
+      console.log(`export fail:${err}`)
+    } finally {
+      console.log(`export finish`)
+    }
   }
 
   // 获取列表
@@ -564,9 +609,23 @@ export default class extends Vue {
 
   // 确认新增
   addCustomers(formName: any) {
-    (this.$refs[formName] as any).validate((valid: any) => {
+    (this.$refs[formName] as any).validate(async(valid: any) => {
       if (valid) {
-        console.log(this.addForm)
+        this.loadingDialog = true
+        let { data: res } = await UserGroupCreate(this.addForm)
+        if (res.success) {
+          this.$message({
+            message: '创建成功!',
+            type: 'success'
+          })
+          this.loadingDialog = false
+          this.dialogFormVisible = false
+          setTimeout(() => {
+            this.getLists()
+          }, 1000)
+        } else {
+          this.$message.error(res.errorMsg)
+        }
       } else {
         console.log('error submit!!')
         return false
@@ -582,6 +641,8 @@ export default class extends Vue {
 
   mounted() {
     this.getLists()
+    this.getDictionary()
+    this.getDutyListByLevel()
   }
 }
 </script>
