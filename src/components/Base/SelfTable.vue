@@ -37,12 +37,23 @@
       <el-table-column
         v-for="item in columns"
         :key="item.key"
+        :prop="item.key"
         :align="item.align || 'center'"
         :min-width="item.width || 100"
         :label="item.label"
         :fixed="item.fixed"
         v-bind="item.attrs"
       >
+        <template
+          v-if="item.header && item.slot"
+          slot="header"
+        >
+          <slot
+            v-if="item.slot && item.header"
+            :name="item.key"
+            :header="true"
+          />
+        </template>
         <template
           slot-scope="scope"
         >
@@ -81,6 +92,7 @@
               v-if="item.slot"
               :name="item.key"
               :row="scope.row"
+              :index="scope.$index"
             />
             <template v-else>
               {{ scope.row[item.key] | DataIsNull }}

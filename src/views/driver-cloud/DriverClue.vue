@@ -449,6 +449,32 @@ export default class extends Vue {
       key: 'createTime'
     },
     {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        multiple: true,
+        'collapse-tags': true
+      },
+      label: '是否邀约成功',
+      key: 'isInvite',
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '是',
+          value: true
+        },
+        {
+          label: '否',
+          value: false
+        }
+      ]
+    },
+    {
       type: 'status',
       col: 24,
       slot: true,
