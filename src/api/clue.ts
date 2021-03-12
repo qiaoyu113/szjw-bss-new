@@ -2,9 +2,10 @@ import request from '@/utils/request'
 // const prefix = '/line'
 const prefix = '/mock/81'
 // 待分配线索 梧桐线索列表
+const mx = '/carrier_center'
 export const GetToAllotWT = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getToAllotWTClueList`,
+    url: `${mx}/v2/market-clue/getClueWSXPrivateSeaPoolList`,
     method: 'post',
     data
   })
@@ -12,7 +13,10 @@ export const GetToAllotWT = (data: any) =>
 // 待分配线索 雷鸟车池线索列表
 export const GetToAllotLNCarPool = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getToAllotLNCarPoolClueList` })
+    url: `${mx}/v2/market-clue/getToAllotLNCarPoolClueList`,
+    data,
+    method: 'post'
+  })
 // const prefix = '/base'
   // let prefix = '/mock/81'
 // 获取客群细分列表
@@ -166,7 +170,7 @@ export const EditCampaignData = (data: any) =>
 // 待分配线索 雷鸟租赁线索列表
 export const GetToAllotLNLease = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getToAllotLNLeaseClueList`,
+    url: `${mx}/v2/market-clue/getToAllotLNLeaseClueList`,
     data,
     method: 'post'
 
@@ -234,14 +238,14 @@ export const GetClueWSXPrivateSeaPoolList = (data: any) =>
 // 私海池线索 雷鸟车池线索列表
 export const GetClueLCXPrivateSeaPoolList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueLCXPrivateSeaPoolList`,
+    url: `/carrier_center/v2/market-clue/getClueLZXPrivateSeaPoolList`,
     method: 'post',
     data
   })
 // 私海池线索 雷鸟租赁线索列表
 export const GetClueLZXPrivateSeaPoolList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueLZXPrivateSeaPoolList`,
+    url: `/carrier_center/v2/market-clue/getToAllotLNLeaseClueList`,
     method: 'post',
     data
   })

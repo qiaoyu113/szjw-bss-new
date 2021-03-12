@@ -74,6 +74,7 @@
         :default-sort="{prop: 'createDate', order: 'descending'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
+        @sort-change="sortDate"
       >
         <template v-slot:num="scope">
           <template v-if="scope.header">
@@ -135,6 +136,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { delayTime } from '@/settings'
+import { forIn } from 'lodash'
 // import { marketClue } from '@/api/driver-cloud'
 
 interface IState {
@@ -175,11 +177,11 @@ export default class extends Vue {
     hasCar: '', // 是否有车
     name: '', // 姓名
     phone: '', // 手机号
-    sourceChannel: '', // 来源渠道
+    sourceChannel: [], // 来源渠道
     carCity: '', // 车辆所在城市
     demandType: '', // 需求类型
-    carType: '', // 车型
-    intentModel: '', // 意向车型
+    carType: [], // 车型
+    intentModel: [], // 意向车型
     createTime: '' // 开始时间
   };
   private tableData: any[] = [];
@@ -274,7 +276,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
       rules: [3, 4],
       options: this.carTypeOptions
@@ -298,7 +302,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
       rules: [2],
       options: this.carTypeOptions
@@ -350,7 +356,8 @@ export default class extends Vue {
         placeholder: '请选择',
         filterable: true,
         clearable: true,
-        multiple: true
+        multiple: true,
+        collapseTags: true
       },
       rules: ['root'],
       options: this.sourceOptions
@@ -484,6 +491,19 @@ export default class extends Vue {
   private dialogListQuery:IState = {
     followerId: []
   };
+  sortDate({ order }:any) {
+    let isSort = false
+    if (order) {
+      order = order === 'ascending' ? 'asc' : 'desc'
+      this.listQuery.sort = order
+      isSort = true
+    } else {
+      this.listQuery.sort = undefined
+    }
+    // this.getList(order)
+    console.log(order)
+    this.getLists(isSort)
+  }
   private validateFollow(rule:any, value:any, callback:Function) {
     if (value === '') {
       callback(new Error('请选择跟进人!'))
@@ -554,7 +574,6 @@ export default class extends Vue {
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
         this.carTypeOptions.push(...carTypeOptions)
-        debugger
         console.log(clueType)
         this.clueArr.push(...clueType)
         this.listQuery.clueType = clueType[0].value
@@ -579,7 +598,6 @@ export default class extends Vue {
           },
           ...demand
         ])
-
         this.getLists()
       } else {
         this.$message.error(res.errorMsg)
@@ -616,34 +634,50 @@ export default class extends Vue {
   _exportFile() {
     // exportFileTip(this, this.)
   }
-
+  getQueryparams() {
+    let params: IState = {
+      clueType: this.listQuery.clueType,
+      page: this.page.page,
+      limit: this.page.limit
+    }
+    this.formItem.map((item: any) => {
+      if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
+        if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
+          params.cityCode = this.listQuery.cityCode[1]
+        } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
+          params.carCity = this.listQuery.carCity[1]
+        } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
+          let createDateStart = new Date(this.listQuery.createTime[0])
+          let createDateEnd = new Date(this.listQuery.createTime[1])
+          params.startDate = createDateStart.setHours(0, 0, 0) || undefined
+          params.endDate = createDateEnd.setHours(23, 59, 59, 999) || undefined
+        } else {
+          this.listQuery[item.key] !== '' && (params[item.key] = this.listQuery[item.key])
+        }
+      }
+      return item
+    })
+    const { sourceChannel, carType, intentModel } = this.listQuery
+    params.sourceChannel = Array.isArray(sourceChannel) && sourceChannel.join(',')
+    params.carType = Array.isArray(carType) && carType.join(',')
+    params.intentModel = Array.isArray(intentModel) && intentModel.join(',')
+    for (const key in params) {
+      if (Object.prototype.hasOwnProperty.call(params, key)) {
+        (params[key] === '' || params[key] === undefined) && delete params[key]
+      }
+    }
+    if (this.listQuery.sort) {
+      params.sort = this.listQuery.sort
+    }
+    return params
+  }
   // 获取列表
   @lock
-  private async getLists() {
+  private async getLists(isSort = false) {
     try {
       this.listLoading = true
-      let params: IState = {
-        clueType: this.listQuery.clueType,
-        page: this.page.page,
-        limit: this.page.limit
-      }
-      this.formItem.map((item: any) => {
-        if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
-          if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
-            params.cityCode = this.listQuery.cityCode[1]
-          } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
-            params.carCity = this.listQuery.carCity[1]
-          } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
-            let createDateStart = new Date(this.listQuery.createTime[0])
-            let createDateEnd = new Date(this.listQuery.createTime[1])
-            params.startDate = createDateStart.setHours(0, 0, 0) || undefined
-            params.endDate = createDateEnd.setHours(23, 59, 59, 999) || undefined
-          } else {
-            this.listQuery[item.key] !== '' && (params[item.key] = this.listQuery[item.key])
-          }
-        }
-        return item
-      })
+      const params = this.getQueryparams()
+
       const submitForm = this.clueArr.find((item: any) => {
         return item.value === this.listQuery.clueType
       }) || {}

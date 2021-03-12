@@ -108,7 +108,7 @@
           <el-checkbox-group
             v-model="listQuery.toDo"
             size="small"
-            @change="handleFilterClick"
+            @change="handleFilterClick(true)"
           >
             <el-checkbox-button :label="true">
               代办事项
@@ -120,7 +120,7 @@
           placeholder="排序方式"
           size="small"
           clearable
-          @change="handleFilterClick"
+          @change="sortClick"
         >
           <el-option
             v-for="item in sortOptions"
@@ -291,7 +291,7 @@ import { GetDictionaryList, GetSpecifiedRoleList,
 } from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
-import { join } from 'lodash'
+import { deburr, keys } from 'lodash'
 
 interface IState {
   [key: string]: any;
@@ -335,7 +335,7 @@ export default class extends Vue {
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
     followerId: [], // 跟进人
-    sourceChannel: '', // 渠道
+    sourceChannel: [], // 渠道
     clueAttribution: '', // 线索归属
     inviteStatus: '', // 邀约情况
     intentDegree: '', // 意向度
@@ -936,15 +936,21 @@ export default class extends Vue {
     })
   }
   // 查询
-  private handleFilterClick() {
+  private handleFilterClick(istrue = false) {
     (this.$refs.PrivateClueTable as any).toggleRowSelection()
     this.page.page = 1
-    this.getLists()
+    if (istrue === true) {
+      this.handleResetClick({})
+    }
+    this.getLists(istrue === true)
+  }
+  private sortClick() {
+    this.getLists(this.listQuery.toDo)
   }
   // 重置
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
-    this.getLists()
+    // this.getLists()
   }
   // 批量分配
   private handleallAllotClick() {
@@ -971,6 +977,7 @@ export default class extends Vue {
       page: this.page.page,
       limit: this.page.limit
     }
+    params.sort = this.listQuery.sort
     if (this.listQuery.toDo) {
       params.toDo = +this.listQuery.toDo
       delete params.followerId
@@ -994,26 +1001,33 @@ export default class extends Vue {
       }
       return item
     })
-    // params.carType = params.carType.join(',')
     params.onlyMe = params.onlyMe ? 1 : 0
-    console.log(params.followerId)
-    params.carType = Array.isArray(params.carType) && params.carType.join(',')
-    params.followerId = Array.isArray(params.followerId) && params.followerId.join(',')
-    params.inviteFailReason = Array.isArray(params.inviteFailReason) && params.inviteFailReason.join(',')
-    params.sort === '' && delete params.sort // 没有排序规则
-    console.log(params, '----')
+    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.join(',')
+    params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.join(',')
+    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.join(',')
+    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.join(',')
+
+    for (const key in params) {
+      if (Object.prototype.hasOwnProperty.call(params, key)) {
+        (params[key] === '' || params[key] === undefined) && delete params[key]
+      }
+    }
+
     return params
   }
   // 获取列表
   @lock
-  private async getLists() {
+  private async getLists(isTodo = false) {
+    console.log(isTodo)
     try {
       this.listLoading = true
-
       const submitForm = this.clueArr.find((item: any) => {
         return item.value === this.listQuery.clueType
       }) || {}
       if (!submitForm.searchUrl) return
+      if (!isTodo) {
+        this.listQuery.toDo = false
+      }
       let params = this.getParams() // 获取参数
       // return
       let { data: res } = await submitForm.searchUrl(params)
@@ -1035,9 +1049,6 @@ export default class extends Vue {
   // 获取跟进人列表
   async getGmOptions(cityCode:number, groupId:any) {
     try {
-      // if (this.followerListOptions.length > 0) {
-      //   return false
-      // }
       let params:any = {
         roleTypes: [1, 4],
         uri: '/v2/clueH5/list/queryFollowerList',
@@ -1287,7 +1298,6 @@ export default class extends Vue {
     }
   }
   // 获取城市下的加盟小组
-  // getGroupInfoByCityCodeAndProductLine
   async getGroup(cityCode:string) {
     let code = this.listQuery.clueType
     try {
@@ -1324,21 +1334,13 @@ export default class extends Vue {
       this.getGmOptions(value[1], '')
     }
   }
-  // @Watch('this.listQuery.haveCar')
-  // private gmChange(value:any) {
-  //   this.getGmOptions(value)
-  // }
-  // @Watch('this.listQuery.gmGroupId')
   private gmChanges(value:any) {
-    // this.listQuery.haveCar = []
     this.listQuery.followerId.splice(0)
     this.followerListOptions.splice(0)
-    // console.log(this.listQuery.cityCode)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
   mounted() {
     this.getBaseInfo()
-    // this.getGmOptions()
   }
 }
 </script>
