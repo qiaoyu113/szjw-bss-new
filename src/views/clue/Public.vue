@@ -349,7 +349,8 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true
       },
       rules: ['root'],
       options: this.sourceOptions

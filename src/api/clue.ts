@@ -225,7 +225,9 @@ export const UpdateFollowerByHighSeas = (data: any) =>
 // 私海池线索 梧桐线索列表
 export const GetClueWSXPrivateSeaPoolList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/getClueWSXPrivateSeaPoolList`,
+    // url: `${prefix}/v2/market-clue/getClueWSXPrivateSeaPoolList`,
+    url: `/carrier_center/v2/market-clue/getClueWSXPrivateSeaPoolList`,
+
     method: 'post',
     data
   })

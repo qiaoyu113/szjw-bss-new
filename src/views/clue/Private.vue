@@ -3,8 +3,7 @@
     v-loading="listLoading"
     class="PrivateClue"
     :class="{
-      p15: isPC,
-      PublicClue: true
+      p15: isPC
     }"
   >
     <self-form
@@ -186,7 +185,6 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
-            @click="callPhone(scope.row)"
           >
             打电话
           </el-button>
@@ -276,13 +274,6 @@
         </el-link>
       </div>
     </SelfDialog>
-    <!-- phoneInfo.status -->
-    <CallPhone
-      :show-dialog.sync="hasCallPhone"
-      :clue-status="1"
-      :phone="phoneInfo.phone"
-      :clue-id="phoneInfo.clueId"
-    />
   </div>
 </template>
 
@@ -291,25 +282,20 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
 import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
-import { today, yesterday, sevenday, thirtyday, month, lastmonth, threemonth } from '@/views/driver-freight/components/date'
+import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList, GetSpecifiedRoleList } from '@/api/common'
+import { GetDictionaryList, GetSpecifiedRoleList,
+  getGroupInfoByCityCodeAndProductLine
+} from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
-import { marketClue, allocationClue } from '@/api/driver-cloud'
-import {
-  CallPhone
-} from './components/index'
+import { join } from 'lodash'
+
 interface IState {
   [key: string]: any;
 }
-// import {
-//   today,
-//   yesterday,
-//
-// } from '../driver-freight/components/date'
 interface PageObj {
   page: number;
   limit: number;
@@ -324,43 +310,43 @@ interface formItem {
   tagAttrs?: object;
   listeners?: object;
   options?: IState[];
-  slot?: boolean;
-  w?: string;
+  slot?:boolean,
+  w?:string
 }
 @Component({
   name: 'PrivateClue',
   components: {
     SelfTable,
     SelfForm,
-    SelfDialog,
-    CallPhone
+    SelfDialog
   }
 })
 export default class extends Vue {
-  times: number = 10;
+  times:number = 10;
   private listLoading: boolean = false;
   private toDoValue: number = 0;
-  private clueArr: IState[] = []
+  private gmGroupList = [{ label: '全部', value: '' }] // 加盟小组
   private listQuery: IState = {
-    carType: '', // 车型
     cityCode: '', // 所属城市
     carCity: '', // 车辆所在城市
     name: '', // 姓名
     phone: '', // 手机号
     hasCar: '', // 是否有车
+    carType: [], // 车型
     gmGroupId: '', // 加盟小组
-    followerId: '', // 跟进人
+    followerId: [], // 跟进人
     sourceChannel: '', // 渠道
     clueAttribution: '', // 线索归属
     inviteStatus: '', // 邀约情况
     intentDegree: '', // 意向度
-    inviteFailReason: '', // 邀约失败原因
+    inviteFailReason: [], // 邀约失败原因
     notFollowDay: '', // 未跟进天数
     onlyMe: false, // 只看自己
     status: '', // 状态
     toDo: false, // 代办事项
     sort: '', // 排序方式
-    clueType: 0
+    clueType: 0,
+    createTime: ''
   };
   private tableData: any[] = [];
   // options
@@ -369,20 +355,6 @@ export default class extends Vue {
     { label: '有', value: 1 },
     { label: '无', value: 0 }
   ];
-  private hasCallPhone:Boolean = false
-  private phoneInfo = {
-    status: '',
-    phone: '',
-    clueId: ''
-  }
-  callPhone({ phone, status, clueId }:any) {
-    this.phoneInfo = {
-      status,
-      phone,
-      clueId
-    }
-    this.hasCallPhone = true
-  }
   private sortOptions: IState[] = [
     { label: '按照未跟进天数倒序', value: 'notFollowDay:desc' },
     { label: '按照未跟进天数正序', value: 'notFollowDay:asc' },
@@ -398,7 +370,7 @@ export default class extends Vue {
   private carTypeOptions: any[] = [] // 车型
   private followTypeOptins: any[] = [] // 跟进情况
   private inviteFailReasonOptions: any[] = [] // 邀约失败原因
-  // private clueArr:IState[] = []
+  private clueArr:IState[] = []
   private page: PageObj = {
     page: 1,
     limit: 30,
@@ -410,7 +382,7 @@ export default class extends Vue {
     sevenday,
     thirtyday
   ]
-  private btns: any[] = [
+  private btns:any[] = [
     {
       name: '',
       text: '全部',
@@ -446,7 +418,11 @@ export default class extends Vue {
       text: '已成交',
       num: 0
     }
-  ];
+  ]
+  /**
+   * rules: []
+   * root 为全局显示
+   * */
   private formItem: formItem[] = [
     {
       type: 'tabGroup',
@@ -513,7 +489,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        'collapse-tags': true
       },
       rules: [3, 4],
       options: this.carTypeOptions
@@ -537,10 +515,12 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
       rules: [2],
-      options: this.hasCarList
+      options: this.carTypeOptions
     },
     {
       type: 1,
@@ -583,6 +563,20 @@ export default class extends Vue {
     },
     {
       type: 2,
+      label: '车型',
+      key: 'carType',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true,
+        multiple: true,
+        collapseTags: true
+      },
+      rules: [0, 1],
+      options: this.carTypeOptions
+    },
+    {
+      type: 2,
       label: '小组',
       key: 'haveCar',
       tagAttrs: {
@@ -591,7 +585,7 @@ export default class extends Vue {
         clearable: true
       },
       rules: [2, 3, 4],
-      options: this.hasCarList
+      options: this.gmGroupList
     },
     {
       type: 2,
@@ -602,8 +596,11 @@ export default class extends Vue {
         filterable: true,
         clearable: true
       },
+      listeners: {
+        change: this.gmChanges
+      },
       rules: [0, 1],
-      options: this.hasCarList
+      options: this.gmGroupList
     },
     {
       type: 2,
@@ -612,8 +609,11 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
+
       rules: ['root'],
       options: this.followerListOptions
     },
@@ -624,7 +624,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
       rules: ['root'],
       options: this.sourceOptions
@@ -672,7 +674,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true
+        clearable: true,
+        multiple: true,
+        collapseTags: true
       },
       rules: [0, 1],
       options: this.inviteFailReasonOptions
@@ -949,10 +953,6 @@ export default class extends Vue {
     // this.rowData.push(...this.multipleSelection)
   }
 
-  // private handleSelectionChange(val: any) {
-  //   this.multipleSelection = val
-  // }
-
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -971,10 +971,16 @@ export default class extends Vue {
       page: this.page.page,
       limit: this.page.limit
     }
+    if (this.listQuery.toDo) {
+      params.toDo = +this.listQuery.toDo
+      delete params.followerId
+      delete params.clueType
+      return params
+    }
     this.formItem.map((item: any) => {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
         if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
-          params.cityCode = this.listQuery.cityCode[1]
+          params.cityCode = this.listQuery.cityCode[1] || ''
         } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
           params.carCity = this.listQuery.carCity[1]
         } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
@@ -988,8 +994,14 @@ export default class extends Vue {
       }
       return item
     })
-    this.listQuery.toDo && (params.toDo = this.listQuery.toDo)
-    this.listQuery.sort && (params.sort = this.listQuery.sort)
+    // params.carType = params.carType.join(',')
+    params.onlyMe = params.onlyMe ? 1 : 0
+    console.log(params.followerId)
+    params.carType = Array.isArray(params.carType) && params.carType.join(',')
+    params.followerId = Array.isArray(params.followerId) && params.followerId.join(',')
+    params.inviteFailReason = Array.isArray(params.inviteFailReason) && params.inviteFailReason.join(',')
+    params.sort === '' && delete params.sort // 没有排序规则
+    console.log(params, '----')
     return params
   }
   // 获取列表
@@ -1003,17 +1015,13 @@ export default class extends Vue {
       }) || {}
       if (!submitForm.searchUrl) return
       let params = this.getParams() // 获取参数
+      // return
       let { data: res } = await submitForm.searchUrl(params)
       if (res.success) {
         // eslint-disable-next-line
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
-        this.btns.forEach((item) => {
-          let key = item.name
-          key = +key
-          item.num = res.title[key]
-        })
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -1025,20 +1033,22 @@ export default class extends Vue {
     }
   }
   // 获取跟进人列表
-  async getGmOptions() {
+  async getGmOptions(cityCode:number, groupId:any) {
     try {
-      if (this.followerListOptions.length > 0) {
-        return false
-      }
+      // if (this.followerListOptions.length > 0) {
+      //   return false
+      // }
       let params:any = {
         roleTypes: [1, 4],
-        uri: '/v2/clueH5/list/queryFollowerList'
+        uri: '/v2/clueH5/list/queryFollowerList',
+        groupId,
+        cityCode
       }
       this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
       if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
         params.cityCode = this.listQuery.workCity[1]
       }
-
+      // this.followerListOptions.splice(0)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
         let arr = res.data.map(function(item: any) {
@@ -1276,16 +1286,66 @@ export default class extends Vue {
       this.$message.error(data.errorMsg)
     }
   }
+  // 获取城市下的加盟小组
+  // getGroupInfoByCityCodeAndProductLine
+  async getGroup(cityCode:string) {
+    let code = this.listQuery.clueType
+    try {
+      const { data } = await getGroupInfoByCityCodeAndProductLine({
+        busiLine: [code].toString(),
+        cityCode: cityCode
+      })
+      console.log(data)
+      // this.
+      this.gmGroupList.splice(1)
+      console.log(this.gmGroupList)
+      if (data.success) {
+        let arr = data.data.map((item:any) => {
+          const { id: value, name: label } = item
+          return {
+            value, label
+          }
+        })
+        this.gmGroupList.push(...arr)
+      }
+    } catch (error) {
+      return error
+    }
+  }
+  @Watch('listQuery.cityCode')
+  private cityChange(value:any) {
+    this.listQuery.gmGroupId = ''
+    this.listQuery.haveCar = ''
+    this.gmGroupList.splice(1)
+    this.listQuery.followerId.splice(0)
+    this.followerListOptions.splice(0)
+    if (value[1]) {
+      this.getGroup(value[1])
+      this.getGmOptions(value[1], '')
+    }
+  }
+  // @Watch('this.listQuery.haveCar')
+  // private gmChange(value:any) {
+  //   this.getGmOptions(value)
+  // }
+  // @Watch('this.listQuery.gmGroupId')
+  private gmChanges(value:any) {
+    // this.listQuery.haveCar = []
+    this.listQuery.followerId.splice(0)
+    this.followerListOptions.splice(0)
+    // console.log(this.listQuery.cityCode)
+    this.getGmOptions(this.listQuery.cityCode[1], value)
+  }
   mounted() {
     this.getBaseInfo()
-    this.getGmOptions()
+    // this.getGmOptions()
   }
 }
 </script>
-<style lang="scss" scope>
-.PublicClue {
-  .el-radio-group {
-    margin-bottom: 0 !important;
+<style lang="scss" scoped>
+.PrivateClue {
+  .el-radio-group{
+    margin-bottom: 0!important;
   }
   .btnPc {
     width: 100%;
