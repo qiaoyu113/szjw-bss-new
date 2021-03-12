@@ -1,5 +1,6 @@
 import request from '@/utils/request'
 let prefix = '/mock/81'
+let cluefix = 'carrier_center'
 export const configurationManagementList = (data: any) =>
   request({
     url: `${prefix}/v2/market-clue/config/list`,

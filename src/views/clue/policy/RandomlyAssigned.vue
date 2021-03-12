@@ -5,10 +5,10 @@
       :form-item="ruleFrom"
       :list-query="listQuery"
     >
-      <template #lineType>
+      <template #clueType>
         <ul>
           <li
-            v-for="item in lineType"
+            v-for="item in clueType"
             :key="item.id"
             :class="{active: item.id === activeLineType}"
             @click="switchLineType(item.id)"
@@ -90,7 +90,7 @@ interface IState {
 })
 export default class extends Vue {
   listQuery: any = {}
-  lineType: Array<any> = [
+  clueType: Array<any> = [
     {
       name: '梧桐专车',
       id: 1
@@ -108,12 +108,12 @@ export default class extends Vue {
       id: 5
     }
   ]
-  activeLineType: number = this.lineType[0].id
+  activeLineType: number = this.clueType[0].id
   private ruleFrom: Array<any> = [
     {
-      type: 'lineType',
+      type: 'clueType',
       slot: true,
-      key: 'lineType',
+      key: 'clueType',
       col: 24
     },
     {
@@ -124,7 +124,7 @@ export default class extends Vue {
         filterable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'driverCity',
+        'node-key': 'city',
         props: {
           lazy: true,
           lazyLoad: this.showWork
@@ -132,7 +132,7 @@ export default class extends Vue {
       },
       col: 4,
       label: '司机城市',
-      key: 'driverCity'
+      key: 'city'
     },
     {
       type: 'btnc',
@@ -205,7 +205,7 @@ export default class extends Vue {
       label: '城市'
     },
     {
-      key: 'id',
+      key: 'userGroupId',
       label: '客群细分ID/业务线/客群类型',
       width: '120px'
     },
@@ -214,20 +214,20 @@ export default class extends Vue {
       label: '目标画像标签'
     },
     {
-      key: 'distributionTypeName',
+      key: 'allocationTypeName',
       label: '分配机制'
     },
     {
-      key: 'cluesAmount',
+      key: 'clueNum',
       label: '线索量',
       width: '120px'
     },
     {
-      key: 'setPerson',
+      key: 'groupUpdateName',
       label: '设置人'
     },
     {
-      key: 'setDate',
+      key: 'groupUpdateDate',
       label: '设置时间',
       attrs: {
         sortable: true
@@ -287,11 +287,11 @@ export default class extends Vue {
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
-        lineType: this.activeLineType,
+        clueType: this.activeLineType,
         order: order || ''
       }
-      if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
-        params.cityName = this.listQuery.cityName[1]
+      if (this.listQuery.city && this.listQuery.city.length > 1) {
+        params.city = this.listQuery.city[1]
       }
       let { data: res } = await configurationManagementList(params)
       if (res.success) {
@@ -306,11 +306,6 @@ export default class extends Vue {
       console.log(`get list fail:${err}`)
     } finally {
       this.listLoading = false
-    }
-  }
-
-  data() {
-    return {
     }
   }
   mounted() {
