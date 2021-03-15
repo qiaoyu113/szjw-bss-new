@@ -324,9 +324,6 @@ export default class extends Vue {
   private ruleChangeSeatForm: any = {
 
   }
-  private ruleNewSeatForm: any = {
-
-  }
   private beforeSeatForm: any = {
     nickName: '',
     seatNumber: ''
@@ -396,10 +393,17 @@ export default class extends Vue {
   private changeSeatForm: any = {
     value: '',
     nickName: '', // 绑定人
+    busiType: '',
+    cityCode: '',
     seatNumber: '', // 绑定人坐席号
     changeName: '', // 更改后的绑定人
     roleName: '', // 角色
     officeName: '' // 组织架构
+  }
+  // 列表城市 业务线
+  private rolerFrom: any = {
+    busiType: '',
+    cityCode: ''
   }
   // 新建绑定
   private newSeatForm: any = {
@@ -593,6 +597,8 @@ export default class extends Vue {
       this.changeSeatForm.id = ''
       this.changeSeatForm.nickName = ''
       this.changeSeatForm.value = ''
+      this.rolerFrom.busiType = row.busiTypeValue
+      this.rolerFrom.cityCode = row.cityCode
       this.dialogFormVisible = true
     } catch (err) {
       console.log(`get lists fail:${err}`)
@@ -628,6 +634,8 @@ export default class extends Vue {
     this.newSeatForm.value = ''
     this.newSeatForm.id = ''
     this.newSeatForm.seatNumber = row.agentNum
+    this.rolerFrom.busiType = row.busiTypeValue
+    this.rolerFrom.cityCode = row.cityCode
     this.getEnableAgentNum()
   }
   // 解除绑定
@@ -748,8 +756,8 @@ export default class extends Vue {
         let parmas = {
           keyword: queryString,
           roleTypes: [8],
-          busiType: this.listQuery.busiType,
-          cityCode: this.listQuery.cityCode[1] ? this.listQuery.cityCode[1] : '',
+          busiType: this.rolerFrom.busiType,
+          cityCode: this.rolerFrom.cityCode,
           uri: '/v3/base/agent/queryGM'
         }
         let { data: res } = await getQueryGM(parmas)
