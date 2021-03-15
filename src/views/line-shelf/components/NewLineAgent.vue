@@ -44,7 +44,13 @@
           class="curation-col"
         >
           <div class="curation-title">
-            仓库图片
+            <span>仓库图片</span>
+            <div>
+              <img
+                src="https://www.baidu.com/img/PCpad_012830ebaa7e4379ce9a9ed1b71f7507.png"
+                alt=""
+              >
+            </div>
           </div>
         </el-col>
         <el-col
@@ -52,7 +58,13 @@
           class="curation-col"
         >
           <div class="curation-title">
-            货物图片
+            <span>货物图片</span>
+            <div>
+              <img
+                src="https://www.baidu.com/img/PCpad_012830ebaa7e4379ce9a9ed1b71f7507.png"
+                alt=""
+              >
+            </div>
           </div>
         </el-col>
         <el-col
@@ -60,7 +72,13 @@
           class="curation-col"
         >
           <div class="curation-title">
-            装货图片
+            <span>装货图片</span>
+            <div>
+              <img
+                src="https://www.baidu.com/img/PCpad_012830ebaa7e4379ce9a9ed1b71f7507.png"
+                alt=""
+              >
+            </div>
           </div>
         </el-col>
         <el-col
@@ -68,11 +86,24 @@
           class="curation-col"
         >
           <div class="curation-title">
-            讲解视频
+            <span>讲解视频</span>
+            <div>
+              <img
+                src="https://www.baidu.com/img/PCpad_012830ebaa7e4379ce9a9ed1b71f7507.png"
+                alt=""
+              >
+            </div>
           </div>
         </el-col>
       </el-row>
     </section-container>
+    <section-container title="标签信息">
+      <self-form
+        :list-query="listQuery"
+        :form-item="formItem"
+      />
+    </section-container>
+
     <section-container title="配送信息" />
     <section-container title="配送要求" />
     <section-container title="货物信息" />
@@ -186,6 +217,32 @@ export default class extends Vue {
   private baseInfo = {
     checkbox: 'fadfas'
   }
+  private listQuery ={
+
+  }
+  private hasOption = [{
+    leble: '是',
+    name: '0'
+  },
+  {
+    leble: '否',
+    name: '1'
+  }
+  ]
+  private formItem =[
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true
+      },
+      label: '业务线',
+      key: 'busiType',
+      col: 8,
+      options: this.hasOption
+    }
+  ]
 }
 </script>
 
@@ -210,6 +267,24 @@ export default class extends Vue {
 }
 .curation-col{
 
+.curation-title{
+  display: flex;
+  flex-wrap: wrap;
+  span{
+        width: 100%;
+    display: inline-block;
+  }
+  div{
+    width: 80%;
+    height: 200px;
+    border: 1px solid #eee;
+    margin-top:12px;
+  }
+  img{
+    width: 100%;
+    height: 100%;
+  }
+}
 }
 </style>
 
