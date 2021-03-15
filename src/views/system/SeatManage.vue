@@ -745,13 +745,14 @@ export default class extends Vue {
   async querySearchAsync(queryString: any, cb: any) {
     try {
       if (queryString) {
-        let { data: res } = await getQueryGM({
+        let parmas = {
           keyword: queryString,
-          roleTypes: [8],
+          roleTypes: 8,
           busiType: this.listQuery.busiType,
           cityCode: this.listQuery.cityCode[1] ? this.listQuery.cityCode[1] : '',
           uri: '/v3/base/agent/queryGM'
-        })
+        }
+        let { data: res } = await getQueryGM(parmas)
         if (res.success) {
           res.data.forEach((element: any) => {
             element.value = element.nickName + element.mobile
