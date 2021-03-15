@@ -2,10 +2,10 @@ import request from '@/utils/request'
 // const prefix = '/line'
 const prefix = '/mock/81'
 // 待分配线索 梧桐线索列表
-const mx = '/carrier_center'
+const produce = '/carrier_center'
 export const GetToAllotWT = (data: any) =>
   request({
-    url: `${mx}/v2/market-clue/getClueWSXPrivateSeaPoolList`,
+    url: `${produce}/v2/market-clue/getClueWSXPrivateSeaPoolList`,
     method: 'post',
     data
   })
@@ -13,7 +13,7 @@ export const GetToAllotWT = (data: any) =>
 // 待分配线索 雷鸟车池线索列表
 export const GetToAllotLNCarPool = (data: any) =>
   request({
-    url: `${mx}/v2/market-clue/getToAllotLNCarPoolClueList`,
+    url: `${produce}/v2/market-clue/getToAllotLNCarPoolClueList`,
     data,
     method: 'post'
   })
@@ -170,7 +170,7 @@ export const EditCampaignData = (data: any) =>
 // 待分配线索 雷鸟租赁线索列表
 export const GetToAllotLNLease = (data: any) =>
   request({
-    url: `${mx}/v2/market-clue/getToAllotLNLeaseClueList`,
+    url: `${produce}/v2/market-clue/getToAllotLNLeaseClueList`,
     data,
     method: 'post'
 
@@ -252,7 +252,7 @@ export const GetClueLZXPrivateSeaPoolList = (data: any) =>
 // 私海池线索分配跟进人
 export const UpdateFollowerByPrivateSeas = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/updateFollowerByPrivateSeas`,
+    url: `${produce}/v2/market-clue/updateFollowerByPrivateSeas`,
     method: 'post',
     data
   })
@@ -279,23 +279,25 @@ export const UploadExcelBird = (data: any) =>
 // 私海池 梧桐线索导出（梧桐共享/梧桐专车）
 export const ExportFirmiana = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/firmiana/export`,
+    // url: `${prefix}/v2/market-clue/privatePool/firmiana/export`,
+    url: `${produce}/v2/market-clue/privatePool/firmiana/export`,
     method: 'get',
     params
   })
   // 私海池 雷鸟车池线索导出
 export const ExportBirdTruck = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdTruckPool/export`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdTruckPool/export`,
     method: 'get',
     params
   })
   // 私海池 雷鸟租赁线索导出
 export const ExportBirdRental = (params: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/export`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdRental/export`,
     method: 'get',
-    params })
+    params
+  })
 /**
  *
  * 私海池 查询当前手机号存在的线索类型

@@ -185,6 +185,7 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
+            @click="callPhoneClick(scope.row)"
           >
             打电话
           </el-button>
@@ -274,6 +275,12 @@
         </el-link>
       </div>
     </SelfDialog>
+    <CallPhone
+      :show-dialog.sync="callPhoneDio"
+      :clue-status="rowStatus.clueType"
+      :phone="rowStatus.phone"
+      :clue-id="rowStatus.clueId"
+    />
   </div>
 </template>
 
@@ -281,8 +288,10 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
-import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
+import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList,
+  UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
+import CallPhone from './components/CallPhone/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
@@ -318,7 +327,8 @@ interface formItem {
   components: {
     SelfTable,
     SelfForm,
-    SelfDialog
+    SelfDialog,
+    CallPhone
   }
 })
 export default class extends Vue {
@@ -419,6 +429,25 @@ export default class extends Vue {
       num: 0
     }
   ]
+  // 打电话
+  private callPhoneDio = false
+  private rowStatus = {
+    clueType: '',
+    phone: '',
+    clueId: ''
+  }
+  callPhoneClick(row:any) {
+    const { clueId, clueType, phone } = row
+    this.rowStatus = {
+      clueId,
+      clueType,
+      phone
+    }
+    this.$nextTick(() => {
+      this.callPhoneDio = true
+    })
+    console.log(row)
+  }
   /**
    * rules: []
    * root 为全局显示
@@ -950,7 +979,7 @@ export default class extends Vue {
   // 重置
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
-    // this.getLists()
+    this.getLists()
   }
   // 批量分配
   private handleallAllotClick() {
@@ -981,7 +1010,7 @@ export default class extends Vue {
     if (this.listQuery.toDo) {
       params.toDo = +this.listQuery.toDo
       delete params.followerId
-      delete params.clueType
+      // delete params.clueType
       return params
     }
     this.formItem.map((item: any) => {
@@ -1016,9 +1045,7 @@ export default class extends Vue {
     return params
   }
   // 获取列表
-  @lock
   private async getLists(isTodo = false) {
-    console.log(isTodo)
     try {
       this.listLoading = true
       const submitForm = this.clueArr.find((item: any) => {
@@ -1176,8 +1203,14 @@ export default class extends Vue {
       let { data: res } = await UpdateFollowerByPrivateSeas(params)
       if (res.success) {
         if (res.data.flag) {
-          (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success(res.data.msg)
+          try {
+            (this.$refs.PublicClueTable as any).toggleRowSelection()
+          } catch (error) {
+            return
+          } finally {
+            this.$message.success(res.data.msg)
+            this.showDialog = false
+          }
         } else {
           this.$message.warning(res.data.msg)
         }
@@ -1280,6 +1313,7 @@ export default class extends Vue {
         exportFile = ExportBirdTruck
         break
       case 3:
+      case 4:
         exportFile = ExportBirdRental
         break
       default:
