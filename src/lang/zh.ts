@@ -7,6 +7,7 @@ export default {
     freightLog: '运费日志',
     driverTitle: '司机管理',
     driverAccount: '司机梧桐账户',
+    seatManage: '坐席管理',
     refundList: '退费管理',
     refundDetail: '退费详情',
     refundApply: '申请退费',

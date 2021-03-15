@@ -10,6 +10,7 @@ export default {
     refundList: 'RefundList',
     driverTitle: 'DriverTitle',
     driverList: 'DriverList',
+    seatManage: 'SeatManage',
     freightDetail: 'FreightDetail',
     freightLog: 'FreightLog',
     editDriver: 'editDriver',
