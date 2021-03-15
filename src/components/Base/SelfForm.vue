@@ -31,7 +31,14 @@
             v-model.trim="listQuery[item.key]"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
-          />
+          >
+            <template
+              v-if="item.fix"
+              :slot="item.fix.type"
+            >
+              {{ item.fix.value }}
+            </template>
+          </el-input>
           <el-input-number
             v-if="item.type === 14"
             v-model.number="listQuery[item.key]"
@@ -152,9 +159,7 @@
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
           />
-          <template
-            v-else-if="item.type ===12"
-          >
+          <template v-else-if="item.type ===12">
             <el-time-select
               v-model="listQuery[item.key].jobStartDate"
               class="timeSelect"
@@ -195,147 +200,145 @@ import { SettingsModule } from '@/store/modules/settings'
 import { DataIsNull } from '@/utils/index'
 import '@/styles/common.scss'
 
-  interface IState {
-    [key: string]: any;
+interface IState {
+  [key: string]: any;
+}
+
+@Component({
+  name: 'SelfForm.houseAddress'
+})
+export default class extends Vue {
+  // 判断是否是PC
+  @Prop({ default: () => {} }) listQuery!: IState;
+  @Prop({ default: () => [] }) formItem!: any[];
+  @Prop({ default: 6 }) pcCol!: Number;
+  @Prop({ default: () => {} }) rules!: IState;
+  @Prop({ default: false }) mBlock!: boolean;
+  @Prop({ default: false }) pcBlock!: boolean;
+  // 区分设备
+  get isPC() {
+    return SettingsModule.isPC
   }
 
-  @Component({
-    name: 'SelfForm.houseAddress'
-
-  })
-export default class extends Vue {
-    // 判断是否是PC
-    @Prop({ default: () => {} }) listQuery!:IState
-    @Prop({ default: () => [] }) formItem!:any[]
-    @Prop({ default: 6 }) pcCol!:Number
-    @Prop({ default: () => {} }) rules!:IState
-    @Prop({ default: false }) mBlock!:boolean
-    @Prop({ default: false }) pcBlock!:boolean
-    // 区分设备
-    get isPC() {
-      return SettingsModule.isPC
-    }
-
-    // 没有数据的情况下，是否展示暂无数据，默认展示否则为空
-    canNull(val:any, isNull:any) {
-      if (isNull) {
-        if (val || val === 0) {
-          return val
-        } else {
-          return ''
-        }
+  // 没有数据的情况下，是否展示暂无数据，默认展示否则为空
+  canNull(val: any, isNull: any) {
+    if (isNull) {
+      if (val || val === 0) {
+        return val
       } else {
-        return DataIsNull(val)
+        return ''
       }
+    } else {
+      return DataIsNull(val)
     }
-    // 提交表单
-    submitForm(args:any) {
-      ((this.$refs['ruleForm']) as any).validate((valid:boolean) => {
-        if (valid) {
-          this.handlePass(valid, args)
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    }
-    // 重置表单
-    resetForm() {
-      ((this.$refs['ruleForm']) as any).resetFields()
-    }
-    clearValidate(props:Array<string>|string) {
-      ((this.$refs['ruleForm']) as any).clearValidate(props)
-    }
-    @Emit('onPass')
-    handlePass(isPass:boolean, args:any) {
-    }
+  }
+  // 提交表单
+  submitForm(args: any) {
+    (this.$refs['ruleForm'] as any).validate((valid: boolean) => {
+      if (valid) {
+        this.handlePass(valid, args)
+      } else {
+        console.log('error submit!!')
+        return false
+      }
+    })
+  }
+  // 重置表单
+  resetForm() {
+    (this.$refs['ruleForm'] as any).resetFields()
+  }
+  clearValidate(props: Array<string> | string) {
+    (this.$refs['ruleForm'] as any).clearValidate(props)
+  }
+  @Emit('onPass')
+  handlePass(isPass: boolean, args: any) {}
 }
 </script>
 
 <style lang="scss" scoped>
-  .selfForm {
-   .clearfix {
-     display: block;
-     content:'';
-     overflow: hidden;
-     clear: both;
-   }
+.selfForm {
+  .clearfix {
+    display: block;
+    content: "";
+    overflow: hidden;
+    clear: both;
   }
+}
 </style>
 
 <style scoped>
-  .selfForm >>> .el-form-item__label {
-    font-family: PingFangSC-Regular;
-    font-size: 14px;
-    color: #4A4A4A;
-  }
-  .selfForm >>> .el-form-item__content {
+.selfForm >>> .el-form-item__label {
+  font-family: PingFangSC-Regular;
+  font-size: 14px;
+  color: #4a4a4a;
+}
+.selfForm >>> .el-form-item__content {
+  display: flex;
+  flex: 1;
+}
+.selfForm >>> .el-input {
+  display: flex;
+  flex: 1;
+}
+.selfForm >>> .el-select {
+  display: flex;
+  flex: 1;
+}
+.selfForm >>> .el-date-editor {
+  display: flex;
+  flex: 1;
+}
+.selfForm >>> .el-cascader {
+  display: flex;
+  flex: 1;
+}
+
+.selfForm >>> .el-autocomplete {
+  display: flex;
+  flex: 1;
+}
+
+.selfForm >>> .el-radio {
+  height: 36px;
+  line-height: 36px;
+}
+
+@media screen and (max-width: 700px) {
+  .mobile >>> .el-form-item {
     display: flex;
-    flex: 1;
+    flex-direction: column;
   }
-  .selfForm >>> .el-input {
+
+  .mobile >>> .el-form-item__label {
+    text-align: left;
+  }
+
+  .mobile >>> .el-form-item__content {
+    margin-left: 0px !important;
+  }
+}
+@media screen and (min-width: 700px) {
+  .pc >>> .el-form-item {
     display: flex;
-    flex: 1;
-  }
-  .selfForm >>> .el-select {
-    display: flex;
-    flex: 1;
-  }
-  .selfForm >>> .el-date-editor {
-    display: flex;
-    flex: 1;
-  }
-  .selfForm >>> .el-cascader {
-    display: flex;
-    flex: 1;
+    flex-direction: column;
   }
 
-  .selfForm >>> .el-autocomplete {
-    display: flex;
-    flex: 1;
+  .pc >>> .el-form-item__label {
+    text-align: left;
   }
 
-  .selfForm >>> .el-radio {
-    height:36px;
-    line-height: 36px;
+  .pc >>> .el-form-item__content {
+    margin-left: 0px !important;
   }
-
-  @media screen and (max-width: 700px){
-    .mobile >>> .el-form-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .mobile >>> .el-form-item__label {
-      text-align: left;
-    }
-
-    .mobile >>> .el-form-item__content {
-      margin-left: 0px!important;
-    }
-  }
-  @media screen and (min-width: 700px){
-    .pc >>> .el-form-item {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pc >>> .el-form-item__label {
-      text-align: left;
-    }
-
-    .pc >>> .el-form-item__content {
-      margin-left: 0px!important;
-    }
-  }
+}
 </style>
 
 <style>
-  @media screen and (max-width: 700px) {
-    .el-picker-panel{
-      left: 0 !important;
-      width: 100%!important;
-      overflow-x: auto;
-    }
+@media screen and (max-width: 700px) {
+  .el-picker-panel {
+    left: 0 !important;
+    width: 100% !important;
+    overflow-x: auto;
   }
+}
 </style>
