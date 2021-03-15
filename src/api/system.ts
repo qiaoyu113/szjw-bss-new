@@ -1,5 +1,8 @@
 import request from '@/utils/request'
+import qs from 'qs'
 const baseURL = '/base'
+const baseURL2 = '/base_center'
+
 // 用户管理-账号查询
 export const getUserList = (params: any) =>
   request({
@@ -261,4 +264,62 @@ export const pushUserToCRM = (params:any) =>
     url: `${baseURL}/v2/base/user/pushUserToCRM`,
     method: 'post',
     params
+  })
+
+// 获取坐席管理列表
+export const getAgentList = (params:any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/list`,
+    method: 'get',
+    params
+  })
+
+// 获取所有可用的坐席号
+export const getEnableAgentNums = () =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/getEnableAgentNums`,
+    method: 'get'
+  })
+
+// 查询绑定人
+export const getQueryGM = (params: any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/queryGM`,
+    method: 'get',
+    params,
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
+    }
+  })
+
+// 绑定坐席号
+export const agentBundling = (data:any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/bundling`,
+    method: 'post',
+    data
+  })
+
+// 更换绑定坐席号
+export const agentChangeBundling = (data:any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/change`,
+    method: 'post',
+    data
+  })
+
+// 根据用户ID获取坐席信息详情
+export const getInfoByUserId = (params: any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/getInfoByUserId`,
+    method: 'get',
+    params
+  })
+
+// 解绑坐席号
+export const agentChangeUnBundling = (data:any) =>
+  request({
+    url: `${baseURL2}/auth/v3/agent/unbundling`,
+    method: 'post',
+    data
   })

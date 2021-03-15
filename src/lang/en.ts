@@ -8,6 +8,7 @@ export default {
     refundApply: 'RefundApply',
     refundAudit: 'RefundAudit',
     refundList: 'RefundList',
+    seatManage: 'SeatManage',
     driverTitle: 'DriverTitle',
     driverList: 'DriverList',
     freightDetail: 'FreightDetail',
