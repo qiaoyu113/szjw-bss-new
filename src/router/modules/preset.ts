@@ -55,8 +55,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'wtSystem', /* 梧桐管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/PermissionManage.vue'),
-      name: 'wtSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/wtSystem/authority',
       meta: {
         title: 'wtSystem',
