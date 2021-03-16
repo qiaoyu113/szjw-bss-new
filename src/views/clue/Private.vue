@@ -36,7 +36,6 @@
           :key="item.text"
           :value="item.num"
           :max="9999"
-          :hidden="item.num === 0"
         >
           <el-button
             type="primary"
@@ -289,7 +288,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
 import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList,
-  UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
+  UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
+  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC
+} from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import CallPhone from './components/CallPhone/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
@@ -400,31 +401,26 @@ export default class extends Vue {
     },
     {
       name: '10',
-      text: '待分配',
+      text: '待跟进',
       num: 0
     },
     {
       name: '20',
-      text: '待跟进', // 审核通过
+      text: '跟进中', // 审核通过
       num: 0
     },
     {
       name: '30',
-      text: '跟进中',
+      text: '邀约成功',
       num: 0
     },
     {
       name: '40',
-      text: '待面试',
-      num: 0
-    },
-    {
-      name: '50',
       text: '已面试',
       num: 0
     },
     {
-      name: '60',
+      name: '50',
       text: '已成交',
       num: 0
     }
@@ -969,7 +965,7 @@ export default class extends Vue {
     (this.$refs.PrivateClueTable as any).toggleRowSelection()
     this.page.page = 1
     if (istrue === true) {
-      this.handleResetClick({})
+      (this.$refs['suggestForm'] as any).resetForm()
     }
     this.getLists(istrue === true)
   }
@@ -980,12 +976,6 @@ export default class extends Vue {
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
     this.getLists()
-  }
-  // 批量分配
-  private handleallAllotClick() {
-    // this.dialogTit = '批量分配'
-    // this.showDialog = true
-    // this.rowData.push(...this.multipleSelection)
   }
 
   private oninputOnlyNum(value: string) {
@@ -1063,6 +1053,7 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
+        this.titleChang(res.title)
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -1072,6 +1063,16 @@ export default class extends Vue {
     } finally {
       this.listLoading = false
     }
+  }
+  titleChang(title:any) {
+    this.btns.forEach(item => {
+      if (item.name === '') {
+        item.num = title.all
+      } else {
+        item.num = title[item.name]
+      }
+    })
+    this.toDoValue = title.toDoCount
   }
   // 获取跟进人列表
   async getGmOptions(cityCode:number, groupId:any) {
@@ -1268,14 +1269,10 @@ export default class extends Vue {
     formData.append('file', param.file)
     const clueType = this.listQuery.clueType
     let fileUpload = null
-    if (clueType === 0 || clueType === 1) {
-      fileUpload = UploadExcelFirmiana
-    } else if (clueType === 3 || clueType === 4) {
-      fileUpload = UploadExcelBird
-    } else {
-      return
-    }
-    fileUpload(formData).then(({ data } : any) => {
+    console.log(clueType)
+    const arr = [UploadExcelFirmianaZC, UploadExcelBirdGX, undefined, UploadExcelLNC, UploadExcelLNB]
+    fileUpload = arr[clueType]
+    fileUpload && fileUpload(formData).then(({ data } : any) => {
       if (data.success) {
         this.$message.success('上传成功')
         this.uploadDialog = false
@@ -1303,24 +1300,8 @@ export default class extends Vue {
     delete params.page
     delete params.limit
     const clueType = this.listQuery.clueType
-    let exportFile = null
-    switch (clueType) {
-      case 0:
-      case 1:
-        exportFile = ExportFirmiana
-        break
-      case 2:
-        exportFile = ExportBirdTruck
-        break
-      case 3:
-      case 4:
-        exportFile = ExportBirdRental
-        break
-      default:
-        break
-    }
-    if (!exportFile) return
-    const { data } = await exportFile(params)
+    console.log(params)
+    const { data } = await ExportFirmiana(params)
     if (data.success) {
       sucFun()
       this.$message({

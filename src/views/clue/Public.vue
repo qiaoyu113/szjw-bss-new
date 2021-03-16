@@ -129,7 +129,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork, validatorNumberRange } from '@/utils/index'
-import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByHighSeas } from '@/api/clue'
+import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByPrivateSeas } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -454,7 +454,7 @@ export default class extends Vue {
       rules: ['root']
     },
     {
-      key: 'creatorName',
+      key: 'createName',
       label: '创建人',
       rules: ['root']
     },
@@ -683,6 +683,7 @@ export default class extends Vue {
       }) || {}
       if (!submitForm.searchUrl) return
       let { data: res } = await submitForm.searchUrl(params)
+      console.log(res)
       if (res.success) {
         // eslint-disable-next-line
         res.page = await HandlePages(res.page)
@@ -718,7 +719,7 @@ export default class extends Vue {
         clueId: this.rows.map((item:any) => item.clueId + ''),
         followerId: +this.dialogListQuery.followerId[2]
       }
-      let { data: res } = await UpdateFollowerByHighSeas(params)
+      let { data: res } = await UpdateFollowerByPrivateSeas(params)
       if (res.success) {
         if (res.data.flag) {
           (this.$refs.PublicClueTable as any).toggleRowSelection()
