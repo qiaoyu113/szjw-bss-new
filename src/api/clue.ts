@@ -76,7 +76,7 @@ export const GetClueCampaignList = (data: any) =>
 // campaign导出
 export const CampaignExport = (data: any) =>
   request({
-    url: `${baseUrl}/v2/clue/campaign/export`,
+    url: `${baseUrl}/v2/clue/campaign/campaign/export`,
     method: 'get',
     params: data
   })
