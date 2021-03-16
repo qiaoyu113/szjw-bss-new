@@ -22,7 +22,7 @@
         <el-radio-group
           v-model="listQuery.clueType"
           size="small"
-          @click="getLists"
+          @change="getLists"
         >
           <el-radio-button
             v-for="item in busiTypeArrs"
@@ -170,7 +170,7 @@ import {
   thirtyday
 } from '../../../driver-freight/components/date'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
-import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
+import { GetClueCampaignList, CampaignExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -209,6 +209,7 @@ export default class extends Vue {
   }
   private userGroupOptions:IState[] = []; // 客群细分id
   private addUserGroup:IState[] = []; // 新增客群细分id
+  private campaignId:string = ''; // 导入的compaignId
   // 新建Campaign
   private showDialog:boolean = false;
   // 导入线索
@@ -434,7 +435,7 @@ export default class extends Vue {
   // 重置
   handleResetClick() {
     this.listQuery = {
-      clueType: 1,
+      clueType: 0,
       userGroupId: '',
       areCity: '',
       cityCode: '',
@@ -458,15 +459,9 @@ export default class extends Vue {
   @lock
   async handleExportClick(sucFun:Function) {
     try {
-      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
-      let obj:IState = {
-        0: FirmianaExport,
-        1: FirmianaExport,
-        2: ThunderBirdTruckPoolExport,
-        3: ThunderBirdRentalExport
-      }
       let params:IState = this.generateParams()
-      let { data: res } = await obj[this.listQuery.clueType](params)
+      delete params.sort
+      let { data: res } = await CampaignExport(params)
       if (res.success) {
         sucFun()
         this.$message.success('操作成功')
@@ -543,6 +538,7 @@ export default class extends Vue {
   // 导入线索
   handleImportClick(row:IState) {
     this.busiType = row.busiType
+    this.campaignId = row.campaignId
     this.showDialog1 = true
   }
   // 新建 确定按钮
@@ -586,13 +582,14 @@ export default class extends Vue {
   // 上传excel
   async handlePass1(formData:FormData) {
     try {
-      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
+      // 梧桐专车(0)、梧桐共享(1)、雷鸟车池(2)、雷鸟租赁(3)
       let obj:IState = {
+        0: FirmianaImport,
         1: FirmianaImport,
-        2: FirmianaImport,
-        3: ThunderBirdTruckPoolImport,
-        4: ThunderBirdRentalImport
+        2: ThunderBirdTruckPoolImport,
+        3: ThunderBirdRentalImport
       }
+      formData.append('campaignId', this.campaignId)
       let { data: res } = await obj[this.listQuery.clueType](formData)
       if (res.success) {
         this.$message.success('操作成功')

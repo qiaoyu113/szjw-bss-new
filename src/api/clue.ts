@@ -73,24 +73,10 @@ export const GetClueCampaignList = (data: any) =>
     data
   })
 
-// 梧桐专车/共享campaign导出
-export const FirmianaExport = (data: any) =>
+// campaign导出
+export const CampaignExport = (data: any) =>
   request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/firmiana/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟租赁campaign导出
-export const ThunderBirdRentalExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdRental/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟车池campaign导出
-export const ThunderBirdTruckPoolExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdTruckPool/export`,
+    url: `${baseUrl}/v2/clue/campaign/export`,
     method: 'get',
     params: data
   })
