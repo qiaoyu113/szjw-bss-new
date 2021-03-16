@@ -142,7 +142,6 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import { getUserManagerList, enableOrDisableUser, resetPassword, pushUserToCRM } from '@/api/system'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { getLabel, phoneReg } from '@/utils/index.ts'
 import { HandlePages } from '@/utils/index'
 import TableHeader from '@/components/TableHeader/index.vue'
 interface PageObj {
@@ -168,13 +167,6 @@ interface tableObj {
   status: number;
 }
 
-interface Tab {
-  label:String,
-  name:String,
-  id:Number,
-  num?:Number | undefined
-}
-
 interface FormObj {
   status:number|string;
   mobile:number|string;
@@ -193,39 +185,17 @@ interface IState {
   }
 })
 export default class extends Vue {
-  // 状态
-  private tab:Tab[] = [
-    {
-      label: '全部',
-      name: '',
-      id: 0,
-      num: 0
-    },
-    {
-      label: '启用',
-      name: '1',
-      id: 1,
-      num: 0
-    },
-    {
-      label: '禁用',
-      name: '2',
-      id: 2,
-      num: 0
-    }
-  ]
-  private tags:any[] = []// 顶部查询按钮回显的数组
   private listLoading:boolean = false
   private tableData:tableObj[] = []
   private columns:ColumnsObj[] = [
     {
       key: 'nickName',
-      label: '姓名',
+      label: '用户姓名',
       'min-width': '140px'
     },
     {
-      key: 'roleName',
-      label: '角色',
+      key: 'mobile',
+      label: '电话',
       'min-width': '140px'
     },
     {
@@ -234,13 +204,13 @@ export default class extends Vue {
       'min-width': '200px'
     },
     {
-      key: 'mobile',
-      label: '电话',
+      key: 'roleName',
+      label: '角色名称',
       'min-width': '140px'
     },
     {
       key: 'status',
-      label: '状态',
+      label: '账号状态',
       'min-width': '140px',
       slot: true
     },
@@ -266,17 +236,17 @@ export default class extends Vue {
     {
       type: 1,
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入用户姓名',
         maxlength: 10,
         clearable: true
       },
-      label: '姓名',
+      label: '用户姓名',
       key: 'nickName'
     },
     {
       type: 1,
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入岗位职责',
         maxlength: 11,
         clearable: true
       },
@@ -284,13 +254,23 @@ export default class extends Vue {
       key: 'mobile'
     },
     {
+      type: 1,
+      tagAttrs: {
+        placeholder: '请输入角色名称',
+        maxlength: 11,
+        clearable: true
+      },
+      label: '角色名称',
+      key: 'role'
+    },
+    {
       type: 2,
       tagAttrs: {
-        placeholder: '请选择',
+        placeholder: '请选择账号状态',
         clearable: true,
         filterable: true
       },
-      label: '状态',
+      label: '账号状态',
       key: 'status',
       options: [
         {
@@ -339,16 +319,6 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.tableData = res.data
         this.page.total = res.page.total
-        for (let i = 0; i < this.tab.length; i++) {
-          let item:Tab = this.tab[i]
-          if (item.name === '') {
-            item.num = res.title.totalCount
-          } else if (item.name === '1') {
-            item.num = res.title.enableCount
-          } else if (item.name === '2') {
-            item.num = res.title.disableCount
-          }
-        }
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -481,24 +451,8 @@ export default class extends Vue {
       mobile: '',
       nickName: ''
     }
-    this.tags = []
-    // this.getLists()
   }
   handleFilterClick() {
-    let blackLists = ['status']
-    this.tags = []
-    for (let key in this.listQuery) {
-      if (this.listQuery[key] !== '' && (this.tags.findIndex(item => item.key === key) === -1) && !blackLists.includes(key)) {
-        let name = getLabel(this.formItem, this.listQuery, key)
-        if (name) {
-          this.tags.push({
-            type: 'info',
-            name: name,
-            key: key
-          })
-        }
-      }
-    }
     this.getLists()
   }
   // 打开重置密码的弹框
