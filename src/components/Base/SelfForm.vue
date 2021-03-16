@@ -115,6 +115,7 @@
             :editable="false"
             type="date"
             value-format="timestamp"
+            v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
           />
           <!-- 显示文本 -->
