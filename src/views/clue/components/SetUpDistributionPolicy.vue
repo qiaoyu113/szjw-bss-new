@@ -71,7 +71,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { setrandomPolicy } from '@/api/clue'
+import { setrandomPolicy, searchInformation } from '@/api/clue'
 import { getGroupInfoByCityCodeAndProductLine, GetSpecifiedRoleList } from '@/api/common'
 @Component({
   name: 'SetUpDistributionPolicy',
@@ -118,8 +118,31 @@ export default class extends Vue {
   usreGroupChange(item: any) {
     // console.log(this.policyData.cityCode, item)
     this.getTeamMember(this.policyData.cityCode, item)
+    if (this.chosenList && this.chosenList.length === 0) {
+      this.getSearchInformation()
+    }
   }
-
+  // 提交后不可接受线索人员回显
+  async getSearchInformation() {
+    try {
+      const { data: res } = await searchInformation({ userIds: '5109,5045,4649,4584' })
+      if (res.success) {
+        this.chosenList = res.data.map(function(item: any) {
+          return {
+            name: item.name,
+            id: item.id
+          }
+        })
+        this.queryInfo.notReceiveIds = res.data.map(function(item: any) {
+          return item.id
+        })
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (error) {
+      return error
+    }
+  }
   // 获取组内人员
   async getTeamMember(cityCode:number, groupId: any) {
     try {

@@ -35,6 +35,12 @@ export const setrandomPolicy = (data:any) => request({
   method: 'post',
   data
 })
+// 不接受线索人员Ids 查询人员信息
+export const searchInformation = (params:any) => request({
+  url: `${cluefix}/v2/market-clue/user-group/updatePolicy/getUserInfoList`,
+  method: 'get',
+  params
+})
 // 设置回流policy
 export const setPolicy = (data:any) => request({
   url: `${cluefix}/v2/market-clue/reflow_conf/settingReflowedConf`,

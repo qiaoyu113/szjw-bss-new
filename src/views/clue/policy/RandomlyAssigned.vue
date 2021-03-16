@@ -105,7 +105,7 @@ export default class extends Vue {
     },
     {
       name: '雷鸟租赁',
-      id: 4
+      id: 3
     }
   ]
   activeLineType: number = this.clueType[0].id
