@@ -93,19 +93,19 @@ export default class extends Vue {
   clueType: Array<any> = [
     {
       name: '梧桐专车',
-      id: 1
+      id: 0
     },
     {
       name: '梧桐共享',
-      id: 2
+      id: 1
     },
     {
       name: '雷鸟车池',
-      id: 4
+      id: 2
     },
     {
       name: '雷鸟租赁',
-      id: 5
+      id: 4
     }
   ]
   activeLineType: number = this.clueType[0].id
