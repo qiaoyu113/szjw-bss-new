@@ -578,8 +578,8 @@ export default class extends Vue {
     if (this.clueStatus < 2) {
       this.WTQuery = { ...this.WTQuery, ...value }
       this.WTQuery.intentWork = [
-        value.expectAddressCity,
-        value.expectAddressCounty
+        String(value.expectAddressCity),
+        String(value.expectAddressCounty)
       ]
       if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
         this.WTQuery.intentWork.pop()
@@ -630,7 +630,7 @@ export default class extends Vue {
           this.$message.warning(res.errorMsg)
         }
       } else {
-        let { data: res } = await getClueLZXDetail({ clueId: 'this.clueId ' })
+        let { data: res } = await getClueLZXDetail({ clueId: this.clueId })
         if (res.success) {
           let {
             marketClueLZXDetailBaseInfoVO,
