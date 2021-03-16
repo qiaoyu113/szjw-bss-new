@@ -590,8 +590,6 @@ export default class extends Vue {
     } else if (this.clueStatus === 3) {
       this.BirdQuery = { ...this.BirdQuery, ...value }
     } else {
-      value.intentModel = '1,2,10'
-      value.fancyModel = '25,35,1'
       value.intentModel = value.intentModel.split(',').map((ele:any) => {
         return +ele
       })

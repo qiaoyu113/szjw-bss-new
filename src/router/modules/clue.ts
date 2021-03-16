@@ -41,7 +41,7 @@ const clueRouter: RouteConfig = {
         title: 'privateDetail',
         activeMenu: '/clue/private',
         hidden: true,
-        noCache: false
+        noCache: true
       }
     },
     {
