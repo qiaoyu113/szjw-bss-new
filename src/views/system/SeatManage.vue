@@ -581,6 +581,8 @@ export default class extends Vue {
   }
   // 获取列表
   handleFilterClick() {
+    this.listQuery.userName = this.stripscript(this.listQuery.userName)
+    this.listQuery.agentNum = this.stripscript(this.listQuery.agentNum)
     this.getLists()
   }
   // 坐席号改绑
@@ -786,6 +788,15 @@ export default class extends Vue {
   // 手机号校验
   private oninputOnlyNum(value: string) {
     this.listQuery.mobile = value.replace(/[^\d]/g, '')
+  }
+  // 特殊符号过滤
+  private stripscript(s:any) {
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]")
+    var rs = ''
+    for (var i = 0; i < s.length; i++) {
+      rs = rs + s.substr(i, 1).replace(pattern, '')
+    }
+    return rs
   }
 }
 </script>
