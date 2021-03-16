@@ -271,11 +271,12 @@ export default class extends Vue {
   // 设置policy
   private showPolicy:boolean = false // has 设置policy弹框
   private policyData:any = {}
-  setPolicyAuto({ busiType, cityCode, id }:any) {
+  setPolicyAuto(row:any) {
+    // console.log(row)
     const object = {
-      busiType,
-      cityCode,
-      id
+      busiType: this.activeLineType,
+      cityCode: row.city,
+      id: row.userGroupId
     }
     this.policyData = object
     this.showPolicy = true

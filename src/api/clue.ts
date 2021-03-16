@@ -14,7 +14,7 @@ export const GetToAllotLNCarPool = (data: any) =>
   request({
     url: `${prefix}/v2/market-clue/getToAllotLNCarPoolClueList` })
 // const prefix = '/base'
-  // let prefix = '/mock/81'
+let cluefix = '/carrier_center'
 // 获取客群细分列表
 export const getClueUserGroupList = (params: any) =>
   request({
@@ -22,45 +22,31 @@ export const getClueUserGroupList = (params: any) =>
     method: 'post',
     params
   })
-
+// 获取随机分配policy列表
 export const configurationManagementList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/config/list`,
+    url: `${cluefix}/v2/market-clue/config/list`,
     method: 'post',
     data
   })
-// 获取小组  设置policy
-
-export const getUserGroup = (params: any) =>
-  request({
-    url: `${prefix}/v2/market-clue/config/get/user-group`,
-    params
-  })
-// 获取小组人员
-export const getGroupUser = (params: any) =>
-  request({
-    url: `${prefix}/v2/market-clue/user-group/user`,
-    params
-  })
-// 设置 policy
+// 设置随机分配policy
+export const setrandomPolicy = (data:any) => request({
+  url: `${cluefix}/v2/market-clue/config/updatePolicy/notReceiveIds`,
+  method: 'post',
+  data
+})
+// 设置回流policy
 export const setPolicy = (data:any) => request({
-  url: `${prefix}/v2/market-clue/config/update/policy`,
+  url: `${cluefix}/v2/market-clue/reflow_conf/settingReflowedConf`,
   method: 'post',
   data
 })
 
 // 获取回流policy 列表
-
-export const getBackFlowPolicyList = (params:any) => request({
-  url: `${prefix}/v2/market-clue/update/policy/list`,
-  params
-})
-
-// 获取默认时间
-
-export const getBackFlowDeflutDate = (params:any) => request({
-  url: `${prefix}/v2/clue/config/backflow/date`,
-  params
+export const getBackFlowPolicyList = (data:any) => request({
+  url: `${cluefix}/v2/market-clue/reflow_conf/list`,
+  method: 'post',
+  data
 })
 
 const baseUrl = '/mock/81'

@@ -1,13 +1,14 @@
 <template>
   <SelfDialog
     class="dasdadad"
-    title="设置policy"
+    title="设置分配policy"
     v-bind="$attrs"
     :width="'40%'"
     destroy-on-close
     :confirm="onConfirm"
     v-on="$listeners"
     @close="resetForm"
+    @open="getUserGroupList"
   >
     <el-form
       :model="queryInfo"
@@ -33,7 +34,7 @@
       </el-form-item>
       <el-form-item label="人员">
         <el-checkbox-group
-          v-model="queryInfo.notReceiveId"
+          v-model="queryInfo.notReceiveIds"
         >
           <el-checkbox
             v-for="item in teamMemberList"
@@ -70,7 +71,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { getUserGroup, getGroupUser, setPolicy } from '@/api/clue'
+import { setrandomPolicy } from '@/api/clue'
+import { getGroupInfoByCityCodeAndProductLine, GetSpecifiedRoleList } from '@/api/common'
 @Component({
   name: 'SetUpDistributionPolicy',
   components: {
@@ -80,76 +82,64 @@ import { getUserGroup, getGroupUser, setPolicy } from '@/api/clue'
 export default class extends Vue {
   @Prop({ default: () => {} }) policyData: any
   private queryInfo: any = {
-    group: '',
-    notReceiveId: []
+    group: [],
+    notReceiveIds: [],
+    cityCode: '',
+    busiLine: ''
   }
   private userGroupList: any = [] // 小组列表
   private chosenList:any = [] // 已经选择人员
   private teamMemberList: any = [] // 人员数组
   // 获取小组
   async getUserGroupList() {
+    let code = this.queryInfo.clueType
+    const { busiType, cityCode } = this.policyData
     try {
-      const { data } = await getUserGroup({})
-      this.userGroupList = [{
-        id: 'aa',
-        name: '加盟一组'
-      },
-      {
-        id: 'bb',
-        name: '加盟二组'
-      }]
-    } catch (error) {
-      return error
+      let params:any = {
+        busiLine: busiType,
+        cityCode: cityCode
+      }
+      let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
+      if (res.success) {
+        this.userGroupList = res.data.map((item:any) => ({
+          id: item.id,
+          name: item.name
+        }))
+      } else {
+        // context.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get group fail:${err}`)
+    } finally {
+    //
     }
   }
   // 小组改变
   usreGroupChange(item: any) {
-    this.getTeamMember(item)
-  }
-  created() {
-    this.getUserGroupList()
+    // console.log(this.policyData.cityCode, item)
+    this.getTeamMember(this.policyData.cityCode, item)
   }
 
   // 获取组内人员
-  async getTeamMember(groudID: string) {
+  async getTeamMember(cityCode:number, groupId: any) {
     try {
-      const { data } = await getUserGroup({
-        groudID
-      })
-      // this.teamMemberList = data.data
-      let ares:any = []
-      if (groudID === 'aa') {
-        ares = [
-          {
-            id: '1',
-            name: '小明'
-          },
-          {
-            id: '2',
-            name: '小刚'
-          },
-          {
-            id: '3',
-            name: '小红'
-          }
-        ]
-      } else {
-        ares = [
-          {
-            id: '4',
-            name: 'xiaoming'
-          },
-          {
-            id: '5',
-            name: 'xiaoHong'
-          },
-          {
-            id: '6',
-            name: 'xiaoLAn'
-          }
-        ]
+      let params:any = {
+        roleTypes: [1, 4],
+        groupId,
+        cityCode,
+        uri: '/v2/clueH5/list/queryFollowerList'
       }
-      this.teamMemberList = ares
+      const { data: res } = await GetSpecifiedRoleList(params)
+      if (res.success) {
+        this.teamMemberList = res.data.map(function(item: any) {
+          return {
+            name: item.name,
+            id: item.id
+          }
+        })
+      } else {
+        this.$message.error(res.errorMsg)
+      }
     } catch (error) {
       return error
     }
@@ -159,7 +149,8 @@ export default class extends Vue {
     this.$nextTick(() => {
       this.queryInfo = {
         group: '',
-        notReceiveId: []
+        notReceiveIds: [],
+        groupId: ''
       }
       this.chosenList = []
       this.teamMemberList = []
@@ -168,12 +159,12 @@ export default class extends Vue {
   // 提交表单
   async setPolicyConfirm(callback: Function) {
     try {
-      const { notReceiveId } = this.queryInfo
+      const { notReceiveIds } = this.queryInfo
       let params = {
-        notReceiveId: notReceiveId.join(','),
-        id: this.policyData.id
+        notReceiveIds: notReceiveIds.join(','),
+        groupId: this.policyData.id
       }
-      const { data } = await setPolicy(params)
+      const { data } = await setrandomPolicy(params)
       if (data.success) {
         this.$message({
           message: '操作成功',
@@ -200,7 +191,7 @@ export default class extends Vue {
       this.chosenList.push(item)
     } else {
       const inx = this.chosenList.findIndex((items:any) => items.id === item.id)
-      console.log(inx, item.id)
+      // console.log(inx, item.id)
       if (inx !== -1) {
         this.chosenList.splice(inx, 1)
       }
@@ -209,9 +200,9 @@ export default class extends Vue {
   // 删除某个Tag
   clearTags(inx:any, id:any) {
     this.chosenList.splice(inx, 1)
-    const index = this.queryInfo.notReceiveId.indexOf(id)
+    const index = this.queryInfo.notReceiveIds.indexOf(id)
     if (index !== -1) {
-      this.queryInfo.notReceiveId.splice(index, 1)
+      this.queryInfo.notReceiveIds.splice(index, 1)
     }
   }
 }
