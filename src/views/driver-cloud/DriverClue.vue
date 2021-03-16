@@ -907,8 +907,7 @@ export default class extends Vue {
       carsType: [
         { required: true, message: '请选择车主类型', trigger: 'change' }
       ],
-      carsphone: [
-        { validator: this.checkPhone, trigger: 'blur' }]
+      carsphone: [{ validator: this.checkPhone, trigger: 'blur' }]
     },
     salesRule: {
       money: [{ required: true, message: '请输入意向售价', trigger: 'blur' }],
@@ -1015,7 +1014,7 @@ export default class extends Vue {
   private checkAll() {
     (this.$refs['baseInfoForm'] as any).submitForm();
     (this.$refs['ownerInfoForm'] as any).submitForm();
-    (this.$refs['sellInfoForm'] as any).validate((valid:boolean) => {
+    (this.$refs['sellInfoForm'] as any).validate((valid: boolean) => {
       console.log(valid)
     });
     (this.$refs['picInfoForm'] as any).submitForm();
@@ -1153,11 +1152,11 @@ export default class extends Vue {
       margin-right: 5px;
     }
   }
-  .moneyBox{
+  .moneyBox {
     display: flex;
     align-items: center;
   }
-  .btnBox{
+  .btnBox {
     width: 100%;
     text-align: center;
     height: 100px;
