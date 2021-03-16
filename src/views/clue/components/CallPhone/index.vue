@@ -29,8 +29,8 @@
         <div>
           <h4>基础信息：</h4>
           <baseInfoForm
-            :id="clueId"
             ref="baseInfo"
+            :clue-id="clueId"
             :clue-status="clueStatus"
             @basePass="basePass"
             @success="successBase"
