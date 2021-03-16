@@ -190,6 +190,7 @@
           </el-button>
           <el-button
             type="text"
+            @click="goDetail(scope.row)"
           >
             详情
           </el-button>
@@ -287,7 +288,8 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
-import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList,
+import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListB,
+  GetClueLZXPrivateSeaPoolListC,
   UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
   UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC
 } from '@/api/clue'
@@ -961,6 +963,16 @@ export default class extends Vue {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
     })
   }
+  // 跳转详情页
+  goDetail({ clueType, phone, clueId }:any) {
+    const query = {
+      clueType, phone, clueId
+    }
+    this.$router.push({
+      path: '/clue/privateDetail',
+      query: query
+    })
+  }
   // 查询
   private handleFilterClick(istrue = false) {
     (this.$refs.PrivateClueTable as any).toggleRowSelection()
@@ -1113,7 +1125,7 @@ export default class extends Vue {
       let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_type', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList]
+        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
 
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))

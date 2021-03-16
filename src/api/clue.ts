@@ -228,7 +228,7 @@ export const UpdateFollowerByHighSeas = (data: any) =>
 // 私海池线索 梧桐线索列表
 export const GetClueWSXPrivateSeaPoolList = (data: any) =>
   request({
-    url: `/carrier_center/v2/market-clue/getClueWSXPrivateSeaPoolList`,
+    url: `/carrier_center/v2/market-clue/getClueWSShareXPrivateSeaPoolList`,
     method: 'post',
     data
   })
@@ -239,14 +239,20 @@ export const GetClueLCXPrivateSeaPoolList = (data: any) =>
     method: 'post',
     data
   })
-// 私海池线索 雷鸟租赁线索列表
-export const GetClueLZXPrivateSeaPoolList = (data: any) =>
+// 私海池线索 雷鸟租赁线索列表 B
+export const GetClueLZXPrivateSeaPoolListB = (data: any) =>
   request({
-    url: `/carrier_center/v2/market-clue/getClueLZXPrivateSeaPoolList`,
+    url: `${produce}/v2/market-clue/getClueLZBXPrivateSeaPoolList`,
     method: 'post',
     data
   })
-
+// 私海池线索 雷鸟租赁线索列表  C
+export const GetClueLZXPrivateSeaPoolListC = (data: any) =>
+  request({
+    url: `${produce}/v2/market-clue/getClueLZCXPrivateSeaPoolList`,
+    method: 'post',
+    data
+  })
 // 私海池线索分配跟进人
 export const UpdateFollowerByPrivateSeas = (data: any) =>
   request({
