@@ -9,7 +9,10 @@
         :data="data"
         :props="defaultProps"
         node-key="id"
-        default-expand-all
+        :default-expand-all="false"
+        :allow-drop="allowDrop"
+        draggable
+        @node-drop="sort"
       >
         <template slot-scope="{node, data}">
           <svg-icon
@@ -66,7 +69,7 @@
               "
             />
 
-            <!-- <el-button
+            <el-button
               v-if="data.type !== 1"
               v-permission="['/v1/base/office/sort']"
               circle
@@ -78,9 +81,9 @@
                   upOffice(node, data);
                 }
               "
-            /> -->
+            />
 
-            <!-- <el-button
+            <el-button
               v-if="data.type !== 1"
               v-permission="['/v1/base/office/sort']"
               circle
@@ -92,7 +95,7 @@
                   downOffice(node, data);
                 }
               "
-            /> -->
+            />
           </div>
         </template>
       </RoleTree>
@@ -647,10 +650,10 @@ export default class extends Vue {
     this.loading = false
     if (data.success) {
       this.data = data.data
-      this.$nextTick(() => {
-        // 兼容上下移动进行手动展开所有节点
-        this.openAll()
-      })
+      // this.$nextTick(() => {
+      //   // 兼容上下移动进行手动展开所有节点
+      //   this.openAll()
+      // })
     } else {
       this.$message.error(data)
     }
@@ -721,6 +724,32 @@ export default class extends Vue {
         this.dialogForm.name = ele.dutyName
       }
     })
+  }
+  private allowDrop(draggingNode: any, dropNode: any, type: any) {
+    if (draggingNode.level === dropNode.level) {
+      // aboveId是父节点id
+      if (draggingNode.aboveId === dropNode.aboveId) {
+        return type === 'prev' || type === 'next'
+      }
+    } else {
+      // 不同级进行处理
+      return false
+    }
+  }
+  private sort(draggingNode: any, dropNode: any, type: any, event: any) {
+    // let obj = {
+    //   aboveId: '',
+    //   arr: []
+    // }
+    // obj.aboveId = dropNode.data.aboveId
+    // for (let item of dropNode.parent.childNodes) {
+    //   obj.arr.push(item.data.id)
+    // }
+    // this.updateOrderMe(obj)
+    console.log(draggingNode, dropNode, type, event)
+  }
+  private updateOrderMe(obj: any) {
+    console.log(obj)
   }
   mounted() {
     this.fetchData()
