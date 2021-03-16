@@ -161,7 +161,7 @@
           {{ row.followerName }}<br>{{ row.followerPhone }}
         </template>
         <template v-slot:followDate="{row}">
-          {{ row.followDate }}<br>{{ row.allocateDate }}
+          {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
           {{ row.hasCar ? '有；' : '无' }}
@@ -855,6 +855,7 @@ export default class extends Vue {
       key: 'followDate',
       label: '最近跟进时间/分配时间',
       rules: ['root'],
+      width: '200px',
       slot: true
     },
     {
