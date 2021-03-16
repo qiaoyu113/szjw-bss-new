@@ -77,6 +77,8 @@ export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
   @Prop({ default: {} }) private baseInfo!: IState;
   @Prop({ default: '' }) private phone!: string;
+  @Prop({ default: '' }) private id!: string;
+  @Prop({ default: '' }) private clueStatus!: number;
 
   private submitLoading: boolean = false;
 
@@ -341,6 +343,8 @@ export default class extends Vue {
   private async handlePassClick(val: boolean) {
     try {
       let params: IState = { ...this.dialogPopQuery }
+      params.clueId = this.id
+      params.status = this.clueStatus
       switch (params.messageType) {
         case 2:
           Reflect.deleteProperty(params, 'interviewDate')
@@ -364,7 +368,7 @@ export default class extends Vue {
         this.$message.warning(res.errorMsg)
       }
     } catch (err) {
-      console.log(err)
+      console.log(err, 'fail')
     }
   }
 }

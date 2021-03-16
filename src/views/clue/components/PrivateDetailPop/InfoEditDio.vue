@@ -66,91 +66,6 @@
           </template>
         </div>
       </SelfForm>
-      <!-- // 梧桐
-      <SelfForm
-        v-if="Number(clueStatus) < 2"
-        ref="editFormWt"
-        key="editFormWt"
-        :rules="rulesWT"
-        :list-query="WTQuery"
-        :form-item="WTItem"
-        size="small"
-        label-width="120px"
-        :pc-col="24"
-        @onPass="handlePassClick"
-      >
-        <div
-          slot="hasCar"
-          style="display:flex;width: 100%;"
-        >
-          <el-select
-            v-model="WTQuery.hasCar"
-            :class="WTQuery.hasCar !== false ? 'carBox' : ''"
-            placeholder="是否有车"
-          >
-            <el-option
-              v-for="item in optionsHasCar"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-          <el-select
-            v-if="WTQuery.hasCar === true"
-            v-model="WTQuery.carType"
-            placeholder="请选择车型"
-          >
-            <el-option
-              v-for="item in optionsCarType"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </div>
-      </SelfForm>
-
-      // 雷鸟车池
-      <SelfForm
-        v-if="Number(clueStatus) === 2"
-        ref="editFormBirdCar"
-        key="editFormBirdCar"
-        :rules="rulesBirdCar"
-        :list-query="BirdCarQuery"
-        :form-item="BirdCarItem"
-        size="small"
-        label-width="120px"
-        :pc-col="24"
-        @onPass="handlePassClick"
-      />
-
-      // 雷鸟租赁C
-      <SelfForm
-        v-if="Number(clueStatus) === 3"
-        ref="editFormBirdC"
-        key="editFormBirdC"
-        :rules="rulesBirdCar"
-        :list-query="BirdCQuery"
-        :form-item="BirdCItem"
-        size="small"
-        label-width="120px"
-        :pc-col="24"
-        @onPass="handlePassClick"
-      />
-
-      // 雷鸟租赁B
-      <SelfForm
-        v-if="Number(clueStatus) === 4"
-        ref="editFormBirdB"
-        key="editFormBirdB"
-        :rules="rulesBirdCar"
-        :list-query="BirdBQuery"
-        :form-item="BirdBItem"
-        size="small"
-        label-width="120px"
-        :pc-col="24"
-        @onPass="handlePassClick"
-      /> -->
     </SelfDialog>
   </div>
 </template>
@@ -527,8 +442,8 @@ export default class extends Vue {
     if (this.clueStatus < 2) {
       this.WTQuery = { ...this.WTQuery, ...value }
       this.WTQuery.intentWork = [
-        value.expectAddressCity,
-        value.expectAddressCounty
+        String(value.expectAddressCity),
+        String(value.expectAddressCounty)
       ]
       if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
         this.WTQuery.intentWork.pop()
@@ -539,8 +454,6 @@ export default class extends Vue {
     } else if (this.clueStatus === 3) {
       this.BirdQuery = { ...this.BirdQuery, ...value }
     } else {
-      value.intentModel = '1,2,10'
-      value.fancyModel = '25,35,1'
       value.intentModel = value.intentModel.split(',').map((ele:any) => {
         return +ele
       })

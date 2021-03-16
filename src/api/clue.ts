@@ -3,6 +3,7 @@ import request from '@/utils/request'
 const prefix = '/mock/81'
 // 待分配线索 梧桐线索列表
 const produce = '/carrier_center'
+const base = '/base_center'
 export const GetToAllotWT = (data: any) =>
   request({
     url: `${produce}/v2/market-clue/getToAllotWTClueList`,
@@ -180,7 +181,7 @@ export const GetToAllotLNLease = (data: any) =>
  */
 export const getClueLCXDetail = (params: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/getClueLCXDetail`,
+    url: `${produce}/v2/market-clue/getClueLCXDetail`,
     method: 'get',
     params
   })
@@ -191,7 +192,7 @@ export const getClueLCXDetail = (params: any) =>
  */
 export const getClueWSXDetail = (params: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/getClueWSXDetail`,
+    url: `${produce}/v2/market-clue/getClueWSXDetail`,
     method: 'get',
     params
   })
@@ -202,7 +203,7 @@ export const getClueWSXDetail = (params: any) =>
  */
 export const getClueLZXDetail = (params: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/getClueLZXDetail`,
+    url: `${produce}/v2/market-clue/getClueLZXDetail`,
     method: 'get',
     params
   })
@@ -213,7 +214,7 @@ export const getClueLZXDetail = (params: any) =>
  */
 export const getClueDetailLogs = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/getClueDetailLogs`,
+    url: `${produce}/v2/market-clue/getClueDetailLogs`,
     method: 'post',
     data
   })
@@ -328,7 +329,7 @@ export const ExportBirdRental = (params: any) =>
  */
 export const getClueTypeList = (params: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/getClueTypeList`,
+    url: `${produce}/v2/market-clue/getClueTypeList`,
     method: 'get',
     params
   })
@@ -339,9 +340,9 @@ export const getClueTypeList = (params: any) =>
  */
 export const cancelInterview = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/cancelInterview`,
+    url: `${produce}/v2/market-clue/cancelInterview`,
     method: 'post',
-    data
+    params: data
   })
 
 /**
@@ -350,9 +351,9 @@ export const cancelInterview = (data: any) =>
  */
 export const clueBreakAnAppointment = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/clueBreakAnAppointment`,
+    url: `${produce}/v2/market-clue/clueBreakAnAppointment`,
     method: 'post',
-    data
+    params: data
   })
 
 /**
@@ -361,7 +362,7 @@ export const clueBreakAnAppointment = (data: any) =>
  */
 export const sendMessageApi = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/sendMessage`,
+    url: `${produce}/v2/market-clue/sendMessage`,
     method: 'post',
     data
   })
@@ -372,7 +373,7 @@ export const sendMessageApi = (data: any) =>
  */
 export const followClueToFirmiana = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/followClueToFirmiana`,
+    url: `${produce}/v2/market-clue/followClueToFirmiana`,
     method: 'post',
     data
   })
@@ -383,7 +384,7 @@ export const followClueToFirmiana = (data: any) =>
  */
 export const followClueToThunderBirdTruckPool = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/followClueToThunderBirdTruckPool`,
+    url: `${produce}/v2/market-clue/followClueToThunderBirdTruckPool`,
     method: 'post',
     data
   })
@@ -394,7 +395,7 @@ export const followClueToThunderBirdTruckPool = (data: any) =>
  */
 export const followClueToThunderBirdRental = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/followClueToThunderBirdRental`,
+    url: `${produce}/v2/market-clue/followClueToThunderBirdRental`,
     method: 'post',
     data
   })
@@ -405,14 +406,14 @@ export const followClueToThunderBirdRental = (data: any) =>
  */
 export const editClue = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/editClue`,
+    url: `${produce}/v2/market-clue/editClue`,
     method: 'post',
     data
   })
   // 通过业务id查询对应的通话日志列表
 export const GetListByBusinessId = (data: any) =>
   request({
-    url: `${baseUrl}/v2/call-log/getListByBusinessId`,
+    url: `${base}/v2/call-log/getListByBusinessId`,
     method: 'post',
     data
   })
