@@ -32,7 +32,7 @@
       </div>
       <template slot="status">
         <el-badge
-          v-for="item in btns"
+          v-for="item in tableBtn"
           :key="item.text"
           :value="item.num"
           :max="9999"
@@ -399,32 +399,68 @@ export default class extends Vue {
     {
       name: '',
       text: '全部',
-      num: 0
+      num: 0,
+      uri: ['root']
     },
     {
       name: '10',
       text: '待跟进',
-      num: 0
+      num: 0,
+      uri: ['root']
     },
     {
       name: '20',
       text: '跟进中', // 审核通过
-      num: 0
+      num: 0,
+      uri: ['root']
+    },
+    {
+      name: '22',
+      text: '可入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '23',
+      text: '待入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '24',
+      text: '已入池', // 审核通过
+      num: 0,
+      uri: [2]
     },
     {
       name: '30',
       text: '邀约成功',
-      num: 0
+      num: 0,
+      uri: [0, 1]
+    },
+    {
+      name: '32',
+      text: '有意向',
+      num: 0,
+      uri: [3, 4]
+    },
+    {
+      name: '35',
+      text: '已看中',
+      num: 0,
+      uri: [3, 4]
     },
     {
       name: '40',
       text: '已面试',
-      num: 0
+      num: 0,
+      uri: [0, 1]
     },
     {
       name: '50',
       text: '已成交',
-      num: 0
+      num: 0,
+      uri: [0, 1, 3, 4]
     }
   ]
   // 打电话
@@ -961,6 +997,11 @@ export default class extends Vue {
   get tableColumns() {
     return this.columns.filter((item: any) => {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
+    })
+  }
+  get tableBtn() {
+    return this.btns.filter((item: any) => {
+      return item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
     })
   }
   // 跳转详情页

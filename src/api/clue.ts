@@ -263,7 +263,7 @@ export const UpdateFollowerByPrivateSeas = (data: any) =>
 // 私海池 梧桐专车线索导入
 export const UploadExcelFirmianaZC = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/firmiana/import/private`,
+    url: `${produce}/v2/market-clue/privatePool/firmiana/import/private`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -273,7 +273,7 @@ export const UploadExcelFirmianaZC = (data: any) =>
 // 私海池 梧桐共享线索导入
 export const UploadExcelBirdGX = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/firmiana/import/shared`,
+    url: `${produce}/v2/market-clue/privatePool/firmiana/import/shared`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -283,7 +283,7 @@ export const UploadExcelBirdGX = (data: any) =>
 // 私海池 雷鸟租赁B线索导入
 export const UploadExcelLNB = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/import/b`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdRental/import/b`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -293,7 +293,7 @@ export const UploadExcelLNB = (data: any) =>
   // 私海池 雷鸟租赁C线索导入
 export const UploadExcelLNC = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/import/c`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdRental/import/c`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
