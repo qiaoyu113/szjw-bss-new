@@ -63,7 +63,8 @@ export const getBackFlowDeflutDate = (params:any) => request({
   params
 })
 
-const baseUrl = '/mock/81'
+// const baseUrl = '/mock/81'
+const baseUrl = '/carrier_center'
 // 获取campaign列表
 export const GetClueCampaignList = (data: any) =>
   request({

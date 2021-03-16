@@ -22,6 +22,7 @@
         <el-radio-group
           v-model="listQuery.clueType"
           size="small"
+          @click="getLists"
         >
           <el-radio-button
             v-for="item in busiTypeArrs"
@@ -90,8 +91,8 @@
         @onPageSize="handlePageSize"
       >
         <template v-slot:userGroupId="{row}">
-          <template v-if="row.userGroupId || row.busiTypeName || row.groupTypeName">
-            {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupTypeName }}
+          <template v-if="row.userGroupId || row.busiTypeName || row.groupType">
+            {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupType }}
           </template>
           <template v-else>
             暂无数据
@@ -197,14 +198,14 @@ export default class extends Vue {
   private platformList:IState[] = []; // 平台列表
   private listLoading:boolean = false;
   private listQuery:IState = {
-    clueType: 1,
+    clueType: 0,
     userGroupId: '',
     areCity: '',
     cityCode: '',
-    launchPlatformCoe: '',
+    launchPlatform: '',
     dropTime: [],
     time: [],
-    sort: 1 // 1: 降序,0:升序
+    sort: 'desc' // 1: 降序(desc),0:升序(asc)
   }
   private userGroupOptions:IState[] = []; // 客群细分id
   private addUserGroup:IState[] = []; // 新增客群细分id
@@ -285,7 +286,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '投放平台',
-      key: 'launchPlatformCoe',
+      key: 'launchPlatform',
       options: this.platformList
     },
     {
@@ -328,7 +329,7 @@ export default class extends Vue {
     {
       key: 'campaignId',
       label: 'Campaign ID',
-      'width': '100px'
+      'width': '110px'
     },
     {
       key: 'userGroupId',
@@ -337,32 +338,32 @@ export default class extends Vue {
       slot: true
     },
     {
-      key: 'areCityName',
+      key: 'regionName',
       label: '所属区域',
       'width': '80px'
     },
     {
       key: 'cityName',
       label: '城市',
-      'width': '80px'
+      'width': '100px'
     },
     {
-      key: 'launchPlatform',
+      key: 'deliveryPlatform',
       label: '投放平台',
       'width': '100px'
     },
     {
-      key: 'dropMaterials',
+      key: 'putMaterials',
       label: '投放物料',
       'width': '140px'
     },
     {
-      key: 'dropStarTime',
+      key: 'putStartDate',
       label: '投放起始时间',
       'width': '160px'
     },
     {
-      key: 'dropEndTime',
+      key: 'putEndDate',
       label: '投放终止时间',
       'width': '160px'
     },
@@ -398,7 +399,7 @@ export default class extends Vue {
     {
       key: 'createUserName',
       label: '创建人',
-      'width': '80px'
+      'width': '100px'
     },
     {
       key: 'createDate',
@@ -489,11 +490,11 @@ export default class extends Vue {
     let obj:IState = {
       sort: this.listQuery.sort
     }
-    this.listQuery.clueType !== '' && (obj.clueType = this.listQuery.clueType)
-    this.listQuery.userGroupId && (obj.userGroupId = this.listQuery.userGroupId)
-    this.listQuery.areCity && (obj.areCity = this.listQuery.areCity)
-    this.listQuery.cityCode && (obj.cityCode = this.listQuery.cityCode)
-    this.listQuery.launchPlatformCoe !== '' && (obj.launchPlatformCoe = this.listQuery.launchPlatformCoe)
+    this.listQuery.clueType !== '' && (obj.clueType = +this.listQuery.clueType)
+    this.listQuery.userGroupId && (obj.userGroupId = +this.listQuery.userGroupId)
+    this.listQuery.areCity && (obj.areCity = +this.listQuery.areCity)
+    this.listQuery.cityCode && (obj.cityCode = +this.listQuery.cityCode)
+    this.listQuery.launchPlatform !== '' && (obj.launchPlatform = this.listQuery.launchPlatform)
     if (this.listQuery.dropTime && this.listQuery.dropTime.length > 0) {
       obj.dropStarTime = new Date(this.listQuery.dropTime[0]).setHours(0, 0, 0)
       obj.dropEndTime = new Date(this.listQuery.dropTime[1]).setHours(23, 59, 59)
@@ -514,7 +515,6 @@ export default class extends Vue {
         limit: this.page.limit,
         ...obj
       }
-
       this.listLoading = true
       let { data: res } = await GetClueCampaignList(params)
       if (res.success) {
@@ -664,9 +664,9 @@ export default class extends Vue {
       this.listQuery.sort === 0 ? row.order = 'ascending' : row.order = 'descending'
     }
     if (row.order === 'ascending') { // 降序
-      this.listQuery.sort = 1
+      this.listQuery.sort = 'desc'
     } else {
-      this.listQuery.sort = 0
+      this.listQuery.sort = 'asc'
     }
     this.getLists()
   }

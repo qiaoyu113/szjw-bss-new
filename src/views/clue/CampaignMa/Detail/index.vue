@@ -16,19 +16,19 @@
       :md="true"
     >
       <WuTong
-        v-if="[1,2].includes(busiType)"
+        v-if="[0,1].includes(busiType)"
         ref="wutong"
         :campaign-id="campaignId"
         :is-edit="isEdit"
       />
       <ThunderbirdPool
-        v-else-if="busiType === 3"
+        v-else-if="busiType === 2"
         ref="pool"
         :campaign-id="campaignId"
         :is-edit="isEdit"
       />
       <ThunderbirdRental
-        v-else-if="busiType === 4"
+        v-else-if="busiType === 3"
         ref="rental"
         :campaign-id="campaignId"
         :is-edit="isEdit"
@@ -69,6 +69,7 @@ import ThunderbirdPool from './components/thunderbirdPool.vue'
 import ThunderbirdRental from './components/thunderbirdRental.vue'
 import { EditCampaignData } from '@/api/clue'
 import CallLog from '@/components/OutboundDialog/CallLog.vue'
+import { divisionFunc } from './components/index'
 interface IState {
   [key: string]: any;
 }
@@ -106,11 +107,11 @@ export default class extends Vue {
     try {
       let params:IState[] = []
       let arrs:IState[] = []
-      if ([1, 2].includes(this.busiType)) {
+      if ([1, 0].includes(this.busiType)) {
         arrs = (this.$refs.wutong as any).tableData
-      } else if (this.busiType === 3) {
+      } else if (this.busiType === 2) {
         arrs = (this.$refs.pool as any).tableData
-      } else if (this.busiType === 4) {
+      } else if (this.busiType === 3) {
         arrs = (this.$refs.rental as any).tableData
       }
       params = arrs.map((item:IState) => ({
@@ -118,7 +119,10 @@ export default class extends Vue {
         campaignId: this.campaignId,
         actualCost: +item.actualCost1,
         clickNum: +item.clickNum1,
-        showNum: +item.showNum1
+        showNum: +item.showNum1,
+        showClickRate: divisionFunc(item.showNum1, item.clickNum1),
+        clickClueRate: divisionFunc(item.clueNum, item.clickNum1),
+        clickCost: divisionFunc(item.actualCost, item.clickNum1)
       }))
       let { data: res } = await EditCampaignData(params)
       if (res.success) {
@@ -135,11 +139,11 @@ export default class extends Vue {
   }
   // 获取数据统计的表格数据
   getTable() {
-    if ([1, 2].includes(this.busiType)) {
+    if ([0, 1].includes(this.busiType)) {
       (this.$refs.wutong as any).getTableData()
-    } else if (this.busiType === 3) {
+    } else if (this.busiType === 2) {
       (this.$refs.pool as any).getTableData()
-    } else if (this.busiType === 4) {
+    } else if (this.busiType === 3) {
       (this.$refs.rental as any).getTableData()
     }
   }
