@@ -49,22 +49,43 @@
           />
         </template>
         <template slot="roleId">
-          <el-input
-            v-if="!!userId"
-            v-model="listQuery.roleName"
-            :disabled="true"
-          />
-          <el-cascader
-            v-else
-            v-model="listQuery.roleId"
-            placeholder="请选择"
-            :props=" {
-              value: 'id',
-              label: 'dutyName',
-              children: 'childDuty'
-            }"
-            :options="roleArr"
-          />
+          <el-row
+            v-for="(item,idx) in listQuery.roleId"
+            :key="idx"
+            style="width:100%;margin-bottom: 10px;"
+          >
+            <el-col :span="22">
+              <el-input
+                v-if="!!userId"
+                v-model="item.roleName"
+                :disabled="true"
+              />
+              <el-cascader
+                v-else
+                v-model="item.roleId"
+                :disabled="item.roleId.length === 3"
+                placeholder="请选择"
+                :props=" {
+                  value: 'id',
+                  label: 'dutyName',
+                  children: 'childDuty'
+                }"
+                :options="roleArr"
+              />
+            </el-col>
+            <el-col :span="2">
+              <i
+                v-if="idx===0"
+                class="el-icon-plus"
+                @click.stop="handleAddRole"
+              />
+              <i
+                v-if="idx > 0"
+                class="el-icon-minus"
+                @click.stop="handleDelRole(idx)"
+              />
+            </el-col>
+          </el-row>
         </template>
         <template slot="passwd">
           <el-input
@@ -121,7 +142,6 @@
             <el-button>取消</el-button>
           </router-link>
 
-          <!-- v-permission="['/v2/base/user/create','/v2/base/user/update']" -->
           <el-button
             type="primary"
             @click="handleValidateForm"
@@ -142,21 +162,10 @@ import { phoneReg, isValidPassWord, lock } from '@/utils/index.ts'
 import { getOfficeByCurrentUserV2 as getOfficeByCurrentUser, getDutyAndRoleList, RoleParams, addUser, modifyUser, userDetail } from '@/api/system'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
-export interface FormObj {
-  id?:number | string;
-  userName: string;
-  mobile: string;
-  officeId: string|number [] ;
-  roleId?: string|number [];
-  passwd: string;
-  confirmPassword: string;
-  nickName: string;
-  roleName?:string;
-  crmUserStatus?:string;
-  syncStatus?:boolean;
-  status?:number;
-}
 
+interface IState {
+  [key: string]: any;
+}
 interface RuleForm {
   userName: any[];
   mobile: any[];
@@ -172,16 +181,22 @@ interface RuleForm {
   }
 })
 export default class extends Vue {
+  [x: string]: any
   userId:string| number = ''
   private listLoading:boolean = false
   private officeArr = [] // 组织架构列表
   private roleArr = [] // 角色列表
-  private listQuery:FormObj = {
+  private rows:number = 1; // 有几行
+  private listQuery:IState = {
     id: '',
     userName: '',
     mobile: '',
     officeId: [],
-    roleId: [],
+    roleId: [
+      {
+        roleId: []
+      }
+    ],
     passwd: 'Aa123456',
     confirmPassword: '',
     nickName: '',
@@ -192,19 +207,10 @@ export default class extends Vue {
   }
   sourcePhone:string = ''
   private formItem:any[] = [
-    // {
-    //   type: 1,
-    //   key: 'userName',
-    //   label: '姓名:',
-    //   tagAttrs: {
-    //     placeholder: '请输入',
-    //     maxlength: 10
-    //   }
-    // },
     {
       type: 'userName',
       key: 'userName',
-      label: '姓名:',
+      label: '用户姓名:',
       slot: true
     },
     {
@@ -223,7 +229,8 @@ export default class extends Vue {
       key: 'roleId',
       type: 'roleId',
       label: '角色:',
-      slot: true
+      slot: true,
+      class: 'role'
     },
     {
       key: 'passwd',
@@ -376,7 +383,7 @@ export default class extends Vue {
   }
   // 组织架构发生变化
   handleOfficeIdChange(val:number[]) {
-    this.listQuery.roleId = []
+    this.listQuery.roleId = [{ roleId: [] }]
     let obj:{
       [propName:string]:any
       } = {
@@ -513,7 +520,7 @@ export default class extends Vue {
   jumplist() {
     setTimeout(() => {
       this.$router.push({
-        path: '/system/user'
+        path: '/roleSystem/user'
       })
     }, delayTime)
   }
@@ -559,6 +566,18 @@ export default class extends Vue {
   beforeRouteLeave(to:any, from:any, next:Function) {
     this.resetForm()
     next()
+  }
+  // 添加角色
+  handleAddRole() {
+    this.listQuery.roleId.push({
+      roleId: []
+    })
+  }
+  // 删掉角色
+  handleDelRole(idx:number) {
+    if (idx > 0) {
+      this.listQuery.roleId.splice(idx, 1)
+    }
   }
   async mounted() {
     this.userId = +this.$route.query.userId || ''
@@ -609,5 +628,16 @@ export default class extends Vue {
   }
   .opUser >>> .el-card__header {
     border-bottom: none;
+  }
+  .opUser >>> .role .el-form-item__content {
+    display: flex;
+    flex-direction: column;
+  }
+  .opUser >>> .el-icon-plus, .opUser >>> .el-icon-minus {
+    font-size: 26px;
+    vertical-align: middle;
+    font-weight: bold;
+    color: #80B436;
+    cursor: pointer;
   }
 </style>

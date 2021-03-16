@@ -48,7 +48,7 @@
       active-name="用户管理"
     >
       <div class="subTitle">
-        <router-link :to="{path: '/system/addUser'}">
+        <router-link :to="{path: '/roleSystem/addUser'}">
           <el-button
             v-permission="['/v2/base/user/create']"
             class="createUser"
@@ -254,6 +254,22 @@ export default class extends Vue {
       key: 'mobile'
     },
     {
+      type: 8,
+      tagAttrs: {
+        placeholder: '请选择',
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'a',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: this.showWork1
+        }
+      },
+      label: '组织架构',
+      key: 'a'
+    },
+    {
       type: 1,
       tagAttrs: {
         placeholder: '请输入角色名称',
@@ -326,6 +342,25 @@ export default class extends Vue {
       console.log(`get lists fail:${err}`)
     } finally {
       this.listLoading = false
+    }
+  }
+  showWork1(node: any, resolve: any) {
+    let query: any = {
+      parentId: ''
+    }
+    if (node.level > 0) {
+      query.parentId = node.value
+    }
+    try {
+      if (node.level === 0) {
+        let nodes:[] = []
+        resolve(nodes)
+      } else if (node.level === 1) {
+        let nodes:[] = []
+        resolve(nodes)
+      }
+    } catch (err) {
+      resolve([])
     }
   }
   // 启用、禁用
