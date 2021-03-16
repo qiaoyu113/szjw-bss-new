@@ -7,6 +7,7 @@
       <RoleTree
         class="treeLine"
         :data="data"
+        :expanded-key="[1]"
         :props="defaultProps"
         :indent="0"
       >
@@ -306,7 +307,7 @@ export default class extends Vue {
     const { data } = await authorityList()
     this.loading = false
     if (data.success) {
-      // console.log(data)
+      console.log(data)
       this.data = data.data
     } else {
       this.$message.error(data)

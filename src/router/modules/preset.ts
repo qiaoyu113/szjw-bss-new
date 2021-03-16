@@ -78,9 +78,9 @@ const presetRouter: RouteConfig = {
         {
           path: 'role',
           component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
-          name: 'RoleSystem',
+          name: 'roleManage',
           meta: {
-            title: 'roleSystem',
+            title: 'roleManage',
             apiUrl: '/v1/base/office/list'
           }
         }

@@ -8,6 +8,7 @@
         class="treeLine"
         :data="data"
         :props="defaultProps"
+        :expanded-key="[1]"
         :indent="0"
       >
         <template slot-scope="{node, data}">
