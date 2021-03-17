@@ -196,7 +196,7 @@ export default class extends Vue {
       tag: { name: '月', type: 'append' },
       tagAttrs: {
         placeholder: '请填写',
-        maxlength: '3'
+        maxlength: '2'
       },
       listeners: {
         input: this.handleValidateExperience
@@ -558,14 +558,19 @@ export default class extends Vue {
   // 获取车型
   async getOptions() {
     try {
-      let params = ['Intentional_compartment']
+      let params = ['Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         let cars = res.data.Intentional_compartment.map(function(item: any) {
           return { label: item.dictLabel, value: +item.dictValue }
         })
 
+        let demandTypeOptions = res.data.demand_type.map((item: any) => {
+          return { label: item.dictLabel, value: +item.dictValue }
+        })
+
         this.optionsCarType.push(...cars)
+        this.demandTypeOptions.push(...demandTypeOptions)
       } else {
         this.$message.error(res.errorMsg)
       }

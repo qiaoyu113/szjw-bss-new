@@ -160,7 +160,7 @@ export default class extends Vue {
       tag: { name: '月', type: 'append' },
       tagAttrs: {
         placeholder: '请填写',
-        maxlength: '3'
+        maxlength: '2'
       },
       listeners: {
         input: this.handleValidateExperience
