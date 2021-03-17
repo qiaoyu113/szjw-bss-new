@@ -8,6 +8,8 @@
       width="80%"
       :sumbit-again="submitLoading"
       :destroy-on-close="true"
+      :show-confirm-button="true"
+      confirm-button-text="提交分配"
       @closed="handleClosed"
       @open="openDio"
     >
@@ -60,22 +62,11 @@
           :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
           :max-height="tableHeight"
           :page-size="pageSize"
+          :func="disabledCheck"
+          :empty="true"
           @onPageSize="handlePageSize"
           @selection-change="handleSelectionChange"
-        >
-          <template v-slot:createDate="scope">
-            {{ scope.row.createDate }}
-          </template>
-          <template v-slot:op="scope">
-            <el-button
-              type="text"
-              :disabled="!isCanallocation"
-              @click="handleAllotClick(scope.row)"
-            >
-              分配
-            </el-button>
-          </template>
-        </self-table>
+        />
       </div>
     </SelfDialog>
   </div>
@@ -109,7 +100,7 @@ export default class extends Vue {
   @Prop({ default: {} }) allowData!: IState;
 
   private pageSize:number[] = [10, 20, 50, 100, 150, 200]
-  private listLoading: boolean = true;
+  private listLoading: boolean = false;
   private submitLoading: boolean = false;
   private tableData:IState = []
   private multipleSelection: any[] = []; // 当前页选中的数据
@@ -207,12 +198,26 @@ export default class extends Vue {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
   openDio(value:any) {
-    if (this.show) this.getLists()
+    // if (this.show) this.getLists()
   }
   // 查询
-  handleFilterClick() {}
+  handleFilterClick() {
+    this.page.page = 1
+    this.getLists()
+  }
   handleResetClick() {
+    this.page.page = 1
+    this.page.total = 0;
     (this.$refs['searchForm'] as any).resetForm()
+    this.tableData = []
+  }
+
+  private disabledCheck(row:any, index:number) {
+    if (row.usedUserCount === 1) {
+      return false
+    } else {
+      return true
+    }
   }
 
   // 分页
@@ -245,7 +250,7 @@ export default class extends Vue {
   }
   // 编辑确认按钮
   confirm() {
-    console.log('confirm')
+    console.log('confirm', this.multipleSelection)
   }
   // 取消按钮
   handleClosed() {
