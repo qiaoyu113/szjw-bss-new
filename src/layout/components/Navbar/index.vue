@@ -184,7 +184,17 @@ export default class extends Vue {
   private async logout(this:any) {
     await UserModule.LogOut()
     this.$notify.closeAll()
+    let makePhoneDom = document.getElementById('makePhone')
+    if ((makePhoneDom as HTMLElement).hasChildNodes()) {
+      this.handleDeleteDom()
+    }
     this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+  }
+  // 删除dom
+  handleDeleteDom() {
+    let makePhone = document.getElementById('makePhone')
+    const child = (makePhone as HTMLHtmlElement).children[0];
+    (makePhone as HTMLHtmlElement).removeChild(child)
   }
 }
 </script>

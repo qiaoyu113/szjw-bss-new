@@ -10,10 +10,10 @@
       :row-style="{height: '20px'}"
       :cell-style="{padding: '5px 0'}"
       :data="tableData"
-      :border="isPC"
+      :border="isPC && $attrs.border !== false"
       size="mini"
       fit
-      stripe
+      :stripe="$attrs.stripe === undefined ? true : $attrs.stripe"
       highlight-current-row
       v-bind="$attrs"
       style="width: 100%; "
@@ -37,11 +37,11 @@
       <el-table-column
         v-for="item in columns"
         :key="item.key"
+        :prop="item.key"
         :align="item.align || 'center'"
         :min-width="item.width || 100"
         :label="item.label"
         :fixed="item.fixed"
-        :prop="item.key"
         v-bind="item.attrs"
       >
         <template
@@ -92,6 +92,7 @@
               v-if="item.slot"
               :name="item.key"
               :row="scope.row"
+              :index="scope.$index"
             />
             <template v-else>
               {{ scope.row[item.key] | DataIsNull }}
