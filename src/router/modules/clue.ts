@@ -23,6 +23,48 @@ const clueRouter: RouteConfig = {
       }
     },
     {
+      path: 'campaignList', /* CamPaign列表 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/List/index.vue'),
+      name: 'CampaignList',
+      meta: {
+        apiUrl: '/v2/clue/campaign/getClueCampaignList',
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    // /v2/clue/campaign/getClueCampaignList
+    {
+      path: 'campaignDetail', /* CamPaign详情 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/Detail/index.vue'),
+      name: 'CampaignDetail',
+      meta: {
+        apiUrl: '/v2/clue/campaign/getClueCampaignList',
+        hidden: true,
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    {
+      path: 'backflowPolicy', /* 配置管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
+      name: 'BackflowPolicy',
+      meta: {
+        apiUrl: 'root',
+        title: 'BackflowPolicy',
+        noCache: false
+      }
+    },
+    {
+      path: 'randomlyAssigned', /* 配置管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
+      name: 'RandomlyAssigned',
+      meta: {
+        apiUrl: 'root',
+        title: 'RandomlyAssigned',
+        noCache: false
+      }
+    },
+    {
       path: 'public', /* 公海池 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Public.vue'),
       name: 'PublicClue',
@@ -52,48 +94,6 @@ const clueRouter: RouteConfig = {
         activeMenu: '/clue/private',
         hidden: true,
         noCache: true
-      }
-    },
-    {
-      path: 'backflowPolicy', /* 配置管理 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
-      name: 'BackflowPolicy',
-      meta: {
-        apiUrl: 'root',
-        title: 'BackflowPolicy',
-        noCache: false
-      }
-    },
-    {
-      path: 'randomlyAssigned', /* 配置管理 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
-      name: 'RandomlyAssigned',
-      meta: {
-        apiUrl: 'root',
-        title: 'RandomlyAssigned',
-        noCache: false
-      }
-    },
-    {
-      path: 'campaignList', /* CamPaign列表 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/List/index.vue'),
-      name: 'CampaignList',
-      meta: {
-        apiUrl: '/v2/clue/campaign/getClueCampaignList',
-        title: 'campaignList',
-        noCache: false
-      }
-    },
-    // /v2/clue/campaign/getClueCampaignList
-    {
-      path: 'campaignDetail', /* CamPaign详情 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/Detail/index.vue'),
-      name: 'CampaignDetail',
-      meta: {
-        apiUrl: '/v2/clue/campaign/getClueCampaignList',
-        hidden: true,
-        title: 'campaignList',
-        noCache: false
       }
     }
   ]
