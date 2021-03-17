@@ -105,7 +105,7 @@ export default class extends Vue {
   // 编辑数据统计
   async editCampaignData() {
     try {
-      let params:IState[] = []
+      let params:IState = {}
       let arrs:IState[] = []
       if ([1, 0].includes(this.busiType)) {
         arrs = (this.$refs.wutong as any).tableData
@@ -114,7 +114,7 @@ export default class extends Vue {
       } else if (this.busiType === 3) {
         arrs = (this.$refs.rental as any).tableData
       }
-      params = arrs.map((item:IState) => ({
+      let obj = arrs.map((item:IState) => ({
         statisticsId: item.statisticsId,
         campaignId: this.campaignId,
         actualCost: +item.actualCost1,
@@ -124,6 +124,7 @@ export default class extends Vue {
         clickClueRate: divisionFunc(item.clueNum, item.clickNum1),
         clickCost: divisionFunc(item.actualCost, item.clickNum1)
       }))
+      params.editFormList = obj
       let { data: res } = await EditCampaignData(params)
       if (res.success) {
         this.$message.success('操作成功')
