@@ -94,6 +94,7 @@
       :operation-list="operationList"
       :total="page.total"
       :page.sync="page.page"
+      :page-sizes="pageSize"
       :limit.sync="page.limit"
       @olclick="handleOlClick"
       @pagination="handlePageSizeChange"
@@ -125,6 +126,7 @@ interface PageObj {
 export default class extends Vue {
   @Prop({ default: () => [] }) tableData!:any[]
   @Prop({ default: () => [] }) columns!:any[]
+  @Prop({ default: () => [10, 20, 30, 40, 50] }) pageSize?:any[]
   @Prop({ default: () => disabledCheckBox }) func!:Function
   @Prop({ default: true }) index!:boolean
   @Prop({ default: true }) isP30!:boolean

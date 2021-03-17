@@ -55,8 +55,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'wtSystem', /* 梧桐管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/PermissionManage.vue'),
-      name: 'wtSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/wtSystem/authority',
       meta: {
         title: 'wtSystem',
@@ -78,9 +78,9 @@ const presetRouter: RouteConfig = {
         {
           path: 'role',
           component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
-          name: 'RoleSystem',
+          name: 'RoleManage',
           meta: {
-            title: 'roleSystem',
+            title: 'roleManage',
             apiUrl: '/v1/base/office/list'
           }
         }
