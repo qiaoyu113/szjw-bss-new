@@ -156,23 +156,13 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { Form as ElForm } from 'element-ui'
-import { ValidateFieldCallback } from 'element-ui/types/form.d'
-import { phoneReg, isValidPassWord, lock } from '@/utils/index.ts'
-import { getOfficeByCurrentUserV2 as getOfficeByCurrentUser, getDutyAndRoleList, RoleParams, addUser, modifyUser, userDetail } from '@/api/system'
+import { isValidPassWord, lock } from '@/utils/index'
+import { addUser, modifyUser, userDetail } from '@/api/system'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
-
+import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../index'
 interface IState {
   [key: string]: any;
-}
-interface RuleForm {
-  userName: any[];
-  mobile: any[];
-  officeId: any[];
-  roleId: any[];
-  passwd: any[];
-  confirmPassword: any[];
 }
 
 @Component({
@@ -186,7 +176,6 @@ export default class extends Vue {
   private listLoading:boolean = false
   private officeArr = [] // 组织架构列表
   private roleArr = [] // 角色列表
-  private rows:number = 1; // 有几行
   private listQuery:IState = {
     id: '',
     userName: '',
@@ -349,113 +338,20 @@ export default class extends Vue {
       console.log(`get user info fail:${err}`)
     }
   }
-  // 获取组织架构
-  async getOfficeByCurrentUser() {
-    try {
-      let { data: res } = await getOfficeByCurrentUser()
-      if (res.success) {
-        let arrs = res.data
-        let brrs = this.deeploopOffice(arrs)
-        this.officeArr.push(...(brrs as []))
-      } else {
-        this.$message.error(res.errorMsg)
-      }
-    } catch (err) {
-      console.log(`get office fail:${err}`)
-    }
-  }
-  // 组织架构数据改造
-  deeploopOffice(arrs:any[]) {
-    let brrs:any[] = []
-    arrs.forEach(item => {
-      if (item.type === 3) {
-        item.disabled = true
-      }
-      if (item.officeVOs === null || item.officeVOs.length === 0) {
-        delete item.officeVOs
-      } else {
-        let crr = this.deeploopOffice(item.officeVOs)
-        item.officeVOs = crr
-      }
-      brrs.push(item)
-    })
-    return brrs
-  }
+
   // 组织架构发生变化
-  handleOfficeIdChange(val:number[]) {
+  async handleOfficeIdChange(val:number[]) {
     this.listQuery.roleId = [{ roleId: [] }]
-    let obj:{
-      [propName:string]:any
-      } = {
-        officeVOs: []
-      }
-    if (val.length >= 1) {
-      obj = this.officeArr.filter((item:any) => item.id === val[0])[0]
-    }
-
-    if (val.length >= 2) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[1])[0]
-    }
-
-    if (val.length >= 3) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[2])[0]
-    }
-    if (val.length >= 4) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[3])[0]
-    }
-    if (val.length >= 5) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[4])[0]
-    }
-    // 目前最大是5级
-    let officeLevel:number = 0
-    if (obj.type === 1) { // 总部
-      officeLevel = 1
-    } else if (obj.type === 2) { // 大区
-      officeLevel = 2
-    } else { // 业务线
-      officeLevel = 3
-    }
-    let params:RoleParams = {
-      officeLevel
-    }
-    if (obj.type > 3) {
-      params.dutyId = obj.dutyId
-    }
-
-    this.getDutyAndRoleList(params)
-  }
-  // 获取角色
-  async getDutyAndRoleList(params:RoleParams) {
+    let params:IState = GetRoleParamsByOfficeId(val, this.officeArr)
     try {
-      let { data: res } = await getDutyAndRoleList(params)
-      if (res.success) {
-        let arrs = res.data
-        this.roleArr = []
-        let brrs = this.deeploopRole(arrs)
-        this.roleArr.push(...(brrs as []))
-      } else {
-        this.$message.error(res.errorMsg)
-      }
+      this.roleArr = []
+      let result = await GetDutyAndRoleList(params)
+      this.roleArr.push(...result)
     } catch (err) {
-      console.log(`get role list fail:{err}`)
+      this.roleArr = []
+    } finally {
+      //
     }
-  }
-  // 角色列表数据改造
-  deeploopRole(arrs:any[]) {
-    let brrs:any[] = []
-    arrs.forEach(item => {
-      if (item.childDuty === null || item.childDuty.length === 0) {
-        delete item.childDuty
-        if (item.dutyLevel < 3) {
-          item.disabled = true
-        }
-      } else {
-        let crr = this.deeploopRole(item.childDuty)
-        item.childDuty = crr
-      }
-      brrs.push(item)
-    })
-    return brrs
   }
   // 新增用户
   @lock
@@ -590,8 +486,15 @@ export default class extends Vue {
       }
       this.formItem.push(add)
     }
-    await this.getOfficeByCurrentUser()
     this.getUserDetail()
+    try {
+      let result = await GetOfficeByCurrentUser()
+      this.officeArr.push(...result)
+    } catch (err) {
+      this.officeArr = []
+    } finally {
+      //
+    }
   }
 }
 </script>
@@ -634,6 +537,7 @@ export default class extends Vue {
     flex-direction: column;
   }
   .opUser >>> .el-icon-plus, .opUser >>> .el-icon-minus {
+    margin-left: 10px;
     font-size: 26px;
     vertical-align: middle;
     font-weight: bold;
