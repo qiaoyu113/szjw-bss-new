@@ -43,11 +43,11 @@
           {{ row.actualCost | DataIsNull }}
         </template>
       </template>
-      <template v-slot:clickConversionRate="{row}">
-        {{ row.clickConversionRate }}%
+      <template v-slot:showClickRate="{row}">
+        {{ row.showClickRate }}%
       </template>
-      <template v-slot:clickClueConversionRate="{row}">
-        {{ row.clickClueConversionRate }}%
+      <template v-slot:clickClueRate="{row}">
+        {{ row.clickClueRate }}%
       </template>
       <template v-slot:clueAlreadyPoolRate="{row}">
         {{ row.clueAlreadyPoolRate }}%
@@ -74,12 +74,12 @@ export default class extends Vue {
   @Prop({ default: () => [] }) isEdit!:boolean
   private columns:IState[] = [
     {
-      key: 'importBatch',
+      key: 'importBatchNo',
       label: '导入批次',
       'width': '140px'
     },
     {
-      key: 'importDate',
+      key: 'createDate',
       label: '线索导入时间',
       'width': '180px'
     },
@@ -121,13 +121,13 @@ export default class extends Vue {
       'width': '140px'
     },
     {
-      key: 'clickConversionRate',
+      key: 'showClickRate',
       label: '展示-点击转化率',
       'width': '140px',
       slot: true
     },
     {
-      key: 'clickClueConversionRate',
+      key: 'clickClueRate',
       label: '点击-线索转化率',
       'width': '140px',
       slot: true
@@ -198,7 +198,7 @@ export default class extends Vue {
       let costArr:number[] = []
 
       const sumCols:string[] = ['showNum', 'clickNum', 'clueNum', 'surePoolNum', 'stayPoolNum', 'alreadyPoolNum', 'actualCost'] // 存数字求和
-      const percentCols:string[] = ['clickConversionRate', 'clickClueConversionRate', 'clueAlreadyPoolRate'] // %求平均数
+      const percentCols:string[] = ['showClickRate', 'clickClueRate', 'clueAlreadyPoolRate'] // %求平均数
       const costCols:string[] = ['clickCost', 'clueCost', 'alreadyPoolCost'] // 成本求平均数
 
       data.forEach((item:IState) => {
@@ -230,10 +230,10 @@ export default class extends Vue {
   percentFunc(sums:any, prop:string) {
     switch (prop) {
       // 展示-点击转化率
-      case 'clickConversionRate':
+      case 'showClickRate':
         return divisionFunc(sums['clickNum'], sums['showNum'])
         // 点击-线索转化率
-      case 'clickClueConversionRate':
+      case 'clickClueRate':
         return divisionFunc(sums['clueNum'], sums['clickNum'])
         // 线索-已入池转化率
       case 'clueAlreadyPoolRate':

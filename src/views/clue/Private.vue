@@ -32,11 +32,10 @@
       </div>
       <template slot="status">
         <el-badge
-          v-for="item in btns"
+          v-for="item in tableBtn"
           :key="item.text"
           :value="item.num"
           :max="9999"
-          :hidden="item.num === 0"
         >
           <el-button
             type="primary"
@@ -108,7 +107,7 @@
           <el-checkbox-group
             v-model="listQuery.toDo"
             size="small"
-            @change="handleFilterClick"
+            @change="handleFilterClick(true)"
           >
             <el-checkbox-button :label="true">
               代办事项
@@ -120,7 +119,7 @@
           placeholder="排序方式"
           size="small"
           clearable
-          @change="handleFilterClick"
+          @change="sortClick"
         >
           <el-option
             v-for="item in sortOptions"
@@ -162,7 +161,7 @@
           {{ row.followerName }}<br>{{ row.followerPhone }}
         </template>
         <template v-slot:followDate="{row}">
-          {{ row.followDate }}<br>{{ row.allocateDate }}
+          {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
           {{ row.hasCar ? '有；' : '无' }}
@@ -185,11 +184,13 @@
         <template v-slot:op="scope">
           <el-button
             type="text"
+            @click="callPhoneClick(scope.row)"
           >
             打电话
           </el-button>
           <el-button
             type="text"
+            @click="goDetail(scope.row)"
           >
             详情
           </el-button>
@@ -267,13 +268,18 @@
         <el-link
           class="mt20"
           type="primary"
-          href="https://element.eleme.io"
-          target="_blank"
+          @click.prevent="downloadFile"
         >
           点击下载模板
         </el-link>
       </div>
     </SelfDialog>
+    <CallPhone
+      :show-dialog.sync="callPhoneDio"
+      :clue-status="rowStatus.clueType"
+      :phone="rowStatus.phone"
+      :clue-id="rowStatus.clueId"
+    />
   </div>
 </template>
 
@@ -281,8 +287,13 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
-import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, UpdateFollowerByPrivateSeas, UploadExcelFirmiana, UploadExcelBird, ExportFirmiana, ExportBirdTruck, ExportBirdRental } from '@/api/clue'
+import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListB,
+  GetClueLZXPrivateSeaPoolListC,
+  UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
+  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC
+} from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
+import CallPhone from './components/CallPhone/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
@@ -291,7 +302,7 @@ import { GetDictionaryList, GetSpecifiedRoleList,
 } from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
-import { join } from 'lodash'
+import { deburr, keys } from 'lodash'
 
 interface IState {
   [key: string]: any;
@@ -318,7 +329,8 @@ interface formItem {
   components: {
     SelfTable,
     SelfForm,
-    SelfDialog
+    SelfDialog,
+    CallPhone
   }
 })
 export default class extends Vue {
@@ -335,7 +347,7 @@ export default class extends Vue {
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
     followerId: [], // 跟进人
-    sourceChannel: '', // 渠道
+    sourceChannel: [], // 渠道
     clueAttribution: '', // 线索归属
     inviteStatus: '', // 邀约情况
     intentDegree: '', // 意向度
@@ -386,39 +398,127 @@ export default class extends Vue {
     {
       name: '',
       text: '全部',
-      num: 0
+      num: 0,
+      uri: ['root']
     },
     {
       name: '10',
-      text: '待分配',
-      num: 0
+      text: '待跟进',
+      num: 0,
+      uri: ['root']
     },
     {
       name: '20',
-      text: '待跟进', // 审核通过
-      num: 0
+      text: '跟进中', // 审核通过
+      num: 0,
+      uri: ['root']
+    },
+    {
+      name: '22',
+      text: '可入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '23',
+      text: '待入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '24',
+      text: '已入池', // 审核通过
+      num: 0,
+      uri: [2]
     },
     {
       name: '30',
-      text: '跟进中',
-      num: 0
+      text: '邀约成功',
+      num: 0,
+      uri: [0, 1]
+    },
+    {
+      name: '32',
+      text: '有意向',
+      num: 0,
+      uri: [3, 4]
+    },
+    {
+      name: '35',
+      text: '已看中',
+      num: 0,
+      uri: [3, 4]
     },
     {
       name: '40',
-      text: '待面试',
-      num: 0
+      text: '已面试',
+      num: 0,
+      uri: [0, 1]
     },
     {
       name: '50',
-      text: '已面试',
-      num: 0
-    },
-    {
-      name: '60',
       text: '已成交',
-      num: 0
+      num: 0,
+      uri: [0, 1, 3, 4]
     }
   ]
+  downloadFile() {
+    const fileList = [
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/c76b93da4d67419b8a895e64c9f74928',
+        recordId: '梧桐专车导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/8217cd68a2bc41539165d56b597e7e52',
+        recordId: '梧桐共享导入模板'
+      },
+      {},
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/daaa37ffdedf403a8d628c3b3718e962',
+        recordId: '雷鸟租赁C导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/2784fc8c0f52419290ef42f1577731bc',
+        recordId: '雷鸟租赁B导入模板'
+      }
+    ]
+    const index = this.listQuery.clueType
+    this.download(fileList[index])
+  }
+  // 下载文件
+  download(row:any) {
+    if (!row.fileUrl) {
+      return
+    }
+    let link = document.createElement('a')
+    link.style.display = 'none'
+    link.href = row.fileUrl
+    link.setAttribute(`download`, `313133.xls`)
+    console.log(link)
+    // return
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+  // 打电话
+  private callPhoneDio = false
+  private rowStatus = {
+    clueType: '',
+    phone: '',
+    clueId: ''
+  }
+  callPhoneClick(row:any) {
+    const { clueId, clueType, phone } = row
+    this.rowStatus = {
+      clueId,
+      clueType,
+      phone
+    }
+    this.$nextTick(() => {
+      this.callPhoneDio = true
+    })
+    console.log(row)
+  }
   /**
    * rules: []
    * root 为全局显示
@@ -830,6 +930,7 @@ export default class extends Vue {
       key: 'followDate',
       label: '最近跟进时间/分配时间',
       rules: ['root'],
+      width: '200px',
       slot: true
     },
     {
@@ -935,22 +1036,37 @@ export default class extends Vue {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
     })
   }
+  get tableBtn() {
+    return this.btns.filter((item: any) => {
+      return item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
+    })
+  }
+  // 跳转详情页
+  goDetail({ clueType, phone, clueId }:any) {
+    const query = {
+      clueType, phone, clueId
+    }
+    this.$router.push({
+      path: '/clue/privateDetail',
+      query: query
+    })
+  }
   // 查询
-  private handleFilterClick() {
+  private handleFilterClick(istrue = false) {
     (this.$refs.PrivateClueTable as any).toggleRowSelection()
     this.page.page = 1
-    this.getLists()
+    if (istrue === true) {
+      (this.$refs['suggestForm'] as any).resetForm()
+    }
+    this.getLists(istrue === true)
+  }
+  private sortClick() {
+    this.getLists(this.listQuery.toDo)
   }
   // 重置
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
     this.getLists()
-  }
-  // 批量分配
-  private handleallAllotClick() {
-    // this.dialogTit = '批量分配'
-    // this.showDialog = true
-    // this.rowData.push(...this.multipleSelection)
   }
 
   private oninputOnlyNum(value: string) {
@@ -971,10 +1087,11 @@ export default class extends Vue {
       page: this.page.page,
       limit: this.page.limit
     }
+    params.sort = this.listQuery.sort
     if (this.listQuery.toDo) {
       params.toDo = +this.listQuery.toDo
       delete params.followerId
-      delete params.clueType
+      // delete params.clueType
       return params
     }
     this.formItem.map((item: any) => {
@@ -994,26 +1111,31 @@ export default class extends Vue {
       }
       return item
     })
-    // params.carType = params.carType.join(',')
     params.onlyMe = params.onlyMe ? 1 : 0
-    console.log(params.followerId)
-    params.carType = Array.isArray(params.carType) && params.carType.join(',')
-    params.followerId = Array.isArray(params.followerId) && params.followerId.join(',')
-    params.inviteFailReason = Array.isArray(params.inviteFailReason) && params.inviteFailReason.join(',')
-    params.sort === '' && delete params.sort // 没有排序规则
-    console.log(params, '----')
+    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.join(',')
+    params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.join(',')
+    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.join(',')
+    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.join(',')
+
+    for (const key in params) {
+      if (Object.prototype.hasOwnProperty.call(params, key)) {
+        (params[key] === '' || params[key] === undefined) && delete params[key]
+      }
+    }
+
     return params
   }
   // 获取列表
-  @lock
-  private async getLists() {
+  private async getLists(isTodo = false) {
     try {
       this.listLoading = true
-
       const submitForm = this.clueArr.find((item: any) => {
         return item.value === this.listQuery.clueType
       }) || {}
       if (!submitForm.searchUrl) return
+      if (!isTodo) {
+        this.listQuery.toDo = false
+      }
       let params = this.getParams() // 获取参数
       // return
       let { data: res } = await submitForm.searchUrl(params)
@@ -1022,6 +1144,7 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
+        this.titleChang(res.title)
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -1032,12 +1155,19 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
+  titleChang(title:any) {
+    this.btns.forEach(item => {
+      if (item.name === '') {
+        item.num = title.all
+      } else {
+        item.num = title[item.name]
+      }
+    })
+    this.toDoValue = title.toDoCount
+  }
   // 获取跟进人列表
   async getGmOptions(cityCode:number, groupId:any) {
     try {
-      // if (this.followerListOptions.length > 0) {
-      //   return false
-      // }
       let params:any = {
         roleTypes: [1, 4],
         uri: '/v2/clueH5/list/queryFollowerList',
@@ -1073,7 +1203,7 @@ export default class extends Vue {
       let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_type', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolList]
+        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
 
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
@@ -1165,8 +1295,14 @@ export default class extends Vue {
       let { data: res } = await UpdateFollowerByPrivateSeas(params)
       if (res.success) {
         if (res.data.flag) {
-          (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success(res.data.msg)
+          try {
+            (this.$refs.PublicClueTable as any).toggleRowSelection()
+          } catch (error) {
+            return
+          } finally {
+            this.$message.success(res.data.msg)
+            this.showDialog = false
+          }
         } else {
           this.$message.warning(res.data.msg)
         }
@@ -1224,14 +1360,10 @@ export default class extends Vue {
     formData.append('file', param.file)
     const clueType = this.listQuery.clueType
     let fileUpload = null
-    if (clueType === 0 || clueType === 1) {
-      fileUpload = UploadExcelFirmiana
-    } else if (clueType === 3 || clueType === 4) {
-      fileUpload = UploadExcelBird
-    } else {
-      return
-    }
-    fileUpload(formData).then(({ data } : any) => {
+    console.log(clueType)
+    const arr = [UploadExcelFirmianaZC, UploadExcelBirdGX, undefined, UploadExcelLNC, UploadExcelLNB]
+    fileUpload = arr[clueType]
+    fileUpload && fileUpload(formData).then(({ data } : any) => {
       if (data.success) {
         this.$message.success('上传成功')
         this.uploadDialog = false
@@ -1259,23 +1391,8 @@ export default class extends Vue {
     delete params.page
     delete params.limit
     const clueType = this.listQuery.clueType
-    let exportFile = null
-    switch (clueType) {
-      case 0:
-      case 1:
-        exportFile = ExportFirmiana
-        break
-      case 2:
-        exportFile = ExportBirdTruck
-        break
-      case 3:
-        exportFile = ExportBirdRental
-        break
-      default:
-        break
-    }
-    if (!exportFile) return
-    const { data } = await exportFile(params)
+    console.log(params)
+    const { data } = await ExportFirmiana(params)
     if (data.success) {
       sucFun()
       this.$message({
@@ -1287,7 +1404,6 @@ export default class extends Vue {
     }
   }
   // 获取城市下的加盟小组
-  // getGroupInfoByCityCodeAndProductLine
   async getGroup(cityCode:string) {
     let code = this.listQuery.clueType
     try {
@@ -1324,21 +1440,13 @@ export default class extends Vue {
       this.getGmOptions(value[1], '')
     }
   }
-  // @Watch('this.listQuery.haveCar')
-  // private gmChange(value:any) {
-  //   this.getGmOptions(value)
-  // }
-  // @Watch('this.listQuery.gmGroupId')
   private gmChanges(value:any) {
-    // this.listQuery.haveCar = []
     this.listQuery.followerId.splice(0)
     this.followerListOptions.splice(0)
-    // console.log(this.listQuery.cityCode)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
   mounted() {
     this.getBaseInfo()
-    // this.getGmOptions()
   }
 }
 </script>
