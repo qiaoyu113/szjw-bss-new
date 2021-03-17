@@ -276,7 +276,8 @@ export default class extends Vue {
     const object = {
       busiType: this.activeLineType,
       cityCode: row.city,
-      id: row.userGroupId
+      id: row.userGroupId,
+      notReceiveId: row.notReceiveId
     }
     this.policyData = object
     this.showPolicy = true

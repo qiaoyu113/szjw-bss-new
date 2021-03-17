@@ -125,7 +125,8 @@ export default class extends Vue {
   // 提交后不可接受线索人员回显
   async getSearchInformation() {
     try {
-      const { data: res } = await searchInformation({ userIds: '5109,5045,4649,4584' })
+      let notReceiveId = this.policyData.notReceiveId
+      const { data: res } = await searchInformation({ userIds: notReceiveId })
       if (res.success) {
         this.chosenList = res.data.map(function(item: any) {
           return {
