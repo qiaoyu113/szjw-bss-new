@@ -8,7 +8,7 @@
     :confirm="onConfirm"
     v-on="$listeners"
     @close="resetForm"
-    @open="getUserGroupList"
+    @open="getOpen"
   >
     <el-form
       :model="queryInfo"
@@ -118,6 +118,9 @@ export default class extends Vue {
   usreGroupChange(item: any) {
     // console.log(this.policyData.cityCode, item)
     this.getTeamMember(this.policyData.cityCode, item)
+  }
+  private getOpen() {
+    this.getUserGroupList()
     if (this.chosenList && this.chosenList.length === 0) {
       this.getSearchInformation()
     }

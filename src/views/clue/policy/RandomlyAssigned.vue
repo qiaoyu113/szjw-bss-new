@@ -18,13 +18,19 @@
         </ul>
       </template>
       <template #btnc>
-        <el-button
-          type="primary"
-          @click="handleFilterClick"
-        >
-          查询
-        </el-button>
-        <el-button> 重置 </el-button>
+        <div class="btnPc">
+          <el-button
+            type="primary"
+            @click="handleFilterClick"
+          >
+            查询
+          </el-button>
+          <el-button
+            @click="handleResetClick"
+          >
+            重置
+          </el-button>
+        </div>
       </template>
     </self-from>
     <!-- 我是配置管理页面 -->
@@ -130,7 +136,7 @@ export default class extends Vue {
           lazyLoad: this.showWork
         }
       },
-      col: 4,
+      col: 8,
       label: '司机城市',
       key: 'city'
     },
@@ -138,8 +144,8 @@ export default class extends Vue {
       type: 'btnc',
       slot: true,
       key: 'btnc',
-      col: 8,
-      offset: 5
+      col: 16
+      // offset: 3
     }
   ]
   private async showWork(node: any, resolve: any) {
@@ -259,6 +265,11 @@ export default class extends Vue {
     this.page.page = 1
     this.getList()
   }
+  // 重置
+  private async handleResetClick() {
+    this.listQuery.city = ''
+    this.getList()
+  }
   // 分页
   handlePageSize(page: PageObj) {
     this.page.page = page.page
@@ -359,4 +370,11 @@ export default class extends Vue {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+  .btnPc{
+       width: 100%;
+       padding: 0 10px;
+       display: flex;
+       flex-flow: row nowrap;
+       justify-content: flex-end;
+    }
 </style>

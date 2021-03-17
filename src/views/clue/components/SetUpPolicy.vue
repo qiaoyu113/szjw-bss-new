@@ -58,52 +58,6 @@ export default class extends Vue {
     flowedDayNum: 0,
     flowingDayNum: 0
   }
-  // activeTab = '0'
-  // 梧桐专车、梧桐共享、雷鸟车池、雷鸟租赁
-  // private lineTypeTab = [
-  //   {
-  //     name: '梧桐专车',
-  //     value: '0'
-  //   },
-  //   {
-  //     name: '梧桐共享',
-  //     value: '1'
-  //   },
-  //   {
-  //     name: '雷鸟车池',
-  //     value: '2'
-  //   },
-  //   {
-  //     name: '雷鸟租赁C',
-  //     value: '4'
-  //   },
-  //   {
-  //     name: '雷鸟租赁B',
-  //     value: '3'
-  //   }
-  // ]
-  // defalutDate = {
-  //   '0': {
-  //     flowedDayNum: 3,
-  //     flowingDayNum: 15
-  //   },
-  //   '1': {
-  //     flowedDayNum: 1,
-  //     flowingDayNum: 7
-  //   },
-  //   '2': {
-  //     flowedDayNum: 1,
-  //     flowingDayNum: 7
-  //   },
-  //   '4': {
-  //     flowedDayNum: 1,
-  //     flowingDayNum: 3
-  //   },
-  //   '3': {
-  //     flowedDayNum: 1,
-  //     flowingDayNum: 7
-  //   }
-  // }
   private userGroupList: any = []
   getdefaultDate() {
     this.queryInfo.flowedDayNum = this.policyData.followedReflowedDayNum
