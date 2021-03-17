@@ -142,10 +142,10 @@
         </el-form-item>
         <el-form-item
           label="分配机制"
-          prop="distributionType"
+          prop="allocationType"
         >
           <el-select
-            v-model="addForm.distributionType"
+            v-model="addForm.allocationType"
             placeholder="请选择"
           >
             <el-option
@@ -158,7 +158,7 @@
         </el-form-item>
         <el-form-item
           label="邀约语"
-          prop="inviteWord"
+          prop="invitation"
         >
           <el-col :span="16">
             <el-input
@@ -171,7 +171,7 @@
         </el-form-item>
         <el-form-item
           label="面试语"
-          prop="interviewWord"
+          prop="interview"
         >
           <el-col :span="16">
             <el-input
@@ -262,7 +262,7 @@ export default class extends Vue {
   private dialogFormVisible: boolean = false;
   private listQuery: IState = {
     clueType: 0,
-    distributionType: '',
+    allocationType: '',
     limit: '',
     page: '',
     portraitLabel: '',
@@ -313,7 +313,7 @@ export default class extends Vue {
       { required: true, message: '请输入目标画像标签', trigger: 'blur' },
       { min: 1, max: 20, message: '最多可输入20字', trigger: 'blur' }
     ],
-    distributionType: [
+    allocationType: [
       { required: true, message: '请选择分配机制', trigger: 'change' }
     ]
   }
@@ -322,7 +322,7 @@ export default class extends Vue {
     busiType: '',
     type: '',
     portraitLabel: '',
-    distributionType: '',
+    allocationType: '',
     invitation: '',
     interview: '',
     remark: ''
@@ -364,7 +364,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '分配机制',
-      key: 'distributionType',
+      key: 'allocationType',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -409,7 +409,7 @@ export default class extends Vue {
       rules: ['root']
     },
     {
-      key: 'typeName',
+      key: 'type',
       label: '客群类型',
       rules: ['root']
     },
@@ -420,14 +420,8 @@ export default class extends Vue {
       rules: ['root']
     },
     {
-      key: 'distributionTypeName',
+      key: 'allocationTypeName',
       label: '分配机制',
-      rules: ['root']
-    },
-    {
-      key: 'distributionManageName',
-      label: '分配机制管理员',
-      width: '130px',
       rules: ['root']
     },
     {
@@ -436,12 +430,12 @@ export default class extends Vue {
       rules: ['root']
     },
     {
-      key: 'inviteWord',
+      key: 'invitation',
       label: '邀约语',
       rules: ['root']
     },
     {
-      key: 'interviewWord',
+      key: 'interview',
       label: '面试语',
       rules: ['root']
     },
@@ -458,11 +452,6 @@ export default class extends Vue {
     {
       key: 'createDate',
       label: '创建时间',
-      slot: true,
-      attrs: {
-        sortable: true
-      },
-      width: '150px',
       rules: ['root']
     }
   ];
@@ -550,7 +539,7 @@ export default class extends Vue {
         page: this.page.page,
         limit: this.page.limit,
         clueType: this.listQuery.clueType,
-        distributionType: this.listQuery.distributionType,
+        allocationType: this.listQuery.allocationType,
         portraitLabel: this.listQuery.portraitLabel,
         startDate: this.listQuery.time[0],
         endDate: this.listQuery.time[1],
@@ -579,7 +568,7 @@ export default class extends Vue {
         page: this.page.page,
         limit: this.page.limit,
         clueType: this.listQuery.clueType,
-        distributionType: this.listQuery.distributionType,
+        allocationType: this.listQuery.allocationType,
         portraitLabel: this.listQuery.portraitLabel,
         startDate: this.listQuery.time[0],
         endDate: this.listQuery.time[1],
@@ -619,11 +608,12 @@ export default class extends Vue {
             type: 'success'
           })
           this.loadingDialog = false
-          this.dialogFormVisible = false
+          this.cancel('ruleAddForm')
           setTimeout(() => {
             this.getLists()
-          }, 1000)
+          }, 2000)
         } else {
+          this.loadingDialog = false
           this.$message.error(res.errorMsg)
         }
       } else {
