@@ -3,6 +3,10 @@ export default {
     dashboard: 'Dashboard',
     freightTitle: 'FreightTitle',
     freightList: 'FreightList',
+    clueTitle: 'Clue',
+    publicClue: 'PublicClue',
+    privateClue: 'PrivateClue',
+    Configuration: 'Configuration',
     driverAccount: 'DriverAccount',
     refundDetail: 'RefundDetail',
     refundApply: 'RefundApply',
@@ -52,6 +56,7 @@ export default {
     createUser: 'createUser',
     editUser: 'editUser',
     roleManage: 'RoleManage',
+    seatManage: 'SeatManage',
     createRole: 'createRole',
     editRole: 'editRole',
     roleDetails: 'roleDetails',
@@ -162,7 +167,10 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    RandomlyAssigned: 'Randomly assign policy settings',
+    BackflowPolicy: 'Backflow policy settings',
+    campaignList: 'campaignListMa'
   },
   navbar: {
     logOut: 'Log Out',

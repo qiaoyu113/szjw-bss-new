@@ -5,6 +5,11 @@ export default {
     freightList: '出车列表',
     freightDetail: '运费详情',
     freightLog: '运费日志',
+    clueTitle: '线索管理',
+    publicClue: '待分配线索',
+    privateClue: '私海池',
+    Configuration: '配置管理',
+    privateDetail: '线索详情',
     driverTitle: '司机管理',
     driverAccount: '司机梧桐账户',
     refundList: '退费管理',
@@ -81,6 +86,7 @@ export default {
     createUser: '创建账号',
     editUser: '编辑账号',
     roleManage: '角色管理',
+    seatManage: '坐席管理',
     createRole: '创建角色',
     editRole: '编辑角色',
     roleDetails: '角色详情',
@@ -184,7 +190,10 @@ export default {
     configManager: '配置管理',
     driverClond: '司机云',
     selfDriverTag: '自承运司机标签',
-    marketClue: '待市场分配线索'
+    marketClue: '待市场分配线索',
+    RandomlyAssigned: '随机分配policy设置',
+    BackflowPolicy: '回流policy设置',
+    campaignList: 'Campaign管理'
   },
   navbar: {
     setPassword: '修改密码',
