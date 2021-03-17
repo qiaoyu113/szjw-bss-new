@@ -58,7 +58,7 @@
       @onPageSize="handlePageSize"
     >
       <template v-slot:op="scope">
-        <div v-if="scope.row.userName">
+        <div v-if="scope.row.status === 1">
           <el-button
             v-permission="['/v3/base/agent/change']"
             type="text"
@@ -346,13 +346,23 @@ export default class extends Vue {
     value: 1
   }, {
     label: '未绑定',
-    value: 0
+    value: 2
   }]
   // 渲染表格的列表
   private columns:ColumnsObj[] = [
     {
       key: 'agentNum',
       label: '坐席号',
+      'min-width': '140px'
+    },
+    {
+      key: 'busiType',
+      label: '所属业务线',
+      'min-width': '140px'
+    },
+    {
+      key: 'cityName',
+      label: '所属城市',
       'min-width': '140px'
     },
     {
@@ -384,6 +394,7 @@ export default class extends Vue {
     }
   ]
   private changeSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
     seatNumber: '', // 绑定人坐席号
     changeName: '', // 更改后的绑定人
@@ -392,6 +403,7 @@ export default class extends Vue {
   }
   // 新建绑定
   private newSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
     seatNumber: '' // 绑定人坐席号
   }
@@ -631,6 +643,9 @@ export default class extends Vue {
           type: 'success',
           message: '解绑成功!'
         })
+        setTimeout(() => {
+          this.getLists()
+        }, 1000)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -730,11 +745,14 @@ export default class extends Vue {
   async querySearchAsync(queryString: any, cb: any) {
     try {
       if (queryString) {
-        let { data: res } = await getQueryGM({
+        let parmas = {
           keyword: queryString,
-          roleTypes: [8],
+          roleTypes: 8,
+          busiType: this.listQuery.busiType,
+          cityCode: this.listQuery.cityCode[1] ? this.listQuery.cityCode[1] : '',
           uri: '/v3/base/agent/queryGM'
-        })
+        }
+        let { data: res } = await getQueryGM(parmas)
         if (res.success) {
           res.data.forEach((element: any) => {
             element.value = element.nickName + element.mobile
