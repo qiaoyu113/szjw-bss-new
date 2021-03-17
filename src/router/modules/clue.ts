@@ -13,7 +13,6 @@ const clueRouter: RouteConfig = {
   },
   children: [
     {
-<<<<<<< src/router/modules/clue.ts
       path: 'subdivision', /* 客群细分管理 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Subdivision.vue'),
       name: 'Subdivision',
