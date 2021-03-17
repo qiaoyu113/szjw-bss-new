@@ -37,7 +37,7 @@ const clueRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/PrivateDetail.vue'),
       name: 'PrivateDetail',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v2/market-clue/getClueDetail',
         title: 'privateDetail',
         activeMenu: '/clue/private',
         hidden: true,

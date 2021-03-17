@@ -10,12 +10,14 @@
             v-model="clueStatus"
             @tab-click="handleClick"
           >
-            <el-tab-pane
-              v-for="(item,index) in clueArray"
-              :key="index"
-              :label="item.name"
-              :name="item.code"
-            />
+            <template>
+              <el-tab-pane
+                v-for="(item,index) in clueArray"
+                :key="index"
+                :label="item.name"
+                :name="item.code"
+              />
+            </template>
           </el-tabs>
         </template>
       </el-card>
@@ -29,6 +31,7 @@
         >
           <div
             slot="rightBox"
+            :key="clueStatus"
             :class="isPC ? 'rightBox' : 'rightBox_min'"
           >
             <span />
@@ -76,7 +79,10 @@
                 {{ scope.row.inviteDate }}
               </template>
               <template v-slot:op="scope">
-                <div class="FollowUpOpBox">
+                <div
+                  :key="clueStatus"
+                  class="FollowUpOpBox"
+                >
                   <el-button
                     v-permission="['/v2/market-clue/cancelInterview']"
                     :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
@@ -109,6 +115,7 @@
         >
           <div
             slot="rightBox"
+            :key="clueStatus"
             class="rightBox"
           >
             <span
@@ -239,12 +246,14 @@
 </template>
 
 <script lang="ts">
+import { checkPermission } from '@/utils/permission'
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import CallLog from '@/components/OutboundDialog/CallLog.vue'
+import { isPermission } from '@/filters/index'
 import {
   FollowUpDiolog,
   SendMessage,
@@ -284,6 +293,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  private checkPermissions:any = isPermission
   private phone: string = ''
   private clueId: string = ''
   private clueStatus: string = '0';
@@ -293,11 +303,11 @@ export default class extends Vue {
   private editDio: boolean = false;
   private clueArray: IState[] = [];
   private clueArr: IState[] = [
-    { name: '梧桐专车', code: '0' },
-    { name: '梧桐共享', code: '1' },
-    { name: '雷鸟车池', code: '2' },
-    { name: '雷鸟租赁C', code: '3' },
-    { name: '雷鸟租赁B', code: '4' }
+    { name: '梧桐专车', code: '0', pUrl: ['/v2/market-clue/getClueWSSpecialXDetail'] },
+    { name: '梧桐共享', code: '1', pUrl: ['/v2/market-clue/getClueWSShareXDetail'] },
+    { name: '雷鸟车池', code: '2', pUrl: ['/v2/market-clue/getClueLCXDetail'] },
+    { name: '雷鸟租赁C', code: '3', pUrl: ['/v2/market-clue/getClueLZCXDetail'] },
+    { name: '雷鸟租赁B', code: '4', pUrl: ['/v2/market-clue/getClueLZBXDetail'] }
   ];
 
   // 跟进表格表头定义
@@ -753,14 +763,19 @@ export default class extends Vue {
           }
         })
       })
-      this.clueArray = this.clueArr.filter((ele:any) => {
+      let arr:IState[] = this.clueArr.filter((ele:any) => {
         return ele.clueId
       })
-      this.clueArray.map((ele:any) => {
+      this.clueArray = isPermission(arr)
+
+      this.clueArray.forEach((ele:any) => {
         if (ele.clueId === this.clueId) {
           this.clueStatus = String(ele.code)
         }
       })
+      if (this.clueStatus === '0') {
+        this.clueStatus = this.clueArray[0].code + ''
+      }
     } else {
       this.$message.warning(res.errorMsg)
     }
