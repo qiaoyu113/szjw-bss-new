@@ -210,7 +210,7 @@ export const getClueDetailLogs = (data: any) =>
 
 export const UpdateFollowerByHighSeas = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/updateFollowerByHighSeas`,
+    url: `${produce}/v2/market-clue/updateFollowerByHighSeas`,
     method: 'post',
     data
   })

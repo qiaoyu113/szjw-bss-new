@@ -439,14 +439,24 @@ export default class extends Vue {
       rules: [3, 4]
     },
     {
-      key: 'intentModelName',
+      key: 'ccc',
       label: '意向车型',
       rules: [3, 4]
     },
     {
+      key: 'cc',
+      label: '需求类型',
+      rules: [2]
+    },
+    {
+      key: 'hjhj',
+      label: '意向车型',
+      rules: [2]
+    },
+    {
       key: 'remark',
       label: '备注',
-      rules: [3, 4]
+      rules: [2, 3, 4]
     },
     {
       key: 'sourceChannelName',
