@@ -27,6 +27,7 @@
           <el-radio-button
             v-for="item in busiTypeArrs"
             :key="item.value"
+            v-permission="[`${item.url}`]"
             :label="item.value"
           >
             {{ item.label }}
@@ -53,6 +54,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/v2/clue/campaign/addCampaign']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -60,8 +62,9 @@
         >
           新建Campaign
         </el-button>
-        <!-- v-permission="[]" -->
+
         <el-button
+          v-permission="['/v2/clue/campaign/campaign/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -107,6 +110,7 @@
             详情
           </el-button>
           <el-button
+            v-permission="['/v2/clue/campaign/campaign/firmiana/import','/v2/clue/campaign/campaign/thunderBirdRental/import','/v2/clue/campaign/campaign/thunderBirdTruckPool/import']"
             type="text"
             size="small"
             @click="handleImportClick(scope.row)"
@@ -130,7 +134,6 @@
         :region-list="regionList"
         :add-userlist="addUserGroup"
         :city-list="cityList"
-        :city-detail="cityDetail"
         :platform-list="platformList"
         @onPass="handlePass"
       />
@@ -169,7 +172,7 @@ import {
   sevenday,
   thirtyday
 } from '../../../driver-freight/components/date'
-import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
+import { GetDictionary, GetDictionaryCity } from '@/api/common'
 import { GetClueCampaignList, CampaignExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
 interface PageObj {
   page:number,
@@ -218,19 +221,23 @@ export default class extends Vue {
   private busiTypeArrs:any[] = [
     {
       label: '梧桐专车',
-      value: 0
+      value: 0,
+      url: '/v2/clue/campaign/getClueCampaignList-0'
     },
     {
       label: '梧桐共享',
-      value: 1
+      value: 1,
+      url: '/v2/clue/campaign/getClueCampaignList-1'
     },
     {
       label: '雷鸟车池',
-      value: 2
+      value: 2,
+      url: '/v2/clue/campaign/getClueCampaignList-2'
     },
     {
       label: '雷鸟租赁',
-      value: 3
+      value: 3,
+      url: '/v2/clue/campaign/getClueCampaignList-3'
     }
   ]
   private formItem:any[] = [
@@ -261,12 +268,7 @@ export default class extends Vue {
       },
       label: '所属区域',
       key: 'areCity',
-      options: this.regionList,
-      listeners: {
-        'change': () => {
-          this.cityDetail(this.listQuery.areCity)
-        }
-      }
+      options: this.regionList
     },
     {
       type: 2,
@@ -606,13 +608,15 @@ export default class extends Vue {
   // 获取大区列表
   private async areaAddress() {
     try {
-      let params:IState = { type: 2 }
-      let { data: res } = await getOfficeByType(params)
+      let params = {
+        dictType: 'region'
+      }
+      let { data: res } = await GetDictionary(params)
       if (res.success) {
         const nodes = res.data.map(function(item: any) {
           return {
-            value: item.id,
-            label: item.name
+            value: +item.dictValue,
+            label: item.dictLabel
           }
         })
         this.regionList.push(...nodes)
@@ -622,20 +626,12 @@ export default class extends Vue {
     }
   }
   // 根据大区获取城市列表
-  async cityDetail(parentId:number) {
-    let len = this.cityList.length
-    if (len > 0) {
-      this.cityList.splice(0, len)
-    }
-    this.listQuery.cityCode = ''
-    let params:IState = {
-      parentId
-    }
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  async cityDetail() {
+    let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
         return {
-          value: item.areaCode,
+          value: +item.code,
           label: item.name
         }
       })
@@ -695,6 +691,7 @@ export default class extends Vue {
   // 初始化公共列表
   init() {
     this.areaAddress()
+    this.cityDetail()
     this.getDictionaryContract()
     this.getUserGroupSelectList(this.listQuery.clueType)
   }
