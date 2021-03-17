@@ -268,8 +268,7 @@
         <el-link
           class="mt20"
           type="primary"
-          href="https://element.eleme.io"
-          target="_blank"
+          @click.prevent="downloadFile"
         >
           点击下载模板
         </el-link>
@@ -463,6 +462,44 @@ export default class extends Vue {
       uri: [0, 1, 3, 4]
     }
   ]
+  downloadFile() {
+    const fileList = [
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/c76b93da4d67419b8a895e64c9f74928',
+        recordId: '梧桐专车导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/8217cd68a2bc41539165d56b597e7e52',
+        recordId: '梧桐共享导入模板'
+      },
+      {},
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/daaa37ffdedf403a8d628c3b3718e962',
+        recordId: '雷鸟租赁C导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/2784fc8c0f52419290ef42f1577731bc',
+        recordId: '雷鸟租赁B导入模板'
+      }
+    ]
+    const index = this.listQuery.clueType
+    this.download(fileList[index])
+  }
+  // 下载文件
+  download(row:any) {
+    if (!row.fileUrl) {
+      return
+    }
+    let link = document.createElement('a')
+    link.style.display = 'none'
+    link.href = row.fileUrl
+    link.setAttribute(`download`, `313133.xls`)
+    console.log(link)
+    // return
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
   // 打电话
   private callPhoneDio = false
   private rowStatus = {

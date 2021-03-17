@@ -220,9 +220,17 @@ export const getClueDetailLogs = (data: any) =>
   })
 
 // 公海池线索分配跟进人
+
 export const UpdateFollowerByHighSeas = (data: any) =>
   request({
     url: `${prefix}/v2/market-clue/updateFollowerByHighSeas`,
+    method: 'post',
+    data
+  })
+  // 私海池线索分配跟进人
+export const UpdateFollowerByPrivateSeas = (data: any) =>
+  request({
+    url: `${produce}/v2/market-clue/updateFollowerByPrivateSeas`,
     method: 'post',
     data
   })
@@ -251,13 +259,6 @@ export const GetClueLZXPrivateSeaPoolListB = (data: any) =>
 export const GetClueLZXPrivateSeaPoolListC = (data: any) =>
   request({
     url: `${produce}/v2/market-clue/getClueLZCXPrivateSeaPoolList`,
-    method: 'post',
-    data
-  })
-// 私海池线索分配跟进人
-export const UpdateFollowerByPrivateSeas = (data: any) =>
-  request({
-    url: `${produce}/v2/market-clue/updateFollowerByPrivateSeas`,
     method: 'post',
     data
   })
