@@ -129,7 +129,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork, validatorNumberRange } from '@/utils/index'
-import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByPrivateSeas } from '@/api/clue'
+import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByHighSeas } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -439,14 +439,24 @@ export default class extends Vue {
       rules: [3, 4]
     },
     {
-      key: 'intentModelName',
+      key: 'ccc',
       label: '意向车型',
       rules: [3, 4]
     },
     {
+      key: 'cc',
+      label: '需求类型',
+      rules: [2]
+    },
+    {
+      key: 'hjhj',
+      label: '意向车型',
+      rules: [2]
+    },
+    {
       key: 'remark',
       label: '备注',
-      rules: [3, 4]
+      rules: [2, 3, 4]
     },
     {
       key: 'sourceChannelName',
@@ -719,11 +729,11 @@ export default class extends Vue {
         clueId: this.rows.map((item:any) => item.clueId + ''),
         followerId: +this.dialogListQuery.followerId[2]
       }
-      let { data: res } = await UpdateFollowerByPrivateSeas(params)
+      let { data: res } = await UpdateFollowerByHighSeas(params)
       if (res.success) {
         if (res.data.flag) {
           (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success(res.data.msg)
+          this.$message.success('分配成功')
         } else {
           this.$message.warning(res.data.msg)
         }

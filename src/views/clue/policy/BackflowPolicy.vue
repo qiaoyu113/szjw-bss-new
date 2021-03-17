@@ -19,6 +19,7 @@
       >
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/market-clue/reflow_conf/settingReflowedConf']"
             type="text"
             size="small"
             @click="setPolicyAuto(scope.row)"
@@ -59,23 +60,23 @@ export default class extends Vue {
   private columns: any[] = [
     {
       key: 'cityName',
-      label: '城市'
+      label: '城市',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'busiTypeName',
       label: '线索类型'
     },
     {
-      key: 'setPerson',
+      key: 'updateName',
       label: '设置人',
       width: '120px'
     },
     {
-      key: 'setDate',
-      label: '设置时间',
-      attrs: {
-        sortable: true
-      }
+      key: 'updateDate',
+      label: '设置时间'
     },
     {
       key: 'op',
@@ -87,11 +88,12 @@ export default class extends Vue {
   showPolicy = false
   setPolicyAuto(item: any) {
     const object = {
-      id: item.id
+      id: item.id,
+      followedReflowedDayNum: item.followedReflowedDayNum,
+      followingReflowedDayNum: item.followingReflowedDayNum
     }
     this.policyData = object
     this.showPolicy = true
-    // this.showPolicy = true
   }
   mounted() {
     this.getList()

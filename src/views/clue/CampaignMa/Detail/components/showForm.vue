@@ -22,6 +22,9 @@
           暂无数据
         </template>
       </template>
+      <template v-slot:createUserName="{row}">
+        {{ row.createUserName }}{{ row.createUserPhone }}
+      </template>
     </self-form>
   </div>
 </template>
@@ -105,9 +108,10 @@ export default class extends Vue {
       key: 'remarks'
     },
     {
-      type: 7,
+      type: 'createUserName',
       label: '创建人',
-      key: 'createUserName'
+      key: 'createUserName',
+      slot: true
     },
     {
       type: 7,

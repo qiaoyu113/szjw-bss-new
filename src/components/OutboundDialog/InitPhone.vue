@@ -5,7 +5,8 @@
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { GetInfoByUserId } from '@/api/common'
 import { PhoneModule } from '@/store/modules/phone'
-import { hangUp, anwserPhone } from './phone'
+import { hangUp, anwserPhone, startRecordTime, clearTimer } from './phone'
+import { VNode } from 'vue'
 interface IState {
   [key: string]: any;
 }
@@ -33,24 +34,16 @@ export default class extends Vue {
   @Watch('status')
   handleStatusChange(val:number) {
     if (val === 1 && this.notification) { // 挂断电话
-      if (this.notification) {
-        this.notification.close()
-        this.notification = null
-      }
+      clearTimer()
+      this.closeNotifiy()
       setTimeout(() => {
         this.handleHangUp()
       }, 310)
     } else if (val === 4) { // 有电话呼入-接听电话
-      if (this.notification) {
-        this.notification.close()
-        this.notification = null
-      }
+      this.closeNotifiy()
       this.handleAnwserStatus()
     } else if (val === 3) { // 接通了
-      if (this.notification) {
-        this.notification.close()
-        this.notification = null
-      }
+      this.closeNotifiy()
       setTimeout(() => {
         this.handleAcceptRing()
       }, 310)
@@ -146,6 +139,11 @@ export default class extends Vue {
   // 接听电话
   handleAcceptRing() {
     const h = this.$createElement
+    let anwserTime = Date.now()
+    startRecordTime(anwserTime, (callTime:string) => {
+      let dom:any = document.getElementById('phoneTime')
+      dom.innerText = callTime
+    })
     this.notification = this.$notify({
       title: '提示',
       dangerouslyUseHTMLString: true,
@@ -161,7 +159,14 @@ export default class extends Vue {
           color: '#333',
           'margin-right': '10px'
         }
-        }, '通话状态:正在通过中...'),
+        }, [
+          h('span', {}, '通话状态:正在通过中...'),
+          h('span', {
+            attrs: {
+              id: 'phoneTime'
+            }
+          }, '')
+        ]),
         h('button', { style: {
           color: 'rgb(255, 255, 255)',
           background: '#f56c6c',
@@ -175,6 +180,14 @@ export default class extends Vue {
         }, '挂断')
       ])
     })
+  }
+
+  // 关闭通知
+  closeNotifiy() {
+    if (this.notification) {
+      this.notification.close()
+      this.notification = null
+    }
   }
   // 已挂断
   handleHangUp() {

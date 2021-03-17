@@ -35,7 +35,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { PhoneModule } from '@/store/modules/phone'
-import { callPhone, hangUp } from './phone'
+import { callPhone, hangUp, startRecordTime, clearTimer } from './phone'
 @Component({
   name: 'MakeCall'
 })
@@ -50,8 +50,6 @@ export default class extends Vue {
    *4:来电
   */
   private callTime:string = '' // 通话时长的展示文案
-  private anwserTime:number = 0 // 接通的时间戳
-  private timer:null | any = null // 定时器
 
   // 电话状态
   get status() {
@@ -60,29 +58,15 @@ export default class extends Vue {
   @Watch('status')
   handleStatusChange(val:number) {
     if (val === 3) { // 接听电话触发的事件
-      this.anwserTime = Date.now()
-      this.startRecordTime()
+      let anwserTime = Date.now()
+      startRecordTime(anwserTime, (callTime:string, timer:any) => {
+        this.callTime = callTime
+      })
+    } else if (val === 1) {
+      clearTimer()
     }
   }
 
-  // 电话拨通后开始计时
-  startRecordTime() {
-    this.timer = setInterval(() => {
-      let now:number = Date.now()
-      let diff:number = (now - this.anwserTime) / 1000
-      let hour = this.formatTime(Math.floor(diff / 3600))
-      let min = this.formatTime(Math.floor(diff % 3600 / 60))
-      let sencond = this.formatTime(Math.floor(diff % 3600 % 60))
-      this.callTime = `${hour}:${min}:${sencond}`
-    }, 1000)
-  }
-  // 格式化时间
-  formatTime(num:number) {
-    if (num < 10) {
-      return `0${num}`
-    }
-    return num
-  }
   // 呼出电话
   handleCallClick() {
     let random:string = callPhone(this.phone, this.callId)

@@ -13,7 +13,59 @@ const clueRouter: RouteConfig = {
   },
   children: [
     {
-      path: 'public', /* 待分配线索 */
+      path: 'subdivision', /* 客群细分管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Subdivision.vue'),
+      name: 'Subdivision',
+      meta: {
+        apiUrl: '/v2/market-clue/user-group',
+        title: 'subdivision',
+        noCache: false
+      }
+    },
+    {
+      path: 'campaignList', /* CamPaign列表 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/List/index.vue'),
+      name: 'CampaignList',
+      meta: {
+        apiUrl: '/v2/clue/campaign/getClueCampaignList',
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    // /v2/clue/campaign/getClueCampaignList
+    {
+      path: 'campaignDetail', /* CamPaign详情 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/Detail/index.vue'),
+      name: 'CampaignDetail',
+      meta: {
+        apiUrl: '/v2/clue/campaign/getClueCampaignList',
+        hidden: true,
+        title: 'campaignList',
+        noCache: false
+      }
+    },
+    {
+      path: 'backflowPolicy', /* 配置管理回流 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
+      name: 'BackflowPolicy',
+      meta: {
+        apiUrl: '/v2/market-clue/reflow_conf/list',
+        title: 'BackflowPolicy',
+        noCache: false
+      }
+    },
+    {
+      path: 'randomlyAssigned', /* 配置管理随机 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
+      name: 'RandomlyAssigned',
+      meta: {
+        apiUrl: '/v2/market-clue/config/list',
+        title: 'RandomlyAssigned',
+        noCache: false
+      }
+    },
+    {
+      path: 'public', /* 公海池 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Public.vue'),
       name: 'PublicClue',
       meta: {
@@ -42,58 +94,6 @@ const clueRouter: RouteConfig = {
         activeMenu: '/clue/private',
         hidden: true,
         noCache: true
-      }
-    },
-    {
-      path: 'backflowPolicy', /* 配置管理 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
-      name: 'BackflowPolicy',
-      meta: {
-        apiUrl: 'root',
-        title: 'BackflowPolicy',
-        noCache: false
-      }
-    },
-    {
-      path: 'randomlyAssigned', /* 配置管理 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
-      name: 'RandomlyAssigned',
-      meta: {
-        apiUrl: 'root',
-        title: 'RandomlyAssigned',
-        noCache: false
-      }
-    },
-    {
-      path: 'campaignList', /* CamPaign列表 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/List/index.vue'),
-      name: 'CampaignList',
-      meta: {
-        apiUrl: 'root',
-        title: 'campaignList',
-        noCache: false
-      }
-    },
-    {
-      path: 'campaignDetail', /* CamPaign详情 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/CampaignMa/Detail/index.vue'),
-      name: 'CampaignDetail',
-      meta: {
-        apiUrl: 'root',
-        hidden: true,
-        title: 'campaignList',
-        noCache: false
-      }
-    },
-    {
-      path: 'phoneDemo', /* CamPaign详情 */
-      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/PhoneDemo.vue'),
-      name: 'phoneDemo',
-      meta: {
-        apiUrl: 'root',
-        hidden: true,
-        title: 'campaignList',
-        noCache: false
       }
     }
   ]

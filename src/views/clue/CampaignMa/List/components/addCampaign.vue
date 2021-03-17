@@ -48,7 +48,6 @@ export default class extends Vue {
   @Prop({ default: () => {} }) regionList!:IState;
   @Prop({ default: () => {} }) cityList!:IState;
   @Prop({ default: () => {} }) platformList!:IState;
-  @Prop({ default: () => {} }) cityDetail!:Function;
   @Prop({ default: () => [] }) addUserlist!:IState[];
   private listQuery:IState = {
     userGroupId: '',
@@ -84,12 +83,7 @@ export default class extends Vue {
       },
       label: '所属区域',
       key: 'areCity',
-      options: this.regionList,
-      listeners: {
-        'change': () => {
-          this.cityDetail(this.listQuery.areCity)
-        }
-      }
+      options: this.regionList
     },
     {
       type: 2,
@@ -137,8 +131,8 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        format: 'yyyy-MM-dd HH',
-        'value-format': 'yyyy-MM-dd HH',
+        format: 'yyyy-MM-dd HH:mm',
+        'value-format': 'yyyy-MM-dd HH:mm',
         'picker-options': {
           disabledDate: (time:Date) => {
             if (!this.listQuery.dropStarTime) {
@@ -157,7 +151,7 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请输入',
         clearable: true,
-        maxlength: 200
+        maxlength: 150
       },
       label: '落地页',
       key: 'landingPage'
@@ -230,7 +224,13 @@ export default class extends Vue {
   }
   // 表单校验通过
   handlePass() {
-    this.$emit('onPass', this.listQuery)
+    let obj = {
+      ...this.listQuery,
+      areCity: +this.listQuery.areCity,
+      budget: +this.listQuery.budget,
+      city: +this.listQuery.city
+    }
+    this.$emit('onPass', obj)
   }
   // 验证表单
   handleValidateForm() {

@@ -1,7 +1,7 @@
 
 import { Message } from 'element-ui'
 import { PhoneModule } from '@/store/modules/phone'
-
+let timer:any = null
 // 挂断
 export const hangUp = () => {
   if (PhoneModule.status !== 1) {
@@ -38,4 +38,31 @@ export const callPhone = (phone:string, callId:string) => {
 // 接听电话
 export const anwserPhone = () => {
   (window.frames as any).szjwCall.document.getElementById('incomingcall').click()
+}
+
+// 电话拨通后开始计时
+export const startRecordTime = (anwserTime:number, cb:Function) => {
+  timer = setInterval(() => {
+    let now:number = Date.now()
+    let diff:number = (now - anwserTime) / 1000
+    let hour = formatTime(Math.floor(diff / 3600))
+    let min = formatTime(Math.floor(diff % 3600 / 60))
+    let sencond = formatTime(Math.floor(diff % 3600 % 60))
+    let callTime = `${hour}:${min}:${sencond}`
+    cb(callTime)
+  }, 1000)
+}
+// 清除定时器
+export const clearTimer = () => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+}
+// 格式化时间
+export const formatTime = (num:number) => {
+  if (num < 10) {
+    return `0${num}`
+  }
+  return num
 }

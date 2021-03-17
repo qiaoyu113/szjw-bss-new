@@ -5,11 +5,12 @@
       :form-item="ruleFrom"
       :list-query="listQuery"
     >
-      <template #lineType>
+      <template #clueType>
         <ul>
           <li
-            v-for="item in lineType"
+            v-for="item in clueType"
             :key="item.id"
+            v-permission="[`${item.url}`]"
             :class="{active: item.id === activeLineType}"
             @click="switchLineType(item.id)"
           >
@@ -18,13 +19,19 @@
         </ul>
       </template>
       <template #btnc>
-        <el-button
-          type="primary"
-          @click="handleFilterClick"
-        >
-          查询
-        </el-button>
-        <el-button> 重置 </el-button>
+        <div class="btnPc">
+          <el-button
+            type="primary"
+            @click="handleFilterClick"
+          >
+            查询
+          </el-button>
+          <el-button
+            @click="handleResetClick"
+          >
+            重置
+          </el-button>
+        </div>
       </template>
     </self-from>
     <!-- 我是配置管理页面 -->
@@ -45,6 +52,7 @@
       >
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/market-clue/config/updatePolicy/notReceiveIds']"
             type="text"
             size="small"
             @click="setPolicyAuto(scope.row)"
@@ -70,7 +78,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
 import { HandlePages, lock } from '@/utils/index'
-import { configurationManagementList } from '@/api/clue'
+import { configurationWTShareList, configurationWTSpecialList, configurationLCList, configurationLZList } from '@/api/clue'
 interface PageObj {
   page: number
   limit: number
@@ -90,30 +98,34 @@ interface IState {
 })
 export default class extends Vue {
   listQuery: any = {}
-  lineType: Array<any> = [
+  clueType: Array<any> = [
     {
       name: '梧桐专车',
-      id: 1
+      id: 0,
+      url: '/v2/market-clue/config/WTSpecialList'
     },
     {
       name: '梧桐共享',
-      id: 2
+      id: 1,
+      url: '/v2/market-clue/config/WTShareList'
     },
     {
       name: '雷鸟车池',
-      id: 4
+      id: 2,
+      url: '/v2/market-clue/config/LCList'
     },
     {
       name: '雷鸟租赁',
-      id: 5
+      id: 3,
+      url: '/v2/market-clue/config/LZList'
     }
   ]
-  activeLineType: number = this.lineType[0].id
+  activeLineType: number = this.clueType[0].id
   private ruleFrom: Array<any> = [
     {
-      type: 'lineType',
+      type: 'clueType',
       slot: true,
-      key: 'lineType',
+      key: 'clueType',
       col: 24
     },
     {
@@ -124,22 +136,22 @@ export default class extends Vue {
         filterable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'driverCity',
+        'node-key': 'city',
         props: {
           lazy: true,
           lazyLoad: this.showWork
         }
       },
-      col: 4,
+      col: 8,
       label: '司机城市',
-      key: 'driverCity'
+      key: 'city'
     },
     {
       type: 'btnc',
       slot: true,
       key: 'btnc',
-      col: 8,
-      offset: 5
+      col: 16
+      // offset: 3
     }
   ]
   private async showWork(node: any, resolve: any) {
@@ -205,7 +217,7 @@ export default class extends Vue {
       label: '城市'
     },
     {
-      key: 'id',
+      key: 'userGroupId',
       label: '客群细分ID/业务线/客群类型',
       width: '120px'
     },
@@ -214,20 +226,20 @@ export default class extends Vue {
       label: '目标画像标签'
     },
     {
-      key: 'distributionTypeName',
+      key: 'allocationTypeName',
       label: '分配机制'
     },
     {
-      key: 'cluesAmount',
+      key: 'clueNum',
       label: '线索量',
       width: '120px'
     },
     {
-      key: 'setPerson',
+      key: 'groupUpdateName',
       label: '设置人'
     },
     {
-      key: 'setDate',
+      key: 'groupUpdateDate',
       label: '设置时间',
       attrs: {
         sortable: true
@@ -259,6 +271,11 @@ export default class extends Vue {
     this.page.page = 1
     this.getList()
   }
+  // 重置
+  private async handleResetClick() {
+    this.listQuery.city = ''
+    this.getList()
+  }
   // 分页
   handlePageSize(page: PageObj) {
     this.page.page = page.page
@@ -271,11 +288,13 @@ export default class extends Vue {
   // 设置policy
   private showPolicy:boolean = false // has 设置policy弹框
   private policyData:any = {}
-  setPolicyAuto({ busiType, cityCode, id }:any) {
+  setPolicyAuto(row:any) {
+    // console.log(row)
     const object = {
-      busiType,
-      cityCode,
-      id
+      busiType: this.activeLineType,
+      cityCode: row.city,
+      id: row.userGroupId,
+      notReceiveId: row.notReceiveId
     }
     this.policyData = object
     this.showPolicy = true
@@ -287,30 +306,57 @@ export default class extends Vue {
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
-        lineType: this.activeLineType,
+        clueType: this.activeLineType,
         order: order || ''
       }
-      if (this.listQuery.cityName && this.listQuery.cityName.length > 1) {
-        params.cityName = this.listQuery.cityName[1]
+      if (this.listQuery.city && this.listQuery.city.length > 1) {
+        params.city = this.listQuery.city[1]
       }
-      let { data: res } = await configurationManagementList(params)
-      if (res.success) {
-        this.tableData = res.data || []
-        this.$refs['ConfigurationForm'].toggleRowSelection()
-        res.page = await HandlePages(res.page)
-        this.page.total = res.page.total
-      } else {
-        this.$message.error(res.errorMsg)
+      if (params.clueType === 0) {
+        let { data: res } = await configurationWTSpecialList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 1) {
+        let { data: res } = await configurationWTShareList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 2) {
+        let { data: res } = await configurationLCList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 3) {
+        let { data: res } = await configurationLZList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
       }
     } catch (err) {
       console.log(`get list fail:${err}`)
     } finally {
       this.listLoading = false
-    }
-  }
-
-  data() {
-    return {
     }
   }
   mounted() {
@@ -362,4 +408,11 @@ export default class extends Vue {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
 }
+  .btnPc{
+       width: 100%;
+       padding: 0 10px;
+       display: flex;
+       flex-flow: row nowrap;
+       justify-content: flex-end;
+    }
 </style>

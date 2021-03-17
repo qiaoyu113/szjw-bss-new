@@ -22,10 +22,12 @@
         <el-radio-group
           v-model="listQuery.clueType"
           size="small"
+          @change="getLists"
         >
           <el-radio-button
             v-for="item in busiTypeArrs"
             :key="item.value"
+            v-permission="[`${item.url}`]"
             :label="item.value"
           >
             {{ item.label }}
@@ -52,6 +54,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/v2/clue/campaign/addCampaign']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -59,8 +62,9 @@
         >
           新建Campaign
         </el-button>
-        <!-- v-permission="[]" -->
+
         <el-button
+          v-permission="['/v2/clue/campaign/campaign/export']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -90,8 +94,8 @@
         @onPageSize="handlePageSize"
       >
         <template v-slot:userGroupId="{row}">
-          <template v-if="row.userGroupId || row.busiTypeName || row.groupTypeName">
-            {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupTypeName }}
+          <template v-if="row.userGroupId || row.busiTypeName || row.groupType">
+            {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupType }}
           </template>
           <template v-else>
             暂无数据
@@ -106,6 +110,7 @@
             详情
           </el-button>
           <el-button
+            v-permission="['/v2/clue/campaign/campaign/firmiana/import','/v2/clue/campaign/campaign/thunderBirdRental/import','/v2/clue/campaign/campaign/thunderBirdTruckPool/import']"
             type="text"
             size="small"
             @click="handleImportClick(scope.row)"
@@ -129,7 +134,6 @@
         :region-list="regionList"
         :add-userlist="addUserGroup"
         :city-list="cityList"
-        :city-detail="cityDetail"
         :platform-list="platformList"
         @onPass="handlePass"
       />
@@ -168,8 +172,8 @@ import {
   sevenday,
   thirtyday
 } from '../../../driver-freight/components/date'
-import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionary } from '@/api/common'
-import { GetClueCampaignList, FirmianaExport, ThunderBirdRentalExport, ThunderBirdTruckPoolExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
+import { GetDictionary, GetDictionaryCity } from '@/api/common'
+import { GetClueCampaignList, CampaignExport, AddCampaign as AddCampaignApi, FirmianaImport, ThunderBirdRentalImport, ThunderBirdTruckPoolImport, GetUserGroupSelectList, GetLaunchPlatformList } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -197,17 +201,18 @@ export default class extends Vue {
   private platformList:IState[] = []; // 平台列表
   private listLoading:boolean = false;
   private listQuery:IState = {
-    clueType: 1,
+    clueType: 0,
     userGroupId: '',
     areCity: '',
     cityCode: '',
-    launchPlatformCoe: '',
+    launchPlatform: '',
     dropTime: [],
     time: [],
-    sort: 1 // 1: 降序,0:升序
+    sort: 'desc' // 1: 降序(desc),0:升序(asc)
   }
   private userGroupOptions:IState[] = []; // 客群细分id
   private addUserGroup:IState[] = []; // 新增客群细分id
+  private campaignId:string = ''; // 导入的compaignId
   // 新建Campaign
   private showDialog:boolean = false;
   // 导入线索
@@ -216,19 +221,23 @@ export default class extends Vue {
   private busiTypeArrs:any[] = [
     {
       label: '梧桐专车',
-      value: 0
+      value: 0,
+      url: '/v2/clue/campaign/getClueCampaignList-0'
     },
     {
       label: '梧桐共享',
-      value: 1
+      value: 1,
+      url: '/v2/clue/campaign/getClueCampaignList-1'
     },
     {
       label: '雷鸟车池',
-      value: 2
+      value: 2,
+      url: '/v2/clue/campaign/getClueCampaignList-2'
     },
     {
       label: '雷鸟租赁',
-      value: 3
+      value: 3,
+      url: '/v2/clue/campaign/getClueCampaignList-3'
     }
   ]
   private formItem:any[] = [
@@ -259,12 +268,7 @@ export default class extends Vue {
       },
       label: '所属区域',
       key: 'areCity',
-      options: this.regionList,
-      listeners: {
-        'change': () => {
-          this.cityDetail(this.listQuery.areCity)
-        }
-      }
+      options: this.regionList
     },
     {
       type: 2,
@@ -285,7 +289,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '投放平台',
-      key: 'launchPlatformCoe',
+      key: 'launchPlatform',
       options: this.platformList
     },
     {
@@ -328,7 +332,7 @@ export default class extends Vue {
     {
       key: 'campaignId',
       label: 'Campaign ID',
-      'width': '100px'
+      'width': '110px'
     },
     {
       key: 'userGroupId',
@@ -337,32 +341,32 @@ export default class extends Vue {
       slot: true
     },
     {
-      key: 'areCityName',
+      key: 'regionName',
       label: '所属区域',
       'width': '80px'
     },
     {
       key: 'cityName',
       label: '城市',
-      'width': '80px'
+      'width': '100px'
     },
     {
-      key: 'launchPlatform',
+      key: 'deliveryPlatform',
       label: '投放平台',
       'width': '100px'
     },
     {
-      key: 'dropMaterials',
+      key: 'putMaterials',
       label: '投放物料',
       'width': '140px'
     },
     {
-      key: 'dropStarTime',
+      key: 'putStartDate',
       label: '投放起始时间',
       'width': '160px'
     },
     {
-      key: 'dropEndTime',
+      key: 'putEndDate',
       label: '投放终止时间',
       'width': '160px'
     },
@@ -398,7 +402,7 @@ export default class extends Vue {
     {
       key: 'createUserName',
       label: '创建人',
-      'width': '80px'
+      'width': '100px'
     },
     {
       key: 'createDate',
@@ -433,7 +437,7 @@ export default class extends Vue {
   // 重置
   handleResetClick() {
     this.listQuery = {
-      clueType: 1,
+      clueType: 0,
       userGroupId: '',
       areCity: '',
       cityCode: '',
@@ -457,15 +461,9 @@ export default class extends Vue {
   @lock
   async handleExportClick(sucFun:Function) {
     try {
-      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
-      let obj:IState = {
-        0: FirmianaExport,
-        1: FirmianaExport,
-        2: ThunderBirdTruckPoolExport,
-        3: ThunderBirdRentalExport
-      }
       let params:IState = this.generateParams()
-      let { data: res } = await obj[this.listQuery.clueType](params)
+      delete params.sort
+      let { data: res } = await CampaignExport(params)
       if (res.success) {
         sucFun()
         this.$message.success('操作成功')
@@ -489,11 +487,11 @@ export default class extends Vue {
     let obj:IState = {
       sort: this.listQuery.sort
     }
-    this.listQuery.clueType !== '' && (obj.clueType = this.listQuery.clueType)
-    this.listQuery.userGroupId && (obj.userGroupId = this.listQuery.userGroupId)
-    this.listQuery.areCity && (obj.areCity = this.listQuery.areCity)
-    this.listQuery.cityCode && (obj.cityCode = this.listQuery.cityCode)
-    this.listQuery.launchPlatformCoe !== '' && (obj.launchPlatformCoe = this.listQuery.launchPlatformCoe)
+    this.listQuery.clueType !== '' && (obj.clueType = +this.listQuery.clueType)
+    this.listQuery.userGroupId && (obj.userGroupId = +this.listQuery.userGroupId)
+    this.listQuery.areCity && (obj.areCity = +this.listQuery.areCity)
+    this.listQuery.cityCode && (obj.cityCode = +this.listQuery.cityCode)
+    this.listQuery.launchPlatform !== '' && (obj.launchPlatform = this.listQuery.launchPlatform)
     if (this.listQuery.dropTime && this.listQuery.dropTime.length > 0) {
       obj.dropStarTime = new Date(this.listQuery.dropTime[0]).setHours(0, 0, 0)
       obj.dropEndTime = new Date(this.listQuery.dropTime[1]).setHours(23, 59, 59)
@@ -514,7 +512,6 @@ export default class extends Vue {
         limit: this.page.limit,
         ...obj
       }
-
       this.listLoading = true
       let { data: res } = await GetClueCampaignList(params)
       if (res.success) {
@@ -543,6 +540,7 @@ export default class extends Vue {
   // 导入线索
   handleImportClick(row:IState) {
     this.busiType = row.busiType
+    this.campaignId = row.campaignId
     this.showDialog1 = true
   }
   // 新建 确定按钮
@@ -586,13 +584,14 @@ export default class extends Vue {
   // 上传excel
   async handlePass1(formData:FormData) {
     try {
-      // 梧桐专车(1)、梧桐共享(2)、雷鸟车池(3)、雷鸟租赁(4)
+      // 梧桐专车(0)、梧桐共享(1)、雷鸟车池(2)、雷鸟租赁(3)
       let obj:IState = {
+        0: FirmianaImport,
         1: FirmianaImport,
-        2: FirmianaImport,
-        3: ThunderBirdTruckPoolImport,
-        4: ThunderBirdRentalImport
+        2: ThunderBirdTruckPoolImport,
+        3: ThunderBirdRentalImport
       }
+      formData.append('campaignId', this.campaignId)
       let { data: res } = await obj[this.listQuery.clueType](formData)
       if (res.success) {
         this.$message.success('操作成功')
@@ -609,13 +608,15 @@ export default class extends Vue {
   // 获取大区列表
   private async areaAddress() {
     try {
-      let params:IState = { type: 2 }
-      let { data: res } = await getOfficeByType(params)
+      let params = {
+        dictType: 'region'
+      }
+      let { data: res } = await GetDictionary(params)
       if (res.success) {
         const nodes = res.data.map(function(item: any) {
           return {
-            value: item.id,
-            label: item.name
+            value: +item.dictValue,
+            label: item.dictLabel
           }
         })
         this.regionList.push(...nodes)
@@ -625,20 +626,12 @@ export default class extends Vue {
     }
   }
   // 根据大区获取城市列表
-  async cityDetail(parentId:number) {
-    let len = this.cityList.length
-    if (len > 0) {
-      this.cityList.splice(0, len)
-    }
-    this.listQuery.cityCode = ''
-    let params:IState = {
-      parentId
-    }
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  async cityDetail() {
+    let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
         return {
-          value: item.areaCode,
+          value: +item.code,
           label: item.name
         }
       })
@@ -664,9 +657,9 @@ export default class extends Vue {
       this.listQuery.sort === 0 ? row.order = 'ascending' : row.order = 'descending'
     }
     if (row.order === 'ascending') { // 降序
-      this.listQuery.sort = 1
+      this.listQuery.sort = 'desc'
     } else {
-      this.listQuery.sort = 0
+      this.listQuery.sort = 'asc'
     }
     this.getLists()
   }
@@ -698,6 +691,7 @@ export default class extends Vue {
   // 初始化公共列表
   init() {
     this.areaAddress()
+    this.cityDetail()
     this.getDictionaryContract()
     this.getUserGroupSelectList(this.listQuery.clueType)
   }

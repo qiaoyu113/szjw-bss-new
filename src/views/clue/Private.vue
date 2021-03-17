@@ -32,7 +32,7 @@
       </div>
       <template slot="status">
         <el-badge
-          v-for="item in btns"
+          v-for="item in tableBtn"
           :key="item.text"
           :value="item.num"
           :max="9999"
@@ -110,7 +110,7 @@
             @change="handleFilterClick(true)"
           >
             <el-checkbox-button :label="true">
-              代办事项
+              待办清单
             </el-checkbox-button>
           </el-checkbox-group>
         </el-badge>
@@ -141,6 +141,7 @@
         style="overflow: initial;"
         :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
         :default-sort="{prop: 'createDate', order: 'descending'}"
+        :func="filterCheck"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
@@ -164,7 +165,7 @@
           {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
-          {{ row.hasCar ? '有；' : '无' }}
+          {{ row.hasCar ? '有' : '无' }}
         </template>
         <template v-slot:notFollowDay="{row}">
           <el-link
@@ -196,6 +197,7 @@
           </el-button>
           <el-button
             type="text"
+            :disabled=" (scope.row.status === 40 || scope.row.status === 50)"
             @click="handleDistributionClick(scope.row)"
           >
             转线索
@@ -268,8 +270,7 @@
         <el-link
           class="mt20"
           type="primary"
-          href="https://element.eleme.io"
-          target="_blank"
+          @click.prevent="downloadFile"
         >
           点击下载模板
         </el-link>
@@ -399,34 +400,111 @@ export default class extends Vue {
     {
       name: '',
       text: '全部',
-      num: 0
+      num: 0,
+      uri: ['root']
     },
     {
       name: '10',
       text: '待跟进',
-      num: 0
+      num: 0,
+      uri: ['root']
     },
     {
       name: '20',
       text: '跟进中', // 审核通过
-      num: 0
+      num: 0,
+      uri: ['root']
+    },
+    {
+      name: '22',
+      text: '可入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '23',
+      text: '待入池', // 审核通过
+      num: 0,
+      uri: [2]
+    },
+    {
+      name: '24',
+      text: '已入池', // 审核通过
+      num: 0,
+      uri: [2]
     },
     {
       name: '30',
       text: '邀约成功',
-      num: 0
+      num: 0,
+      uri: [0, 1]
+    },
+    {
+      name: '32',
+      text: '有意向',
+      num: 0,
+      uri: [3, 4]
+    },
+    {
+      name: '35',
+      text: '已看中',
+      num: 0,
+      uri: [3, 4]
     },
     {
       name: '40',
       text: '已面试',
-      num: 0
+      num: 0,
+      uri: [0, 1]
     },
     {
       name: '50',
       text: '已成交',
-      num: 0
+      num: 0,
+      uri: [0, 1, 3, 4]
     }
   ]
+  downloadFile() {
+    const fileList = [
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/9aad173773eb4ab0aee22bdb1b2e5b2f',
+        recordId: '梧桐专车导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/a6e4f7b4d35d4761851fc142f591fd58',
+        recordId: '梧桐共享导入模板'
+      },
+      {},
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/6a4eb42e42594e2992747d345275044f',
+        recordId: '雷鸟租赁C导入模板'
+      },
+      {
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/ce168afed219417b8567915a0ce89237',
+        recordId: '雷鸟租赁B导入模板'
+      }
+    ]
+    const index = this.listQuery.clueType
+    this.download(fileList[index])
+  }
+  filterCheck({ status }:any) {
+    return !(status === 40 || status === 50)
+  }
+  // 下载文件
+  download(row:any) {
+    if (!row.fileUrl) {
+      return
+    }
+    let link = document.createElement('a')
+    link.style.display = 'none'
+    link.href = row.fileUrl
+    link.setAttribute(`download`, `313133.xls`)
+    console.log(link)
+    // return
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
   // 打电话
   private callPhoneDio = false
   private rowStatus = {
@@ -721,16 +799,14 @@ export default class extends Vue {
       options: this.followTypeOptins
     },
     {
-      type: 2,
+      type: 1,
       label: '未跟进天数',
       key: 'notFollowDay',
       tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
+        placeholder: '请输入',
         clearable: true
       },
-      rules: ['root'],
-      options: this.hasCarList
+      rules: ['root']
     },
     {
       type: 5,
@@ -963,6 +1039,11 @@ export default class extends Vue {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
     })
   }
+  get tableBtn() {
+    return this.btns.filter((item: any) => {
+      return item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
+    })
+  }
   // 跳转详情页
   goDetail({ clueType, phone, clueId }:any) {
     const query = {
@@ -1127,7 +1208,6 @@ export default class extends Vue {
       if (res.success) {
         const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
-
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
@@ -1273,11 +1353,15 @@ export default class extends Vue {
   uploadConfirm() {
     (this.$refs.upload as any).submit()
   }
+  private hasUpdata = false // 防止重复点击
   uploadClose() {
     (this.$refs.upload as any).clearFiles()
+    this.hasUpdata = false
   }
   customUpload(param: any) {
     // 自定义上传
+    if (this.hasUpdata) return
+    this.hasUpdata = true
     const formData = new FormData()
     formData.append('file', param.file)
     const clueType = this.listQuery.clueType
@@ -1287,7 +1371,12 @@ export default class extends Vue {
     fileUpload = arr[clueType]
     fileUpload && fileUpload(formData).then(({ data } : any) => {
       if (data.success) {
-        this.$message.success('上传成功')
+        this.$notify({
+          title: '',
+          message: '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
+          duration: 0,
+          offset: 70
+        })
         this.uploadDialog = false
         this.handleResetClick({})
       } else {

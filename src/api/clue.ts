@@ -1,9 +1,12 @@
 import request from '@/utils/request'
-// const prefix = '/line'
-const prefix = '/mock/81'
+const baseUrl = '/carrier_center'
+// const baseUrl = '/mock/81'
+const prefix = '/line'
+// const prefix = '/mock/81'
 // 待分配线索 梧桐线索列表
 const produce = '/carrier_center'
 const base = '/base_center'
+
 export const GetToAllotWT = (data: any) =>
   request({
     url: `${produce}/v2/market-clue/getToAllotWTClueList`,
@@ -17,57 +20,60 @@ export const GetToAllotLNCarPool = (data: any) =>
     data,
     method: 'post'
   })
-// const prefix = '/base'
-  // let prefix = '/mock/81'
-// 获取客群细分列表
-export const getClueUserGroupList = (params: any) =>
+// 获取随机分配policy列表(梧桐共享)
+export const configurationWTShareList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/user-group/getClueUserGroupList`,
-    method: 'post',
-    params
-  })
-
-export const configurationManagementList = (data: any) =>
-  request({
-    url: `${prefix}/v2/market-clue/config/list`,
+    url: `${baseUrl}/v2/market-clue/config/WTShareList`,
     method: 'post',
     data
   })
-// 获取小组  设置policy
-
-export const getUserGroup = (params: any) =>
+  // 获取随机分配policy列表（梧桐专车）
+export const configurationWTSpecialList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/config/get/user-group`,
-    params
+    url: `${baseUrl}/v2/market-clue/config/WTSpecialList`,
+    method: 'post',
+    data
   })
-// 获取小组人员
-export const getGroupUser = (params: any) =>
+// 获取随机分配policy列表（雷鸟车池）
+export const configurationLCList = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/user-group/user`,
-    params
+    url: `${baseUrl}/v2/market-clue/config/LCList`,
+    method: 'post',
+    data
   })
-// 设置 policy
+  // 获取随机分配policy列表（雷鸟租赁）
+export const configurationLZList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/config/LZList`,
+    method: 'post',
+    data
+  })
+// 设置随机分配policy
+export const setrandomPolicy = (data:any) => request({
+  url: `${baseUrl}/v2/market-clue/config/updatePolicy/notReceiveIds`,
+  method: 'post',
+  data
+})
+// 不接受线索人员Ids 查询人员信息
+export const searchInformation = (params:any) => request({
+  url: `${baseUrl}/v2/market-clue/user-group/updatePolicy/getUserInfoList`,
+  method: 'get',
+  params
+})
+// 设置回流policy
 export const setPolicy = (data:any) => request({
-  url: `${prefix}/v2/market-clue/config/update/policy`,
+  url: `${baseUrl}/v2/market-clue/reflow_conf/settingReflowedConf`,
   method: 'post',
   data
 })
 
 // 获取回流policy 列表
-
-export const getBackFlowPolicyList = (params:any) => request({
-  url: `${prefix}/v2/market-clue/update/policy/list`,
-  params
+export const getBackFlowPolicyList = (data:any) => request({
+  url: `${baseUrl}/v2/market-clue/reflow_conf/list`,
+  method: 'post',
+  data
 })
 
-// 获取默认时间
-
-export const getBackFlowDeflutDate = (params:any) => request({
-  url: `${prefix}/v2/clue/config/backflow/date`,
-  params
-})
-
-const baseUrl = '/mock/81'
 // 获取campaign列表
 export const GetClueCampaignList = (data: any) =>
   request({
@@ -76,26 +82,12 @@ export const GetClueCampaignList = (data: any) =>
     data
   })
 
-// 梧桐专车/共享campaign导出
-export const FirmianaExport = (data: any) =>
+// campaign导出
+export const CampaignExport = (data: any) =>
   request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/firmiana/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟租赁campaign导出
-export const ThunderBirdRentalExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdRental/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟车池campaign导出
-export const ThunderBirdTruckPoolExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdTruckPool/export`,
-    method: 'get',
-    params: data
+    url: `${baseUrl}/v2/clue/campaign/campaign/export`,
+    method: 'post',
+    data: data
   })
 
 // 新建campaign
@@ -220,9 +212,17 @@ export const getClueDetailLogs = (data: any) =>
   })
 
 // 公海池线索分配跟进人
+
 export const UpdateFollowerByHighSeas = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/updateFollowerByHighSeas`,
+    url: `${produce}/v2/market-clue/updateFollowerByHighSeas`,
+    method: 'post',
+    data
+  })
+  // 私海池线索分配跟进人
+export const UpdateFollowerByPrivateSeas = (data: any) =>
+  request({
+    url: `${produce}/v2/market-clue/updateFollowerByPrivateSeas`,
     method: 'post',
     data
   })
@@ -254,17 +254,10 @@ export const GetClueLZXPrivateSeaPoolListC = (data: any) =>
     method: 'post',
     data
   })
-// 私海池线索分配跟进人
-export const UpdateFollowerByPrivateSeas = (data: any) =>
-  request({
-    url: `${produce}/v2/market-clue/updateFollowerByPrivateSeas`,
-    method: 'post',
-    data
-  })
 // 私海池 梧桐专车线索导入
 export const UploadExcelFirmianaZC = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/firmiana/import/private`,
+    url: `${produce}/v2/market-clue/privatePool/firmiana/import/private`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -274,7 +267,7 @@ export const UploadExcelFirmianaZC = (data: any) =>
 // 私海池 梧桐共享线索导入
 export const UploadExcelBirdGX = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/firmiana/import/shared`,
+    url: `${produce}/v2/market-clue/privatePool/firmiana/import/shared`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -284,7 +277,7 @@ export const UploadExcelBirdGX = (data: any) =>
 // 私海池 雷鸟租赁B线索导入
 export const UploadExcelLNB = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/import/b`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdRental/import/b`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -294,7 +287,7 @@ export const UploadExcelLNB = (data: any) =>
   // 私海池 雷鸟租赁C线索导入
 export const UploadExcelLNC = (data: any) =>
   request({
-    url: `${prefix}/v2/market-clue/privatePool/thunderBirdRental/import/c`,
+    url: `${produce}/v2/market-clue/privatePool/thunderBirdRental/import/c`,
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -429,4 +422,52 @@ export const GetLaunchPlatformList = () =>
   request({
     url: `${baseUrl}/v2/clue/campaign/getLaunchPlatformList`,
     method: 'get'
+  })
+
+// 获取客群细分列表(专车)
+export const getWTSpecialClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getWTSpecialClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表(共享)
+export const getWTShareClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getWTShareClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表(租赁)
+export const getLZClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getLZClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表（车池）
+export const getLCClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getLCClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 创建客群创建
+export const UserGroupCreate = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/create`,
+    method: 'post',
+    data
+  })
+
+// 客群导出
+export const UserGroupExport = (params: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/userGroup/export`,
+    method: 'get',
+    params
   })
