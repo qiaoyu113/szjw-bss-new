@@ -69,7 +69,13 @@ const clueRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Public.vue'),
       name: 'PublicClue',
       meta: {
-        apiUrl: 'root',
+        apiUrl: [
+          '/v2/market-clue/list-wt-special/getToAllotWTClueList',
+          '/v2/market-clue/list-wt-share/getToAllotWTClueList',
+          '/v2/market-clue/list-ln-carPool/getToAllotLNCarPoolClueList',
+          '/v2/market-clue/list-ln-hire-c/getToAllotLNLeaseClueList',
+          '/v2/market-clue/list-ln-hire-b/getToAllotLNLeaseClueList'
+        ],
         title: 'publicClue',
         noCache: false
       }
@@ -79,7 +85,13 @@ const clueRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Private.vue'),
       name: 'PrivateClue',
       meta: {
-        apiUrl: 'root',
+        apiUrl: [
+          '/v2/market-clue/getCluePrivateSeaPoolList',
+          '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLCXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
+        ],
         title: 'privateClue',
         noCache: false
       }
