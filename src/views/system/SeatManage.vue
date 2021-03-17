@@ -324,9 +324,6 @@ export default class extends Vue {
   private ruleChangeSeatForm: any = {
 
   }
-  private ruleNewSeatForm: any = {
-
-  }
   private beforeSeatForm: any = {
     nickName: '',
     seatNumber: ''
@@ -396,10 +393,17 @@ export default class extends Vue {
   private changeSeatForm: any = {
     value: '',
     nickName: '', // 绑定人
+    busiType: '',
+    cityCode: '',
     seatNumber: '', // 绑定人坐席号
     changeName: '', // 更改后的绑定人
     roleName: '', // 角色
     officeName: '' // 组织架构
+  }
+  // 列表城市 业务线
+  private rolerFrom: any = {
+    busiType: '',
+    cityCode: ''
   }
   // 新建绑定
   private newSeatForm: any = {
@@ -421,11 +425,6 @@ export default class extends Vue {
     agentNum: '',
     mobile: '',
     userName: ''
-  }
-  // 业务线 城市查询
-  private selectItem: any = {
-    busiType: '',
-    cityCode: ''
   }
   // 渲染查询表单的列表
   private formItem:any[] = [
@@ -586,6 +585,8 @@ export default class extends Vue {
   }
   // 获取列表
   handleFilterClick() {
+    this.listQuery.userName = this.stripscript(this.listQuery.userName)
+    this.listQuery.agentNum = this.stripscript(this.listQuery.agentNum)
     this.getLists()
   }
   // 坐席号改绑
@@ -598,9 +599,9 @@ export default class extends Vue {
       this.changeSeatForm.id = ''
       this.changeSeatForm.nickName = ''
       this.changeSeatForm.value = ''
+      this.rolerFrom.busiType = row.busiTypeValue
+      this.rolerFrom.cityCode = row.cityCode
       this.dialogFormVisible = true
-      this.selectItem.busiType = row.busiTypeValue
-      this.selectItem.cityCode = row.cityCode
     } catch (err) {
       console.log(`get lists fail:${err}`)
     } finally {
@@ -635,8 +636,8 @@ export default class extends Vue {
     this.newSeatForm.value = ''
     this.newSeatForm.id = ''
     this.newSeatForm.seatNumber = row.agentNum
-    this.selectItem.busiType = row.busiTypeValue
-    this.selectItem.cityCode = row.cityCode
+    this.rolerFrom.busiType = row.busiTypeValue
+    this.rolerFrom.cityCode = row.cityCode
     this.getEnableAgentNum()
   }
   // 解除绑定
@@ -756,9 +757,9 @@ export default class extends Vue {
       if (queryString) {
         let parmas = {
           keyword: queryString,
-          roleTypes: 8,
-          busiType: this.selectItem.busiType,
-          cityCode: this.selectItem.cityCode,
+          roleTypes: [8],
+          busiType: this.rolerFrom.busiType,
+          cityCode: this.rolerFrom.cityCode,
           uri: '/v3/base/agent/queryGM'
         }
         let { data: res } = await getQueryGM(parmas)
@@ -798,6 +799,15 @@ export default class extends Vue {
   // 手机号校验
   private oninputOnlyNum(value: string) {
     this.listQuery.mobile = value.replace(/[^\d]/g, '')
+  }
+  // 特殊符号过滤
+  private stripscript(s:any) {
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]")
+    var rs = ''
+    for (var i = 0; i < s.length; i++) {
+      rs = rs + s.substr(i, 1).replace(pattern, '')
+    }
+    return rs
   }
 }
 </script>
