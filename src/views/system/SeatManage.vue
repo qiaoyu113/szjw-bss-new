@@ -58,7 +58,7 @@
       @onPageSize="handlePageSize"
     >
       <template v-slot:op="scope">
-        <div v-if="scope.row.userName">
+        <div v-if="scope.row.status === 1">
           <el-button
             v-permission="['/v3/base/agent/change']"
             type="text"
@@ -324,9 +324,6 @@ export default class extends Vue {
   private ruleChangeSeatForm: any = {
 
   }
-  private ruleNewSeatForm: any = {
-
-  }
   private beforeSeatForm: any = {
     nickName: '',
     seatNumber: ''
@@ -346,13 +343,23 @@ export default class extends Vue {
     value: 1
   }, {
     label: '未绑定',
-    value: 0
+    value: 2
   }]
   // 渲染表格的列表
   private columns:ColumnsObj[] = [
     {
       key: 'agentNum',
       label: '坐席号',
+      'min-width': '140px'
+    },
+    {
+      key: 'busiType',
+      label: '所属业务线',
+      'min-width': '140px'
+    },
+    {
+      key: 'cityName',
+      label: '所属城市',
       'min-width': '140px'
     },
     {
@@ -384,14 +391,23 @@ export default class extends Vue {
     }
   ]
   private changeSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
+    busiType: '',
+    cityCode: '',
     seatNumber: '', // 绑定人坐席号
     changeName: '', // 更改后的绑定人
     roleName: '', // 角色
     officeName: '' // 组织架构
   }
+  // 列表城市 业务线
+  private rolerFrom: any = {
+    busiType: '',
+    cityCode: ''
+  }
   // 新建绑定
   private newSeatForm: any = {
+    value: '',
     nickName: '', // 绑定人
     seatNumber: '' // 绑定人坐席号
   }
@@ -569,6 +585,8 @@ export default class extends Vue {
   }
   // 获取列表
   handleFilterClick() {
+    this.listQuery.userName = this.stripscript(this.listQuery.userName)
+    this.listQuery.agentNum = this.stripscript(this.listQuery.agentNum)
     this.getLists()
   }
   // 坐席号改绑
@@ -581,6 +599,8 @@ export default class extends Vue {
       this.changeSeatForm.id = ''
       this.changeSeatForm.nickName = ''
       this.changeSeatForm.value = ''
+      this.rolerFrom.busiType = row.busiTypeValue
+      this.rolerFrom.cityCode = row.cityCode
       this.dialogFormVisible = true
     } catch (err) {
       console.log(`get lists fail:${err}`)
@@ -616,6 +636,8 @@ export default class extends Vue {
     this.newSeatForm.value = ''
     this.newSeatForm.id = ''
     this.newSeatForm.seatNumber = row.agentNum
+    this.rolerFrom.busiType = row.busiTypeValue
+    this.rolerFrom.cityCode = row.cityCode
     this.getEnableAgentNum()
   }
   // 解除绑定
@@ -631,6 +653,9 @@ export default class extends Vue {
           type: 'success',
           message: '解绑成功!'
         })
+        setTimeout(() => {
+          this.getLists()
+        }, 1000)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -730,11 +755,14 @@ export default class extends Vue {
   async querySearchAsync(queryString: any, cb: any) {
     try {
       if (queryString) {
-        let { data: res } = await getQueryGM({
+        let parmas = {
           keyword: queryString,
           roleTypes: [8],
+          busiType: this.rolerFrom.busiType,
+          cityCode: this.rolerFrom.cityCode,
           uri: '/v3/base/agent/queryGM'
-        })
+        }
+        let { data: res } = await getQueryGM(parmas)
         if (res.success) {
           res.data.forEach((element: any) => {
             element.value = element.nickName + element.mobile
@@ -771,6 +799,15 @@ export default class extends Vue {
   // 手机号校验
   private oninputOnlyNum(value: string) {
     this.listQuery.mobile = value.replace(/[^\d]/g, '')
+  }
+  // 特殊符号过滤
+  private stripscript(s:any) {
+    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]")
+    var rs = ''
+    for (var i = 0; i < s.length; i++) {
+      rs = rs + s.substr(i, 1).replace(pattern, '')
+    }
+    return rs
   }
 }
 </script>

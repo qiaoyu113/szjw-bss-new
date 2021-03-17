@@ -1,7 +1,7 @@
 <template>
   <SelfDialog
     class="dasdadad"
-    title="设置policy"
+    title="设置回流policy"
     v-bind="$attrs"
     :width="'40%'"
     destroy-on-close
@@ -15,22 +15,10 @@
       label-width="80px"
       label-position="left"
     >
-      <!-- <el-tabs
-        v-model="activeTab"
-        style="margin-top: 20px"
-        @tab-click="handleClick"
-      >
-        <el-tab-pane
-          v-for="(item, index) in lineTypeTab"
-          :key="index"
-          :label="item.name"
-          :name="item.value"
-        />
-      </el-tabs> -->
       <h3>设置线索回流时间</h3>
       <el-form-item label="待跟进">
         <el-input-number
-          v-model="queryInfo.followDayNum"
+          v-model="queryInfo.flowedDayNum"
           :min="1"
           :max="99"
           class="num-input-setup-clue"
@@ -38,7 +26,7 @@
       </el-form-item>
       <el-form-item label="跟进中">
         <el-input-number
-          v-model="queryInfo.followingDayNum"
+          v-model="queryInfo.flowingDayNum"
           :min="1"
           :max="99"
           class="num-input-setup-clue"
@@ -57,7 +45,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { getBackFlowDeflutDate, setPolicy } from '@/api/clue'
+import { setPolicy } from '@/api/clue'
 @Component({
   name: 'SetUpPolicy',
   components: {
@@ -67,94 +55,31 @@ import { getBackFlowDeflutDate, setPolicy } from '@/api/clue'
 export default class extends Vue {
   @Prop({ default: () => {} }) policyData: any
   private queryInfo: any = {
-    followDayNum: 0,
-    followingDayNum: 0
+    flowedDayNum: 0,
+    flowingDayNum: 0
   }
-  // activeTab = '0'
-  // 梧桐专车、梧桐共享、雷鸟车池、雷鸟租赁
-  // private lineTypeTab = [
-  //   {
-  //     name: '梧桐专车',
-  //     value: '0'
-  //   },
-  //   {
-  //     name: '梧桐共享',
-  //     value: '1'
-  //   },
-  //   {
-  //     name: '雷鸟车池',
-  //     value: '2'
-  //   },
-  //   {
-  //     name: '雷鸟租赁C',
-  //     value: '4'
-  //   },
-  //   {
-  //     name: '雷鸟租赁B',
-  //     value: '3'
-  //   }
-  // ]
-  // defalutDate = {
-  //   '0': {
-  //     followDayNum: 3,
-  //     followingDayNum: 15
-  //   },
-  //   '1': {
-  //     followDayNum: 1,
-  //     followingDayNum: 7
-  //   },
-  //   '2': {
-  //     followDayNum: 1,
-  //     followingDayNum: 7
-  //   },
-  //   '4': {
-  //     followDayNum: 1,
-  //     followingDayNum: 3
-  //   },
-  //   '3': {
-  //     followDayNum: 1,
-  //     followingDayNum: 7
-  //   }
-  // }
   private userGroupList: any = []
-  async getdefaultDate() {
-    const { busiType, cityCode, id } = this.policyData
-    try {
-      const { data } = await getBackFlowDeflutDate({
-        id,
-        cityCode,
-        busiType
-      })
-      console.log(data)
-      if (data.success) {
-        this.queryInfo = data.data
-      } else {
-        this.$message({
-          type: 'error',
-          message: data.errorMsg
-        })
-      }
-    } catch (error) {
-      return error
-    }
+  getdefaultDate() {
+    this.queryInfo.flowedDayNum = this.policyData.followedReflowedDayNum
+    this.queryInfo.flowingDayNum = this.policyData.followingReflowedDayNum
   }
   resetForm() {
     this.$nextTick(() => {
       this.queryInfo = {
-        followDayNum: 0,
-        followingDayNum: 0
+        flowedDayNum: 0,
+        flowingDayNum: 0
       }
     })
   }
   async setPolicyConfirm(callback: Function) {
     try {
-      const { followingDayNum, followDayNum } = this.queryInfo
+      const { flowingDayNum, flowedDayNum } = this.queryInfo
       const { busiType, cityCode, id } = this.policyData
 
       let params = {
         id,
-        followingDayNum: followingDayNum || 0,
-        followDayNum: followingDayNum || 0,
+        flowingDayNum: flowingDayNum || 0,
+        flowedDayNum: flowedDayNum || 0,
         busiType,
         cityCode
       }
@@ -172,7 +97,6 @@ export default class extends Vue {
           type: 'error'
         })
       }
-      console.log(data)
     } catch (err) {
       console.log(err)
     }
@@ -180,11 +104,6 @@ export default class extends Vue {
   onConfirm(callback: Function) {
     this.setPolicyConfirm(callback)
   }
-  // handleClick(this:any, { name }: any) {
-  //   const { followDayNum, followingDayNum } = this.defalutDate[name]
-  //   this.queryInfo.followDayNum = followDayNum
-  //   this.queryInfo.followingDayNum = followingDayNum
-  // }
 }
 </script>
 

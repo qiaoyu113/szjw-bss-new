@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 import qs from 'qs'
 const baseURL = '/base'
-// const baseURL2 = '/base_center'
-const baseURL2 = '/mock/231'
+const baseURL2 = '/base_center'
+
 // 用户管理-账号查询
 export const getUserList = (params: any) =>
   request({
@@ -265,7 +265,6 @@ export const pushUserToCRM = (params:any) =>
     method: 'post',
     params
   })
-
 // 获取坐席管理列表
 export const getAgentList = (params:any) =>
   request({

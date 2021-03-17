@@ -29,8 +29,8 @@
         <div>
           <h4>基础信息：</h4>
           <baseInfoForm
-            :id="clueId"
             ref="baseInfo"
+            :clue-id="clueId"
             :clue-status="clueStatus"
             @basePass="basePass"
             @success="successBase"
@@ -42,6 +42,7 @@
             ref="followform"
             :clue-status="clueStatus"
             :call-id="callId"
+            :clue-id="clueId"
             @success="successSend"
             @followPass="followPass"
           />
@@ -125,6 +126,7 @@ export default class extends Vue {
   }
 
   allSuccess(res:boolean[]) {
+    console.log(res)
     if (res[0] && res[1]) {
       this.$message({
         type: 'success',
@@ -136,7 +138,7 @@ export default class extends Vue {
         type: 'warning',
         message: '备注信息保存成功，基础信息保存失败'
       })
-    } else if (res[0] && res[1]) {
+    } else if (res[0] && !res[1]) {
       this.$message({
         type: 'warning',
         message: '基础信息保存成功，备注信息保存失败'
