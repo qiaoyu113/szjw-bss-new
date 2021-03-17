@@ -23,32 +23,32 @@ export const GetToAllotLNCarPool = (data: any) =>
 // 获取随机分配policy列表
 export const configurationManagementList = (data: any) =>
   request({
-    url: `${cluefix}/v2/market-clue/config/list`,
+    url: `${baseUrl}/v2/market-clue/config/list`,
     method: 'post',
     data
   })
 // 设置随机分配policy
 export const setrandomPolicy = (data:any) => request({
-  url: `${cluefix}/v2/market-clue/config/updatePolicy/notReceiveIds`,
+  url: `${baseUrl}/v2/market-clue/config/updatePolicy/notReceiveIds`,
   method: 'post',
   data
 })
 // 不接受线索人员Ids 查询人员信息
 export const searchInformation = (params:any) => request({
-  url: `${cluefix}/v2/market-clue/user-group/updatePolicy/getUserInfoList`,
+  url: `${baseUrl}/v2/market-clue/user-group/updatePolicy/getUserInfoList`,
   method: 'get',
   params
 })
 // 设置回流policy
 export const setPolicy = (data:any) => request({
-  url: `${cluefix}/v2/market-clue/reflow_conf/settingReflowedConf`,
+  url: `${baseUrl}/v2/market-clue/reflow_conf/settingReflowedConf`,
   method: 'post',
   data
 })
 
 // 获取回流policy 列表
 export const getBackFlowPolicyList = (data:any) => request({
-  url: `${cluefix}/v2/market-clue/reflow_conf/list`,
+  url: `${baseUrl}/v2/market-clue/reflow_conf/list`,
   method: 'post',
   data
 })
