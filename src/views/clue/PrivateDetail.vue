@@ -31,12 +31,10 @@
             slot="rightBox"
             :class="isPC ? 'rightBox' : 'rightBox_min'"
           >
-            <!-- v-permission="['/root']"
-              v-permission="['/root']"
-              v-permission="['/root']" -->
             <span />
             <el-button
               v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
+              v-permission="['/v2/market-clue/detail/makeCall']"
               type="text"
               @click="callPhoneDio = true"
             >
@@ -44,6 +42,7 @@
             </el-button>
             <el-button
               v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
+              v-permission="['/v2/market-clue/followClue']"
               type="text"
               @click="followUpDio = true"
             >
@@ -51,6 +50,7 @@
             </el-button>
             <el-button
               v-if="(baseInfoEdio.status === 10 || baseInfoEdio.status === 20 || baseInfoEdio.status === 30) && Number(clueStatus) < 2 "
+              v-permission="['/v2/market-clue/sendMessage']"
               type="text"
               @click="messageDio = true"
             >
@@ -78,6 +78,7 @@
               <template v-slot:op="scope">
                 <div class="FollowUpOpBox">
                   <el-button
+                    v-permission="['/v2/market-clue/cancelInterview']"
                     :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,1)"
@@ -85,6 +86,7 @@
                     取消面试
                   </el-button>
                   <el-button
+                    v-permission="['/v2/market-clue/clueBreakAnAppointment']"
                     :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,0)"
@@ -109,7 +111,10 @@
             slot="rightBox"
             class="rightBox"
           >
-            <span @click="editDio = true">编辑</span>
+            <span
+              v-permission="['/v2/market-clue/editClue']"
+              @click="editDio = true"
+            >编辑</span>
           </div>
           <div>
             <el-row :gutter="20">
@@ -671,9 +676,8 @@ export default class extends Vue {
     baseInfoArr.forEach((ele: any) => {
       arr.forEach((item: any) => {
         if (item.key === 'intentWorkAddress') {
-          item.value =
-            this.baseInfoEdio.expectAddressCityName || '' +
-            this.baseInfoEdio.expectAddressCountyName || ''
+          item.value = (this.baseInfoEdio.expectAddressCityName && this.baseInfoEdio.expectAddressCountyName) ? (this.baseInfoEdio.expectAddressCityName || '' +
+            this.baseInfoEdio.expectAddressCountyName || '') : ''
         }
         if (item.key !== undefined && ele[0] === item.key) {
           if (item.key === 'hasCar') {
