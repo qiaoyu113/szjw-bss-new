@@ -110,7 +110,7 @@
             @change="handleFilterClick(true)"
           >
             <el-checkbox-button :label="true">
-              代办清单
+              待办清单
             </el-checkbox-button>
           </el-checkbox-group>
         </el-badge>
@@ -799,16 +799,14 @@ export default class extends Vue {
       options: this.followTypeOptins
     },
     {
-      type: 2,
+      type: 1,
       label: '未跟进天数',
       key: 'notFollowDay',
       tagAttrs: {
-        placeholder: '请选择',
-        filterable: true,
+        placeholder: '请输入',
         clearable: true
       },
-      rules: ['root'],
-      options: this.hasCarList
+      rules: ['root']
     },
     {
       type: 5,
@@ -1210,7 +1208,6 @@ export default class extends Vue {
       if (res.success) {
         const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
-        debugger
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
