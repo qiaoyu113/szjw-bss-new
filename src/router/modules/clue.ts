@@ -45,21 +45,21 @@ const clueRouter: RouteConfig = {
       }
     },
     {
-      path: 'backflowPolicy', /* 配置管理 */
+      path: 'backflowPolicy', /* 配置管理回流 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/BackflowPolicy.vue'),
       name: 'BackflowPolicy',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v2/market-clue/reflow_conf/list',
         title: 'BackflowPolicy',
         noCache: false
       }
     },
     {
-      path: 'randomlyAssigned', /* 配置管理 */
+      path: 'randomlyAssigned', /* 配置管理随机 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/policy/RandomlyAssigned.vue'),
       name: 'RandomlyAssigned',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v2/market-clue/config/list',
         title: 'RandomlyAssigned',
         noCache: false
       }
