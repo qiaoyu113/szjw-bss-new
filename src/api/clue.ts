@@ -410,10 +410,34 @@ export const GetLaunchPlatformList = () =>
     method: 'get'
   })
 
-// 获取客群细分列表
-export const getClueUserGroupList = (data: any) =>
+// 获取客群细分列表(专车)
+export const getWTSpecialClueUserGroupList = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/user-group/getClueUserGroupList`,
+    url: `${baseUrl}/v2/market-clue/user-group/getWTSpecialClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表(共享)
+export const getWTShareClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getWTShareClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表(租赁)
+export const getLZClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getLZClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 获取客群细分列表（车池）
+export const getLCClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getLCClueUserGroupList`,
     method: 'post',
     data
   })

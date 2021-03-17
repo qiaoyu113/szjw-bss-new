@@ -56,6 +56,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/v2/market-clue/user-group/userGroup/export']"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="times === 10 ? false :true"
           name="driverlist_offout_btn"
@@ -218,7 +219,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock } from '@/utils/index'
-import { getClueUserGroupList, UserGroupCreate, UserGroupExport } from '@/api/clue'
+import { getLCClueUserGroupList, getLZClueUserGroupList, getWTShareClueUserGroupList, getWTSpecialClueUserGroupList, UserGroupCreate, UserGroupExport } from '@/api/clue'
 import { GetDutyListByLevel, GetDictionaryList } from '@/api/common'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
@@ -495,11 +496,17 @@ export default class extends Vue {
         label: item.dictLabel,
         value: item.dictValue
       }))
+      this.distributionTypeArr.push({ label: '全部', value: '' }, ...this.distributionTypeArrFrom)
+      let roleArr = (localStorage.getItem('permission') && (window as any).localStorage.getItem('permission').split(','))
       this.clueArr = data.data.mkt_clue_busi_type.map((item:any) => ({
         label: item.dictLabel,
-        value: item.dictValue
-      }))
-      this.distributionTypeArr.push({ label: '全部', value: '' }, ...this.distributionTypeArrFrom)
+        value: item.dictValue,
+        role: item.remarks
+      })).filter((item: any) => {
+        if (roleArr.includes(item.role)) {
+          return true
+        }
+      })
     } else {
       this.$message.error(data)
     }
@@ -571,22 +578,53 @@ export default class extends Vue {
       let params: IState = {
         page: this.page.page,
         limit: this.page.limit,
-        clueType: this.listQuery.clueType,
+        clueType: String(this.listQuery.clueType),
         allocationType: this.listQuery.allocationType,
         portraitLabel: this.listQuery.portraitLabel,
         startDate: this.listQuery.time[0],
         endDate: this.listQuery.time[1],
         type: this.listQuery.type
       }
-      let { data: res } = await getClueUserGroupList(params)
-      if (res.success) {
-        // eslint-disable-next-line
-        res.page = await HandlePages(res.page)
-        this.page.total = res.page.total
-        this.tableData = res.data || []
-      } else {
-        this.tableData = res.data || []
-        this.$message.error(res.errorMsg)
+      if (params.clueType === '0') {
+        let { data: res } = await getWTSpecialClueUserGroupList(params)
+        if (res.success) {
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+          this.tableData = res.data || []
+        } else {
+          this.tableData = res.data || []
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === '1') {
+        let { data: res } = await getWTShareClueUserGroupList(params)
+        if (res.success) {
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+          this.tableData = res.data || []
+        } else {
+          this.tableData = res.data || []
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === '2') {
+        let { data: res } = await getLCClueUserGroupList(params)
+        if (res.success) {
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+          this.tableData = res.data || []
+        } else {
+          this.tableData = res.data || []
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === '3') {
+        let { data: res } = await getLZClueUserGroupList(params)
+        if (res.success) {
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+          this.tableData = res.data || []
+        } else {
+          this.tableData = res.data || []
+          this.$message.error(res.errorMsg)
+        }
       }
     } catch (err) {
       console.log(`get list fail:${err}`)

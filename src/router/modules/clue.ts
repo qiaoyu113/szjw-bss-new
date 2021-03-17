@@ -17,6 +17,7 @@ const clueRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Subdivision.vue'),
       name: 'Subdivision',
       meta: {
+        // apiUrl: '/v2/market-clue/user-group',
         apiUrl: 'root',
         title: 'subdivision',
         noCache: false
