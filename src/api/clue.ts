@@ -77,8 +77,8 @@ export const GetClueCampaignList = (data: any) =>
 export const CampaignExport = (data: any) =>
   request({
     url: `${baseUrl}/v2/clue/campaign/campaign/export`,
-    method: 'get',
-    params: data
+    method: 'post',
+    data: data
   })
 
 // 新建campaign
