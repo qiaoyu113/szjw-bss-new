@@ -1,9 +1,12 @@
 import request from '@/utils/request'
-// const prefix = '/line'
-const prefix = '/mock/81'
+const baseUrl = '/carrier_center'
+// const baseUrl = '/mock/81'
+const prefix = '/line'
+// const prefix = '/mock/81'
 // 待分配线索 梧桐线索列表
 const produce = '/carrier_center'
 const base = '/base_center'
+
 export const GetToAllotWT = (data: any) =>
   request({
     url: `${produce}/v2/market-clue/getToAllotWTClueList`,
@@ -16,15 +19,6 @@ export const GetToAllotLNCarPool = (data: any) =>
     url: `${produce}/v2/market-clue/getToAllotLNCarPoolClueList`,
     data,
     method: 'post'
-  })
-// const prefix = '/base'
-  // let prefix = '/mock/81'
-// 获取客群细分列表
-export const getClueUserGroupList = (params: any) =>
-  request({
-    url: `${prefix}/v2/market-clue/user-group/getClueUserGroupList`,
-    method: 'post',
-    params
   })
 
 export const configurationManagementList = (data: any) =>
@@ -67,8 +61,6 @@ export const getBackFlowDeflutDate = (params:any) => request({
   params
 })
 
-// const baseUrl = '/mock/81'
-const baseUrl = '/carrier_center'
 // 获取campaign列表
 export const GetClueCampaignList = (data: any) =>
   request({
@@ -416,4 +408,28 @@ export const GetLaunchPlatformList = () =>
   request({
     url: `${baseUrl}/v2/clue/campaign/getLaunchPlatformList`,
     method: 'get'
+  })
+
+// 获取客群细分列表
+export const getClueUserGroupList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/getClueUserGroupList`,
+    method: 'post',
+    data
+  })
+
+// 创建客群创建
+export const UserGroupCreate = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/create`,
+    method: 'post',
+    data
+  })
+
+// 客群导出
+export const UserGroupExport = (params: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/user-group/userGroup/export`,
+    method: 'get',
+    params
   })

@@ -13,7 +13,18 @@ const clueRouter: RouteConfig = {
   },
   children: [
     {
-      path: 'public', /* 待分配线索 */
+<<<<<<< src/router/modules/clue.ts
+      path: 'subdivision', /* 客群细分管理 */
+      component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Subdivision.vue'),
+      name: 'Subdivision',
+      meta: {
+        apiUrl: 'root',
+        title: 'subdivision',
+        noCache: false
+      }
+    },
+    {
+      path: 'public', /* 公海池 */
       component: () => import(/* webpackChunkName: "clue" */ '@/views/clue/Public.vue'),
       name: 'PublicClue',
       meta: {
