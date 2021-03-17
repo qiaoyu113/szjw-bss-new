@@ -28,7 +28,7 @@ export const threeday = {
   }
 }
 export const sevenday = {
-  text: '近7天',
+  text: '近七天',
   onClick(picker: any) {
     const date = new Date().setHours(0, 0, 0, 0)
     const start = +date - startTime * 7
@@ -82,3 +82,12 @@ export const threemonth = {
     picker.$emit('pick', [start, end])
   }
 }
+// export const thirtyday = {
+//   text: '近30天',
+//   onClick(picker: any) {
+//     const date = new Date().setHours(0, 0, 0, 0)
+//     const start = +date - startTime * 30
+//     const end = new Date().setHours(23, 59, 59)
+//     picker.$emit('pick', [start, end])
+//   }
+// }
