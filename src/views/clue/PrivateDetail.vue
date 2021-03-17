@@ -773,7 +773,7 @@ export default class extends Vue {
           this.clueStatus = String(ele.code)
         }
       })
-      if (this.clueStatus === '0') {
+      if (this.clueStatus === '0' && this.clueArray.length > 0) {
         this.clueStatus = this.clueArray[0].code + ''
       }
     } else {
