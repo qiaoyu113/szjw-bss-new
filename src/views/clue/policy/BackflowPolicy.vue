@@ -19,6 +19,7 @@
       >
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/market-clue/reflow_conf/settingReflowedConf']"
             type="text"
             size="small"
             @click="setPolicyAuto(scope.row)"
@@ -59,7 +60,10 @@ export default class extends Vue {
   private columns: any[] = [
     {
       key: 'cityName',
-      label: '城市'
+      label: '城市',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'busiTypeName',
@@ -72,10 +76,7 @@ export default class extends Vue {
     },
     {
       key: 'updateDate',
-      label: '设置时间',
-      attrs: {
-        sortable: true
-      }
+      label: '设置时间'
     },
     {
       key: 'op',

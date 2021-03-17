@@ -20,10 +20,31 @@ export const GetToAllotLNCarPool = (data: any) =>
     data,
     method: 'post'
   })
-// 获取随机分配policy列表
-export const configurationManagementList = (data: any) =>
+// 获取随机分配policy列表(梧桐共享)
+export const configurationWTShareList = (data: any) =>
   request({
-    url: `${baseUrl}/v2/market-clue/config/list`,
+    url: `${baseUrl}/v2/market-clue/config/WTShareList`,
+    method: 'post',
+    data
+  })
+  // 获取随机分配policy列表（梧桐专车）
+export const configurationWTSpecialList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/config/WTSpecialList`,
+    method: 'post',
+    data
+  })
+// 获取随机分配policy列表（雷鸟车池）
+export const configurationLCList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/config/LCList`,
+    method: 'post',
+    data
+  })
+  // 获取随机分配policy列表（雷鸟租赁）
+export const configurationLZList = (data: any) =>
+  request({
+    url: `${baseUrl}/v2/market-clue/config/LZList`,
     method: 'post',
     data
   })

@@ -10,6 +10,7 @@
           <li
             v-for="item in clueType"
             :key="item.id"
+            v-permission="[`${item.url}`]"
             :class="{active: item.id === activeLineType}"
             @click="switchLineType(item.id)"
           >
@@ -51,6 +52,7 @@
       >
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/market-clue/config/updatePolicy/notReceiveIds']"
             type="text"
             size="small"
             @click="setPolicyAuto(scope.row)"
@@ -76,7 +78,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
 import { HandlePages, lock } from '@/utils/index'
-import { configurationManagementList } from '@/api/clue'
+import { configurationWTShareList, configurationWTSpecialList, configurationLCList, configurationLZList } from '@/api/clue'
 interface PageObj {
   page: number
   limit: number
@@ -99,19 +101,23 @@ export default class extends Vue {
   clueType: Array<any> = [
     {
       name: '梧桐专车',
-      id: 0
+      id: 0,
+      url: '/v2/market-clue/config/WTSpecialList'
     },
     {
       name: '梧桐共享',
-      id: 1
+      id: 1,
+      url: '/v2/market-clue/config/WTShareList'
     },
     {
       name: '雷鸟车池',
-      id: 2
+      id: 2,
+      url: '/v2/market-clue/config/LCList'
     },
     {
       name: '雷鸟租赁',
-      id: 3
+      id: 3,
+      url: '/v2/market-clue/config/LZList'
     }
   ]
   activeLineType: number = this.clueType[0].id
@@ -306,14 +312,46 @@ export default class extends Vue {
       if (this.listQuery.city && this.listQuery.city.length > 1) {
         params.city = this.listQuery.city[1]
       }
-      let { data: res } = await configurationManagementList(params)
-      if (res.success) {
-        this.tableData = res.data || []
-        this.$refs['ConfigurationForm'].toggleRowSelection()
-        res.page = await HandlePages(res.page)
-        this.page.total = res.page.total
-      } else {
-        this.$message.error(res.errorMsg)
+      if (params.clueType === 0) {
+        let { data: res } = await configurationWTSpecialList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 1) {
+        let { data: res } = await configurationWTShareList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 2) {
+        let { data: res } = await configurationLCList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } else if (params.clueType === 3) {
+        let { data: res } = await configurationLZList(params)
+        if (res.success) {
+          this.tableData = res.data || []
+          this.$refs['ConfigurationForm'].toggleRowSelection()
+          res.page = await HandlePages(res.page)
+          this.page.total = res.page.total
+        } else {
+          this.$message.error(res.errorMsg)
+        }
       }
     } catch (err) {
       console.log(`get list fail:${err}`)
