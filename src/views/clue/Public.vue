@@ -22,7 +22,7 @@
           @change="handleResetClick"
         >
           <el-radio-button
-            v-for="item in clueArr"
+            v-for="item in cartTypePremission"
             :key="item.value"
             :label="item.value"
           >
@@ -32,6 +32,7 @@
       </div>
       <div
         slot="mulBtn"
+        :key="listQuery.clueType"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
@@ -50,6 +51,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="disPremission"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="multipleSelection.length > 0 ? false :true"
@@ -94,6 +96,8 @@
         </template>
         <template v-slot:op="scope">
           <el-button
+            :key="listQuery.clueType"
+            v-permission="disPremission"
             type="text"
             @click="handleDistributionClick(scope.row)"
           >
@@ -137,6 +141,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { delayTime } from '@/settings'
 import { forIn } from 'lodash'
+import { checkPermission } from '@/utils/permission'
 // import { marketClue } from '@/api/driver-cloud'
 
 interface IState {
@@ -568,18 +573,42 @@ export default class extends Vue {
   /**
    *获取基础信息
    */
+  private distributionPremission:any = {
+    0: ['/v2/market-clue/batchUpdateFollower-wt-special/updateFollowerByHighSeas',
+      '/v2/market-clue/updateFollower-wt-special/updateFollowerByHighSeas'],
+    1: ['/v2/market-clue/batchUpdateFollower-wt-share/updateFollowerByHighSeas',
+      '/v2/market-clue/updateFollower-wt-share/updateFollowerByHighSeas'],
+    2: ['/v2/market-clue/batchUpdateFollower-ln-carPool/updateFollowerByHighSeas',
+      '/v2/market-clue/updateFollower-ln-carPool/updateFollowerByHighSeas'],
+    3: ['/v2/market-clue/updateFollower-ln-hire-c/updateFollowerByHighSeas',
+      '/v2/market-clue/batchUpdateFollower-ln-hire-c/updateFollowerByHighSeas'],
+    4: ['/v2/market-clue/batchUpdateFollower-ln-hire-b/updateFollowerByHighSeas',
+      '/v2/market-clue/updateFollower-ln-hire-b/updateFollowerByHighSeas']
+  }
+  get disPremission() {
+    const index = this.listQuery.clueType
+    return this.distributionPremission[index]
+    // return this.distributionPremission[1] || ['/o']
+  }
   async getBaseInfo() {
     try {
       let params = ['clue_attribution', 'source_channel', 'mkt_clue_type', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
 
-      console.log(res)
       if (res.success) {
+        const listPermission = [
+          '/v2/market-clue/list-wt-special/getToAllotWTClueList',
+          '/v2/market-clue/list-wt-share/getToAllotWTClueList',
+          '/v2/market-clue/list-ln-carPool/getToAllotLNCarPoolClueList',
+          '/v2/market-clue/list-ln-hire-c/getToAllotLNLeaseClueList',
+          '/v2/market-clue/list-ln-hire-b/getToAllotLNLeaseClueList'
+        ]
         const searchArr = [GetToAllotWT, GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, GetToAllotLNLease]
+        // const clueTypeUri = [['']]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType } = res.data
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index] }))
+        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index], pUrl: listPermission[index] }))
         let carTypeOptions = IntentionalCompartment.map((item:any, index:number) => ({ label: item.dictLabel, value: item.dictValue }))
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
@@ -716,6 +745,12 @@ export default class extends Vue {
   // 表单验证通过
   handlePassClick(val:boolean) {
     this.updateFollower()
+  }
+  // 业务线权限分配
+  get cartTypePremission() {
+    const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
+    this.listQuery.clueType = arr[0].value
+    return arr
   }
   // 分配、批量分配
   @lock
