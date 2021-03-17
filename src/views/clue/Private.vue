@@ -22,7 +22,7 @@
           @change="handleResetClick"
         >
           <el-radio-button
-            v-for="item in clueArr"
+            v-for="item in clueTypePermission"
             :key="item.value"
             :label="item.value"
           >
@@ -51,6 +51,7 @@
       </template>
       <div
         slot="mulBtn"
+        :key="listQuery.clueType"
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
@@ -69,6 +70,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/v2/market-clue/updateFollowerByPrivateSeas']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="multipleSelection.length > 0 ? false :true"
@@ -78,6 +80,7 @@
         </el-button>
         <el-button
           v-if="listQuery.clueType !== 2"
+          v-permission="importClue"
           type="primary"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
@@ -86,6 +89,7 @@
           导入线索
         </el-button>
         <el-button
+          v-permission="['/v2/market-clue/privatePool/export']"
           type="primary"
           size="small"
           :disabled="times === 10 ? false :true"
@@ -115,6 +119,7 @@
           </el-checkbox-group>
         </el-badge>
         <el-select
+          v-if="hasShow"
           v-model="listQuery.sort"
           placeholder="排序方式"
           size="small"
@@ -184,18 +189,21 @@
         </template>
         <template v-slot:op="scope">
           <el-button
+            v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
             @click="callPhoneClick(scope.row)"
           >
             打电话
           </el-button>
           <el-button
+            v-permission="['/v2/market-clue/getClueDetail']"
             type="text"
             @click="goDetail(scope.row)"
           >
             详情
           </el-button>
           <el-button
+            v-permission="['/v2/market-clue/updateFollowerByPrivateSeas']"
             type="text"
             :disabled=" (scope.row.status === 40 || scope.row.status === 50)"
             @click="handleDistributionClick(scope.row)"
@@ -304,7 +312,7 @@ import { GetDictionaryList, GetSpecifiedRoleList,
 } from '@/api/common'
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
-import { deburr, keys } from 'lodash'
+import { checkPermission } from '@/utils/permission'
 
 interface IState {
   [key: string]: any;
@@ -370,8 +378,8 @@ export default class extends Vue {
     { label: '无', value: 0 }
   ];
   private sortOptions: IState[] = [
-    { label: '按照未跟进天数倒序', value: 'notFollowDay:desc' },
-    { label: '按照未跟进天数正序', value: 'notFollowDay:asc' },
+    { label: '按照未跟进天数倒序', value: 'notFollowStartDate:asc' },
+    { label: '按照未跟进天数正序', value: 'notFollowStartDate:desc' },
     { label: '按照跟进次数倒序', value: 'followNum:desc' },
     { label: '按照跟进次数正序', value: 'followNum:asc' }
   ]
@@ -804,7 +812,13 @@ export default class extends Vue {
       key: 'notFollowDay',
       tagAttrs: {
         placeholder: '请输入',
-        clearable: true
+        clearable: true,
+        type: 'number'
+      },
+      listeners: {
+        input: () => {
+          this.listQuery.notFollowDay = this.listQuery.notFollowDay.replace(/[^\d]/g, '')
+        }
       },
       rules: ['root']
     },
@@ -1039,10 +1053,16 @@ export default class extends Vue {
       return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
     })
   }
+  // 表格按钮
   get tableBtn() {
     return this.btns.filter((item: any) => {
       return item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
     })
+  }
+
+  get hasShow() {
+    const status = this.listQuery.status
+    return (status === '10' || status === '20')
   }
   // 跳转详情页
   goDetail({ clueType, phone, clueId }:any) {
@@ -1198,6 +1218,12 @@ export default class extends Vue {
       console.log(err)
     }
   }
+  //
+  get clueTypePermission() {
+    const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
+    this.listQuery.clueType = arr[0].value
+    return arr
+  }
   /**
    *获取基础信息
    */
@@ -1207,13 +1233,20 @@ export default class extends Vue {
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
+        const clueTypePremission = [
+          '/v2/market-clue/getCluePrivateSeaPoolList',
+          '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLCXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
+          '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
+        ]
         let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let intentDegreeOptions = intentDegree.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteFailReasonOptions = inviteFailReason.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index] }))
+        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index], pUrl: clueTypePremission[index] }))
         let carTypeOptions = IntentionalCompartment.map((item:any, index:number) => ({ label: item.dictLabel, value: item.dictValue }))
         let followTypeOptins = followType.map((item:any, index:number) => ({ label: item.dictLabel, value: item.dictValue }))
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
@@ -1459,6 +1492,17 @@ export default class extends Vue {
   mounted() {
     this.getBaseInfo()
   }
+  // 权限
+   private distributionPremission:any = {
+     0: ['/v2/market-clue/privatePool/firmiana/import/private'],
+     1: ['/v2/market-clue/privatePool/firmiana/import/shared'],
+     2: [''],
+     3: ['/v2/market-clue/privatePool/thunderBirdRental/import/c'],
+     4: ['/v2/market-clue/privatePool/thunderBirdRental/import/b']
+   }
+   get importClue() {
+     return this.distributionPremission[this.listQuery.clueType]
+   }
 }
 </script>
 <style lang="scss" scoped>
