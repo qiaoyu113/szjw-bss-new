@@ -19,6 +19,7 @@
       <el-form-item label="待跟进">
         <el-input-number
           v-model="queryInfo.flowedDayNum"
+          :precision="0"
           :min="1"
           :max="99"
           class="num-input-setup-clue"
@@ -27,6 +28,7 @@
       <el-form-item label="跟进中">
         <el-input-number
           v-model="queryInfo.flowingDayNum"
+          :precision="0"
           :min="1"
           :max="99"
           class="num-input-setup-clue"
