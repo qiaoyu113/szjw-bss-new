@@ -733,7 +733,7 @@ export default class extends Vue {
       if (res.success) {
         if (res.data.flag) {
           (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success(res.data.msg)
+          this.$message.success('分配成功')
         } else {
           this.$message.warning(res.data.msg)
         }
