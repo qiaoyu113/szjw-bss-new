@@ -67,7 +67,8 @@ export const getBackFlowDeflutDate = (params:any) => request({
   params
 })
 
-const baseUrl = '/mock/81'
+// const baseUrl = '/mock/81'
+const baseUrl = '/carrier_center'
 // 获取campaign列表
 export const GetClueCampaignList = (data: any) =>
   request({
@@ -76,26 +77,12 @@ export const GetClueCampaignList = (data: any) =>
     data
   })
 
-// 梧桐专车/共享campaign导出
-export const FirmianaExport = (data: any) =>
+// campaign导出
+export const CampaignExport = (data: any) =>
   request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/firmiana/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟租赁campaign导出
-export const ThunderBirdRentalExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdRental/export`,
-    method: 'get',
-    params: data
-  })
-// campaign管理 雷鸟车池campaign导出
-export const ThunderBirdTruckPoolExport = (data: any) =>
-  request({
-    url: `${baseUrl}/v2/clue/campaign/campaign/thunderBirdTruckPool/export`,
-    method: 'get',
-    params: data
+    url: `${baseUrl}/v2/clue/campaign/campaign/export`,
+    method: 'post',
+    data: data
   })
 
 // 新建campaign

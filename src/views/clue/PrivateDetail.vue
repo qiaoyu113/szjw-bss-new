@@ -78,14 +78,14 @@
               <template v-slot:op="scope">
                 <div class="FollowUpOpBox">
                   <el-button
-                    :disabled="!baseInfoEdio.status === 30"
+                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,1)"
                   >
                     取消面试
                   </el-button>
                   <el-button
-                    :disabled="!baseInfoEdio.status === 30"
+                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,0)"
                   >
@@ -189,6 +189,7 @@
               style="overflow: initial;"
               :style="logData.length ===0 ? 'margin-bottom: 30px;':''"
               :page="logPage"
+              max-height="400px"
               @onPageSize="handlePageSize"
             />
           </div>

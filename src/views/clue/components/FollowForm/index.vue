@@ -630,7 +630,6 @@ export default class extends Vue {
   }
 
   async sendWtFollow(value: IState) {
-    console.log(this.$parent)
     try {
       let params: IState = {
         clueId: this.clueId
@@ -774,8 +773,8 @@ export default class extends Vue {
   }
 
   resetForms() {
+    (this.$refs[this.formStatus] as any).resetForm()
     setTimeout(() => {
-      (this.$refs[this.formStatus] as any).resetForm();
       (this.$refs[this.formStatus] as any).clearValidate()
       this.intentDegreeOptions.splice(0, this.intentDegreeOptions.length)
       this.demandTypeOptions.splice(0, this.demandTypeOptions.length)
