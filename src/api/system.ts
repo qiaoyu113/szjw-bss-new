@@ -219,6 +219,10 @@ export const getOfficeByCurrentUserV2 = () =>
     method: 'get'
   })
 
+export interface RoleParams {
+    dutyId?:number;
+    officeLevel:number;
+  }
 // 根据组织架构获取角色-new
 export const getDutyAndRoleList = (data:any) =>
   request({
