@@ -34,27 +34,29 @@
         :is-edit="isEdit"
       />
       <template #rightBox>
-        <div v-if="isEdit">
-          <el-button
-            type="text"
-            @click="handleCancelClick"
-          >
-            取消
-          </el-button>
-          <el-button
-            type="text"
-            @click="handleFinishClick"
-          >
-            完成
-          </el-button>
-        </div>
-        <div v-else>
-          <el-button
-            type="text"
-            @click="handleEditClick"
-          >
-            编辑
-          </el-button>
+        <div v-permission="[' /v2/clue/campaign/editCampaignData']">
+          <div v-if="isEdit">
+            <el-button
+              type="text"
+              @click="handleCancelClick"
+            >
+              取消
+            </el-button>
+            <el-button
+              type="text"
+              @click="handleFinishClick"
+            >
+              完成
+            </el-button>
+          </div>
+          <div v-else>
+            <el-button
+              type="text"
+              @click="handleEditClick"
+            >
+              编辑
+            </el-button>
+          </div>
         </div>
       </template>
     </SectionContainer>

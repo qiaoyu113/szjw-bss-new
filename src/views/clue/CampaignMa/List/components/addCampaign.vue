@@ -48,7 +48,6 @@ export default class extends Vue {
   @Prop({ default: () => {} }) regionList!:IState;
   @Prop({ default: () => {} }) cityList!:IState;
   @Prop({ default: () => {} }) platformList!:IState;
-  @Prop({ default: () => {} }) cityDetail!:Function;
   @Prop({ default: () => [] }) addUserlist!:IState[];
   private listQuery:IState = {
     userGroupId: '',
@@ -84,12 +83,7 @@ export default class extends Vue {
       },
       label: '所属区域',
       key: 'areCity',
-      options: this.regionList,
-      listeners: {
-        'change': () => {
-          this.cityDetail(this.listQuery.areCity)
-        }
-      }
+      options: this.regionList
     },
     {
       type: 2,
@@ -137,7 +131,7 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        format: 'yyyy-MM-dd HH',
+        format: 'yyyy-MM-dd HH:mm',
         'value-format': 'yyyy-MM-dd HH:mm',
         'picker-options': {
           disabledDate: (time:Date) => {
