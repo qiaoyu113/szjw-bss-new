@@ -36,19 +36,21 @@
               v-permission="['/root']" -->
             <span />
             <el-button
+              v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
               type="text"
               @click="callPhoneDio = true"
             >
               打电话
             </el-button>
             <el-button
+              v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
               type="text"
               @click="followUpDio = true"
             >
               添加线下跟进
             </el-button>
             <el-button
-              v-if="Number(clueStatus) < 2"
+              v-if="(baseInfoEdio.status === 10 || baseInfoEdio.status === 20 || baseInfoEdio.status === 30) && Number(clueStatus) < 2 "
               type="text"
               @click="messageDio = true"
             >
@@ -76,12 +78,14 @@
               <template v-slot:op="scope">
                 <div class="FollowUpOpBox">
                   <el-button
+                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,1)"
                   >
                     取消面试
                   </el-button>
                   <el-button
+                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,0)"
                   >
@@ -116,7 +120,7 @@
               >
                 <DetailItem
                   :name="item.name"
-                  :value="item.value"
+                  :value="item.value || ''"
                 />
               </el-col>
             </el-row>
@@ -185,6 +189,7 @@
               style="overflow: initial;"
               :style="logData.length ===0 ? 'margin-bottom: 30px;':''"
               :page="logPage"
+              max-height="400px"
               @onPageSize="handlePageSize"
             />
           </div>
@@ -201,13 +206,16 @@
       </el-card>
     </div>
     <FollowUpDiolog
+      :id="clueId"
       :show-dialog.sync="followUpDio"
       :clue-status="clueStatus"
     />
     <send-message
+      :id="clueId"
       :show-dialog.sync="messageDio"
       :base-info="baseInfoEdio"
       :phone="baseInfoEdio.phone"
+      :clue-status="+clueStatus"
     />
 
     <InfoEditDio
@@ -220,7 +228,7 @@
       :show-dialog.sync="callPhoneDio"
       :clue-status="+clueStatus"
       :phone="baseInfoEdio.phone"
-      :clue-id="13"
+      :clue-id="clueId"
     />
   </div>
 </template>
@@ -664,13 +672,13 @@ export default class extends Vue {
       arr.forEach((item: any) => {
         if (item.key === 'intentWorkAddress') {
           item.value =
-            this.baseInfoEdio.expectAddressCityName +
-            this.baseInfoEdio.expectAddressCountyName
+            this.baseInfoEdio.expectAddressCityName || '' +
+            this.baseInfoEdio.expectAddressCountyName || ''
         }
         if (item.key !== undefined && ele[0] === item.key) {
           if (item.key === 'hasCar') {
             item.value =
-              (ele[1] ? '有' : '否') + ';' + this.baseInfoEdio.carTypeName
+              (ele[1] ? '有' + ';' + this.baseInfoEdio.carTypeName : '否')
           } else {
             item.value = ele[1]
           }
@@ -734,28 +742,34 @@ export default class extends Vue {
     let params = { phone: phone }
     let { data: res } = await getClueTypeList(params)
     if (res.success) {
-      // this.clueArr.forEach(ele => {
-      //   res.data.forEach((item:IState) => {
-      //     if (+ele.code === item.clueType) {
-      //       ele.clueId = item.clueId
-      //     }
-      //   })
-      // })
-      // this.clueArray = this.clueArr.filter((ele:any) => {
-      //   return ele.clueId
-      // })
-      // this.clueStatus = String(this.clueArray.findIndex((value) => value.clueId === this.clueId))
-      this.clueArray = this.clueArr // 测试degbug代码
-      this.clueStatus = String(this.clueArray[0].code) // 测试degbug代码
+      this.clueArr.forEach(ele => {
+        res.data.forEach((item:IState) => {
+          if (+ele.code === item.clueType) {
+            ele.clueId = item.clueId
+          }
+        })
+      })
+      this.clueArray = this.clueArr.filter((ele:any) => {
+        return ele.clueId
+      })
+      this.clueArray.map((ele:any) => {
+        if (ele.clueId === this.clueId) {
+          this.clueStatus = String(ele.code)
+        }
+      })
     } else {
       this.$message.warning(res.errorMsg)
     }
   }
 
   // 取消面试
-  async getCancel() {
+  async getCancel(followId:string) {
     try {
-      let { data: res } = await cancelInterview({ clueId: this.clueId })
+      let param = {
+        followId,
+        clueId: this.clueId
+      }
+      let { data: res } = await cancelInterview(param)
       if (res.success) {
         this.$message({
           type: 'success',
@@ -771,9 +785,13 @@ export default class extends Vue {
   }
 
   // 标记爽约
-  async getAppointment() {
+  async getAppointment(followId:string) {
     try {
-      let { data: res } = await clueBreakAnAppointment({ clueId: this.clueId })
+      let param = {
+        followId,
+        clueId: this.clueId
+      }
+      let { data: res } = await clueBreakAnAppointment(param)
       if (res.success) {
         this.$message({
           type: 'success',
@@ -789,6 +807,7 @@ export default class extends Vue {
   }
 
   private handleInterviewClick(row: any, type: number) {
+    console.log(row)
     if (type) {
       this.$confirm('是否取消面试?', `已邀约面试时间：${row.inviteDate}`, {
         confirmButtonText: '确定',
@@ -797,7 +816,7 @@ export default class extends Vue {
         type: 'warning'
       })
         .then(() => {
-          this.getCancel()
+          this.getCancel(row.followId)
         })
         .catch(() => {
           this.$message({
@@ -813,7 +832,7 @@ export default class extends Vue {
         type: 'warning'
       })
         .then(() => {
-          this.getAppointment()
+          this.getAppointment(row.followId)
         })
         .catch(() => {
           this.$message({
@@ -846,7 +865,7 @@ export default class extends Vue {
             (+this.clueStatus as number)
           ].listData = marketClueWSXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueWSXDetailBaseInfoVO
-          this.setOther(marketClueWSXDetailOtherInfoVO)
+          this.setOther(marketClueWSXDetailOtherInfoVO || [])
           this.backData = marketClueWSXDetailRepeatedInfoVOList
         } else {
           this.$message.warning(res.errorMsg)
@@ -864,7 +883,7 @@ export default class extends Vue {
             (+this.clueStatus as number)
           ].listData = marketClueLCXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLCXDetailBaseInfoVO
-          this.setOther(marketClueLCXDetailOtherInfoVO)
+          this.setOther(marketClueLCXDetailOtherInfoVO || [])
           this.backData = marketClueLCXDetailRepeatedInfoVOList
         } else {
           this.$message.warning(res.errorMsg)
@@ -882,7 +901,7 @@ export default class extends Vue {
             (+this.clueStatus as number)
           ].listData = marketClueLZXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLZXDetailBaseInfoVO
-          this.setOther(marketClueLZXDetailOtherInfoVO)
+          this.setOther(marketClueLZXDetailOtherInfoVO || [])
           this.backData = marketClueLZXDetailRepeatedInfoVOList
         } else {
           this.$message.warning(res.errorMsg)
