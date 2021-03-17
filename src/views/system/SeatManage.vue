@@ -422,6 +422,11 @@ export default class extends Vue {
     mobile: '',
     userName: ''
   }
+  // 业务线 城市查询
+  private selectItem: any = {
+    busiType: '',
+    cityCode: ''
+  }
   // 渲染查询表单的列表
   private formItem:any[] = [
     {
@@ -594,6 +599,8 @@ export default class extends Vue {
       this.changeSeatForm.nickName = ''
       this.changeSeatForm.value = ''
       this.dialogFormVisible = true
+      this.selectItem.busiType = row.busiTypeValue
+      this.selectItem.cityCode = row.cityCode
     } catch (err) {
       console.log(`get lists fail:${err}`)
     } finally {
@@ -628,6 +635,8 @@ export default class extends Vue {
     this.newSeatForm.value = ''
     this.newSeatForm.id = ''
     this.newSeatForm.seatNumber = row.agentNum
+    this.selectItem.busiType = row.busiTypeValue
+    this.selectItem.cityCode = row.cityCode
     this.getEnableAgentNum()
   }
   // 解除绑定
@@ -748,8 +757,8 @@ export default class extends Vue {
         let parmas = {
           keyword: queryString,
           roleTypes: 8,
-          busiType: this.listQuery.busiType,
-          cityCode: this.listQuery.cityCode[1] ? this.listQuery.cityCode[1] : '',
+          busiType: this.selectItem.busiType,
+          cityCode: this.selectItem.cityCode,
           uri: '/v3/base/agent/queryGM'
         }
         let { data: res } = await getQueryGM(parmas)
