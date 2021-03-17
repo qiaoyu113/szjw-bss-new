@@ -22,10 +22,10 @@
         >
           <el-radio-button
             v-for="item in clueArr"
-            :key="item.code"
-            :label="item.code"
+            :key="item.value"
+            :label="item.value"
           >
-            {{ item.name }}
+            {{ item.label }}
           </el-radio-button>
         </el-radio-group>
       </div>
@@ -109,10 +109,10 @@
             placeholder="请选择"
           >
             <el-option
-              v-for="(sub,index) in busiTypeArr"
+              v-for="(sub,index) in clueArr"
               :key="'select-'+sub.value+'-'+index"
-              :label="sub.dutyName"
-              :value="sub.id"
+              :label="sub.label"
+              :value="sub.value"
             />
           </el-select>
         </el-form-item>
@@ -190,7 +190,7 @@
             <el-input
               v-model="addForm.remark"
               type="textarea"
-              maxlength="300"
+              maxlength="100"
               show-word-limit
             />
           </el-col>
@@ -284,10 +284,10 @@ export default class extends Vue {
     { label: '无', value: 0 }
   ];
   private clueArr:IState[] = [
-    { name: '梧桐专车', code: 0 },
-    { name: '梧桐共享', code: 1 },
-    { name: '雷鸟车池', code: 2 },
-    { name: '雷鸟租赁', code: 3 }
+    { label: '梧桐专车', value: 0 },
+    { label: '梧桐共享', value: 1 },
+    { label: '雷鸟车池', value: 2 },
+    { label: '雷鸟租赁', value: 3 }
   ]
   private page: PageObj = {
     page: 1,
@@ -489,9 +489,13 @@ export default class extends Vue {
   }
   // 获取字典
   private async getDictionary() {
-    const { data } = await GetDictionaryList(['allocation_type'])
+    const { data } = await GetDictionaryList(['allocation_type', 'mkt_clue_busi_type'])
     if (data.success) {
       this.distributionTypeArrFrom = data.data.allocation_type.map((item:any) => ({
+        label: item.dictLabel,
+        value: item.dictValue
+      }))
+      this.clueArr = data.data.mkt_clue_busi_type.map((item:any) => ({
         label: item.dictLabel,
         value: item.dictValue
       }))
