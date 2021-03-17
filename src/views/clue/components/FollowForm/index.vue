@@ -125,6 +125,7 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: 0 }) private clueStatus!: number;
   @Prop({ default: '' }) private callId?: string;
+  @Prop({ default: '' }) private clueId?: string;
 
   // 字典数组
   private inviteFailReasonOptions: object[] = [];
@@ -630,7 +631,9 @@ export default class extends Vue {
 
   async sendWtFollow(value: IState) {
     try {
-      let params: IState = {}
+      let params: IState = {
+        clueId: this.clueId
+      }
       if (value.inviteStatus) {
         let { inviteStatus, inviteDate, remark } = value
         params.inviteStatus = inviteStatus
@@ -644,7 +647,7 @@ export default class extends Vue {
         remark !== '' && (params.remark = remark)
       }
       if (this.callId) {
-        params.callId = this.callId
+        params.callLogId = this.callId
       }
       let { data: res } = await followClueToFirmiana(params)
       if (res.success) {
@@ -661,7 +664,9 @@ export default class extends Vue {
 
   async sendBirdCarFollow(value: IState) {
     try {
-      let params: IState = {}
+      let params: IState = {
+        clueId: this.clueId
+      }
       let { markStatus, demandType, remark, contact, hasIntentionGold } = value
       switch (value.markStatus) {
         case 1:
@@ -681,6 +686,9 @@ export default class extends Vue {
           remark !== '' && (params.remark = remark)
           break
       }
+      if (this.callId) {
+        params.callLogId = this.callId
+      }
       params.markStatus = markStatus
       let { data: res } = await followClueToThunderBirdTruckPool(params)
       if (res.success) {
@@ -697,7 +705,9 @@ export default class extends Vue {
 
   async sendRentalFollow(value: IState) {
     try {
-      let params: IState = {}
+      let params: IState = {
+        clueId: this.clueId
+      }
       let { markStatus, intentModel, remark, contact, fancyCar } = value
       switch (value.markStatus) {
         case 5:
@@ -717,6 +727,9 @@ export default class extends Vue {
         case 8:
           remark !== '' && (params.remark = remark)
           break
+      }
+      if (this.callId) {
+        params.callLogId = this.callId
       }
       params.markStatus = markStatus
       let { data: res } = await followClueToThunderBirdRental(params)
@@ -760,8 +773,8 @@ export default class extends Vue {
   }
 
   resetForms() {
+    (this.$refs[this.formStatus] as any).resetForm()
     setTimeout(() => {
-      (this.$refs[this.formStatus] as any).resetForm();
       (this.$refs[this.formStatus] as any).clearValidate()
       this.intentDegreeOptions.splice(0, this.intentDegreeOptions.length)
       this.demandTypeOptions.splice(0, this.demandTypeOptions.length)

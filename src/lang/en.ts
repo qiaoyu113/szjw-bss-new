@@ -5,6 +5,7 @@ export default {
     freightList: 'FreightList',
     clueTitle: 'Clue',
     publicClue: 'PublicClue',
+    subdivision: 'Subdivision',
     privateClue: 'PrivateClue',
     Configuration: 'Configuration',
     driverAccount: 'DriverAccount',

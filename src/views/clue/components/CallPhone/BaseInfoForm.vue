@@ -196,7 +196,7 @@ export default class extends Vue {
       tag: { name: '月', type: 'append' },
       tagAttrs: {
         placeholder: '请填写',
-        maxlength: '3'
+        maxlength: '2'
       },
       listeners: {
         input: this.handleValidateExperience
@@ -558,14 +558,19 @@ export default class extends Vue {
   // 获取车型
   async getOptions() {
     try {
-      let params = ['Intentional_compartment']
+      let params = ['Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         let cars = res.data.Intentional_compartment.map(function(item: any) {
           return { label: item.dictLabel, value: +item.dictValue }
         })
 
+        let demandTypeOptions = res.data.demand_type.map((item: any) => {
+          return { label: item.dictLabel, value: +item.dictValue }
+        })
+
         this.optionsCarType.push(...cars)
+        this.demandTypeOptions.push(...demandTypeOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -578,8 +583,8 @@ export default class extends Vue {
     if (this.clueStatus < 2) {
       this.WTQuery = { ...this.WTQuery, ...value }
       this.WTQuery.intentWork = [
-        value.expectAddressCity,
-        value.expectAddressCounty
+        String(value.expectAddressCity),
+        String(value.expectAddressCounty)
       ]
       if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
         this.WTQuery.intentWork.pop()
@@ -590,8 +595,6 @@ export default class extends Vue {
     } else if (this.clueStatus === 3) {
       this.BirdQuery = { ...this.BirdQuery, ...value }
     } else {
-      value.intentModel = '1,2,10'
-      value.fancyModel = '25,35,1'
       value.intentModel = value.intentModel.split(',').map((ele:any) => {
         return +ele
       })
@@ -632,7 +635,7 @@ export default class extends Vue {
           this.$message.warning(res.errorMsg)
         }
       } else {
-        let { data: res } = await getClueLZXDetail({ clueId: 'this.clueId ' })
+        let { data: res } = await getClueLZXDetail({ clueId: this.clueId })
         if (res.success) {
           let {
             marketClueLZXDetailBaseInfoVO,

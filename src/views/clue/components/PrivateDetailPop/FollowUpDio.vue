@@ -10,6 +10,7 @@
     >
       <FollowForm
         ref="followform"
+        :clue-id="id"
         :clue-status="+clueStatus"
         @success="successSend"
         @followPass="followPass"
@@ -35,6 +36,8 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) private showDialog!: boolean;
   @Prop({ default: '0' }) private clueStatus!: string;
+  @Prop({ default: '' }) private id!: string;
+
   private submitLoading: boolean = false;
   private errMsg:IState = {}
 
