@@ -85,7 +85,7 @@
                 >
                   <el-button
                     v-permission="['/v2/market-clue/cancelInterview']"
-                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
+                    :disabled="!(scope.row.inviteStatus === 1 && !scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,1)"
                   >
@@ -93,7 +93,7 @@
                   </el-button>
                   <el-button
                     v-permission="['/v2/market-clue/clueBreakAnAppointment']"
-                    :disabled="!(scope.row.inviteStatus === 1 && scope.row.operationType)"
+                    :disabled="!(scope.row.inviteStatus === 1 && !scope.row.operationType)"
                     type="text"
                     @click="handleInterviewClick(scope.row,0)"
                   >

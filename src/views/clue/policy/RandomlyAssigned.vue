@@ -214,7 +214,10 @@ export default class extends Vue {
   private columns: any[] = [
     {
       key: 'cityName',
-      label: '城市'
+      label: '城市',
+      attrs: {
+        sortable: true
+      }
     },
     {
       key: 'userGroupId',
@@ -240,10 +243,7 @@ export default class extends Vue {
     },
     {
       key: 'groupUpdateDate',
-      label: '设置时间',
-      attrs: {
-        sortable: true
-      }
+      label: '设置时间'
     },
     {
       key: 'op',
@@ -272,7 +272,7 @@ export default class extends Vue {
     this.getList()
   }
   // 重置
-  private async handleResetClick() {
+  handleResetClick() {
     this.listQuery.city = ''
     this.getList()
   }

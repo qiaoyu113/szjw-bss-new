@@ -194,7 +194,8 @@ export default {
     marketClue: '待市场分配线索',
     RandomlyAssigned: '随机分配policy设置',
     BackflowPolicy: '回流policy设置',
-    campaignList: 'Campaign管理'
+    campaignList: 'Campaign管理',
+    campaignDetail: 'Campaign详情'
   },
   navbar: {
     setPassword: '修改密码',
