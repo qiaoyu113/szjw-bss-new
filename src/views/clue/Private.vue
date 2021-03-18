@@ -65,7 +65,7 @@
         <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          @click="handleResetClick"
+          @click="handleResetClicks"
         >
           重置
         </el-button>
@@ -191,6 +191,7 @@
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
+            :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)"
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -1089,7 +1090,9 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     this.getLists()
   }
-
+  private async handleResetClicks(row: IState) {
+    (this.$refs['suggestForm'] as any).resetForm()
+  }
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -1117,7 +1120,7 @@ export default class extends Vue {
     }
     this.formItem.map((item: any) => {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
-        if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
+        if (item.key === 'cityCode' && this.listQuery.cityCode) {
           params.cityCode = this.listQuery.cityCode[1] || ''
         } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
           params.carCity = this.listQuery.carCity[1]

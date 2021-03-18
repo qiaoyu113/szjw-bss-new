@@ -435,12 +435,13 @@ async function cityDetail(params: any, node: any) {
 }
 
 // 获取城市、小组、跟进人
-export async function showCityGroupPerson(node: any, resolve: any) {
+export async function showCityGroupPerson(node: any, resolve: any, clueType:any) {
   if (node.level === 0) {
     let citys = await getOpenCitys()
     resolve(citys)
   } else if (node.level === 1) {
-    let groups = await GroupInfoByCityCodeAndProductLine(+node.value)
+    console.log(+node.value)
+    let groups = await GroupInfoByCityCodeAndProductLine(+node.value, clueType)
     resolve(groups)
   } else if (node.level === 2) {
     let [groupId, busiType] = node.value.split(',')
@@ -467,10 +468,14 @@ async function getOpenCitys() {
   }
 }
 // 获取小组
-async function GroupInfoByCityCodeAndProductLine(cityCode:number) {
+async function GroupInfoByCityCodeAndProductLine(cityCode:number, clueType:any) {
   try {
+    let busiLine = [0, 1]
+    if (clueType > 1) {
+      busiLine = [5]
+    }
     let params:any = {
-      busiLine: [0, 1].toString(),
+      busiLine: busiLine.toString(),
       cityCode
     }
     let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)

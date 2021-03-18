@@ -46,7 +46,7 @@
         <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          @click="handleResetClick"
+          @click="handleResetClicks"
         >
           重置
         </el-button>
@@ -108,6 +108,7 @@
     </div>
     <!-- dialog -->
     <SelfDialog
+      :key="listQuery.clueType"
       :visible.sync="showDialog"
       :title="title"
       :confirm="confirm"
@@ -446,18 +447,18 @@ export default class extends Vue {
       rules: [3, 4]
     },
     {
-      key: 'ccc',
+      key: 'intentModelName',
       label: '意向车型',
       rules: [3, 4]
     },
     {
-      key: 'cc',
+      key: 'demandTypeName',
       label: '需求类型',
       rules: [2]
     },
     {
-      key: 'hjhj',
-      label: '意向车型',
+      key: 'carTypeName',
+      label: '车型',
       rules: [2]
     },
     {
@@ -548,7 +549,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: showCityGroupPerson
+          lazyLoad: (node:any, resolve:any) => showCityGroupPerson(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',
@@ -659,7 +660,9 @@ export default class extends Vue {
     this.page.page = 1
     this.getLists()
   }
-
+  private async handleResetClicks(row: IState) {
+    (this.$refs['suggestForm'] as any).resetForm()
+  }
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -683,8 +686,8 @@ export default class extends Vue {
     }
     this.formItem.map((item: any) => {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
-        if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
-          params.cityCode = this.listQuery.cityCode[1]
+        if (item.key === 'cityCode' && this.listQuery.cityCode) {
+          params.cityCode = this.listQuery.cityCode[1] || ''
         } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
           params.carCity = this.listQuery.carCity[1]
         } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
