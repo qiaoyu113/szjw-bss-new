@@ -382,9 +382,11 @@ export default class extends Vue {
     {
       type: 3,
       rules: ['root'],
+      col: 8,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        align: 'right',
         'default-time': ['00:00:00', '23:59:59'],
         pickerOptions: {
           shortcuts: this.shortcuts
