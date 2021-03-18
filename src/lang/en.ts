@@ -171,7 +171,8 @@ export default {
     selfDriverTag: 'selfDriverTag',
     RandomlyAssigned: 'Randomly assign policy settings',
     BackflowPolicy: 'Backflow policy settings',
-    campaignList: 'campaignListMa'
+    campaignList: 'campaignListMa',
+    campaignDetail: 'campaignDetail'
   },
   navbar: {
     logOut: 'Log Out',

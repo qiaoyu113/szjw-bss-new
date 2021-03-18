@@ -24,6 +24,9 @@ export const sumFunc = (values:number[]) => {
 
 // 除法
 export const divisionFunc = (values:number, value:number) => {
+  if (value === 0) {
+    return 0
+  }
   let num:number = values / value
   return isInteger(num)
 }

@@ -358,7 +358,10 @@ export default class extends Vue {
     {
       key: 'putMaterials',
       label: '投放物料',
-      'width': '140px'
+      'width': '140px',
+      attrs: {
+        'show-overflow-tooltip': true
+      }
     },
     {
       key: 'putStartDate',
@@ -596,6 +599,7 @@ export default class extends Vue {
       if (res.success) {
         this.$message.success('操作成功')
         this.showDialog1 = false
+        this.getLists()
       } else {
         this.$message.error(res.message)
       }
@@ -697,6 +701,7 @@ export default class extends Vue {
   }
   activated() {
     this.getLists()
+    this.getUserGroupSelectList(this.listQuery.clueType)
   }
   mounted() {
     this.init()

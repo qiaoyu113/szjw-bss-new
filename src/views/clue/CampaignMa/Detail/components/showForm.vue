@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="clueDetail">
     <self-form
       label-position="top"
       :list-query="listQuery"
@@ -11,14 +11,14 @@
     >
       <template #landingPage="{row}">
         <div class="breakWord">
-          {{ row.landingPage |DataIsNull }}
+          {{ row.landingPage | DataIsNull }}
         </div>
       </template>
       <template v-slot:userGroupId="{row}">
         <template v-if="row.userGroupId || row.busiTypeName || row.groupTypeName">
           {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupTypeName }}
         </template>
-        <template ve-else>
+        <template v-else>
           暂无数据
         </template>
       </template>
@@ -69,7 +69,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '投放平台',
-      key: 'launchPlatform'
+      key: 'launchPlatform',
+      class: 'breakWord'
     },
     {
       type: 7,
@@ -84,7 +85,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '投放物料',
-      key: 'dropMaterials'
+      key: 'dropMaterials',
+      class: 'breakWord'
     },
     {
       type: 'landingPage',
@@ -95,7 +97,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '诉求',
-      key: 'appeal'
+      key: 'appeal',
+      class: 'breakWord'
     },
     {
       type: 7,
@@ -105,7 +108,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '备注',
-      key: 'remarks'
+      key: 'remarks',
+      class: 'breakWord'
     },
     {
       type: 'createUserName',
@@ -142,5 +146,11 @@ export default class extends Vue {
 <style lang="scss" scoped>
   .breakWord {
     word-break: break-word;
+  }
+</style>
+
+<style scoped>
+  .clueDetail >>> .el-form-item__content {
+    word-break: break-all;
   }
 </style>
