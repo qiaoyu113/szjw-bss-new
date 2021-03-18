@@ -49,22 +49,43 @@
           />
         </template>
         <template slot="roleId">
-          <el-input
-            v-if="!!userId"
-            v-model="listQuery.roleName"
-            :disabled="true"
-          />
-          <el-cascader
-            v-else
-            v-model="listQuery.roleId"
-            placeholder="请选择"
-            :props=" {
-              value: 'id',
-              label: 'dutyName',
-              children: 'childDuty'
-            }"
-            :options="roleArr"
-          />
+          <el-row
+            v-for="(item,idx) in listQuery.roleId"
+            :key="idx"
+            style="width:100%;margin-bottom: 10px;"
+          >
+            <el-col :span="22">
+              <el-input
+                v-if="!!userId"
+                v-model="item.roleName"
+                :disabled="true"
+              />
+              <el-cascader
+                v-else
+                v-model="item.roleId"
+                :disabled="item.roleId.length === 3"
+                placeholder="请选择"
+                :props=" {
+                  value: 'id',
+                  label: 'dutyName',
+                  children: 'childDuty'
+                }"
+                :options="roleArr"
+              />
+            </el-col>
+            <el-col :span="2">
+              <i
+                v-if="idx===0"
+                class="el-icon-plus"
+                @click.stop="handleAddRole"
+              />
+              <i
+                v-if="idx > 0"
+                class="el-icon-minus"
+                @click.stop="handleDelRole(idx)"
+              />
+            </el-col>
+          </el-row>
         </template>
         <template slot="passwd">
           <el-input
@@ -121,7 +142,6 @@
             <el-button>取消</el-button>
           </router-link>
 
-          <!-- v-permission="['/v2/base/user/create','/v2/base/user/update']" -->
           <el-button
             type="primary"
             @click="handleValidateForm"
@@ -136,34 +156,13 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { Form as ElForm } from 'element-ui'
-import { ValidateFieldCallback } from 'element-ui/types/form.d'
-import { phoneReg, isValidPassWord, lock } from '@/utils/index.ts'
-import { getOfficeByCurrentUserV2 as getOfficeByCurrentUser, getDutyAndRoleList, RoleParams, addUser, modifyUser, userDetail } from '@/api/system'
+import { isValidPassWord, lock } from '@/utils/index'
+import { addUser, modifyUser, userDetail } from '@/api/system'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
-export interface FormObj {
-  id?:number | string;
-  userName: string;
-  mobile: string;
-  officeId: string|number [] ;
-  roleId?: string|number [];
-  passwd: string;
-  confirmPassword: string;
-  nickName: string;
-  roleName?:string;
-  crmUserStatus?:string;
-  syncStatus?:boolean;
-  status?:number;
-}
-
-interface RuleForm {
-  userName: any[];
-  mobile: any[];
-  officeId: any[];
-  roleId: any[];
-  passwd: any[];
-  confirmPassword: any[];
+import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../index'
+interface IState {
+  [key: string]: any;
 }
 
 @Component({
@@ -172,16 +171,21 @@ interface RuleForm {
   }
 })
 export default class extends Vue {
+  [x: string]: any
   userId:string| number = ''
   private listLoading:boolean = false
   private officeArr = [] // 组织架构列表
   private roleArr = [] // 角色列表
-  private listQuery:FormObj = {
+  private listQuery:IState = {
     id: '',
     userName: '',
     mobile: '',
     officeId: [],
-    roleId: [],
+    roleId: [
+      {
+        roleId: []
+      }
+    ],
     passwd: 'Aa123456',
     confirmPassword: '',
     nickName: '',
@@ -192,19 +196,10 @@ export default class extends Vue {
   }
   sourcePhone:string = ''
   private formItem:any[] = [
-    // {
-    //   type: 1,
-    //   key: 'userName',
-    //   label: '姓名:',
-    //   tagAttrs: {
-    //     placeholder: '请输入',
-    //     maxlength: 10
-    //   }
-    // },
     {
       type: 'userName',
       key: 'userName',
-      label: '姓名:',
+      label: '用户姓名:',
       slot: true
     },
     {
@@ -223,7 +218,8 @@ export default class extends Vue {
       key: 'roleId',
       type: 'roleId',
       label: '角色:',
-      slot: true
+      slot: true,
+      class: 'role'
     },
     {
       key: 'passwd',
@@ -342,113 +338,20 @@ export default class extends Vue {
       console.log(`get user info fail:${err}`)
     }
   }
-  // 获取组织架构
-  async getOfficeByCurrentUser() {
-    try {
-      let { data: res } = await getOfficeByCurrentUser()
-      if (res.success) {
-        let arrs = res.data
-        let brrs = this.deeploopOffice(arrs)
-        this.officeArr.push(...(brrs as []))
-      } else {
-        this.$message.error(res.errorMsg)
-      }
-    } catch (err) {
-      console.log(`get office fail:${err}`)
-    }
-  }
-  // 组织架构数据改造
-  deeploopOffice(arrs:any[]) {
-    let brrs:any[] = []
-    arrs.forEach(item => {
-      if (item.type === 3) {
-        item.disabled = true
-      }
-      if (item.officeVOs === null || item.officeVOs.length === 0) {
-        delete item.officeVOs
-      } else {
-        let crr = this.deeploopOffice(item.officeVOs)
-        item.officeVOs = crr
-      }
-      brrs.push(item)
-    })
-    return brrs
-  }
+
   // 组织架构发生变化
-  handleOfficeIdChange(val:number[]) {
-    this.listQuery.roleId = []
-    let obj:{
-      [propName:string]:any
-      } = {
-        officeVOs: []
-      }
-    if (val.length >= 1) {
-      obj = this.officeArr.filter((item:any) => item.id === val[0])[0]
-    }
-
-    if (val.length >= 2) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[1])[0]
-    }
-
-    if (val.length >= 3) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[2])[0]
-    }
-    if (val.length >= 4) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[3])[0]
-    }
-    if (val.length >= 5) {
-      obj = obj.officeVOs.filter((item:any) => item.id === val[4])[0]
-    }
-    // 目前最大是5级
-    let officeLevel:number = 0
-    if (obj.type === 1) { // 总部
-      officeLevel = 1
-    } else if (obj.type === 2) { // 大区
-      officeLevel = 2
-    } else { // 业务线
-      officeLevel = 3
-    }
-    let params:RoleParams = {
-      officeLevel
-    }
-    if (obj.type > 3) {
-      params.dutyId = obj.dutyId
-    }
-
-    this.getDutyAndRoleList(params)
-  }
-  // 获取角色
-  async getDutyAndRoleList(params:RoleParams) {
+  async handleOfficeIdChange(val:number[]) {
+    this.listQuery.roleId = [{ roleId: [] }]
+    let params:IState = GetRoleParamsByOfficeId(val, this.officeArr)
     try {
-      let { data: res } = await getDutyAndRoleList(params)
-      if (res.success) {
-        let arrs = res.data
-        this.roleArr = []
-        let brrs = this.deeploopRole(arrs)
-        this.roleArr.push(...(brrs as []))
-      } else {
-        this.$message.error(res.errorMsg)
-      }
+      this.roleArr = []
+      let result = await GetDutyAndRoleList(params)
+      this.roleArr.push(...result)
     } catch (err) {
-      console.log(`get role list fail:{err}`)
+      this.roleArr = []
+    } finally {
+      //
     }
-  }
-  // 角色列表数据改造
-  deeploopRole(arrs:any[]) {
-    let brrs:any[] = []
-    arrs.forEach(item => {
-      if (item.childDuty === null || item.childDuty.length === 0) {
-        delete item.childDuty
-        if (item.dutyLevel < 3) {
-          item.disabled = true
-        }
-      } else {
-        let crr = this.deeploopRole(item.childDuty)
-        item.childDuty = crr
-      }
-      brrs.push(item)
-    })
-    return brrs
   }
   // 新增用户
   @lock
@@ -513,7 +416,7 @@ export default class extends Vue {
   jumplist() {
     setTimeout(() => {
       this.$router.push({
-        path: '/system/user'
+        path: '/roleSystem/user'
       })
     }, delayTime)
   }
@@ -560,6 +463,18 @@ export default class extends Vue {
     this.resetForm()
     next()
   }
+  // 添加角色
+  handleAddRole() {
+    this.listQuery.roleId.push({
+      roleId: []
+    })
+  }
+  // 删掉角色
+  handleDelRole(idx:number) {
+    if (idx > 0) {
+      this.listQuery.roleId.splice(idx, 1)
+    }
+  }
   async mounted() {
     this.userId = +this.$route.query.userId || ''
     if (this.userId) {
@@ -571,8 +486,15 @@ export default class extends Vue {
       }
       this.formItem.push(add)
     }
-    await this.getOfficeByCurrentUser()
     this.getUserDetail()
+    try {
+      let result = await GetOfficeByCurrentUser()
+      this.officeArr.push(...result)
+    } catch (err) {
+      this.officeArr = []
+    } finally {
+      //
+    }
   }
 }
 </script>
@@ -609,5 +531,17 @@ export default class extends Vue {
   }
   .opUser >>> .el-card__header {
     border-bottom: none;
+  }
+  .opUser >>> .role .el-form-item__content {
+    display: flex;
+    flex-direction: column;
+  }
+  .opUser >>> .el-icon-plus, .opUser >>> .el-icon-minus {
+    margin-left: 10px;
+    font-size: 26px;
+    vertical-align: middle;
+    font-weight: bold;
+    color: #80B436;
+    cursor: pointer;
   }
 </style>

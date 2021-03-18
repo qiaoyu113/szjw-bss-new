@@ -54,6 +54,18 @@ const presetRouter: RouteConfig = {
       }
     },
     {
+      path: 'addUser', /* 新建用户 */
+      component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/CreateUser/index.vue'),
+      name: 'addUser',
+      meta: {
+        title: 'addUser',
+        activeMenu: '/roleSystem/user',
+        noCache: true,
+        icon: '',
+        apiUrl: '/v1/base/user/menu'
+      }
+    },
+    {
       path: 'wtSystem', /* 梧桐管理 */
       component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
       name: 'Index',
