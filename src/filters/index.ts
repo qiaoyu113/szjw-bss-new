@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-09-15 16:38:06
+ * @LastEditTime: 2021-03-17 20:33:39
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \szjw_bss_web\src\filters\index.ts
+ */
 // Set utils function parseTime to filter
 import store from '@/store'
 export { parseTime, Timestamp, TimestampYMD, DataIsNull } from '@/utils'

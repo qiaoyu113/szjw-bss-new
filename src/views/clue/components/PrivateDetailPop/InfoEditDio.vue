@@ -631,7 +631,7 @@ export default class extends Vue {
         this.show = false;
         (this.$parent as any).getDetailApi()
       } else {
-        console.log('fail', res.errorMsg)
+        this.$message.error(res.errorMsg)
       }
     } catch (err) {
       console.log(err)

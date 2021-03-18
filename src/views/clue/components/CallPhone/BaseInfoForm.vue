@@ -383,7 +383,7 @@ export default class extends Vue {
       tagAttrs: {
         type: 'textarea',
         placeholder: '选填，最多输入100个字',
-        maxlength: '50',
+        maxlength: '100',
         showWordLimit: true
       }
     }
