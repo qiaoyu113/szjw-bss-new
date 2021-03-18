@@ -40,7 +40,7 @@ const clueRouter: RouteConfig = {
       meta: {
         apiUrl: '/v2/clue/campaign/getClueCampaignList',
         hidden: true,
-        title: 'campaignList',
+        title: 'campaignDetail',
         noCache: false
       }
     },
