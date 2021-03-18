@@ -88,8 +88,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'lnSystem', /* 雷鸟管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/lnSystem/PermissionManage.vue'),
-      name: 'lnSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/lnSystem/index.vue'),
+      name: 'Index',
       redirect: '/lnSystem/authority',
       meta: {
         title: 'lnSystem',
@@ -121,8 +121,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'roleSystem', /* 权限管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/roleSystem/PermissionManage.vue'),
-      name: 'roleSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/roleSystem/index.vue'),
+      name: 'Index',
       redirect: '/roleSystem/authority',
       meta: {
         title: 'roleSystem',
@@ -154,8 +154,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'clueSystem', /* 线索管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/clueSystem/PermissionManage.vue'),
-      name: 'clueSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/clueSystem/index.vue'),
+      name: 'Index',
       redirect: '/clueSystem/authority',
       meta: {
         title: 'clueSystem',
@@ -187,8 +187,8 @@ const presetRouter: RouteConfig = {
     },
     {
       path: 'dataSystem', /* 数据管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/dataSystem/PermissionManage.vue'),
-      name: 'dataSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/dataSystem/index.vue'),
+      name: 'Index',
       redirect: '/dataSystem/authority',
       meta: {
         title: 'dataSystem',

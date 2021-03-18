@@ -262,3 +262,11 @@ export const pushUserToCRM = (params:any) =>
     method: 'post',
     params
   })
+
+// 权限管理-权限列表
+export const authorityListNew = (params:any) =>
+  request({
+    url: `${baseURL}/v3/base/authority/list`,
+    method: 'get',
+    params
+  })
