@@ -93,8 +93,6 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
-            title: 'roleManage',
             apiUrl: '/v1/base/office/list',
             sysType: 1
           }
@@ -140,8 +138,6 @@ const presetRouter: RouteConfig = {
     {
       path: 'lnSystem', /* 雷鸟管理 */
       component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/lnSystem/index.vue'),
-      name: 'Index',
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
       name: 'Index',
       redirect: '/lnSystem/authority',
       meta: {
