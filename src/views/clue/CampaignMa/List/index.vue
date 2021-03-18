@@ -597,7 +597,13 @@ export default class extends Vue {
       formData.append('campaignId', this.campaignId)
       let { data: res } = await obj[this.listQuery.clueType](formData)
       if (res.success) {
-        this.$message.success('操作成功')
+        // this.$message.success('操作成功')
+        this.$notify({
+          title: '',
+          message: '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
+          duration: 0,
+          offset: 70
+        })
         this.showDialog1 = false
         this.getLists()
       } else {
