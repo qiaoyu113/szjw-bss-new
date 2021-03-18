@@ -188,10 +188,11 @@
           {{ scope.row.createDate }}
         </template>
         <template v-slot:op="scope">
+          <!-- :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)" -->
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
-            :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)"
+
             @click="callPhoneClick(scope.row)"
           >
             打电话
