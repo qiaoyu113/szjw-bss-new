@@ -102,12 +102,11 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
           name: 'ShowUser',
           meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/wtSystem/role',
             title: 'showUser',
             noCache: true,
-            hidden: true,
-            icon: '',
-            apiUrl: '/v1/base/user/menu',
-            activeMenu: '/wtSystem/role'
+            hidden: true
           }
         }
       ]
@@ -154,7 +153,7 @@ const presetRouter: RouteConfig = {
             hidden: true,
             icon: '',
             apiUrl: '/v1/base/user/menu',
-            activeMenu: '/lnSystem/role'
+            activeMenu: '/roleSystem/lnSystem/role'
           }
         }
       ]
@@ -201,7 +200,7 @@ const presetRouter: RouteConfig = {
             hidden: true,
             icon: '',
             apiUrl: '/v1/base/user/menu',
-            activeMenu: '/roleSystem/role'
+            activeMenu: '/roleSystem/roleSystem/role'
           }
         }
       ]
@@ -248,7 +247,7 @@ const presetRouter: RouteConfig = {
             hidden: true,
             icon: '',
             apiUrl: '/v1/base/user/menu',
-            activeMenu: '/clueSystem/role'
+            activeMenu: '/roleSystem/clueSystem/role'
           }
         }
       ]
@@ -295,7 +294,7 @@ const presetRouter: RouteConfig = {
             hidden: true,
             icon: '',
             apiUrl: '/v1/base/user/menu',
-            activeMenu: '/dataSystem/role'
+            activeMenu: '/roleSystem/dataSystem/role'
           }
         }
       ]
