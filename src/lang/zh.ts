@@ -190,7 +190,8 @@ export default {
     clueSystem: '线索管理系统',
     dataSystem: '数据管理系统',
     authoritySystem: '权限管理',
-    roleSystem: '权限管理系统'
+    roleSystem: '权限管理系统',
+    showUser: '查看用户列表'
   },
   navbar: {
     setPassword: '修改密码',

@@ -8,6 +8,7 @@
         class="treeLine"
         :data="data"
         :props="defaultProps"
+        :expanded-key="[1]"
         :indent="0"
       >
         <template slot-scope="{node, data}">
@@ -67,104 +68,69 @@
         ref="dialogForm"
         :rules="rules"
         :model="dialogForm"
-        label-width="80px"
+        label-width="110px"
       >
         <el-tabs
           v-model="activeName"
           class="dialog-tab"
         >
-          <el-tab-pane
-            v-if="activeName === '3'"
-            label="分类"
-            name="3"
+          <el-form-item
+            label="权限菜单类型"
+            prop="authType"
           >
-            <el-form-item
-              label="权限名称"
-              prop="authName"
+            <el-select
+              v-model="dialogForm.authType"
+              placeholder="请选择"
+              name="permissionmanage_chooseAuthName3_authType"
+              clearable
             >
-              <el-input
-                v-model="dialogForm.authName"
-                placeholder="请输入权限名称"
-                maxlength="10"
-                clearable
-                name="permissionmanage_chooseAuthName1_input"
+              <el-option
+                v-for="(item, index) in authList"
+                :key="index"
+                :label="item.name"
+                :value="item.value"
               />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane
-            v-if="activeName === '4'"
-            label="页面"
-            name="4"
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            label="权限名称"
+            prop="authName"
           >
-            <el-form-item
-              label="权限名称"
-              prop="authName"
-            >
-              <el-input
-                v-model="dialogForm.authName"
-                placeholder="请输入权限名称"
-                maxlength="10"
-                name="permissionmanage_chooseAuthName2_input"
-                clearable
-              />
-            </el-form-item>
-            <el-form-item
-              label="页面地址"
-              prop="url"
-            >
-              <el-input
-                v-model="dialogForm.url"
-                maxlength="100"
-                placeholder="请输入页面地址"
-                clearable
-                name="permissionmanage_url1_input"
-              />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane
-            v-if="activeName === '5'"
-            label="功能"
-            name="5"
+            <el-input
+              v-model="dialogForm.authName"
+              placeholder="请输入权限名称"
+              maxlength="10"
+              clearable
+              name="permissionmanage_chooseAuthName3_input"
+            />
+          </el-form-item>
+          <el-form-item
+            label="数据权限"
+            prop="controlType"
           >
-            <el-form-item
-              label="权限名称"
-              prop="authName"
-            >
-              <el-input
-                v-model="dialogForm.authName"
-                placeholder="请输入权限名称"
-                maxlength="10"
-                clearable
-                name="permissionmanage_chooseAuthName3_input"
-              />
-            </el-form-item>
-            <el-form-item
-              label="数据权限"
-              prop="controlType"
-            >
-              <el-radio-group v-model="dialogForm.controlType">
-                <el-radio :label="1">
-                  需要
-                </el-radio>
-                <el-radio :label="0">
-                  不需要
-                </el-radio>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item
-              v-if="dialogForm.controlType"
-              label="页面地址"
-              prop="url"
-            >
-              <el-input
-                v-model="dialogForm.url"
-                maxlength="100"
-                placeholder="请输入页面地址"
-                clearable
-                name="permissionmanage_url2_input"
-              />
-            </el-form-item>
-          </el-tab-pane>
+            <el-radio-group v-model="dialogForm.controlType">
+              <el-radio :label="1">
+                需要
+              </el-radio>
+              <el-radio :label="0">
+                不需要
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item
+            v-if="dialogForm.authType !== '3'"
+            label="页面地址"
+            prop="url"
+          >
+            <el-input
+              v-model="dialogForm.url"
+              maxlength="100"
+              placeholder="请输入页面地址"
+              clearable
+              name="permissionmanage_url2_input"
+            />
+          </el-form-item>
         </el-tabs>
       </el-form>
     </SelfDialog>
@@ -179,7 +145,7 @@ import { RoleTree } from '../components'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { lock } from '@/utils/index'
 import {
-  authorityList,
+  authorityListNew,
   createAuthority,
   updateAuthority,
   deleteAuthority
@@ -198,6 +164,11 @@ import '@/styles/tree-line.scss'
 export default class extends Vue {
   private loading: boolean = false;
   private data: any = [];
+  private authList: any = [
+    { name: '分类', value: '3' },
+    { name: '页面', value: '4' },
+    { name: '功能', value: '5' }
+  ]
   private defaultProps: any = {
     children: 'childAuth',
     label: 'authName'
@@ -210,13 +181,16 @@ export default class extends Vue {
   private dialogTit: string = '新建权限';
   private dialogForm: any = {
     authName: '',
-    authType: 0,
+    authType: '',
     controlType: '',
     parentId: 0,
     parentsId: '',
     url: ''
   };
   private rules: any = {
+    authType: [
+      { required: true, message: '请选择权限菜单类型', trigger: 'blur' }
+    ],
     authName: [
       { required: true, message: '请输入权限名称', trigger: 'blur' }
     ],
@@ -239,9 +213,9 @@ export default class extends Vue {
   private isAdd: boolean = false;
   private disabled: boolean = false;
 
-  @Watch('dialogForm.controlType')
+  @Watch('dialogForm.authType')
   private onval(value: any) {
-    if (!value && this.addNode.level === 5) {
+    if (value === '3') {
       this.dialogForm.url = ''
     }
   }
@@ -272,6 +246,7 @@ export default class extends Vue {
             parentsId + (parentsId ? ',' : '') + `${this.addData.id}`
         delete postData.id
         delete postData.childAuth
+        postData.sysType = 3
         const { data } = await createAuthority(postData)
         if (data.success) {
           this.$message.success(`创建成功`)
@@ -303,7 +278,7 @@ export default class extends Vue {
   }
   private async authorityList() {
     this.loading = true
-    const { data } = await authorityList()
+    const { data } = await authorityListNew({ sysType: 3 })
     this.loading = false
     if (data.success) {
       // console.log(data)
@@ -320,6 +295,39 @@ export default class extends Vue {
     this.addData = data
     this.dialogTit = '新建权限'
     this.activeName = String(data.authType + 1)
+    if (node.level === 4) {
+      if (node.parent.data.authType === 3) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '页面', value: '4' }
+        ]
+      }
+      if (node.parent.data.authType === 4) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '功能', value: '5' }
+        ]
+      }
+    }
+    if (node.level === 5) {
+      if (node.parent.data.authType === 3) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '页面', value: '4' }
+        ]
+      }
+      if (node.parent.data.authType === 4) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '功能', value: '5' }
+        ]
+      }
+      if (node.parent.data.authType === 2 && node.parent.parent.data.authType === 2) {
+        this.authList = [
+          { name: '页面', value: '4' }
+        ]
+      }
+    }
     this.isAdd = true
     this.showDialog = true
   }
@@ -327,8 +335,42 @@ export default class extends Vue {
     this.addNode = node
     this.addData = data
     this.dialogTit = '编辑权限'
+    data.authType = String(data.authType)
     this.dialogForm = Object.assign(this.dialogForm, data)
     this.activeName = String(data.authType)
+    if (node.level === 4) {
+      if (node.parent.data.authType === 3) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '页面', value: '4' }
+        ]
+      }
+      if (node.parent.data.authType === 4) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '功能', value: '5' }
+        ]
+      }
+    }
+    if (node.level === 5) {
+      if (node.parent.data.authType === 3) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '页面', value: '4' }
+        ]
+      }
+      if (node.parent.data.authType === 4) {
+        this.authList = [
+          { name: '分类', value: '3' },
+          { name: '功能', value: '5' }
+        ]
+      }
+      if (node.parent.data.authType === 2 && node.parent.parent.data.authType === 2) {
+        this.authList = [
+          { name: '页面', value: '4' }
+        ]
+      }
+    }
     this.isAdd = false
     this.showDialog = true
   }
