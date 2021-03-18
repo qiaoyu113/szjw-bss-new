@@ -14,12 +14,13 @@
         <el-upload
           ref="upload"
           drag
-          :show-file-list="false"
+          :show-file-list="true"
           :limit="1"
           action="/121"
           :auto-upload="false"
           :file-list="fileList"
           :http-request="uploadFile"
+          :before-remove="beforeRemove"
           :on-change="handleExcelChange"
           :class="selectFile ? 'uploadSuc':''"
         >
@@ -89,7 +90,7 @@ export default class extends Vue {
   handleExcelChange({ raw }:{raw:File}) {
     const type = raw.type
     this.filename = raw.name
-    if (['application/vnd.ms-excel', 'application/x-xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(type)) {
+    if (['application/vnd.ms-excel', 'application/x-xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'].includes(type)) {
       this.selectFile = true
       return true
     }
@@ -113,6 +114,9 @@ export default class extends Vue {
     let formData = new FormData()
     formData.append('file', file.file)
     this.$emit('onPass', formData)
+  }
+  beforeRemove() {
+    this.handleResetFile()
   }
   // 下载模板
   handleDownloadClick() {

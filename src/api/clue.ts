@@ -465,9 +465,9 @@ export const UserGroupCreate = (data: any) =>
   })
 
 // 客群导出
-export const UserGroupExport = (params: any) =>
+export const UserGroupExport = (data: any) =>
   request({
     url: `${baseUrl}/v2/market-clue/user-group/userGroup/export`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   })
