@@ -5,16 +5,20 @@
   >
     <SectionContainer title="职责管理">
       <RoleTree
+        ref="tree"
         class="treeLine"
         :data="data"
         :props="defaultProps"
         :indent="0"
+        :default-expand-all="false"
+        :load="getDutyList"
+        lazy
       >
         <template slot-scope="{node, data}">
           <span class="mr10">{{ node.label }}</span>
           <div class="right-btn">
             <el-button
-              v-if="data.dutyLevel !== 2"
+              v-if="showAppend(node, data)"
               v-permission="['/v2/base/duty/create']"
               circle
               size="mini"
@@ -110,7 +114,7 @@ import {
   createDuty,
   updateDuty,
   deleteDuty
-} from '@/api/system'
+} from '@/api/role-system'
 @Component({
   name: 'DutyManage',
   components: {
@@ -119,13 +123,16 @@ import {
     SelfDialog
   }
 })
-
+// 城市职责-业务线-岗位职责。
+// 大区公共职责-岗位职责。
+// 总部职责-部门-岗位职责。
 export default class extends Vue {
   private loading: boolean = false;
   private data: any = [];
   private defaultProps: any = {
     children: 'childDuty',
-    label: 'dutyName'
+    label: 'dutyName',
+    isLeaf: 'leaf'
   };
   private addNode: any = {};
   private addData: any = {};
@@ -153,6 +160,13 @@ export default class extends Vue {
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
+  }
+  // 判断是否显示添加按钮
+  private showAppend(node: any, data: any) {
+    if (data.dutyLevel === 1 && node.parent && node.parent.nextSibling && node.parent.previousSibling) {
+      return false
+    }
+    return data.dutyLevel !== 2
   }
   // 弹窗提交
   private confirm(done: any) {
@@ -195,6 +209,7 @@ export default class extends Vue {
     this.addData = data
     this.dialogForm.parentDutyName = data.dutyName
     this.dialogForm.parentId = data.id
+    this.dialogForm.dutyLevel = node.level
     this.dialogForm.parentsId = [this.dialogForm.parentsId, data.id].join(',')
     this.dialogTit = '新建职责'
     this.isAdd = true
@@ -206,6 +221,7 @@ export default class extends Vue {
     this.addData = data
     this.dialogTit = '编辑职责'
     this.dialogForm.dutyName = data.dutyName
+    this.dialogForm.dutyLevel = data.dutyLevel
     this.dialogForm.id = data.id
     this.dialogForm.parentId = node.parent.data.id
     this.dialogForm.parentsId = [this.dialogForm.parentsId, node.parent.data.id].join(',')
@@ -234,32 +250,65 @@ export default class extends Vue {
       .catch(() => {})
   }
   // 获取列表
-  private async getDutyList() {
-    this.loading = true
-    const { data } = await dutyList()
+  private async getDutyList(node: any, resolve: any) {
+    let childNodes = []
+    let dutyParentId = 0
+    if (node.level === 0) {
+      this.loading = true
+      dutyParentId = -99
+    } else {
+      dutyParentId = node.data.id
+      childNodes = node.parent.childNodes
+    }
+    const { data } = await dutyList({ dutyParentId })
     this.loading = false
     if (data.success) {
-      this.data = data.data
+      let i = 3
+      if (node.level === 1 && childNodes.length > 0) {
+        const index = childNodes.findIndex((item: any) => item.data.id === node.data.id)
+        i = index === 1 ? 2 : 3
+      }
+      const treeList = data.data.map((item: any) => {
+        if (node.level === 0) {
+          item.leaf = false
+        } else if (node.level === 1) {
+          item.leaf = i === 2
+        } else {
+          item.leaf = true
+        }
+        return item
+      })
+      resolve(treeList || [])
     } else {
       this.$message.error(data)
     }
   }
   // 删除tree 节点
   private remove(node: any, data: any) {
-    const parent = node.parent
-    const children = parent.data.childDuty || parent.data
-    const index = children.findIndex((d: any) => {
-      return d.id === data.id
-    })
-    children.splice(index, 1)
+    (this.$refs.tree as any).$refs.roleTree.remove(node)
   }
   // append tree节点
   private append(data: any) {
-    const newChild = { ...data }
-    if (!this.addData.childDuty) {
-      this.$set(this.addData, 'childDuty', [])
+    const node = this.addNode
+    let leaf = true
+    let i = 0
+    let childNodes = node.parent.childNodes
+    if (node.level === 1 && childNodes.length > 0) {
+      const index = childNodes.findIndex((item: any) => item.data.id === node.data.id)
+      i = index === 1 ? 2 : 3
     }
-    this.addData.childDuty.push(newChild)
+    if (node.level === 0) {
+      leaf = false
+    } else if (node.level === 1) {
+      leaf = i === 2
+    } else {
+      leaf = true
+    }
+    const newChild = {
+      ...data,
+      leaf
+    };
+    (this.$refs.tree as any).$refs.roleTree.append(newChild, this.addData.id)
   }
   // update tree节点
   private update(data: any, childDuty: any) {
@@ -275,10 +324,10 @@ export default class extends Vue {
     })
   }
   private fetchData() {
-    this.getDutyList()
+    // this.getDutyList()
   }
   mounted() {
-    this.fetchData()
+    // this.fetchData()
   }
 }
 </script>
@@ -322,3 +371,7 @@ export default class extends Vue {
   transform: translateY(6px);
 }
 </style>
+
+function item(item: any, arg1: (any: any) => void) {
+  throw new Error('Function not implemented.')
+}

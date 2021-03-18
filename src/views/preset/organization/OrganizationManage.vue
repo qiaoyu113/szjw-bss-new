@@ -10,9 +10,12 @@
         :props="defaultProps"
         node-key="id"
         :default-expand-all="false"
-        :allow-drop="allowDrop"
+        :allow-drag="allowDrop"
         draggable
-        @node-drop="sort"
+        :load="getOfficeList"
+        lazy
+        @node-drop="handleDrop"
+        @node-drag-start="handleDragStart"
       >
         <template slot-scope="{node, data}">
           <svg-icon
@@ -309,12 +312,10 @@ import {
   sortOffice,
   updateOffice,
   deleteOffice,
-  getDutyListByLevel,
-  getSpecifiedLower
-} from '@/api/system'
+  getDutyListByLevel
+} from '@/api/role-system'
 
 import '@/styles/common.scss'
-import { forEach } from 'jszip'
 
 @Component({
   name: 'CreateRole',
@@ -325,6 +326,7 @@ import { forEach } from 'jszip'
   }
 })
 export default class extends Vue {
+  private copyData = {} // 深拷贝data
   private defaultExpandAll: boolean = false;
   private loading: boolean = false;
   private data: any = [];
@@ -641,19 +643,24 @@ export default class extends Vue {
     if (node && node[0]) {
       this.dialogForm.name = node[0].label
       console.log(this.dialogForm.name)
+    } else {
+      this.dialogForm.name = ''
     }
   }
   // 获取组织管理列表
-  private async getOfficeList() {
-    this.loading = true
-    const { data } = await getOfficeList()
+  private async getOfficeList(node: any, resolve: any) {
+    console.log(node, resolve)
+    let parentId = 0
+    if (node.level === 0) {
+      this.loading = true
+      parentId = 0
+    } else {
+      parentId = node.data.id
+    }
+    const { data } = await getOfficeList({ parentId })
     this.loading = false
     if (data.success) {
-      this.data = data.data
-      // this.$nextTick(() => {
-      //   // 兼容上下移动进行手动展开所有节点
-      //   this.openAll()
-      // })
+      resolve(data.data || [])
     } else {
       this.$message.error(data)
     }
@@ -715,7 +722,7 @@ export default class extends Vue {
     }
   }
   private fetchData() {
-    this.getOfficeList()
+    // this.getOfficeList()
     this.getArea()
   }
   private changeDuty(value: any) {
@@ -726,17 +733,18 @@ export default class extends Vue {
     })
   }
   private allowDrop(draggingNode: any, dropNode: any, type: any) {
-    if (draggingNode.level === dropNode.level) {
-      // aboveId是父节点id
-      if (draggingNode.aboveId === dropNode.aboveId) {
-        return type === 'prev' || type === 'next'
-      }
+    if (draggingNode.level === dropNode.level + 1) {
+      return type === 'inner'
+    } else if (draggingNode.level === dropNode.level) {
+      return type === 'prev' || type === 'next'
     } else {
-      // 不同级进行处理
       return false
     }
   }
-  private sort(draggingNode: any, dropNode: any, type: any, event: any) {
+  private handleDragStart() {
+    this.copyData = JSON.parse(JSON.stringify(this.data))
+  }
+  private handleDrop(draggingNode: any, dropNode: any, type: any, event: any) {
     // let obj = {
     //   aboveId: '',
     //   arr: []
@@ -746,10 +754,24 @@ export default class extends Vue {
     //   obj.arr.push(item.data.id)
     // }
     // this.updateOrderMe(obj)
-    console.log(draggingNode, dropNode, type, event)
+    const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
+    const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
+    console.log(openList)
+
+    // 失败后处理
+    this.data = this.copyData
+    this.$nextTick(() => {
+      this.openItem(openList)
+    })
   }
   private updateOrderMe(obj: any) {
     console.log(obj)
+  }
+  private openItem(list: any) {
+    const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].expanded = list.includes(nodes[i].data.id)
+    }
   }
   mounted() {
     this.fetchData()
