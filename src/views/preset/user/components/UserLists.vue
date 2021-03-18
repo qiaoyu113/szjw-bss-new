@@ -79,7 +79,8 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
-import { getUserManagerList, enableOrDisableUser, resetPassword, pushUserToCRM } from '@/api/system'
+import { enableOrDisableUser, resetPassword, pushUserToCRM } from '@/api/system'
+import { GetUserListsV3 } from '@/api/preset'
 import { HandlePages } from '@/utils/index'
 interface IState {
   [key: string]: any;
@@ -163,21 +164,18 @@ export default class extends Vue {
   async getLists() {
     try {
       this.listLoading = true
-      interface Params {
-        limit:number;
-        page:number;
-        nickName?:string;
-        mobile?:string;
-        status?:string|number
-      }
-      let params:Params = {
+      let params:IState = {
         limit: +this.page.limit,
-        page: +this.page.page
+        page: +this.page.page,
+        url: '/v3/base/user/page/list'
       }
       this.listQuery.status !== '' && (params.status = this.listQuery.status)
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
-      let { data: res } = await getUserManagerList(params)
+      this.listQuery.officeId && this.listQuery.officeId.length > 0 && (params.officeId = this.listQuery.officeId[this.listQuery.officeId.length - 1])
+      this.listQuery.roleId !== '' && (params.roleId = this.listQuery.roleId)
+      this.listQuery.roleName && (params.roleName = this.listQuery.roleName)
+      let { data: res } = await GetUserListsV3(params)
       if (res.success) {
         res.page = await HandlePages(res.page)
         this.tableData = res.data
@@ -205,7 +203,7 @@ export default class extends Vue {
   handleCommandChange(key:string|number, row:any) {
     if (key === 'edit') { // 编辑
       this.$router.push({
-        path: '/system/modifyUser',
+        path: '/roleSystem/addUser',
         query: {
           userId: row.id
         }
@@ -216,7 +214,6 @@ export default class extends Vue {
       this.openDisableUser(row)
     } else if (key === 'crm') {
       this.openSendCrmData(row)
-      console.log('crm')
     }
   }
   // 打开重置密码的弹框
