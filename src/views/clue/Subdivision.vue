@@ -34,13 +34,6 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          type="primary"
-          size="small"
-          @click="handleAddClick"
-        >
-          新建客群
-        </el-button>
-        <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -54,6 +47,13 @@
           @click="handleResetClick"
         >
           重置
+        </el-button>
+        <el-button
+          type="primary"
+          size="small"
+          @click="handleAddClick"
+        >
+          新建客群
         </el-button>
         <el-button
           v-permission="['/v2/market-clue/user-group/userGroup/export']"
