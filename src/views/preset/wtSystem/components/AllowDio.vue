@@ -6,7 +6,7 @@
       :confirm="confirm"
       top="5vh"
       width="80%"
-      :sumbit-again="submitLoading"
+      :sumbit-again="canSumbit"
       :destroy-on-close="true"
       :show-confirm-button="true"
       confirm-button-text="提交分配"
@@ -63,6 +63,7 @@
           :max-height="tableHeight"
           :page-size="pageSize"
           :func="disabledCheck"
+          :sumbit-again="canSumbit"
           :empty="true"
           @onPageSize="handlePageSize"
           @selection-change="handleSelectionChange"
@@ -100,8 +101,8 @@ export default class extends Vue {
   @Prop({ default: {} }) allowData!: IState;
 
   private pageSize:number[] = [10, 20, 50, 100, 150, 200]
+  private canSumbit:boolean = true
   private listLoading: boolean = false;
-  private submitLoading: boolean = false;
   private tableData:IState = []
   private multipleSelection: any[] = []; // 当前页选中的数据
   private listQuery: IState = {
@@ -194,6 +195,15 @@ export default class extends Vue {
   set show(value: boolean) {
     this.$emit('update:showDialog', value)
   }
+
+  @Watch('multipleSelection')
+  columnsData(arr:object[]) {
+    if (arr.length > 0) {
+      this.canSumbit = false
+    } else {
+      this.canSumbit = true
+    }
+  }
   checkPhone(value:string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -250,7 +260,11 @@ export default class extends Vue {
   }
   // 编辑确认按钮
   confirm() {
-    console.log('confirm', this.multipleSelection)
+    if (this.multipleSelection.length > 0) {
+      console.log('confirm', this.multipleSelection)
+    } else {
+      this.$message.warning('请先筛选出分配')
+    }
   }
   // 取消按钮
   handleClosed() {

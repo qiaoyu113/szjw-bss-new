@@ -32,7 +32,10 @@
           </el-button>
         </div>
       </self-form>
-      <div class="table_center">
+      <div
+        v-loading="listLoading"
+        class="table_center"
+      >
         <!-- 表格 -->
         <self-table
           ref="selfDriverTag"
@@ -47,7 +50,7 @@
         >
           <template v-slot:user="scope">
             <el-button type="text">
-              {{ scope.row.user }}
+              {{ scope.row.user + 'dododododo' }}
             </el-button>
           </template>
           <template v-slot:op="scope">
