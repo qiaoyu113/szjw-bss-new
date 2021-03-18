@@ -30,6 +30,14 @@
           >
             重置
           </el-button>
+          <el-button
+            size="small"
+            :class="isPC ? '' : 'btnMobile'"
+            type="primary"
+            @click="goCreateUser"
+          >
+            新建角色
+          </el-button>
         </div>
       </self-form>
       <div
@@ -57,13 +65,50 @@
             </el-button>
           </template>
           <template v-slot:op="scope">
-            <el-button
-              v-permission="['/v2/driver/label-sync/update']"
-              type="text"
-              @click="handleAllowClick(scope.row)"
+            <el-dropdown
+              :trigger="isPC ? 'hover' : 'click'"
+              name="rolemanage_moreMenu_dropdown"
             >
-              分配角色
-            </el-button>
+              <span
+                v-if="isPC"
+                class="el-dropdown-link"
+              >
+                更多操作<i
+                  v-if="isPC"
+                  class="el-icon-arrow-down el-icon--right"
+                />
+              </span>
+              <span
+                v-else
+                style="font-size: 18px;"
+                class="el-dropdown-link"
+              >
+                <i class="el-icon-setting el-icon--right" />
+              </span>
+              <el-dropdown-menu
+                slot="dropdown"
+                name="rolemanage_moreMenuItem_dropdown"
+              >
+                <el-dropdown-item
+                  v-permission="['/v2/base/role/deleteByRoleId']"
+                  @click.native="handleAllowClick(scope.row)"
+                >
+                  分配角色
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-permission="['/v2/base/role/deleteByRoleId']"
+                  @click.native="deleteRole(scope.row)"
+                >
+                  删除
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-permission="['/v1/base/role/update']"
+                  @click.native="editRole(scope.row)"
+                >
+                  编辑
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </template>
         </self-table>
       </div>
@@ -77,7 +122,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { roleList } from '@/api/preset'
+import { roleList, deleteRole } from '@/api/preset'
 import { HandlePages } from '@/utils/index'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -211,6 +256,9 @@ export default class extends Vue {
       this.getList()
     })
   }
+  handleEditClick() {
+
+  }
   // 分页
   private handlePageSize(page:PageObj) {
     this.page.page = page.page
@@ -256,6 +304,27 @@ export default class extends Vue {
       { name: 'ShowUser',
         query: { id: id }
       })
+  }
+  private goCreateUser() {
+    this.$router.push({ name: 'RoleCreate', query: { sysType: this.$route.meta.sysType } })
+  }
+  private editRole(row: any) {
+    this.$router.push({ name: 'RoleOperate', query: { id: row.id, sysType: this.$route.meta.sysType } })
+  }
+  private deleteRole(item: any) {
+    this.$confirm(`您确定要删除“${item.nick}”吗？`, '删除角色', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(async() => {
+      const { data } = await deleteRole(item.id)
+      if (data.success) {
+        this.$message.success(`删除成功`)
+        this.getList()
+      } else {
+        this.$message.error(data)
+      }
+    })
   }
   mounted() {
     this.listQuery.sysType = this.$route.meta.sysType

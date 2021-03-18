@@ -108,6 +108,30 @@ const presetRouter: RouteConfig = {
             noCache: true,
             hidden: true
           }
+        },
+        {
+          path: 'roleOperate', /* 编辑角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleOperate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/wtSystem/role',
+            title: 'roleOperate',
+            noCache: true,
+            hidden: true
+          }
+        },
+        {
+          path: 'roleCreate', /* 新建角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleCreate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/wtSystem/role',
+            title: 'roleCreate',
+            noCache: true,
+            hidden: true
+          }
         }
       ]
     },
@@ -154,6 +178,18 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/lnSystem/role'
+          }
+        },
+        {
+          path: 'roleCreate', /* 新建角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleCreate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/lnSystem/role',
+            title: 'roleCreate',
+            noCache: true,
+            hidden: true
           }
         }
       ]
@@ -202,6 +238,18 @@ const presetRouter: RouteConfig = {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/roleSystem/role'
           }
+        },
+        {
+          path: 'roleCreate', /* 新建角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleCreate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/roleSystem/role',
+            title: 'roleCreate',
+            noCache: true,
+            hidden: true
+          }
         }
       ]
     },
@@ -249,6 +297,18 @@ const presetRouter: RouteConfig = {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/clueSystem/role'
           }
+        },
+        {
+          path: 'roleCreate', /* 新建角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleCreate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/clueSystem/role',
+            title: 'roleCreate',
+            noCache: true,
+            hidden: true
+          }
         }
       ]
     },
@@ -295,6 +355,18 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/dataSystem/role'
+          }
+        },
+        {
+          path: 'roleCreate', /* 新建角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleCreate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/dataSystem/role',
+            title: 'roleCreate',
+            noCache: true,
+            hidden: true
           }
         }
       ]

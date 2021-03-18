@@ -97,8 +97,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages } from '@/utils/index'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { roleList, distributeRoleToUser } from '@/api/preset'
-import { getUserManagerList } from '@/api/system'
+import { roleList, distributeRoleToUser, GetUserListsV3 } from '@/api/preset'
 import userList from '../../user/components/UserLists.vue'
 import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../../user/index'
 interface IState {
@@ -287,13 +286,13 @@ export default class extends Vue {
   private async getLists() {
     try {
       this.listLoading = true
-      let params:IState = { ...this.page }
+      let params:IState = { ...this.page, officeId: [] }
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
+      this.listQuery.officeId.length > 0 && (params.officeId.push(...this.listQuery.officeId))
       params.url = '/v3/base/user/page/list'
       Reflect.deleteProperty(params, 'total')
-      const { data } = await getUserManagerList(params)
-      this.listLoading = false
+      const { data } = await GetUserListsV3(params)
       if (data.success) {
         this.tableData = data.data
         data.page = await HandlePages(data.page)
@@ -303,6 +302,8 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log(err)
+    } finally {
+      this.listLoading = false
     }
   }
 
@@ -339,7 +340,7 @@ export default class extends Vue {
   }
   // 取消按钮
   handleClosed() {
-    console.log('cancel')
+    (this.$refs['searchForm'] as any).resetForm()
   }
   async getOffice() {
     try {
