@@ -60,6 +60,9 @@
             设置分配policy
           </el-button>
         </template>
+        <template v-slot:Id="{row}">
+          {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupType }}
+        </template>
       </self-table>
     </div>
     <SetUpDistributionPolicy
@@ -220,7 +223,8 @@ export default class extends Vue {
       }
     },
     {
-      key: 'userGroupId',
+      key: 'Id',
+      slot: true,
       label: '客群细分ID/业务线/客群类型',
       width: '120px'
     },
