@@ -1,8 +1,6 @@
 <template>
   <div class="new-line-container">
-    <el-row
-      class="row-status"
-    >
+    <el-row class="row-status">
       <el-col
         :span="8"
         class="col-status"
@@ -104,6 +102,7 @@
         ref="form"
         :model="form"
         label-width="90px"
+        class="lable-form"
       >
         <el-row :gutter="10">
           <el-col :span="7">
@@ -131,6 +130,7 @@
               <el-tooltip
                 placement="top"
                 effect="light"
+                popper-class="new-line-popper"
               >
                 <div slot="content">
                   说明：<br>
@@ -163,7 +163,7 @@
               <el-tooltip
                 placement="top"
                 effect="light"
-                popper-class="adsadada"
+                popper-class="new-line-popper"
               >
                 <template #content>
                   提示<br>
@@ -195,12 +195,17 @@
           >
             <el-form-item
               class="checkbox-all"
-              label="是否万金油"
               label-width="100%"
             >
+              <template #label>
+                卖点(多选)：
+                <span style="font-size:12px;color:#838383">
+                  修改卖点后，将修改该线路的项目下所有的线路的卖点
+                </span>
+              </template>
               <el-checkbox-group
                 v-model="form.ccc"
-                size="medium"
+                size="mini"
               >
                 <el-checkbox-button
                   v-for="city in cities"
@@ -243,10 +248,9 @@
     </section-container>
 
     <!-- 按钮 -->
-    <el-row :gutter="20">
+    <el-row style="margin:40px 0;">
       <el-col
-        :span="5"
-        :offset="4"
+        :offset="16"
       >
         <el-button
           class="agent-button"
@@ -255,16 +259,14 @@
         >
           跳过暂不检查
         </el-button>
-      </el-col>
-      <el-col :span="5">
+
         <el-button
           class="agent-button"
           type="primary"
         >
           检查不通过
         </el-button>
-      </el-col>
-      <el-col :span="5">
+
         <el-button
           class="agent-button"
           type="primary"
@@ -273,18 +275,29 @@
         </el-button>
       </el-col>
     </el-row>
+    <!-- 分页 -->
+    <pagination
+      v-show="true"
+      :operation-list="operationList"
+      :total="1000"
+      :page="1"
+      :limit="12"
+    />
   </div>
 </template>
 
 <script lang="ts">
+
 import { Component, Vue, Watch } from 'vue-property-decorator'
+import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 @Component({
   name: 'NewLineAgent',
   components: {
     SectionContainer,
-    SelfForm
+    SelfForm,
+    pagination
   }
 })
 export default class extends Vue {
@@ -442,25 +455,29 @@ export default class extends Vue {
       type: 7,
       label: '预计月出车天数:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '每日出车趟数:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '预计工作时间:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '配送数量:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '配送里程:',
       key: 'lineName'
     }
   ]
-  private deliveryDemandInfo ={}
+  private deliveryDemandInfo = {}
   private goodsItem = [
     {
       type: 7,
@@ -471,49 +488,56 @@ export default class extends Vue {
       type: 7,
       label: '货物件数:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '是否需要搬运:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '货物体积:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '货物重量:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '其他上岗要求:',
       key: 'lineName'
     }
   ]
-  private goodsInfo = {
-
-  }
+  private goodsInfo = {}
   private SettlementItem = [
     {
       type: 7,
       label: '单趟报价:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '单趟提成报价:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '预计月报价:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '计价方式:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '结算周期:',
       key: 'lineName'
-    }, {
+    },
+    {
       type: 7,
       label: '结算天数:',
       key: 'lineName'
@@ -525,32 +549,34 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .row-status {
   margin: 0 !important;
-  background: linear-gradient(225deg, #64C9EE 0%, #649CEE 100%);
+  background: linear-gradient(225deg, #64c9ee 0%, #649cee 100%);
   padding: 18px 0;
 }
 .col-status {
-  border-right:1px solid #EFF5FE;
+  border-right: 1px solid #eff5fe;
   padding: 4px 0;
-  color: #FFF;
-  &:nth-last-child(1){
+  color: #fff;
+  &:nth-last-child(1) {
     border: none;
   }
-  span{
-    display:block;
+  span {
+    display: block;
     text-align: center;
     width: 100%;
   }
-  .number{
+  .number {
     font-size: 18px;
-    margin-bottom:4px ;
+    margin-bottom: 4px;
   }
-  .title{
+  .title {
     font-size: 14px;
   }
 }
 .agent-button {
-  margin: 20px 0;
-  width: 100% !important;
+  // margin: 20px 0;
+  margin-right: 20px;
+  // width: 100% !important;
+  min-width: 120px;
   border: none;
 }
 .curation-row {
@@ -565,7 +591,7 @@ export default class extends Vue {
       color: #838383;
       line-height: 26px;
       max-width: 120px;
-      margin-right:16px ;
+      margin-right: 16px;
       display: inline-block;
     }
     div {
@@ -587,9 +613,10 @@ export default class extends Vue {
 }
 ::v-deep .el-checkbox-button__inner {
   border: none;
-  border: 1px solid #dcdfe6 !important;
+  border: 1px solid #649CEE !important;
   border-radius: 4px !important;
   box-sizing: border-box;
+  color: #649CEE;
 }
 ::v-deep .is-checked {
   .el-checkbox-button__inner {
@@ -601,10 +628,11 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .new-line-container {
+  overflow: hidden;
   ::v-deep .SectionContainer {
     margin-top: 8px;
     box-shadow: none;
-    border-bottom: 2px solid #F8F9FA;
+    border-bottom: 2px solid #f8f9fa;
     .title {
       border: none;
     }
@@ -617,19 +645,25 @@ export default class extends Vue {
     background: #ccc;
     color: #333;
   }
-  ::v-deep .active {
-    color: #4899d0;
-  }
-  ::v-deep .error {
-    color: red;
-  }
+  // ::v-deep .active {
+  //   color: #4899d0;
+  // }
+  // ::v-deep .error {
+  //   color: red;
+  // }
   .el-icon-question {
     font-size: 18px;
     line-height: 36px;
     margin-right: 6px;
+    color: #656565;
   }
-  ::v-deep .el-form-item{
+  ::v-deep .el-form-item {
     margin-bottom: 12px !important;
+  }
+  .lable-form{
+    ::v-deep .el-form-item__label {
+      color: #333 !important;
+    }
   }
   .question-item {
     ::v-deep .el-form-item__label {
@@ -656,13 +690,12 @@ export default class extends Vue {
 }
 </style>
 <style lang="scss">
-.adsadada{
+.new-line-popper {
   border: none !important;
-  box-shadow: 0 -2px 6px 0 rgba(0,0,0,0.24);
-  .popper__arrow{
+  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.24);
+  .popper__arrow {
     border: none;
-  box-shadow: 0 -2px 6px 0 rgba(0,0,0,0.24);
-
+    box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.24);
   }
 }
 </style>

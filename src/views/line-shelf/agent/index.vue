@@ -1,6 +1,6 @@
 <template>
   <div class="cpmplate-container">
-    <line-layout :active.sync="active" />
+    <!-- <line-layout :active.sync="active" /> -->
     <new-line-agent />
   </div>
 </template>
