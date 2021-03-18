@@ -21,6 +21,7 @@ import customerFreight from './modules/customer-freight'
 import freightRouter from './modules/freight'
 import driverAccountRouter from './modules/driver-account'
 import driverCloudRouter from './modules/driver-cloud'
+import presetRouter from './modules/preset'
 // import customerRouter from './modules/customer'
 
 Vue.use(Router)
@@ -241,6 +242,8 @@ export const asyncRoutes: RouteConfig[] = [
   driverCloudRouter,
   // 系统管理
   systemRouter,
+  // 权限管理
+  presetRouter,
   {
     path: '*',
     redirect: '/401',
