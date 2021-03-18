@@ -49,8 +49,11 @@
           @onPageSize="handlePageSize"
         >
           <template v-slot:user="scope">
-            <el-button type="text">
-              {{ scope.row.user + 'dododododo' }}
+            <el-button
+              type="text"
+              @click="goUserPage(scope.row.id)"
+            >
+              查看用户列表
             </el-button>
           </template>
           <template v-slot:op="scope">
@@ -74,7 +77,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { roleList, createRole, updateRole, deleteRole } from '@/api/system'
+import { roleList } from '@/api/preset'
 import { HandlePages } from '@/utils/index'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -119,7 +122,8 @@ export default class extends Vue {
   private listLoading = false;
   private listQuery: IState = {
     nick: '',
-    duty: ''
+    dutyName: '',
+    sysType: ''
   };
   private formItem: IState[] = [
     {
@@ -131,16 +135,22 @@ export default class extends Vue {
         maxlength: 10,
         'show-word-limit': true,
         clearable: true
+      },
+      listeners: {
+        'input': () => { this.trimValue('nick') }
       }
     },
     {
       type: 1,
       label: '岗位职责',
-      key: 'duty',
+      key: 'dutyName',
       tagAttrs: {
         placeholder: '请输入岗位职责',
         maxlength: 10,
         clearable: true
+      },
+      listeners: {
+        'input': () => { this.trimValue('dutyName') }
       }
     },
     {
@@ -152,28 +162,24 @@ export default class extends Vue {
   ];
   private columns: IState[] = [
     {
-      key: 'nickName',
-      label: '角色名称',
-      width: '140px'
+      key: 'nick',
+      label: '角色名称'
     },
     {
       key: 'description',
-      label: '角色描述',
-      width: '100px'
+      label: '角色描述'
     },
     {
       key: 'dutyName',
-      label: '岗位职责',
-      width: '100px'
+      label: '岗位职责'
     },
     {
       key: 'usedUserCount',
-      label: '使用人数',
-      width: '100px'
+      label: '使用人数'
     },
     {
-      key: 'user',
       label: '用户',
+      key: 'user',
       slot: true
     },
     {
@@ -190,6 +196,9 @@ export default class extends Vue {
   }
   get tableHeight() {
     return SettingsModule.tableHeight + 110
+  }
+  trimValue(this:any, type:string) {
+    this.listQuery[type].replace(/ /g, '')
   }
   // 查询
   handleFilterClick() {
@@ -219,31 +228,43 @@ export default class extends Vue {
   private tableClick(row: any, column: any, cell: any, event: any) {}
   // 请求列表
   private async getList() {
-    this.listLoading = true
-    let params = { ...this.listQuery, ...this.page }
-    const { data } = await roleList(params)
-    this.listLoading = false
-    if (data.success) {
-      this.list = data.data
-      data.page = await HandlePages(data.page)
-      this.page.total = data.page.total
-    } else {
-      this.$message.error(data)
+    try {
+      this.listLoading = true
+      let params = { ...this.listQuery, ...this.page }
+      Reflect.deleteProperty(params, 'total')
+      const { data } = await roleList(params)
+
+      if (data.success) {
+        this.list = data.data || []
+        data.page = await HandlePages(data.page)
+        this.page.total = data.page.total
+      } else {
+        this.$message.error(data)
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      this.listLoading = false
     }
   }
   private handleAllowClick(item: any) {
     this.allowData = item
     this.showAllow = true
   }
-  private goDetails(row: any) {
-    this.$router.push({ name: 'RoleDetails', query: { id: row.id } })
+  private goUserPage(id: string) {
+    this.$router.push(
+      { name: 'ShowUser',
+        query: { id: id }
+      })
   }
   mounted() {
+    this.listQuery.sysType = this.$route.meta.sysType
     this.fetchData()
   }
   activated() {
+    this.listQuery.sysType = this.$route.meta.sysType
     this.$nextTick(() => {
-      (this.$refs['multipleTable'] as any).doLayout()
+      (this.$refs['searchForm'] as any).doLayout()
     })
   }
 }

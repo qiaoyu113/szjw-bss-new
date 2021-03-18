@@ -191,6 +191,10 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
+  // 删除colums操作
+  deteleOp() {
+    this.columns.splice(this.columns.length - 1, 1)
+  }
   // 分页
   handlePageSize(page:PageObj) {
     this.page.page = page.page

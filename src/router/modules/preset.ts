@@ -93,15 +93,29 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/v1/base/office/list',
+            sysType: 1
+          }
+        },
+        {
+          path: 'showUser', /* 查看用户 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
+          name: 'ShowUser',
+          meta: {
+            title: 'showUser',
+            noCache: true,
+            hidden: true,
+            icon: '',
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/wtSystem/role'
           }
         }
       ]
     },
     {
       path: 'lnSystem', /* 雷鸟管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/lnSystem/PermissionManage.vue'),
-      name: 'lnSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/lnSystem/authority',
       meta: {
         title: 'lnSystem',
@@ -122,19 +136,33 @@ const presetRouter: RouteConfig = {
         },
         {
           path: 'role',
-          component: () => import('@/views/preset/lnSystem/RoleManage.vue'),
+          component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/v1/base/office/list',
+            sysType: 2
+          }
+        },
+        {
+          path: 'showUser', /* 查看用户 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
+          name: 'ShowUser',
+          meta: {
+            title: 'showUser',
+            noCache: true,
+            hidden: true,
+            icon: '',
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/lnSystem/role'
           }
         }
       ]
     },
     {
       path: 'roleSystem', /* 权限管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/roleSystem/PermissionManage.vue'),
-      name: 'roleSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/roleSystem/authority',
       meta: {
         title: 'roleSystem',
@@ -155,19 +183,33 @@ const presetRouter: RouteConfig = {
         },
         {
           path: 'role',
-          component: () => import('@/views/preset/roleSystem/RoleManage.vue'),
+          component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/v1/base/office/list',
+            sysType: 5
+          }
+        },
+        {
+          path: 'showUser', /* 查看用户 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
+          name: 'ShowUser',
+          meta: {
+            title: 'showUser',
+            noCache: true,
+            hidden: true,
+            icon: '',
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/role'
           }
         }
       ]
     },
     {
       path: 'clueSystem', /* 线索管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/clueSystem/PermissionManage.vue'),
-      name: 'clueSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/clueSystem/authority',
       meta: {
         title: 'clueSystem',
@@ -188,19 +230,33 @@ const presetRouter: RouteConfig = {
         },
         {
           path: 'role',
-          component: () => import('@/views/preset/clueSystem/RoleManage.vue'),
+          component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/v1/base/office/list',
+            sysType: 3
+          }
+        },
+        {
+          path: 'showUser', /* 查看用户 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
+          name: 'ShowUser',
+          meta: {
+            title: 'showUser',
+            noCache: true,
+            hidden: true,
+            icon: '',
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/clueSystem/role'
           }
         }
       ]
     },
     {
       path: 'dataSystem', /* 数据管理系统 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/dataSystem/PermissionManage.vue'),
-      name: 'dataSystem',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/preset/wtSystem/index.vue'),
+      name: 'Index',
       redirect: '/dataSystem/authority',
       meta: {
         title: 'dataSystem',
@@ -221,11 +277,25 @@ const presetRouter: RouteConfig = {
         },
         {
           path: 'role',
-          component: () => import('@/views/preset/dataSystem/RoleManage.vue'),
+          component: () => import('@/views/preset/wtSystem/RoleManage.vue'),
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/v1/base/office/list',
+            sysType: 4
+          }
+        },
+        {
+          path: 'showUser', /* 查看用户 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/List/showUser.vue'),
+          name: 'ShowUser',
+          meta: {
+            title: 'showUser',
+            noCache: true,
+            hidden: true,
+            icon: '',
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/dataSystem/role'
           }
         }
       ]
