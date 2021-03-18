@@ -14,6 +14,19 @@
       label-width="90px"
       class="p15 SuggestForm"
     >
+      <template slot="officeId">
+        <el-cascader
+          v-model="listQuery.officeId"
+          placeholder="请选择"
+          :props=" {
+            checkStrictly: true,
+            value: 'id',
+            label: 'name',
+            children: 'officeVOs'
+          }"
+          :options="officeArr"
+        />
+      </template>
       <div
         slot="btn"
         :class="isPC ? 'btnPc' : 'mobile'"
@@ -49,6 +62,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import UserList from '../components/UserLists.vue'
+import { GetOfficeByCurrentUser } from '../index'
 interface IState {
   [key: string]: any;
 }
@@ -63,8 +77,11 @@ export default class extends Vue {
   private listQuery:IState = {
     status: '',
     mobile: '',
-    nickName: ''
+    nickName: '',
+    officeId: [],
+    roleName: ''
   }
+  private officeArr:IState[] = []
   private formItem:any[] = [
     {
       type: 1,
@@ -87,30 +104,20 @@ export default class extends Vue {
       key: 'mobile'
     },
     {
-      type: 8,
-      tagAttrs: {
-        placeholder: '请选择',
-        'default-expanded-keys': true,
-        'default-checked-keys': true,
-        'node-key': 'a',
-        clearable: true,
-        props: {
-          lazy: true,
-          lazyLoad: this.showWork1
-        }
-      },
+      type: 'officeId',
       label: '组织架构',
-      key: 'a'
+      key: 'officeId',
+      slot: true
     },
     {
       type: 1,
       tagAttrs: {
         placeholder: '请输入角色名称',
-        maxlength: 11,
+        maxlength: 20,
         clearable: true
       },
       label: '角色名称',
-      key: 'role'
+      key: 'roleName'
     },
     {
       type: 2,
@@ -142,8 +149,10 @@ export default class extends Vue {
     return SettingsModule.isPC
   }
 
-  mounted() {
+  async mounted() {
     this.getLists()
+    let result = await GetOfficeByCurrentUser()
+    this.officeArr.push(...result)
   }
   getLists() {
     (this.$refs.userlist as any).getLists()

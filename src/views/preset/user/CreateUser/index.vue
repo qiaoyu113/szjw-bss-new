@@ -50,7 +50,7 @@
         </template>
         <template slot="roleId">
           <el-row
-            v-for="(item,idx) in listQuery.roleId"
+            v-for="(item,idx) in (!!userId ? listQuery.roleNames :listQuery.roleId)"
             :key="idx"
             style="width:100%;margin-bottom: 10px;"
           >
@@ -63,7 +63,7 @@
               <el-cascader
                 v-else
                 v-model="item.roleId"
-                :disabled="item.roleId.length === 3"
+                :disabled="item.roleId.length > 0"
                 placeholder="请选择"
                 :props=" {
                   value: 'id',
@@ -71,9 +71,13 @@
                   children: 'childDuty'
                 }"
                 :options="roleArr"
+                @change="handleCascaderChange"
               />
             </el-col>
-            <el-col :span="2">
+            <el-col
+              v-if="!userId"
+              :span="2"
+            >
               <i
                 v-if="idx===0"
                 class="el-icon-plus"
@@ -157,7 +161,8 @@
 import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { isValidPassWord, lock } from '@/utils/index'
-import { addUser, modifyUser, userDetail } from '@/api/system'
+import { addUser, modifyUser } from '@/api/system'
+import { GetUserDetail, UpdateUser, CreateUser } from '@/api/preset'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
 import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../index'
@@ -181,11 +186,8 @@ export default class extends Vue {
     userName: '',
     mobile: '',
     officeId: [],
-    roleId: [
-      {
-        roleId: []
-      }
-    ],
+    roleId: [{ roleId: '' }],
+    roleNames: [],
     passwd: 'Aa123456',
     confirmPassword: '',
     nickName: '',
@@ -236,12 +238,6 @@ export default class extends Vue {
     mobile: [
       { required: true, message: '请输入手机号', trigger: 'blur' },
       { validator: this.validatePhone, trigger: 'blur' }
-    ],
-    officeId: [
-      { required: true, message: '请选择组织机构', trigger: 'blur' }
-    ],
-    roleId: [
-      { required: true, message: '请选择角色', trigger: 'blur' }
     ],
     passwd: [
       { required: true, message: '请输入密码', trigger: 'blur' },
@@ -299,10 +295,19 @@ export default class extends Vue {
       if (!this.userId) {
         return false
       }
-
-      let { data: res } = await userDetail(+this.userId)
+      let params:IState = {
+        userId: +this.userId
+      }
+      let { data: res } = await GetUserDetail(params)
       if (res.success) {
         let result = res.data
+        let roleNameArr = result.roleNames.split(',')
+        let roleNames:IState[] = []
+        roleNameArr.forEach((item:string) => {
+          roleNames.push({
+            roleName: item
+          })
+        })
         let officeIds = this.getTreeSelectOffice(this.officeArr, result.officeId)
         this.sourcePhone = result.mobile
         this.listQuery = {
@@ -310,11 +315,10 @@ export default class extends Vue {
           userName: result.nickName,
           mobile: result.mobile,
           officeId: officeIds,
-          roleName: result.roleName,
+          roleNames,
           passwd: '123456789qQ',
           confirmPassword: '123456789qQ',
           nickName: result.nickName,
-          roleId: [result.roleId],
           crmUserStatus: result.crmUserStatus,
           syncStatus: result.syncStatus,
           status: result.status
@@ -358,11 +362,15 @@ export default class extends Vue {
   async addUser() {
     try {
       this.listLoading = true
+      let roleId:number[] = []
+      this.listQuery.roleId.forEach((item:IState) => {
+        roleId.push(Number(item.roleId[item.roleId.length - 1]))
+      })
       let params:any = {
         ...this.listQuery,
         nickName: this.listQuery.userName,
         officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1],
-        roleId: (this.listQuery.roleId as [])[(this.listQuery.roleId as []).length - 1]
+        roleId: roleId
       }
       params.confirmPassword = params.passwd
       delete params.id
@@ -370,7 +378,8 @@ export default class extends Vue {
       delete params.crmUserStatus
       delete params.syncStatus
       delete params.status
-      let { data: res } = await addUser(params)
+      delete params.roleNames
+      let { data: res } = await CreateUser(params)
       if (res.success) {
         this.$message.success('创建成功')
         this.jumplist()
@@ -395,7 +404,7 @@ export default class extends Vue {
       if (this.sourcePhone !== this.listQuery.mobile) {
         params.mobile = this.listQuery.mobile
       }
-      let { data: res } = await modifyUser(params)
+      let { data: res } = await UpdateUser(params)
       if (res.success) {
         if (this.sourcePhone !== this.listQuery.mobile && this.listQuery.syncStatus) {
           this.$message.success('无法更改CRM中手机号，建议在本系统重新创建以新手机号为账号，并同至CRM，并前往CRM中删除相关账号')
@@ -466,13 +475,27 @@ export default class extends Vue {
   // 添加角色
   handleAddRole() {
     this.listQuery.roleId.push({
-      roleId: []
+      roleId: ''
     })
   }
   // 删掉角色
   handleDelRole(idx:number) {
     if (idx > 0) {
       this.listQuery.roleId.splice(idx, 1)
+    }
+  }
+  // 角色发生变化
+  handleCascaderChange() {
+    let arr = this.listQuery.roleId.map((item:IState) => item.roleId.join('-'))
+    if (arr.length > 1) {
+      let last = arr[arr.length - 1]
+      let brr = JSON.parse(JSON.stringify(arr))
+      brr.pop()
+      let index = brr.findIndex((item:string) => item === last)
+      if (index > -1) {
+        this.$message.warning('选择角色重复')
+        this.listQuery.roleId.pop()
+      }
     }
   }
   async mounted() {
@@ -485,6 +508,13 @@ export default class extends Vue {
         slot: true
       }
       this.formItem.push(add)
+    } else {
+      this.rules.roleId = [
+        { required: true, message: '请选择角色', trigger: 'blur' }
+      ]
+      this.rules.officeId = [
+        { required: true, message: '请选择组织机构', trigger: 'blur' }
+      ]
     }
     this.getUserDetail()
     try {
