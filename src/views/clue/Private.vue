@@ -357,6 +357,7 @@ export default class extends Vue {
     name: '', // 姓名
     phone: '', // 手机号
     hasCar: '', // 是否有车
+    haveCar: '',
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
     followerId: [], // 跟进人
@@ -564,7 +565,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      key: 'carCity',
+      key: 'cityCode',
       label: '车辆所在城市',
       rules: [2],
       tagAttrs: {
@@ -692,11 +693,14 @@ export default class extends Vue {
     {
       type: 2,
       label: '小组',
-      key: 'haveCar',
+      key: 'gmGroupId',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
+      },
+      listeners: {
+        change: this.gmChanges
       },
       rules: [2, 3, 4],
       options: this.gmGroupList
@@ -1033,7 +1037,6 @@ export default class extends Vue {
       key: 'followerId'
     }
   ]
-
   // 导入文件
   private uploadDialog: boolean = false;
   private fileList: any[] = [];
@@ -1089,7 +1092,9 @@ export default class extends Vue {
   }
   // 重置
   private async handleResetClick(row: IState) {
+    this.listQuery.citycode = '';
     (this.$refs['suggestForm'] as any).resetForm()
+    this.cityChange('')
     this.getLists()
   }
   private async handleResetClicks(row: IState) {
@@ -1194,8 +1199,13 @@ export default class extends Vue {
   // 获取跟进人列表
   async getGmOptions(cityCode:any, groupId:any) {
     try {
+      let roleTypes = [1, 4]
+      //  业务线大于1 的属于雷鸟
+      if (this.listQuery.clueType > 1) {
+        roleTypes = [11, 12]
+      }
       let params:any = {
-        roleTypes: [1, 4],
+        roleTypes,
         uri: '/v2/clueH5/list/queryFollowerList',
         groupId,
         cityCode
@@ -1225,7 +1235,11 @@ export default class extends Vue {
   //
   get clueTypePermission() {
     const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
-    this.listQuery.clueType = arr[0].value
+    this.$nextTick(() => {
+      if (arr[0]) {
+        this.listQuery.clueType = arr[0].value
+      }
+    })
     return arr
   }
   /**
@@ -1452,6 +1466,9 @@ export default class extends Vue {
   // 获取城市下的加盟小组
   async getGroup(cityCode:string) {
     let code = this.listQuery.clueType
+    if (this.listQuery.clueType > 1) {
+      code = 5
+    }
     try {
       const { data } = await getGroupInfoByCityCodeAndProductLine({
         busiLine: [code].toString(),
@@ -1495,7 +1512,7 @@ export default class extends Vue {
     this.getBaseInfo()
     this.getGmOptions('', '')
   }
-  // 权限
+   // 权限
    private distributionPremission:any = {
      0: ['/v2/market-clue/privatePool/firmiana/import/private'],
      1: ['/v2/market-clue/privatePool/firmiana/import/shared'],
