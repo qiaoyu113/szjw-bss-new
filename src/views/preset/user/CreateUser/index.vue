@@ -116,11 +116,11 @@
           />
         </template>
         <template
-          v-slot:mobile="scope"
+          slot="mobile"
         >
           <el-input
             v-model.trim="listQuery.mobile"
-            :disabled="scope.row.status ===1&&listQuery.id!==''"
+            :disabled="listQuery.id!==''"
             maxlength="11"
             placeholder="请输入"
           />
@@ -517,10 +517,11 @@ export default class extends Vue {
         { required: true, message: '请选择组织机构', trigger: 'blur' }
       ]
     }
-    this.getUserDetail()
+
     try {
       let result = await GetOfficeByCurrentUser()
       this.officeArr.push(...result)
+      this.getUserDetail()
     } catch (err) {
       this.officeArr = []
     } finally {
