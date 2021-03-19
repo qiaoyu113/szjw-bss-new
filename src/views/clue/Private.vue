@@ -1094,10 +1094,13 @@ export default class extends Vue {
   }
   // 重置
   private async handleResetClick(row: IState) {
-    this.listQuery.citycode = '';
     (this.$refs['suggestForm'] as any).resetForm()
-    this.cityChange('')
-    this.getLists()
+    // 重新请求小组数据
+    this.$nextTick(() => {
+      this.listQuery.citycode = ''
+      this.cityChange('')
+      this.getLists()
+    })
   }
   private async handleResetClicks(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
@@ -1223,9 +1226,13 @@ export default class extends Vue {
         let arr = res.data.map(function(item: any) {
           return {
             label: item.name,
-            value: item.id
+            value: item.id,
+            status: item.status
           }
         })
+        if (this.listQuery.clueType > 1) {
+          arr = arr.filter((item:any) => item.status === 1)
+        }
         this.followerListOptions.push(...arr)
       } else {
         this.$message.error(res.errorMsg)
