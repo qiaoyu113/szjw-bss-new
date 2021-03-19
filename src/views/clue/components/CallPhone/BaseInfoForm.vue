@@ -3,6 +3,7 @@
     <h5>基本信息</h5>
     <SelfForm
       ref="baseInfoForm"
+      :key="WTQuery.hasCar"
       :rules="rulesWT"
       :list-query="queryAndItem.query"
       :form-item="queryAndItem.formItem"
@@ -515,23 +516,6 @@ export default class extends Vue {
       resolve(nodes)
     }
   }
-  // async loadWorkCity(node: any, resolve: any) {
-  //   let params: string[] = []
-  //   console.log(node)
-  //   if (node.level === 0) {
-  //     let nodes = await this.getOpenCity()
-  //     console.log('city:', nodes)
-  //     resolve(nodes)
-  //   } else if (node.level === 1) {
-  //     params = ['100000']
-  //     params.push(node.value.toString().slice(0, 2) + '0000')
-  //     params.push(node.value)
-  //     let nodes = await this.loadCityByCode(params)
-  //     this.countryValue = nodes[1].value
-  //     console.log('city1:', nodes)
-  //     resolve(nodes)
-  //   }
-  // }
   // 获取开通城市
   async getOpenCity() {
     try {
@@ -598,37 +582,43 @@ export default class extends Vue {
   }
 
   private setQuerys(value: IState) {
-    if (this.clueStatus < 2) {
-      this.WTQuery = { ...this.WTQuery, ...value }
-      this.WTQuery.intentWork = [
-        String(value.expectAddressCity),
-        String(value.expectAddressCounty)
-      ]
-      debugger
-      if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
-        this.WTQuery.intentWork.pop()
-        this.WTQuery.intentWork.push(this.countryValue)
-      }
-    } else if (this.clueStatus === 2) {
-      this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
-    } else if (this.clueStatus === 3) {
-      this.BirdQuery = { ...this.BirdQuery, ...value }
-    } else {
-      if (value.intentModel) {
-        value.intentModel = (value.intentModel).split(',').map((ele:any) => {
-          return +ele
-        })
+    try {
+      if (this.clueStatus < 2) {
+        this.WTQuery = { ...this.WTQuery, ...value }
+        this.WTQuery.intentWork = [
+          String(value.expectAddressCity),
+          String(value.expectAddressCounty)
+        ]
+
+        if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
+          this.WTQuery.intentWork.pop()
+          this.WTQuery.intentWork.push(this.countryValue)
+        }
+      } else if (this.clueStatus === 2) {
+        this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
+      } else if (this.clueStatus === 3) {
+        this.BirdQuery = { ...this.BirdQuery, ...value }
+        this.BirdQuery.intentModel = +this.BirdQuery.intentModel
+        this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
       } else {
-        value.intentModel = []
+        if (value.intentModel) {
+          value.intentModel = (value.intentModel).split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.intentModel = []
+        }
+        if (value.fancyModel) {
+          value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.fancyModel = []
+        }
+        this.BirdQuery = { ...this.BirdQuery, ...value }
       }
-      if (value.fancyModel) {
-        value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
-          return +ele
-        })
-      } else {
-        value.fancyModel = []
-      }
-      this.BirdQuery = { ...this.BirdQuery, ...value }
+    } catch (err) {
+      console.log('fail:', err)
     }
   }
 

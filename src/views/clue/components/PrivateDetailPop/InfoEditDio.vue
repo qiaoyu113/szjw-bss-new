@@ -455,6 +455,8 @@ export default class extends Vue {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
         this.BirdQuery = { ...this.BirdQuery, ...value }
+        this.BirdQuery.intentModel = +this.BirdQuery.intentModel
+        this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
       } else {
         if (value.intentModel) {
           value.intentModel = (value.intentModel).split(',').map((ele:any) => {
