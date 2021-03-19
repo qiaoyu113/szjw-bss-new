@@ -1148,10 +1148,10 @@ export default class extends Vue {
       return item
     })
     params.onlyMe = params.onlyMe ? 1 : 0
-    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item === '').join(',')
+    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
     // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
-    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item === '').join(',')
-    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item === '').join(',')
+    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
+    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item !== '').join(',')
 
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
