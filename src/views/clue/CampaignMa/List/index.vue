@@ -252,8 +252,9 @@ export default class extends Vue {
     {
       type: 2,
       tagAttrs: {
-        placeholder: '请输入客群细分ID',
-        clearable: true
+        placeholder: '请选择客群细分ID',
+        clearable: true,
+        filterable: true
       },
       label: '客群细分ID',
       key: 'userGroupId',
