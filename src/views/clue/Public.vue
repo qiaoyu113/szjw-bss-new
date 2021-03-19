@@ -702,9 +702,9 @@ export default class extends Vue {
       return item
     })
     const { sourceChannel, carType, intentModel } = this.listQuery
-    params.sourceChannel = Array.isArray(sourceChannel) && sourceChannel.join(',')
-    params.carType = Array.isArray(carType) && carType.join(',')
-    params.intentModel = Array.isArray(intentModel) && intentModel.join(',')
+    params.sourceChannel = Array.isArray(sourceChannel) && sourceChannel.filter(item => item !== '').join(',')
+    params.carType = Array.isArray(carType) && carType.filter(item => item !== '').join(',')
+    params.intentModel = Array.isArray(intentModel) && intentModel.filter(item => item !== '').join(',')
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
         (params[key] === '' || params[key] === undefined) && delete params[key]

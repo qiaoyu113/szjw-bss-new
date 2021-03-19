@@ -75,9 +75,16 @@
               style="overflow: initial;"
               max-height="520px"
             >
+              <template v-slot:inviteName="scope">
+                {{ `${scope.row.inviteName}(${scope.row.invitePhone})` }}
+              </template>
+              <template v-slot:followerName="scope">
+                {{ `${scope.row.followerName}(${scope.row.followerPhone})` }}
+              </template>
               <template v-slot:inviteDate="scope">
                 {{ scope.row.inviteDate }}
               </template>
+
               <template v-slot:op="scope">
                 <div
                   :key="clueStatus"
@@ -293,9 +300,9 @@ interface IState {
   }
 })
 export default class extends Vue {
-  private checkPermissions:any = isPermission
-  private phone: string = ''
-  private clueId: string = ''
+  private checkPermissions: any = isPermission;
+  private phone: string = '';
+  private clueId: string = '';
   private clueStatus: string = '0';
   private followUpDio: boolean = false;
   private messageDio: boolean = false;
@@ -303,11 +310,27 @@ export default class extends Vue {
   private editDio: boolean = false;
   private clueArray: IState[] = [];
   private clueArr: IState[] = [
-    { name: '梧桐专车', code: '0', pUrl: ['/v2/market-clue/getClueWSSpecialXDetail'] },
-    { name: '梧桐共享', code: '1', pUrl: ['/v2/market-clue/getClueWSShareXDetail'] },
+    {
+      name: '梧桐专车',
+      code: '0',
+      pUrl: ['/v2/market-clue/getClueWSSpecialXDetail']
+    },
+    {
+      name: '梧桐共享',
+      code: '1',
+      pUrl: ['/v2/market-clue/getClueWSShareXDetail']
+    },
     { name: '雷鸟车池', code: '2', pUrl: ['/v2/market-clue/getClueLCXDetail'] },
-    { name: '雷鸟租赁C', code: '3', pUrl: ['/v2/market-clue/getClueLZCXDetail'] },
-    { name: '雷鸟租赁B', code: '4', pUrl: ['/v2/market-clue/getClueLZBXDetail'] }
+    {
+      name: '雷鸟租赁C',
+      code: '3',
+      pUrl: ['/v2/market-clue/getClueLZCXDetail']
+    },
+    {
+      name: '雷鸟租赁B',
+      code: '4',
+      pUrl: ['/v2/market-clue/getClueLZBXDetail']
+    }
   ];
 
   // 跟进表格表头定义
@@ -338,7 +361,8 @@ export default class extends Vue {
     },
     {
       key: 'inviteName',
-      label: '邀约人'
+      label: '邀约人',
+      slot: true
     },
     {
       key: 'followDate',
@@ -380,7 +404,8 @@ export default class extends Vue {
     },
     {
       key: 'followerName',
-      label: '跟进人'
+      label: '跟进人',
+      slot: true
     },
     {
       key: 'followDate',
@@ -686,15 +711,28 @@ export default class extends Vue {
     baseInfoArr.forEach((ele: any) => {
       arr.forEach((item: any) => {
         if (item.key === 'intentWorkAddress') {
-          item.value = (this.baseInfoEdio.expectAddressCityName && this.baseInfoEdio.expectAddressCountyName) ? (this.baseInfoEdio.expectAddressCityName || '' +
-            this.baseInfoEdio.expectAddressCountyName || '') : ''
+          item.value =
+            this.baseInfoEdio.expectAddressCityName &&
+            this.baseInfoEdio.expectAddressCountyName
+              ? this.baseInfoEdio.expectAddressCityName ||
+                '' + this.baseInfoEdio.expectAddressCountyName ||
+                ''
+              : ''
         }
-        if (item.key !== undefined && ele[0] === item.key) {
-          if (item.key === 'hasCar') {
-            item.value =
-              (ele[1] ? '有' + ';' + this.baseInfoEdio.carTypeName : '否')
-          } else {
-            item.value = ele[1]
+
+        if (ele[0] === item.key) {
+          if (ele[1] !== undefined && ele[1] !== null) {
+            if (item.key === 'followerName') {
+              item.value = `${this.baseInfoEdio.followerName}(${this.baseInfoEdio.followerPhone})`
+            } else if (item.key === 'beforeFollowerName') {
+              item.value = `${this.baseInfoEdio.beforeFollowerName}(${this.baseInfoEdio.beforeFollowerPhone})`
+            } else if (item.key === 'hasCar') {
+              item.value = ele[1]
+                ? '有' + ';' + this.baseInfoEdio.carTypeName
+                : '否'
+            } else {
+              item.value = isNaN(ele[1]) ? ele[1] : String(ele[1])
+            }
           }
         }
       })
@@ -756,19 +794,19 @@ export default class extends Vue {
     let params = { phone: phone }
     let { data: res } = await getClueTypeList(params)
     if (res.success) {
-      this.clueArr.forEach(ele => {
-        res.data.forEach((item:IState) => {
+      this.clueArr.forEach((ele) => {
+        res.data.forEach((item: IState) => {
           if (+ele.code === item.clueType) {
             ele.clueId = item.clueId
           }
         })
       })
-      let arr:IState[] = this.clueArr.filter((ele:any) => {
+      let arr: IState[] = this.clueArr.filter((ele: any) => {
         return ele.clueId
       })
       this.clueArray = isPermission(arr)
 
-      this.clueArray.forEach((ele:any) => {
+      this.clueArray.forEach((ele: any) => {
         if (ele.clueId === this.clueId) {
           this.clueStatus = String(ele.code)
         }
@@ -782,7 +820,7 @@ export default class extends Vue {
   }
 
   // 取消面试
-  async getCancel(followId:string) {
+  async getCancel(followId: string) {
     try {
       let param = {
         followId,
@@ -804,7 +842,7 @@ export default class extends Vue {
   }
 
   // 标记爽约
-  async getAppointment(followId:string) {
+  async getAppointment(followId: string) {
     try {
       let param = {
         followId,
@@ -880,9 +918,7 @@ export default class extends Vue {
             marketClueWSXDetailOtherInfoVO,
             marketClueWSXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[
-            (+this.clueStatus as number)
-          ].listData = marketClueWSXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus as number].listData = marketClueWSXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueWSXDetailBaseInfoVO
           this.setOther(marketClueWSXDetailOtherInfoVO || [])
           this.backData = marketClueWSXDetailRepeatedInfoVOList
@@ -898,9 +934,7 @@ export default class extends Vue {
             marketClueLCXDetailOtherInfoVO,
             marketClueLCXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[
-            (+this.clueStatus as number)
-          ].listData = marketClueLCXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus as number].listData = marketClueLCXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLCXDetailBaseInfoVO
           this.setOther(marketClueLCXDetailOtherInfoVO || [])
           this.backData = marketClueLCXDetailRepeatedInfoVOList
@@ -916,9 +950,7 @@ export default class extends Vue {
             marketClueLZXDetailOtherInfoVO,
             marketClueLZXDetailRepeatedInfoVOList
           } = res.data
-          this.followUpLogArr[
-            (+this.clueStatus as number)
-          ].listData = marketClueLZXDetailFollowInfoVOList
+          this.followUpLogArr[+this.clueStatus as number].listData = marketClueLZXDetailFollowInfoVOList
           this.baseInfoEdio = marketClueLZXDetailBaseInfoVO
           this.setOther(marketClueLZXDetailOtherInfoVO || [])
           this.backData = marketClueLZXDetailRepeatedInfoVOList
@@ -947,11 +979,11 @@ export default class extends Vue {
     }
   }
 
-  mounted() {
+  async mounted() {
     this.phone = (this.$route as any).query.phone
     this.clueId = (this.$route as any).query.clueId
-    this.getClueId(this.phone)
-    this.getDetailApi()
+    await this.getClueId(this.phone)
+    await this.getDetailApi()
     this.getDoLog()
   }
 }
