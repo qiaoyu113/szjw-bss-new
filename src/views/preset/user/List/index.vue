@@ -96,7 +96,7 @@ export default class extends Vue {
     {
       type: 1,
       tagAttrs: {
-        placeholder: '请输入岗位职责',
+        placeholder: '请输入电话',
         maxlength: 11,
         clearable: true
       },
