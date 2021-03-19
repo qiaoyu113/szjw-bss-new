@@ -902,7 +902,7 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'name1',
+      key: 'demandTypeName',
       label: '需求类型',
       rules: [2]
     },
@@ -917,7 +917,7 @@ export default class extends Vue {
       rules: [3, 4]
     },
     {
-      key: 'carTypeName1',
+      key: 'payIntentionMoney',
       label: '是否交意向金',
       rules: [2]
     },
@@ -971,12 +971,12 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'haveCar12',
+      key: 'cityName',
       label: '车辆所在城市',
       rules: [2]
     },
     {
-      key: 'haveCar12',
+      key: 'cityName',
       label: '所在城市',
       rules: [3, 4]
     },
@@ -1018,6 +1018,8 @@ export default class extends Vue {
       { validator: this.validateFollow, trigger: 'change' }
     ]
   };
+
+  // 获取选择分配人
   private dialogFormItem:any[] = [
     {
       type: 8,
@@ -1503,6 +1505,8 @@ export default class extends Vue {
       this.getGmOptions('', '')
     }
   }
+
+  // 加盟小组改变
   private gmChanges(value:any) {
     this.listQuery.followerId.splice(0)
     this.followerListOptions.splice(0)
