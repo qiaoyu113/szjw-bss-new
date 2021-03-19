@@ -627,10 +627,10 @@ export default class extends Vue {
           ...clue
         ])
         this.sourceOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...sources
         ])
         this.demandOptions.push(...[
