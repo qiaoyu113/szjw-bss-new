@@ -226,7 +226,7 @@ export default class extends Vue {
       tagAttrs: {
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'householdProvince',
+        'node-key': 'intentWork',
         placeholder: '期望工作区域',
         props: {
           lazy: true,
@@ -509,11 +509,29 @@ export default class extends Vue {
       params = ['100000']
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
+
       let nodes = await this.loadCityByCode(params)
       this.countryValue = nodes[1].value
       resolve(nodes)
     }
   }
+  // async loadWorkCity(node: any, resolve: any) {
+  //   let params: string[] = []
+  //   console.log(node)
+  //   if (node.level === 0) {
+  //     let nodes = await this.getOpenCity()
+  //     console.log('city:', nodes)
+  //     resolve(nodes)
+  //   } else if (node.level === 1) {
+  //     params = ['100000']
+  //     params.push(node.value.toString().slice(0, 2) + '0000')
+  //     params.push(node.value)
+  //     let nodes = await this.loadCityByCode(params)
+  //     this.countryValue = nodes[1].value
+  //     console.log('city1:', nodes)
+  //     resolve(nodes)
+  //   }
+  // }
   // 获取开通城市
   async getOpenCity() {
     try {
@@ -586,6 +604,7 @@ export default class extends Vue {
         String(value.expectAddressCity),
         String(value.expectAddressCounty)
       ]
+      debugger
       if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
         this.WTQuery.intentWork.pop()
         this.WTQuery.intentWork.push(this.countryValue)

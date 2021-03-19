@@ -446,6 +446,7 @@ export default class extends Vue {
           String(value.expectAddressCity),
           String(value.expectAddressCounty)
         ]
+
         if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
           this.WTQuery.intentWork.pop()
           this.WTQuery.intentWork.push(this.countryValue)
@@ -505,6 +506,7 @@ export default class extends Vue {
       params = ['100000']
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
+
       let nodes = await this.loadCityByCode(params)
       this.countryValue = nodes[1].value
       resolve(nodes)
