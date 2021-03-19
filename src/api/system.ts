@@ -227,7 +227,7 @@ export interface RoleParams {
     officeLevel:number;
   }
 // 根据组织架构获取角色-new
-export const getDutyAndRoleList = (data:RoleParams) =>
+export const getDutyAndRoleList = (data:any) =>
   request({
     url: `${baseURL}/v2/base/duty/getDutyAndRoleList`,
     method: 'post',
@@ -321,4 +321,12 @@ export const agentChangeUnBundling = (data:any) =>
     url: `${baseURL2}/auth/v3/agent/unbundling`,
     method: 'post',
     data
+  })
+
+// 权限管理-权限列表
+export const authorityListNew = (params:any) =>
+  request({
+    url: `${baseURL}/v3/base/authority/list`,
+    method: 'get',
+    params
   })
