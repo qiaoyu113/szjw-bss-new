@@ -168,7 +168,8 @@ export default {
     clueSystem: 'ClueSystem',
     dataSystem: 'DataSystem',
     authoritySystem: 'AuthoritySystem',
-    roleSystem: 'RoleSystem'
+    roleSystem: 'RoleSystem',
+    addUserNew: 'addUser'
   },
   navbar: {
     logOut: 'Log Out',

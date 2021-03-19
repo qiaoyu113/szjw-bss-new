@@ -191,7 +191,8 @@ export default {
     dataSystem: '数据管理系统',
     authoritySystem: '权限管理',
     roleSystem: '权限管理系统',
-    showUser: '查看用户列表'
+    showUser: '查看用户列表',
+    addUserNew: '创建用户'
   },
   navbar: {
     setPassword: '修改密码',
