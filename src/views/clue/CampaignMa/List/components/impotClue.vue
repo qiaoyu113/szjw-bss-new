@@ -22,6 +22,7 @@
           :http-request="uploadFile"
           :before-remove="beforeRemove"
           :on-change="handleExcelChange"
+          :accept="'.xlsx,.xls'"
           :class="selectFile ? 'uploadSuc':''"
         >
           <template v-if="selectFile">
@@ -88,15 +89,9 @@ export default class extends Vue {
     }
   ];
   handleExcelChange({ raw }:{raw:File}) {
-    const type = raw.type
+    this.selectFile = true
     this.filename = raw.name
-    if (['application/vnd.ms-excel', 'application/x-xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'].includes(type)) {
-      this.selectFile = true
-      return true
-    }
-    this.handleResetFile()
-    this.$message.warning('请选择excel文件')
-    return false
+    return true
   }
   // 重置文件
   handleResetFile() {
