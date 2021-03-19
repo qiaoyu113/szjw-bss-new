@@ -65,7 +65,7 @@
         <el-button
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          @click="handleResetClick"
+          @click="handleResetClicks"
         >
           重置
         </el-button>
@@ -188,9 +188,11 @@
           {{ scope.row.createDate }}
         </template>
         <template v-slot:op="scope">
+          <!-- :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)" -->
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
+
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -215,6 +217,7 @@
     </div>
     <!-- dialog -->
     <SelfDialog
+      :key="listQuery.clueType"
       :visible.sync="showDialog"
       :title="title"
       :confirm="confirm"
@@ -507,7 +510,6 @@ export default class extends Vue {
     link.style.display = 'none'
     link.href = row.fileUrl
     link.setAttribute(`download`, `313133.xls`)
-    console.log(link)
     // return
     document.body.appendChild(link)
     link.click()
@@ -530,7 +532,6 @@ export default class extends Vue {
     this.$nextTick(() => {
       this.callPhoneDio = true
     })
-    console.log(row)
   }
   /**
    * rules: []
@@ -1025,7 +1026,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: showCityGroupPerson
+          lazyLoad: (node:any, resolve:any) => showCityGroupPerson(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',
@@ -1091,7 +1092,9 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     this.getLists()
   }
-
+  private async handleResetClicks(row: IState) {
+    (this.$refs['suggestForm'] as any).resetForm()
+  }
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
@@ -1119,7 +1122,7 @@ export default class extends Vue {
     }
     this.formItem.map((item: any) => {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
-        if (item.key === 'cityCode' && this.listQuery.cityCode && this.listQuery.cityCode.length > 0) {
+        if (item.key === 'cityCode' && this.listQuery.cityCode) {
           params.cityCode = this.listQuery.cityCode[1] || ''
         } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
           params.carCity = this.listQuery.carCity[1]
@@ -1189,7 +1192,7 @@ export default class extends Vue {
     this.toDoValue = title.toDoCount
   }
   // 获取跟进人列表
-  async getGmOptions(cityCode:number, groupId:any) {
+  async getGmOptions(cityCode:any, groupId:any) {
     try {
       let params:any = {
         roleTypes: [1, 4],
@@ -1201,6 +1204,7 @@ export default class extends Vue {
       if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
         params.cityCode = this.listQuery.workCity[1]
       }
+      // delete params.cityCode
       // this.followerListOptions.splice(0)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
@@ -1399,7 +1403,6 @@ export default class extends Vue {
     formData.append('file', param.file)
     const clueType = this.listQuery.clueType
     let fileUpload = null
-    console.log(clueType)
     const arr = [UploadExcelFirmianaZC, UploadExcelBirdGX, undefined, UploadExcelLNC, UploadExcelLNB]
     fileUpload = arr[clueType]
     fileUpload && fileUpload(formData).then(({ data } : any) => {
@@ -1435,7 +1438,6 @@ export default class extends Vue {
     delete params.page
     delete params.limit
     const clueType = this.listQuery.clueType
-    console.log(params)
     const { data } = await ExportFirmiana(params)
     if (data.success) {
       sucFun()
@@ -1455,10 +1457,8 @@ export default class extends Vue {
         busiLine: [code].toString(),
         cityCode: cityCode
       })
-      console.log(data)
       // this.
       this.gmGroupList.splice(1)
-      console.log(this.gmGroupList)
       if (data.success) {
         let arr = data.data.map((item:any) => {
           const { id: value, name: label } = item
@@ -1482,6 +1482,8 @@ export default class extends Vue {
     if (value[1]) {
       this.getGroup(value[1])
       this.getGmOptions(value[1], '')
+    } else {
+      this.getGmOptions('', '')
     }
   }
   private gmChanges(value:any) {
@@ -1489,8 +1491,9 @@ export default class extends Vue {
     this.followerListOptions.splice(0)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
-  mounted() {
+  async mounted() {
     this.getBaseInfo()
+    this.getGmOptions('', '')
   }
   // 权限
    private distributionPremission:any = {
