@@ -30,11 +30,11 @@ export const deleteDuty = (data: any = {}) =>
   })
 // 组织管理列表
 // 组织管理-组织列表
-export const getOfficeList = (params: any) =>
+export const getOfficeListPost = (data: any) =>
   request({
     url: `${baseURL}/v3/base/office/list`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   })
 // 组织管理-创建组织
 export const createOffice = (data: any = {}) =>
@@ -72,9 +72,16 @@ export const officeDrag = (data: any = {}) =>
     data
   })
   // 组织管理-查询职责列表
-export const getDutyListByLevel = (params: any = {}) =>
+export const getDutyListByLevel = (data: any = {}) =>
   request({
     url: `${baseURL}/v3/base/duty/getDutyListByLevel`,
     method: 'post',
-    params
+    data
+  })
+// 组织管理-同步城市
+export const createAll = (data: any = {}) =>
+  request({
+    url: `${baseURL}/v3/base/office/createAll`,
+    method: 'post',
+    data
   })

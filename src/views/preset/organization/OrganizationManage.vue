@@ -6,14 +6,14 @@
     >
       <RoleTree
         ref="tree"
+        :key="treeKey"
         :data="data"
         :props="defaultProps"
         node-key="id"
         :default-expand-all="false"
-        :allow-drag="allowDrop"
+        :allow-drop="allowDrop"
+        :allow-drag="allowDrag"
         draggable
-        :load="getOfficeList"
-        lazy
         @node-drop="handleDrop"
         @node-drag-start="handleDragStart"
       >
@@ -23,14 +23,109 @@
             :name="'type_' + data.type"
           />
           <span class="mr10">{{ node.label }}</span>
-          <el-badge
+          <!-- <el-badge
             type="primary"
             :value="data.userCount"
             class="mr10"
-          />
+          /> -->
           <div class="right-btn">
             <el-button
               v-if="data.type !== 5"
+              v-permission="['/v2/base/office/create']"
+              circle
+              size="mini"
+              name="organizationmanage_appendOffice_btn"
+              icon="el-icon-circle-plus-outline"
+              @click.stop="
+                () => {
+                  appendOffice(node, data);
+                }
+              "
+            />
+
+            <el-button
+              v-if="data.type !== 1"
+              v-permission="['/v2/base/office/delete']"
+              circle
+              size="mini"
+              name="organizationmanage_deleteOffice_btn"
+              class="delete"
+              icon="el-icon-remove-outline"
+              @click.stop="
+                () => {
+                  deleteOffice(node, data);
+                }
+              "
+            />
+
+            <el-button
+              v-if="data.type !== 1"
+              v-permission="['/v2/base/office/update']"
+              circle
+              size="mini"
+              icon="el-icon-edit"
+              name="organizationmanage_updateOffice_btn"
+              @click.stop="
+                () => {
+                  updateOffice(node, data);
+                }
+              "
+            />
+
+            <el-button
+              v-if="data.type !== 1"
+              v-permission="['/v1/base/office/sort']"
+              circle
+              size="mini"
+              icon="el-icon-top"
+              name="organizationmanage_upOffice_btn"
+              @click.stop="
+                () => {
+                  upOffice(node, data);
+                }
+              "
+            />
+
+            <el-button
+              v-if="data.type !== 1"
+              v-permission="['/v1/base/office/sort']"
+              circle
+              size="mini"
+              icon="el-icon-bottom"
+              name="organizationmanage_downOffice_btn"
+              @click.stop="
+                () => {
+                  downOffice(node, data);
+                }
+              "
+            />
+          </div>
+        </template>
+      </RoleTree>
+      <RoleTree
+        ref="tree2"
+        :props="defaultProps"
+        :data="data2"
+        node-key="id"
+        :default-expand-all="false"
+        :load="getOfficeListPost"
+        lazy
+        style="margin-top: -20px"
+      >
+        <template slot-scope="{node, data}">
+          <svg-icon
+            class="tree-icon"
+            :name="'type_' + data.type"
+          />
+          <span class="mr10">{{ node.label }}</span>
+          <!-- <el-badge
+            type="primary"
+            :value="data.userCount"
+            class="mr10"
+          /> -->
+          <div class="right-btn">
+            <el-button
+              v-if="!node.isLeaf"
               v-permission="['/v2/base/office/create']"
               circle
               size="mini"
@@ -113,7 +208,7 @@
         ref="dialogForm"
         :rules="rules"
         :model="dialogForm"
-        label-width="80px"
+        label-width="120px"
       >
         <template v-if="isAdd">
           <div>
@@ -196,6 +291,23 @@
               placeholder="上级组织"
               clearable
               name="organizationmanage_upName_input"
+            />
+          </el-form-item>
+          <el-form-item
+            v-if="addData.type === 3"
+            label="同步节点至其他城市"
+            prop="cityList"
+          >
+            <el-cascader
+              :key="dialogForm.dutyId"
+              ref="cityList"
+              :options="data3"
+              :props="propsCity"
+              :show-all-levels="false"
+              collapse-tags
+              clearable
+              class="city-cascader"
+              :disabled="dialogForm.dutyId === ''"
             />
           </el-form-item>
         </template>
@@ -307,16 +419,22 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetArea } from '@/api/common'
 import { lock } from '@/utils/index'
 import {
-  getOfficeList,
+  getOfficeListPost,
   createOffice,
   sortOffice,
   updateOffice,
   deleteOffice,
-  getDutyListByLevel
+  createAll,
+  officeDrag
 } from '@/api/role-system'
-
+import {
+  getOfficeList,
+  getDutyListByLevel
+} from '@/api/system'
 import '@/styles/common.scss'
-
+interface IState {
+  [key: string]: any;
+}
 @Component({
   name: 'CreateRole',
   components: {
@@ -326,18 +444,23 @@ import '@/styles/common.scss'
   }
 })
 export default class extends Vue {
+  private treeKey = 0
   private copyData = {} // 深拷贝data
   private defaultExpandAll: boolean = false;
   private loading: boolean = false;
   private data: any = [];
+  private data2: any = [];
+  private data3: any = [];
   private defaultProps: any = {
     children: 'officeVOs',
-    label: 'name'
+    label: 'name',
+    isLeaf: 'leaf'
   };
   private addNode: any = {};
   private addData: any = {};
 
   // 弹窗
+  private cityList: any = []; // 同步至其他城市
   private showDialog: boolean = false;
   private activeName: string = 'first';
   private dialogTit: string = '新建组织';
@@ -352,34 +475,6 @@ export default class extends Vue {
 
   private busitypeOptions: any = [];
   private optionsArea: any = [];
-  //  props: any = {
-  //    lazy: true,
-  //    emitPath: false,
-  //    lazyLoad(node: any, resolve: any) {
-  //      const { level } = node
-  //      let params:string[] = []
-  //      if (level === 0) {
-  //        params = ['100000']
-  //      } else if (level === 1) {
-  //        params = ['100000']
-  //        params.push(node.value)
-  //      }
-  //      if (level < 2) {
-  //        GetArea(params).then(({ data }) => {
-  //          if (data.success) {
-  //            const nodes = data.data.map((item: any) => ({
-  //              value: item.code,
-  //              label: item.name,
-  //              leaf: level === 1
-  //            }))
-  //            resolve(nodes)
-  //          } else {
-  //            this.$message.error(data)
-  //          }
-  //        })
-  //      }
-  //    }
-  //  };
   private props: any = {
     label: 'name',
     value: 'code',
@@ -403,6 +498,12 @@ export default class extends Vue {
       })
     }
   };
+  private propsCity: any = {
+    multiple: true,
+    label: 'name',
+    value: 'id',
+    children: 'officeVOs'
+  }
 
   private areaList: any = [];
   private rules: any = {
@@ -545,7 +646,6 @@ export default class extends Vue {
     }
     try {
       let { data: res } = await getDutyListByLevel(params)
-      console.log(res)
       this.busitypeOptions = res.data
     } catch (err) {
       console.log(err)
@@ -564,11 +664,11 @@ export default class extends Vue {
   async saveData() {
     try {
       this.dialogForm.parentId = this.addData.id
-      this.dialogForm.parentIds =
-          this.addData.parentIds + ',' + this.addData.id
+      this.dialogForm.parentIds = this.addData.parentIds + ',' + this.addData.id
+      let submitForm = createOffice
       if (this.isAdd) {
         // 添加
-        let params = {
+        let params:IState = {
           name: '',
           parentId: 0,
           parentIds: '',
@@ -578,22 +678,45 @@ export default class extends Vue {
         }
         params.name = this.dialogForm.name
         params.type = this.addData.type + 1
-        params.parentIds = this.addData.parentIds
         params.parentIds = `${this.addData.parentIds},${this.addData.id}`
         if (this.addData.type === 2) {
           params.areaCode = this.dialogForm.areaCode
         }
         if (this.addData.type === 3) {
+          submitForm = createAll
           params.dutyId = this.dialogForm.dutyId
+          let list = []
+          // 处理list数组
+          const cityList = (this.$refs['cityList'] as any).getCheckedNodes(true)
+          if (cityList.length === 0) {
+            list = [{
+              'parentId': this.addData.id,
+              'parentIds': params.parentIds
+            }]
+          } else {
+            list = cityList.map((item: any) => ({ parentId: item.data.id, parentIds: `${this.addData.parentIds},${this.addData.id}` }))
+            if (!cityList.some((item : any) => item.data.id === this.addData.id)) {
+              list.push({
+                'parentId': this.addData.id,
+                'parentIds': params.parentIds
+              })
+            }
+          }
+          params.parentMessages = list
         }
         if (this.addData.type === 4) {
           params.dutyId = this.addData.dutyId
         }
         params.parentId = this.addData.id
-        const { data } = await createOffice(params)
+
+        const { data } = await submitForm(params)
         if (data.success) {
           this.$message.success(`创建成功`)
-          this.append(data.data)
+          if (this.addData.type === 3) {
+            this.getOfficeList()
+          } else {
+            this.append(data.data)
+          }
           this.showDialog = false
           this.resetDialog()
         } else {
@@ -621,7 +744,7 @@ export default class extends Vue {
         }
       }
     } catch (err) {
-      console.log(`submit fail:${err}`)
+      console.log(`submit fail:${err.message}`)
     } finally {
       console.log(`finally`)
     }
@@ -642,25 +765,94 @@ export default class extends Vue {
     const node = (this.$refs.cascader as any).getCheckedNodes()
     if (node && node[0]) {
       this.dialogForm.name = node[0].label
-      console.log(this.dialogForm.name)
     } else {
       this.dialogForm.name = ''
     }
   }
   // 获取组织管理列表
-  private async getOfficeList(node: any, resolve: any) {
-    console.log(node, resolve)
-    let parentId = 0
-    if (node.level === 0) {
-      this.loading = true
-      parentId = 0
-    } else {
-      parentId = node.data.id
-    }
-    const { data } = await getOfficeList({ parentId })
+  private async getOfficeList(cb: any = () => {}) {
+    this.loading = true
+    const { data } = await getOfficeList()
     this.loading = false
     if (data.success) {
-      resolve(data.data || [])
+      this.treeKey = +new Date()
+      this.data = JSON.parse(JSON.stringify(data.data))
+      const list = data.data[0].officeVOs
+      const fact = (list: any) => {
+        for (let index = 0; index < list.length; index++) {
+          const item = list[index]
+          if (item.type > 3) {
+            list.splice(index, 1)
+            // 手动后退，避免漏掉元素
+            index--
+          } else if (item.type === 3) {
+            item.children = item.officeVOs
+            item.officeVOs = undefined
+          } else {
+            fact(item.officeVOs)
+          }
+        }
+      }
+      fact(list)
+      this.data3 = [
+        {
+          name: '全部城市',
+          officeVOs: [...list]
+        }
+      ]
+      cb()
+    } else {
+      this.$message.error(data)
+    }
+  }
+  // 获取组织管理列表（第二课tree）
+  // getOfficeListPost
+  private async getOfficeListPost(node: any, resolve: any) {
+    let postData = {
+      type: [2],
+      parentId: undefined
+    }
+    if (node.level === 0) {
+      // 请求第一级 初始化
+      resolve([
+        {
+          id: -1,
+          name: '大区公共组织',
+          type: 1,
+          parentId: 0,
+          parentIds: '0',
+          officeVOs: [],
+          userCount: 0,
+          leaf: false
+        },
+        {
+          id: -2,
+          name: '总部组织',
+          type: 1,
+          parentId: 0,
+          parentIds: '0',
+          officeVOs: [],
+          userCount: 0,
+          leaf: false
+        }
+      ])
+      return
+    } else if (node.level === 1) {
+      postData.type = [2]
+    } else {
+      postData.parentId = node.data.id
+      postData.type = []
+    }
+    const { data } = await getOfficeListPost(postData)
+    if (data.success) {
+      let arr = data.data
+      if ((node.data.id === -1 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
+        arr = data.data.map((item: any) => {
+          item.leaf = true
+          return item
+        })
+      }
+      resolve(arr || [])
     } else {
       this.$message.error(data)
     }
@@ -705,7 +897,7 @@ export default class extends Vue {
     if (!this.addData.officeVOs) {
       this.$set(this.addData, 'officeVOs', [])
     }
-    this.addData.officeVOs.unshift(newChild)
+    this.addData.officeVOs.push(newChild)
   }
   // update tree节点
   private update(item: any) {
@@ -722,7 +914,7 @@ export default class extends Vue {
     }
   }
   private fetchData() {
-    // this.getOfficeList()
+    this.getOfficeList()
     this.getArea()
   }
   private changeDuty(value: any) {
@@ -731,6 +923,9 @@ export default class extends Vue {
         this.dialogForm.name = ele.dutyName
       }
     })
+    if (this.isAdd) {
+      this.changeProps()
+    }
   }
   private allowDrop(draggingNode: any, dropNode: any, type: any) {
     if (draggingNode.level === dropNode.level + 1) {
@@ -745,33 +940,67 @@ export default class extends Vue {
     this.copyData = JSON.parse(JSON.stringify(this.data))
   }
   private handleDrop(draggingNode: any, dropNode: any, type: any, event: any) {
-    // let obj = {
-    //   aboveId: '',
-    //   arr: []
-    // }
-    // obj.aboveId = dropNode.data.aboveId
-    // for (let item of dropNode.parent.childNodes) {
-    //   obj.arr.push(item.data.id)
-    // }
-    // this.updateOrderMe(obj)
+    let params = {
+      fromId: draggingNode.data.id,
+      childrenids: dropNode.parent.childNodes.map((item: any) => item.data.id),
+      parentId: dropNode.parent.data.id,
+      parentIds: `${dropNode.parent.data.parentIds},${dropNode.parent.data.id}`
+    }
+    if (type === 'inner') {
+      params.childrenids = dropNode.childNodes.map((item: any) => item.data.id)
+      params.parentId = dropNode.data.id
+      params.parentIds = `${dropNode.data.parentIds},${dropNode.data.id}`
+    }
+
     const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
     const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
-    console.log(openList)
 
-    // 失败后处理
-    this.data = this.copyData
-    this.$nextTick(() => {
-      this.openItem(openList)
-    })
+    officeDrag(params)
+      .then(({ data }) => {
+        if (!data.success) {
+          this.data = this.copyData
+          this.$nextTick(() => {
+            this.openItem(openList)
+          })
+          this.$message.error(data.message)
+        // } else {
+        //   this.getOfficeList(() => {
+        //     this.$nextTick(() => {
+        //       this.openItem(openList)
+        //     })
+        //   })
+        }
+      }).catch(({ message }) => {
+        // 失败后处理
+        this.data = this.copyData
+        this.$nextTick(() => {
+          this.openItem(openList)
+        })
+        this.$message.error(message)
+      })
   }
-  private updateOrderMe(obj: any) {
-    console.log(obj)
+  private allowDrag(node: any) {
+    return node.level === 3 && node.data.type === 3
   }
   private openItem(list: any) {
     const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
     for (let i = 0; i < nodes.length; i++) {
       nodes[i].expanded = list.includes(nodes[i].data.id)
     }
+  }
+  private changeProps() {
+    const fact = (list: any) => {
+      for (let index = 0; index < list.length; index++) {
+        const item = list[index]
+        if (item.children) {
+          item.disabled = item.children.some((ele: any) => ele.dutyId === this.dialogForm.dutyId)
+        } else {
+          fact(item.officeVOs)
+        }
+      }
+    }
+    fact(this.data3)
+    this.data3 = this.data3.slice(0)
   }
   mounted() {
     this.fetchData()
@@ -837,6 +1066,10 @@ export default class extends Vue {
 .OrganizationManagement-m .el-cascader >>> input {
   background-color: rgba(0, 0, 0, 0);
   color: rgba(0, 0, 0, 0);
+}
+.OrganizationManagement .el-cascader.city-cascader >>> input,
+.OrganizationManagement-m .el-cascader.city-cascader >>> input{
+  color: initial;
 }
 .OrganizationManagement .opacity >>> input,
 .OrganizationManagement-m .opacity >>> input {
