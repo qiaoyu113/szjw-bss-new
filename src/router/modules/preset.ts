@@ -61,6 +61,7 @@ const presetRouter: RouteConfig = {
         title: 'addUserNew',
         activeMenu: '/roleSystem/addUser',
         noCache: true,
+        hidden: true,
         icon: '',
         apiUrl: '/v1/base/user/menu'
       }
@@ -75,7 +76,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: ['/wutong/authory/message', '/wutong/role/message']
       },
       children: [
         {
@@ -84,7 +85,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: '/wutong/authory/message'
           }
         },
         {
@@ -93,7 +94,7 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: '/wutong/role/message',
             sysType: 1
           }
         },
