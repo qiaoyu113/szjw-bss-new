@@ -50,6 +50,29 @@
         </el-button>
       </div>
     </self-form>
+    <table-header
+      :tab="[
+        {
+          name: '用户管理',
+          label: '用户管理'
+        }
+      ]"
+      active-name="用户管理"
+    >
+      <div class="subTitle">
+        <router-link :to="{path: '/roleSystem/addUser'}">
+          <el-button
+            v-permission="['/v2/base/user/create']"
+            class="createUser"
+            icon="el-icon-plus"
+            type="primary"
+            size="small"
+          >
+            新建用户
+          </el-button>
+        </router-link>
+      </div>
+    </table-header>
 
     <user-list
       ref="userlist"
@@ -62,6 +85,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import UserList from '../components/UserLists.vue'
+import TableHeader from '@/components/TableHeader/index.vue'
 import { GetOfficeByCurrentUser } from '../index'
 interface IState {
   [key: string]: any;
@@ -70,7 +94,8 @@ interface IState {
 @Component({
   components: {
     SelfForm,
-    UserList
+    UserList,
+    TableHeader
   }
 })
 export default class extends Vue {
