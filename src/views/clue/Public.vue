@@ -754,7 +754,12 @@ export default class extends Vue {
   // 业务线权限分配
   get cartTypePremission() {
     const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
-    this.listQuery.clueType = arr[0].value
+    this.$nextTick(() => {
+      if (arr[0]) {
+        this.listQuery.clueType = arr[0].value
+      }
+    })
+    // this.listQuery.clueType = arr[0].value
     return arr
   }
   // 分配、批量分配

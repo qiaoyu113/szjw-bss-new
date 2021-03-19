@@ -1357,14 +1357,14 @@ export default class extends Vue {
           } finally {
             this.$message.success(res.data.msg)
             this.showDialog = false
+            setTimeout(() => {
+              this.getLists()
+            }, delayTime)
           }
         } else {
           this.$message.warning(res.data.msg)
         }
         this.showDialog = false
-        setTimeout(() => {
-          this.getLists()
-        }, delayTime)
       } else {
         this.$message.error(res.errorMsg)
       }
