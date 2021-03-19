@@ -106,6 +106,7 @@
             />
           </el-form-item>
           <el-form-item
+            v-if="dialogForm.authType !== '3'"
             label="数据权限"
             prop="controlType"
           >
@@ -119,7 +120,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item
-            v-if="dialogForm.authType !== '3'"
+            v-if="dialogForm.authType !== '3' && dialogForm.controlType"
             label="页面地址"
             prop="url"
           >
@@ -219,6 +220,12 @@ export default class extends Vue {
       this.dialogForm.url = ''
     }
   }
+  @Watch('dialogForm.controlType')
+  private val(value: any) {
+    if (!value) {
+      this.dialogForm.url = ''
+    }
+  }
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -240,7 +247,7 @@ export default class extends Vue {
         }
         const { id, parentsId } = this.addData
         postData.controlType = postData.controlType || 0
-        postData.authType = Number(this.activeName)
+        postData.authType = Number(postData.authType)
         postData.parentId = id
         postData.parentsId =
             parentsId + (parentsId ? ',' : '') + `${this.addData.id}`
@@ -259,7 +266,7 @@ export default class extends Vue {
         const postData = {
           ...this.dialogForm
         }
-        postData.authType = Number(this.activeName)
+        postData.authType = Number(postData.authType)
         delete postData.childAuth
         const { data } = await updateAuthority(postData)
         if (data.success) {
