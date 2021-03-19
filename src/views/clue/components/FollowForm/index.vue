@@ -201,7 +201,15 @@ export default class extends Vue {
       label: '邀约面试时间',
       col: 24,
       tagAttrs: {
-        placeholder: '请选择面试时间'
+        placeholder: '请选择面试时间',
+        clearable: true,
+        format: 'yyyy-MM-dd HH:mm',
+        'value-format': 'yyyy-MM-dd HH:mm',
+        'picker-options': {
+          disabledDate: (time:Date) => {
+            return time.getTime() < new Date().getTime()
+          }
+        }
       }
     }
   ];
