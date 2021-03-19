@@ -41,7 +41,7 @@ import { SettingsModule } from '@/store/modules/settings'
 export default class extends Vue {
   @Prop({ required: true }) private data: any; // 展示数据
   @Prop({ default: 'id' }) private nodeKey!: string;
-  @Prop({ default: [] }) private expandedKey!: Array<any>;
+  @Prop({ default: () => [] }) private expandedKey!: Array<any>;
   @Prop({ default: false }) private showCheckbox!: boolean;
   @Prop({ default: false }) private defaultExpandAll!: boolean;
   // 判断是否是PC

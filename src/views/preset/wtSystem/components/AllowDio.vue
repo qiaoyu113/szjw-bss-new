@@ -263,13 +263,14 @@ export default class extends Vue {
     this.page.page = 1
     this.page.total = 0;
     (this.$refs['searchForm'] as any).resetForm()
-    this.tableData = []
+    this.tableData.splice(0, this.tableData.length)
   }
 
   private disabledCheck(row:any, index:number) {
     let selfId = this.allowData.id
     let allIds = row.roleIds
-    return !allIds.includes(selfId)
+    // let busi = this.allowData.busiType
+    return !(allIds.includes(selfId))
   }
 
   // 分页
@@ -337,6 +338,7 @@ export default class extends Vue {
   // 取消按钮
   handleClosed() {
     (this.$refs['searchForm'] as any).resetForm()
+    this.tableData.splice(0, this.tableData.length)
   }
   async getOffice() {
     try {

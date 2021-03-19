@@ -253,6 +253,7 @@ export default class extends Vue {
   private async handleChange(value: any) {
     const item = (this.$refs['dutyTree'] as any).getCheckedNodes()[0]
     if (!item) return
+    console.log(item)
     this.ruleForm.dutyName = item.label
     this.ruleForm.productLine = item.value
   }
@@ -286,7 +287,7 @@ export default class extends Vue {
           (TagsViewModule as any).delView(this.$route); // 关闭当前页面
           (TagsViewModule as any).delCachedView({
             // 删除指定页面缓存（进行刷新操作）
-            name: 'RoleManage'
+            name: 'roleManage'
           })
           this.$nextTick(() => {
             this.$router.go(-1)
@@ -317,10 +318,10 @@ export default class extends Vue {
         (TagsViewModule as any).delView(this.$route); // 关闭当前页面
         (TagsViewModule as any).delCachedView({
           // 删除指定页面缓存（进行刷新操作）
-          name: 'RoleManage'
+          name: 'roleManage'
         })
         this.$nextTick(() => {
-          this.$router.push({ name: 'RoleManage' })
+          this.$router.go(-1)
         })
       }, 800)
     } else {

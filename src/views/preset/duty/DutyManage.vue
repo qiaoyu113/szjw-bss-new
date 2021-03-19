@@ -163,9 +163,9 @@ export default class extends Vue {
   }
   // 判断是否显示添加按钮
   private showAppend(node: any, data: any) {
-    if (data.dutyLevel === 1 && node.parent && node.parent.nextSibling && node.parent.previousSibling) {
-      return false
-    }
+    // if (data.dutyLevel === 1 && node.parent && node.parent.nextSibling && node.parent.previousSibling) {
+    //   return false
+    // }
     return data.dutyLevel !== 2
   }
   // 弹窗提交
@@ -263,17 +263,9 @@ export default class extends Vue {
     const { data } = await dutyList({ dutyParentId })
     this.loading = false
     if (data.success) {
-      let i = 3
-      if (node.level === 1 && childNodes.length > 0) {
-        const index = childNodes.findIndex((item: any) => item.data.id === node.data.id)
-        i = index === 1 ? 2 : 3
-      }
+      console.log(node.level)
       const treeList = data.data.map((item: any) => {
-        if (node.level === 0) {
-          item.leaf = false
-        } else if (node.level === 1) {
-          item.leaf = i === 2
-        } else {
+        if (node.level === 2) {
           item.leaf = true
         }
         return item
