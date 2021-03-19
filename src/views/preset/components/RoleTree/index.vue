@@ -7,6 +7,7 @@
       >
         <el-tree
           ref="roleTree"
+          :default-expanded-keys="expandedKey"
           :default-expand-all="defaultExpandAll"
           :show-checkbox="showCheckbox"
           :data="data"
@@ -40,8 +41,9 @@ import { SettingsModule } from '@/store/modules/settings'
 export default class extends Vue {
   @Prop({ required: true }) private data: any; // 展示数据
   @Prop({ default: 'id' }) private nodeKey!: string;
+  @Prop({ default: [] }) private expandedKey!: Array<any>;
   @Prop({ default: false }) private showCheckbox!: boolean;
-  @Prop({ default: true }) private defaultExpandAll!: boolean;
+  @Prop({ default: false }) private defaultExpandAll!: boolean;
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC

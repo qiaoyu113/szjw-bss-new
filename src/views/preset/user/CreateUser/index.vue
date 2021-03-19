@@ -140,7 +140,7 @@
           :class="isPC ? 'btnPc' : 'mobile'"
         >
           <router-link
-            :to="{path: '/system/user'}"
+            :to="{path: '/roleSystem/user'}"
             style="margin-right:20px;"
           >
             <el-button>取消</el-button>
@@ -370,7 +370,7 @@ export default class extends Vue {
         ...this.listQuery,
         nickName: this.listQuery.userName,
         officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1],
-        roleId: roleId
+        roleIds: roleId
       }
       params.confirmPassword = params.passwd
       delete params.id
@@ -379,6 +379,7 @@ export default class extends Vue {
       delete params.syncStatus
       delete params.status
       delete params.roleNames
+      delete params.roleId
       let { data: res } = await CreateUser(params)
       if (res.success) {
         this.$message.success('创建成功')
