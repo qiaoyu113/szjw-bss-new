@@ -1095,11 +1095,11 @@ export default class extends Vue {
   // 重置
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
+    this.getLists()
     // 重新请求小组数据
     this.$nextTick(() => {
       this.listQuery.citycode = ''
       this.cityChange('')
-      this.getLists()
     })
   }
   private async handleResetClicks(row: IState) {
