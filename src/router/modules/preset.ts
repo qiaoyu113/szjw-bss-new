@@ -11,7 +11,7 @@ const presetRouter: RouteConfig = {
     icon: 'system',
     apiUrl: ['/v1/base/user/menu', '/v2/base/user/create', '/v2/base/user/update',
       '/v2/base/role/create', '/v2/base/role/list', '/v1/base/authority/list', '/v2/base/duty/list',
-      '/v1/base/office/list', '/v1/base/role/update', '/v2/base/role/getByRoleId', '/v2/line/label/configManager', '/v1/product/product/list/page',
+      'root', '/v1/base/role/update', '/v2/base/role/getByRoleId', '/v2/line/label/configManager', '/v1/product/product/list/page',
       '/v1/product/product/system/setting'
     ]
 
@@ -26,7 +26,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/organizationmanage',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       }
     },
     {
@@ -76,7 +76,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       },
       children: [
         {
@@ -85,7 +85,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -94,7 +94,7 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: 'root',
             sysType: 1
           }
         },
@@ -146,7 +146,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/lnSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       },
       children: [
         {
@@ -155,7 +155,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -164,7 +164,7 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: 'root',
             sysType: 2
           }
         },
@@ -217,7 +217,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       },
       children: [
         {
@@ -226,7 +226,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -235,7 +235,7 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: 'root',
             sysType: 5
           }
         },
@@ -288,7 +288,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/clueSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       },
       children: [
         {
@@ -297,7 +297,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -306,7 +306,7 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: 'root',
             sysType: 3
           }
         },
@@ -359,7 +359,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/dataSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: '/v1/base/office/list'
+        apiUrl: 'root'
       },
       children: [
         {
@@ -368,7 +368,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/office/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -377,7 +377,7 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/v1/base/office/list',
+            apiUrl: 'root',
             sysType: 4
           }
         },
