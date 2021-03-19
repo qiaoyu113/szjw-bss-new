@@ -614,13 +614,22 @@ export default class extends Vue {
 
   async editDio(val: IState) {
     try {
-      let val = this.queryAndItem.query
+      let val:any = Object.assign({}, this.queryAndItem.query)
       if (this.clueStatus < 2) {
         val.expectAddressCity = val.intentWork[0]
         val.expectAddressCounty = val.intentWork[1]
       } else if (+this.clueStatus === 4) {
         val.intentModel = String(val.intentModel)
         val.fancyModel = String(val.fancyModel)
+      }
+      if (val.age === '') {
+        Reflect.deleteProperty(val, 'age')
+      }
+      if (val.experience === '') {
+        Reflect.deleteProperty(val, 'experience')
+      }
+      if (val.carType === '') {
+        Reflect.deleteProperty(val, 'carType')
       }
       let { data: res } = await editClue(val)
       if (res.success) {
