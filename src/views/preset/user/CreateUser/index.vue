@@ -140,7 +140,7 @@
           :class="isPC ? 'btnPc' : 'mobile'"
         >
           <router-link
-            :to="{path: '/system/user'}"
+            :to="{path: '/roleSystem/user'}"
             style="margin-right:20px;"
           >
             <el-button>取消</el-button>
