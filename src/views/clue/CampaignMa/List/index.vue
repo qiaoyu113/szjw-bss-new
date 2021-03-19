@@ -252,8 +252,9 @@ export default class extends Vue {
     {
       type: 2,
       tagAttrs: {
-        placeholder: '请输入客群细分ID',
-        clearable: true
+        placeholder: '请选择客群细分ID',
+        clearable: true,
+        filterable: true
       },
       label: '客群细分ID',
       key: 'userGroupId',
@@ -491,7 +492,7 @@ export default class extends Vue {
       sort: this.listQuery.sort
     }
     this.listQuery.clueType !== '' && (obj.clueType = +this.listQuery.clueType)
-    this.listQuery.userGroupId && (obj.userGroupId = +this.listQuery.userGroupId)
+    this.listQuery.userGroupId && (obj.userGroupId = String(this.listQuery.userGroupId))
     this.listQuery.areCity && (obj.areCity = +this.listQuery.areCity)
     this.listQuery.cityCode && (obj.cityCode = +this.listQuery.cityCode)
     this.listQuery.launchPlatform !== '' && (obj.launchPlatform = this.listQuery.launchPlatform)
