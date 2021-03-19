@@ -62,7 +62,7 @@
       <div class="subTitle">
         <router-link :to="{path: '/roleSystem/addUser'}">
           <el-button
-            v-permission="['/v2/base/user/create']"
+            v-permission="['/v3/base/user/create']"
             class="createUser"
             icon="el-icon-plus"
             type="primary"
