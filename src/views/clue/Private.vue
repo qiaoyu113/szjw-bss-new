@@ -170,7 +170,7 @@
           {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
-          {{ row.hasCar ? '有' : '无' }}
+          {{ row.hasCar ? '有' : '无' }}{{ row.carTypeName? '/'+row.carTypeName:'' }}
         </template>
         <template v-slot:notFollowDay="{row}">
           <el-link
@@ -192,7 +192,7 @@
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
-
+            :disabled="hasPhone(scope.row.status)"
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -357,9 +357,10 @@ export default class extends Vue {
     name: '', // 姓名
     phone: '', // 手机号
     hasCar: '', // 是否有车
+    haveCar: '',
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
-    followerId: [], // 跟进人
+    followerId: '', // 跟进人
     sourceChannel: [], // 渠道
     clueAttribution: '', // 线索归属
     inviteStatus: '', // 邀约情况
@@ -564,7 +565,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      key: 'carCity',
+      key: 'cityCode',
       label: '车辆所在城市',
       rules: [2],
       tagAttrs: {
@@ -692,11 +693,14 @@ export default class extends Vue {
     {
       type: 2,
       label: '小组',
-      key: 'haveCar',
+      key: 'gmGroupId',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
         clearable: true
+      },
+      listeners: {
+        change: this.gmChanges
       },
       rules: [2, 3, 4],
       options: this.gmGroupList
@@ -723,9 +727,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true,
-        multiple: true,
-        collapseTags: true
+        clearable: true
+        // multiple: true,
+        // collapseTags: true
       },
 
       rules: ['root'],
@@ -898,7 +902,7 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'name1',
+      key: 'demandTypeName',
       label: '需求类型',
       rules: [2]
     },
@@ -908,12 +912,12 @@ export default class extends Vue {
       rules: [2]
     },
     {
-      key: 'carTypeName',
+      key: 'intentCarTypeName',
       label: '意向车型',
       rules: [3, 4]
     },
     {
-      key: 'carTypeName1',
+      key: 'payIntentionMoney',
       label: '是否交意向金',
       rules: [2]
     },
@@ -967,12 +971,12 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'haveCar12',
+      key: 'carCityName',
       label: '车辆所在城市',
       rules: [2]
     },
     {
-      key: 'haveCar12',
+      key: 'cityName',
       label: '所在城市',
       rules: [3, 4]
     },
@@ -1014,6 +1018,8 @@ export default class extends Vue {
       { validator: this.validateFollow, trigger: 'change' }
     ]
   };
+
+  // 获取选择分配人
   private dialogFormItem:any[] = [
     {
       type: 8,
@@ -1033,7 +1039,6 @@ export default class extends Vue {
       key: 'followerId'
     }
   ]
-
   // 导入文件
   private uploadDialog: boolean = false;
   private fileList: any[] = [];
@@ -1091,6 +1096,11 @@ export default class extends Vue {
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
     this.getLists()
+    // 重新请求小组数据
+    this.$nextTick(() => {
+      this.listQuery.citycode = ''
+      this.cityChange('')
+    })
   }
   private async handleResetClicks(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
@@ -1138,10 +1148,10 @@ export default class extends Vue {
       return item
     })
     params.onlyMe = params.onlyMe ? 1 : 0
-    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.join(',')
-    params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.join(',')
-    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.join(',')
-    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.join(',')
+    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
+    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
+    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item !== '').join(',')
 
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
@@ -1194,8 +1204,13 @@ export default class extends Vue {
   // 获取跟进人列表
   async getGmOptions(cityCode:any, groupId:any) {
     try {
+      let roleTypes = [1, 4]
+      //  业务线大于1 的属于雷鸟
+      if (this.listQuery.clueType > 1) {
+        roleTypes = [11, 12]
+      }
       let params:any = {
-        roleTypes: [1, 4],
+        roleTypes,
         uri: '/v2/clueH5/list/queryFollowerList',
         groupId,
         cityCode
@@ -1211,9 +1226,13 @@ export default class extends Vue {
         let arr = res.data.map(function(item: any) {
           return {
             label: item.name,
-            value: item.id
+            value: item.id,
+            status: item.status
           }
         })
+        if (this.listQuery.clueType > 1) {
+          arr = arr.filter((item:any) => item.status === 1)
+        }
         this.followerListOptions.push(...arr)
       } else {
         this.$message.error(res.errorMsg)
@@ -1225,7 +1244,11 @@ export default class extends Vue {
   //
   get clueTypePermission() {
     const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
-    this.listQuery.clueType = arr[0].value
+    this.$nextTick(() => {
+      if (arr[0]) {
+        this.listQuery.clueType = arr[0].value
+      }
+    })
     return arr
   }
   /**
@@ -1267,10 +1290,10 @@ export default class extends Vue {
           ...clue
         ])
         this.sourceOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...sources
         ])
         this.inviteStatusOptions.push(...[
@@ -1288,10 +1311,10 @@ export default class extends Vue {
           ...intentDegreeOptions
         ])
         this.inviteFailReasonOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...inviteFailReasonOptions
         ])
         this.demandOptions.push(...[
@@ -1341,14 +1364,14 @@ export default class extends Vue {
           } finally {
             this.$message.success(res.data.msg)
             this.showDialog = false
+            setTimeout(() => {
+              this.getLists()
+            }, delayTime)
           }
         } else {
           this.$message.warning(res.data.msg)
         }
         this.showDialog = false
-        setTimeout(() => {
-          this.getLists()
-        }, delayTime)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -1452,6 +1475,9 @@ export default class extends Vue {
   // 获取城市下的加盟小组
   async getGroup(cityCode:string) {
     let code = this.listQuery.clueType
+    if (this.listQuery.clueType > 1) {
+      code = 5
+    }
     try {
       const { data } = await getGroupInfoByCityCodeAndProductLine({
         busiLine: [code].toString(),
@@ -1477,7 +1503,7 @@ export default class extends Vue {
     this.listQuery.gmGroupId = ''
     this.listQuery.haveCar = ''
     this.gmGroupList.splice(1)
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     if (value[1]) {
       this.getGroup(value[1])
@@ -1486,8 +1512,10 @@ export default class extends Vue {
       this.getGmOptions('', '')
     }
   }
+
+  // 加盟小组改变
   private gmChanges(value:any) {
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
@@ -1495,7 +1523,7 @@ export default class extends Vue {
     this.getBaseInfo()
     this.getGmOptions('', '')
   }
-  // 权限
+   // 权限
    private distributionPremission:any = {
      0: ['/v2/market-clue/privatePool/firmiana/import/private'],
      1: ['/v2/market-clue/privatePool/firmiana/import/shared'],
@@ -1505,6 +1533,14 @@ export default class extends Vue {
    }
    get importClue() {
      return this.distributionPremission[this.listQuery.clueType]
+   }
+   // 限制
+   hasPhone(status:any) {
+     if (this.listQuery.clueType > 1) {
+       return false
+     } else {
+       return !(status === 10 || status === 20)
+     }
    }
 }
 </script>

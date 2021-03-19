@@ -3,6 +3,7 @@
     <self-from
       class="configuration-self-form p15"
       :form-item="ruleFrom"
+      :city-list="cityList"
       :list-query="listQuery"
     >
       <template #clueType>
@@ -79,7 +80,7 @@ import SetUpDistributionPolicy from '../components/SetUpDistributionPolicy.vue'
 import SelfFrom from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { getOfficeByType, getOfficeByTypeAndOfficeId } from '@/api/common'
+import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionaryCity } from '@/api/common'
 import { HandlePages, lock } from '@/utils/index'
 import { configurationWTShareList, configurationWTSpecialList, configurationLCList, configurationLZList } from '@/api/clue'
 interface PageObj {
@@ -100,6 +101,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  private cityList:IState[] = []; // 城市列表
   listQuery: any = {}
   clueType: Array<any> = [
     {
@@ -139,12 +141,13 @@ export default class extends Vue {
         filterable: true,
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'city',
-        props: {
-          lazy: true,
-          lazyLoad: this.showWork
-        }
+        'node-key': 'city'
+        // props: {
+        //   lazy: true,
+        //   lazyLoad: this.cityList
+        // }
       },
+      options: this.cityList,
       col: 8,
       label: '司机城市',
       key: 'city'
@@ -157,53 +160,17 @@ export default class extends Vue {
       // offset: 3
     }
   ]
-  private async showWork(node: any, resolve: any) {
-    let query: any = {
-      parentId: ''
-    }
-    if (node.level === 1) {
-      query.parentId = node.value
-    }
-    try {
-      if (node.level === 0) {
-        let nodes = await this.areaAddress({ type: 2 })
-        resolve(nodes)
-      } else if (node.level === 1) {
-        let nodes = await this.cityDetail(query)
-        resolve(nodes)
-      }
-    } catch (err) {
-      resolve([])
-    }
-  }
-  private async cityDetail(params: any) {
-    let { data: city } = await getOfficeByTypeAndOfficeId(params)
+  // 获取获取城市列表
+  async cityDetail() {
+    let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
         return {
-          value: item.areaCode,
-          label: item.name,
-          leaf: true
+          value: +item.code,
+          label: item.name
         }
       })
-      return nodes
-    }
-  }
-  private async areaAddress(params: any) {
-    try {
-      let { data: res } = await getOfficeByType(params)
-      if (res.success) {
-        const nodes = res.data.map(function(item: any) {
-          return {
-            value: item.id,
-            label: item.name,
-            leaf: false
-          }
-        })
-        return nodes
-      }
-    } catch (err) {
-      console.log(`load city by code fail:${err}`)
+      this.cityList.push(...nodes)
     }
   }
   switchLineType(val: number) {
@@ -313,9 +280,10 @@ export default class extends Vue {
         clueType: this.activeLineType,
         order: order || ''
       }
-      if (this.listQuery.city && this.listQuery.city.length > 1) {
-        params.city = this.listQuery.city[1]
-      }
+      // if (this.listQuery.city && this.listQuery.city.length > 1) {
+      //   params.city = this.listQuery.city
+      // }
+      this.listQuery.city && (params.city = +this.listQuery.city)
       if (params.clueType === 0) {
         let { data: res } = await configurationWTSpecialList(params)
         if (res.success) {
@@ -365,6 +333,7 @@ export default class extends Vue {
   }
   mounted() {
     this.getList()
+    this.cityDetail()
   }
 }
 </script>
