@@ -11,7 +11,7 @@
         <router-view :key="key" />
       </keep-alive>
     </transition>
-    <init-phone />
+    <!-- <init-phone /> -->
   </section>
 </template>
 

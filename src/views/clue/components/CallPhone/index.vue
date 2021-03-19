@@ -14,6 +14,7 @@
       :show-other-button="showOtherBtn"
       other-button-text="挂断并保存"
       other-type="danger"
+      :destroy-on-close="true"
       :other="other(true)"
       top="5vh"
       @closed="handleDialogClosed"

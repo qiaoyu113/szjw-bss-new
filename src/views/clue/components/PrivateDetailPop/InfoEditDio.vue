@@ -106,7 +106,7 @@ export default class extends Vue {
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
-    { label: '面包', value: 35 },
+    { label: '面包', value: 48 },
     { label: '其他', value: 45 }
   ];
   private submitLoading: boolean = false;
@@ -446,6 +446,7 @@ export default class extends Vue {
           String(value.expectAddressCity),
           String(value.expectAddressCounty)
         ]
+
         if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
           this.WTQuery.intentWork.pop()
           this.WTQuery.intentWork.push(this.countryValue)
@@ -454,13 +455,15 @@ export default class extends Vue {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
         this.BirdQuery = { ...this.BirdQuery, ...value }
+        this.BirdQuery.intentModel = +this.BirdQuery.intentModel
+        this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
       } else {
         if (value.intentModel) {
           value.intentModel = (value.intentModel).split(',').map((ele:any) => {
             return +ele
           })
         } else {
-          value.intentModel = [1, 2, 3]
+          value.intentModel = []
         }
         if (value.fancyModel) {
           value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
@@ -505,6 +508,7 @@ export default class extends Vue {
       params = ['100000']
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
+
       let nodes = await this.loadCityByCode(params)
       this.countryValue = nodes[1].value
       resolve(nodes)

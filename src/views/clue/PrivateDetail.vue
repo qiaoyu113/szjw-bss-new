@@ -763,7 +763,7 @@ export default class extends Vue {
     }
   }
 
-  private showBtn() {
+  get showBtn() {
     if (+this.clueStatus < 2) {
       return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20)
     } else {

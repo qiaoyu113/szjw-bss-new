@@ -3,6 +3,7 @@
     <h5>基本信息</h5>
     <SelfForm
       ref="baseInfoForm"
+      :key="WTQuery.hasCar"
       :rules="rulesWT"
       :list-query="queryAndItem.query"
       :form-item="queryAndItem.formItem"
@@ -90,7 +91,7 @@ export default class extends Vue {
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
-    { label: '面包', value: 35 },
+    { label: '面包', value: 48 },
     { label: '其他', value: 45 }
   ];
 
@@ -226,7 +227,7 @@ export default class extends Vue {
       tagAttrs: {
         'default-expanded-keys': true,
         'default-checked-keys': true,
-        'node-key': 'householdProvince',
+        'node-key': 'intentWork',
         placeholder: '期望工作区域',
         props: {
           lazy: true,
@@ -509,6 +510,7 @@ export default class extends Vue {
       params = ['100000']
       params.push(node.value.toString().slice(0, 2) + '0000')
       params.push(node.value)
+
       let nodes = await this.loadCityByCode(params)
       this.countryValue = nodes[1].value
       resolve(nodes)
@@ -580,30 +582,43 @@ export default class extends Vue {
   }
 
   private setQuerys(value: IState) {
-    if (this.clueStatus < 2) {
-      this.WTQuery = { ...this.WTQuery, ...value }
-      this.WTQuery.intentWork = [
-        String(value.expectAddressCity),
-        String(value.expectAddressCounty)
-      ]
-      if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
-        this.WTQuery.intentWork.pop()
-        this.WTQuery.intentWork.push(this.countryValue)
+    try {
+      if (this.clueStatus < 2) {
+        this.WTQuery = { ...this.WTQuery, ...value }
+        this.WTQuery.intentWork = [
+          String(value.expectAddressCity),
+          String(value.expectAddressCounty)
+        ]
+
+        if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
+          this.WTQuery.intentWork.pop()
+          this.WTQuery.intentWork.push(this.countryValue)
+        }
+      } else if (this.clueStatus === 2) {
+        this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
+      } else if (this.clueStatus === 3) {
+        this.BirdQuery = { ...this.BirdQuery, ...value }
+        this.BirdQuery.intentModel = +this.BirdQuery.intentModel
+        this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
+      } else {
+        if (value.intentModel) {
+          value.intentModel = (value.intentModel).split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.intentModel = []
+        }
+        if (value.fancyModel) {
+          value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.fancyModel = []
+        }
+        this.BirdQuery = { ...this.BirdQuery, ...value }
       }
-    } else if (this.clueStatus === 2) {
-      this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
-    } else if (this.clueStatus === 3) {
-      this.BirdQuery = { ...this.BirdQuery, ...value }
-    } else {
-      value.intentModel = value.intentModel.split(',').map((ele:any) => {
-        return +ele
-      })
-      value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
-        return +ele
-      })
-      this.BirdQuery.intentModel = []
-      this.BirdQuery.fancyModel = []
-      this.BirdQuery = { ...this.BirdQuery, ...value }
+    } catch (err) {
+      console.log('fail:', err)
     }
   }
 
