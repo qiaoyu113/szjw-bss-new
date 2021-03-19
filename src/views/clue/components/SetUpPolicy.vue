@@ -66,10 +66,10 @@ export default class extends Vue {
   }
   resetForm() {
     this.$nextTick(() => {
-      this.queryInfo = {
-        flowedDayNum: 0,
-        flowingDayNum: 0
-      }
+      // this.queryInfo = {
+      //   flowedDayNum: 0,
+      //   flowingDayNum: 0
+      // }
     })
   }
   async setPolicyConfirm(callback: Function) {
