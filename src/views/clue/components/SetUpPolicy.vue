@@ -7,7 +7,6 @@
     destroy-on-close
     :confirm="onConfirm"
     v-on="$listeners"
-    @close="resetForm"
     @open="getdefaultDate"
   >
     <el-form
@@ -63,14 +62,6 @@ export default class extends Vue {
   getdefaultDate() {
     this.queryInfo.flowedDayNum = this.policyData.followedReflowedDayNum
     this.queryInfo.flowingDayNum = this.policyData.followingReflowedDayNum
-  }
-  resetForm() {
-    this.$nextTick(() => {
-      this.queryInfo = {
-        flowedDayNum: 0,
-        flowingDayNum: 0
-      }
-    })
   }
   async setPolicyConfirm(callback: Function) {
     try {
