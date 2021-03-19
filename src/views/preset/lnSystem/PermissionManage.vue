@@ -106,7 +106,6 @@
             />
           </el-form-item>
           <el-form-item
-            v-if="dialogForm.authType !== '3'"
             label="数据权限"
             prop="controlType"
           >
@@ -120,7 +119,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item
-            v-if="dialogForm.authType !== '3' && dialogForm.controlType"
+            v-if="dialogForm.authType !== '3'"
             label="页面地址"
             prop="url"
           >
@@ -217,12 +216,6 @@ export default class extends Vue {
   @Watch('dialogForm.authType')
   private onval(value: any) {
     if (value === '3') {
-      this.dialogForm.url = ''
-    }
-  }
-  @Watch('dialogForm.controlType')
-  private val(value: any) {
-    if (!value) {
       this.dialogForm.url = ''
     }
   }
