@@ -22,7 +22,7 @@
         <el-radio-group
           v-model="listQuery.clueType"
           size="small"
-          @change="getLists"
+          @change="handleBusiTypeChange"
         >
           <el-radio-button
             v-for="item in busiTypeArrs"
@@ -132,7 +132,7 @@
       <AddCampaign
         ref="addCampaign"
         :region-list="regionList"
-        :add-userlist="addUserGroup"
+        :add-userlist="userGroupOptions"
         :city-list="cityList"
         :platform-list="platformList"
         @onPass="handlePass"
@@ -211,7 +211,6 @@ export default class extends Vue {
     sort: 'desc' // 1: 降序(desc),0:升序(asc)
   }
   private userGroupOptions:IState[] = []; // 客群细分id
-  private addUserGroup:IState[] = []; // 新增客群细分id
   private campaignId:string = ''; // 导入的compaignId
   // 新建Campaign
   private showDialog:boolean = false;
@@ -453,9 +452,6 @@ export default class extends Vue {
   }
   // 新建Campaign
   handleAddClick() {
-    if (this.addUserGroup.length === 0) {
-      this.getUserGroupSelectList('')
-    }
     this.showDialog = true
   }
   // 导出
@@ -681,23 +677,26 @@ export default class extends Vue {
       if (clueType !== '') {
         params.clueType = clueType
       }
+      let len = this.userGroupOptions.length
+      this.userGroupOptions.splice(0, len)
       let { data: res } = await GetUserGroupSelectList(params)
       if (res.success) {
         let result:IState[] = res.data.map((item:IState) => ({
           label: item.label,
           value: item.groupId
         }))
-        if (clueType !== '') {
-          this.userGroupOptions.push(...result)
-        } else {
-          this.addUserGroup.push(...result)
-        }
+        this.userGroupOptions.push(...result)
       } else {
         this.$message.error(res.message)
       }
     } catch (err) {
       console.log(`get user groupId fail:${err}`)
     }
+  }
+  // 业务线发生变化
+  handleBusiTypeChange() {
+    this.getUserGroupSelectList(this.listQuery.clueType)
+    this.getLists()
   }
   // 初始化公共列表
   init() {
