@@ -754,7 +754,12 @@ export default class extends Vue {
   // 业务线权限分配
   get cartTypePremission() {
     const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
-    this.listQuery.clueType = arr[0].value
+    this.$nextTick(() => {
+      if (arr[0]) {
+        this.listQuery.clueType = arr[0].value
+      }
+    })
+    // this.listQuery.clueType = arr[0].value
     return arr
   }
   // 分配、批量分配
@@ -772,15 +777,20 @@ export default class extends Vue {
       let { data: res } = await UpdateFollowerByHighSeas(params)
       if (res.success) {
         if (res.data.flag) {
-          (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success('分配成功')
+          try {
+            (this.$refs.PublicClueTable as any).toggleRowSelection()
+            this.$message.success('分配成功')
+          } catch (error) {
+            return error
+          } finally {
+            setTimeout(() => {
+              this.getLists()
+            }, delayTime)
+          }
         } else {
           this.$message.warning(res.data.msg)
         }
         this.showDialog = false
-        setTimeout(() => {
-          this.getLists()
-        }, delayTime)
       } else {
         this.$message.error(res.errorMsg)
       }
