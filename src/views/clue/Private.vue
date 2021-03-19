@@ -360,7 +360,7 @@ export default class extends Vue {
     haveCar: '',
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
-    followerId: [], // 跟进人
+    followerId: '', // 跟进人
     sourceChannel: [], // 渠道
     clueAttribution: '', // 线索归属
     inviteStatus: '', // 邀约情况
@@ -727,9 +727,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
-        clearable: true,
-        multiple: true,
-        collapseTags: true
+        clearable: true
+        // multiple: true,
+        // collapseTags: true
       },
 
       rules: ['root'],
@@ -1148,10 +1148,10 @@ export default class extends Vue {
       return item
     })
     params.onlyMe = params.onlyMe ? 1 : 0
-    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.join(',')
-    params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.join(',')
-    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.join(',')
-    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.join(',')
+    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item === '').join(',')
+    // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
+    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item === '').join(',')
+    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item === '').join(',')
 
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
