@@ -44,12 +44,15 @@
           class="curation-col"
         >
           <div class="curation-title">
-            <span>仓库图片</span>
+            <span>仓库图片(12)</span>
             <div>
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
               >
+              <div class="mask-img">
+                <span>预览1</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -248,33 +251,29 @@
     </section-container>
 
     <!-- 按钮 -->
-    <el-row style="margin:40px 0;">
-      <el-col
-        :offset="16"
+    <div class="new-line-btn">
+      <el-button
+        class="agent-button"
+        type="info"
+        plain
       >
-        <el-button
-          class="agent-button"
-          type="info"
-          plain
-        >
-          跳过暂不检查
-        </el-button>
+        跳过暂不检查
+      </el-button>
 
-        <el-button
-          class="agent-button"
-          type="primary"
-        >
-          检查不通过
-        </el-button>
+      <el-button
+        class="agent-button"
+        type="primary"
+      >
+        检查不通过
+      </el-button>
 
-        <el-button
-          class="agent-button"
-          type="primary"
-        >
-          检查通过
-        </el-button>
-      </el-col>
-    </el-row>
+      <el-button
+        class="agent-button"
+        type="primary"
+      >
+        检查通过
+      </el-button>
+    </div>
     <!-- 分页 -->
     <pagination
       v-show="true"
@@ -583,15 +582,17 @@ export default class extends Vue {
   padding: 15px;
 }
 .curation-col {
+  position: relative;
   .curation-title {
     display: flex;
     font-size: 0;
+    position: relative;
     span {
       font-size: 14px;
       color: #838383;
       line-height: 26px;
-      max-width: 120px;
-      margin-right: 16px;
+      max-width: 90px;
+      margin-right: 12px;
       display: inline-block;
     }
     div {
@@ -603,9 +604,27 @@ export default class extends Vue {
     }
     img {
       width: 100%;
+      // display: none;
       height: 100%;
     }
+    .mask-img{
+      position: absolute;
+      width: 260px;
+      height: 32px;
+      background: rgba(0,0,0,0.40);
+      bottom: 0;
+      right: 0;
+      z-index: 1;
+      text-align: center;
+      overflow: hidden;
+      span{
+        line-height: 32px;
+        color: #FFF;
+        letter-spacing:1px;
+      }
+    }
   }
+
 }
 // 按钮组的样式
 .check-label {
@@ -623,6 +642,11 @@ export default class extends Vue {
     border: 1px solid #649cee !important;
     box-shadow: none !important;
   }
+}
+.new-line-btn{
+  display: flex;
+  justify-content: flex-end;
+  padding: 40px 60px;
 }
 </style>
 
