@@ -306,10 +306,46 @@ export default class extends Vue {
       })
   }
   private goCreateUser() {
-    this.$router.push({ name: 'RoleCreate', query: { sysType: this.$route.meta.sysType } })
+    let name = 'wtSystem'
+    switch (this.$route.meta.sysType) {
+      case 1:
+        name = 'wtSystem'
+        break
+      case 2:
+        name = 'lnSystem'
+        break
+      case 3:
+        name = 'clueSystem'
+        break
+      case 4:
+        name = 'dataSystem'
+        break
+      case 5:
+        name = 'roleSystem'
+        break
+    }
+    this.$router.push({ path: `/roleSystem/${name}/RoleCreate`, query: { sysType: this.$route.meta.sysType } })
   }
   private editRole(row: any) {
-    this.$router.push({ name: 'RoleOperate', query: { id: row.id, sysType: this.$route.meta.sysType } })
+    let name = 'wtSystem'
+    switch (this.$route.meta.sysType) {
+      case 1:
+        name = 'wtSystem'
+        break
+      case 2:
+        name = 'lnSystem'
+        break
+      case 3:
+        name = 'clueSystem'
+        break
+      case 4:
+        name = 'dataSystem'
+        break
+      case 5:
+        name = 'roleSystem'
+        break
+    }
+    this.$router.push({ path: `/${name}/RoleOperate`, query: { id: row.id, sysType: this.$route.meta.sysType } })
   }
   private deleteRole(item: any) {
     this.$confirm(`您确定要删除“${item.nick}”吗？`, '删除角色', {
