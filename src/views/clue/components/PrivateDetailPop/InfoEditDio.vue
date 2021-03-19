@@ -106,7 +106,7 @@ export default class extends Vue {
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
-    { label: '面包', value: 35 },
+    { label: '面包', value: 48 },
     { label: '其他', value: 45 }
   ];
   private submitLoading: boolean = false;
@@ -460,7 +460,7 @@ export default class extends Vue {
             return +ele
           })
         } else {
-          value.intentModel = [1, 2, 3]
+          value.intentModel = []
         }
         if (value.fancyModel) {
           value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
