@@ -192,7 +192,7 @@
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
-
+            :disabled="hasPhone(scope.row.status)"
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -1290,10 +1290,10 @@ export default class extends Vue {
           ...clue
         ])
         this.sourceOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...sources
         ])
         this.inviteStatusOptions.push(...[
@@ -1311,10 +1311,10 @@ export default class extends Vue {
           ...intentDegreeOptions
         ])
         this.inviteFailReasonOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...inviteFailReasonOptions
         ])
         this.demandOptions.push(...[
@@ -1503,7 +1503,7 @@ export default class extends Vue {
     this.listQuery.gmGroupId = ''
     this.listQuery.haveCar = ''
     this.gmGroupList.splice(1)
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     if (value[1]) {
       this.getGroup(value[1])
@@ -1515,7 +1515,7 @@ export default class extends Vue {
 
   // 加盟小组改变
   private gmChanges(value:any) {
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
@@ -1533,6 +1533,14 @@ export default class extends Vue {
    }
    get importClue() {
      return this.distributionPremission[this.listQuery.clueType]
+   }
+   // 限制
+   hasPhone(status:any) {
+     if (this.listQuery.clueType > 1) {
+       return false
+     } else {
+       return !(status === 10 || status === 20)
+     }
    }
 }
 </script>
