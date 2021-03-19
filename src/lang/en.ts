@@ -175,8 +175,7 @@ export default {
     dataSystem: 'DataSystem',
     authoritySystem: 'AuthoritySystem',
     roleSystem: 'RoleSystem',
-    addUserNew: 'addUser'
-    selfDriverTag: 'selfDriverTag',
+    addUserNew: 'addUser',
     RandomlyAssigned: 'Randomly assign policy settings',
     BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa',
