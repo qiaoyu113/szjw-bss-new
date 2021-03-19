@@ -76,7 +76,7 @@
         >
           <div class="curation-title">
             <span>装货图片(2)</span>
-            <div>
+            <div class="img-ccc">
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
@@ -591,16 +591,20 @@ export default class extends Vue {
       font-size: 14px;
       color: #838383;
       line-height: 26px;
-      max-width: 90px;
-      margin-right: 12px;
+      width: 95px;
+      // margin-right: 12px;
       display: inline-block;
     }
     div {
       flex: 1;
       width: 260px;
+      max-width: 260px;
       height: 160px;
       border-radius: 5px;
       overflow: hidden;
+    }
+    img:hover .mask-img{
+      background: #649CEE;
     }
     img {
       width: 100%;
@@ -609,11 +613,11 @@ export default class extends Vue {
     }
     .mask-img{
       position: absolute;
-      width: 260px;
+      width: calc(100% - 95px);
       height: 32px;
       background: rgba(0,0,0,0.40);
       bottom: 0;
-      right: 0;
+      left: 95;
       z-index: 1;
       text-align: center;
       overflow: hidden;
