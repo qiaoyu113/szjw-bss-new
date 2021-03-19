@@ -14,7 +14,7 @@
       <template #budget>
         <el-input
           v-model="listQuery.budget"
-          v-only-number="{min: 0, max: 9999999.99, precision: 2}"
+          v-only-number="{min: 0, max: 9999999, precision: 0}"
           placeholder="请输入"
           clearable
         />

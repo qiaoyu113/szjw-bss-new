@@ -445,7 +445,7 @@ export async function showCityGroupPerson(node: any, resolve: any, clueType:any)
     resolve(groups)
   } else if (node.level === 2) {
     let [groupId, busiType] = node.value.split(',')
-    let users = await getGmOptions(node.parent.value, busiType, groupId)
+    let users = await getGmOptions(node.parent.value, busiType, groupId, clueType)
     resolve(users)
   }
 }
@@ -468,8 +468,9 @@ async function getOpenCitys() {
   }
 }
 // 获取小组
-async function GroupInfoByCityCodeAndProductLine(cityCode:number, clueType:any) {
+async function GroupInfoByCityCodeAndProductLine(cityCode:number, clueType:any = 0) {
   try {
+    //  业务线大于1 的属于雷鸟
     let busiLine = [0, 1]
     if (clueType > 1) {
       busiLine = [5]
@@ -494,10 +495,15 @@ async function GroupInfoByCityCodeAndProductLine(cityCode:number, clueType:any) 
   }
 }
 // 获取小组下的人
-async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
+async function getGmOptions(cityCode:number, busiType:number, groupId:number, clueType:any = 0) {
   try {
+    let roleTypes = [1, 4]
+    //  业务线大于1 的属于雷鸟
+    if (clueType > 1) {
+      roleTypes = [11, 12]
+    }
     let params:any = {
-      roleTypes: [1, 4],
+      roleTypes,
       cityCode,
       busiType,
       groupId,

@@ -188,10 +188,11 @@
           {{ scope.row.createDate }}
         </template>
         <template v-slot:op="scope">
+          <!-- :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)" -->
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
-            :disabled="!(scope.row.status=== 10 || scope.row.status=== 20)"
+
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -216,6 +217,7 @@
     </div>
     <!-- dialog -->
     <SelfDialog
+      :key="listQuery.clueType"
       :visible.sync="showDialog"
       :title="title"
       :confirm="confirm"
@@ -1024,7 +1026,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: showCityGroupPerson
+          lazyLoad: (node:any, resolve:any) => showCityGroupPerson(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',
