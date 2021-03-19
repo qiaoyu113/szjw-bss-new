@@ -58,8 +58,8 @@ const presetRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "user" */ '@/views/preset/user/CreateUser/index.vue'),
       name: 'addUser',
       meta: {
-        title: 'addUser',
-        activeMenu: '/roleSystem/user',
+        title: 'addUserNew',
+        activeMenu: '/roleSystem/addUser',
         noCache: true,
         icon: '',
         apiUrl: '/v1/base/user/menu'
