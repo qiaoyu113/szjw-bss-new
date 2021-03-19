@@ -117,7 +117,7 @@ const presetRouter: RouteConfig = {
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/wtSystem/role',
-            title: 'roleOperate',
+            title: 'editRole',
             noCache: true,
             hidden: true
           }
@@ -129,7 +129,7 @@ const presetRouter: RouteConfig = {
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/wtSystem/role',
-            title: 'roleCreate',
+            title: 'createRole',
             noCache: true,
             hidden: true
           }
@@ -182,13 +182,25 @@ const presetRouter: RouteConfig = {
           }
         },
         {
+          path: 'roleOperate', /* 编辑角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleOperate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/lnSystem/role',
+            title: 'editRole',
+            noCache: true,
+            hidden: true
+          }
+        },
+        {
           path: 'roleCreate', /* 新建角色 */
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/lnSystem/role',
-            title: 'roleCreate',
+            title: 'createRole',
             noCache: true,
             hidden: true
           }
@@ -241,13 +253,25 @@ const presetRouter: RouteConfig = {
           }
         },
         {
+          path: 'roleOperate', /* 编辑角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleOperate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/roleSystem/role',
+            title: 'editRole',
+            noCache: true,
+            hidden: true
+          }
+        },
+        {
           path: 'roleCreate', /* 新建角色 */
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/roleSystem/role',
-            title: 'roleCreate',
+            title: 'createRole',
             noCache: true,
             hidden: true
           }
@@ -300,13 +324,25 @@ const presetRouter: RouteConfig = {
           }
         },
         {
+          path: 'roleOperate', /* 编辑角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleOperate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/clueSystem/role',
+            title: 'editRole',
+            noCache: true,
+            hidden: true
+          }
+        },
+        {
           path: 'roleCreate', /* 新建角色 */
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/clueSystem/role',
-            title: 'roleCreate',
+            title: 'createRole',
             noCache: true,
             hidden: true
           }
@@ -359,13 +395,25 @@ const presetRouter: RouteConfig = {
           }
         },
         {
+          path: 'roleOperate', /* 编辑角色 */
+          component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
+          name: 'RoleOperate',
+          meta: {
+            apiUrl: '/v1/base/user/menu',
+            activeMenu: '/roleSystem/dataSystem/role',
+            title: 'editRole',
+            noCache: true,
+            hidden: true
+          }
+        },
+        {
           path: 'roleCreate', /* 新建角色 */
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
             apiUrl: '/v1/base/user/menu',
             activeMenu: '/roleSystem/dataSystem/role',
-            title: 'roleCreate',
+            title: 'createRole',
             noCache: true,
             hidden: true
           }
