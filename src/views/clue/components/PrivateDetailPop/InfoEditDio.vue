@@ -439,30 +439,40 @@ export default class extends Vue {
   }
 
   private setQuerys(value: IState) {
-    if (this.clueStatus < 2) {
-      this.WTQuery = { ...this.WTQuery, ...value }
-      this.WTQuery.intentWork = [
-        String(value.expectAddressCity),
-        String(value.expectAddressCounty)
-      ]
-      if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
-        this.WTQuery.intentWork.pop()
-        this.WTQuery.intentWork.push(this.countryValue)
+    try {
+      if (this.clueStatus < 2) {
+        this.WTQuery = { ...this.WTQuery, ...value }
+        this.WTQuery.intentWork = [
+          String(value.expectAddressCity),
+          String(value.expectAddressCounty)
+        ]
+        if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
+          this.WTQuery.intentWork.pop()
+          this.WTQuery.intentWork.push(this.countryValue)
+        }
+      } else if (this.clueStatus === 2) {
+        this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
+      } else if (this.clueStatus === 3) {
+        this.BirdQuery = { ...this.BirdQuery, ...value }
+      } else {
+        if (value.intentModel) {
+          value.intentModel = (value.intentModel).split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.intentModel = [1, 2, 3]
+        }
+        if (value.fancyModel) {
+          value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
+            return +ele
+          })
+        } else {
+          value.fancyModel = []
+        }
+        this.BirdQuery = { ...this.BirdQuery, ...value }
       }
-    } else if (this.clueStatus === 2) {
-      this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
-    } else if (this.clueStatus === 3) {
-      this.BirdQuery = { ...this.BirdQuery, ...value }
-    } else {
-      value.intentModel = value.intentModel.split(',').map((ele:any) => {
-        return +ele
-      })
-      value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
-        return +ele
-      })
-      this.BirdQuery.intentModel = []
-      this.BirdQuery.fancyModel = []
-      this.BirdQuery = { ...this.BirdQuery, ...value }
+    } catch (err) {
+      console.log('fail:', err)
     }
   }
 
