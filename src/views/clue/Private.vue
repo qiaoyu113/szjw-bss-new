@@ -170,7 +170,7 @@
           {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
-          {{ row.hasCar ? '有' : '无' }}
+          {{ row.hasCar ? '有' : '无' }}{{ row.carTypeName? '/'+row.carTypeName:'' }}
         </template>
         <template v-slot:notFollowDay="{row}">
           <el-link
@@ -912,7 +912,7 @@ export default class extends Vue {
       rules: [2]
     },
     {
-      key: 'carTypeName',
+      key: 'intentCarTypeName',
       label: '意向车型',
       rules: [3, 4]
     },

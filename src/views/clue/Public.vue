@@ -777,15 +777,20 @@ export default class extends Vue {
       let { data: res } = await UpdateFollowerByHighSeas(params)
       if (res.success) {
         if (res.data.flag) {
-          (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success('分配成功')
+          try {
+            (this.$refs.PublicClueTable as any).toggleRowSelection()
+            this.$message.success('分配成功')
+          } catch (error) {
+            return error
+          } finally {
+            setTimeout(() => {
+              this.getLists()
+            }, delayTime)
+          }
         } else {
           this.$message.warning(res.data.msg)
         }
         this.showDialog = false
-        setTimeout(() => {
-          this.getLists()
-        }, delayTime)
       } else {
         this.$message.error(res.errorMsg)
       }
