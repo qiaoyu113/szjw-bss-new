@@ -642,20 +642,20 @@ export default class extends Vue {
   addCustomers(formName: any) {
     (this.$refs[formName] as any).validate(async(valid: any) => {
       if (valid) {
-        this.loadingDialog = true
+        // this.loadingDialog = true
         let { data: res } = await UserGroupCreate(this.addForm)
         if (res.success) {
           this.$message({
             message: '创建成功!',
             type: 'success'
           })
-          this.loadingDialog = false
+          // this.loadingDialog = false
           this.cancel('ruleAddForm')
           setTimeout(() => {
             this.getLists()
           }, 2000)
         } else {
-          this.loadingDialog = false
+          // this.loadingDialog = false
           this.$message.error(res.errorMsg)
         }
       } else {

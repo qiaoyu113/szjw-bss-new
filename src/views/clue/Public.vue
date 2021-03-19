@@ -627,10 +627,10 @@ export default class extends Vue {
           ...clue
         ])
         this.sourceOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...sources
         ])
         this.demandOptions.push(...[
@@ -702,9 +702,9 @@ export default class extends Vue {
       return item
     })
     const { sourceChannel, carType, intentModel } = this.listQuery
-    params.sourceChannel = Array.isArray(sourceChannel) && sourceChannel.join(',')
-    params.carType = Array.isArray(carType) && carType.join(',')
-    params.intentModel = Array.isArray(intentModel) && intentModel.join(',')
+    params.sourceChannel = Array.isArray(sourceChannel) && sourceChannel.filter(item => item !== '').join(',')
+    params.carType = Array.isArray(carType) && carType.filter(item => item !== '').join(',')
+    params.intentModel = Array.isArray(intentModel) && intentModel.filter(item => item !== '').join(',')
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
         (params[key] === '' || params[key] === undefined) && delete params[key]
@@ -754,7 +754,12 @@ export default class extends Vue {
   // 业务线权限分配
   get cartTypePremission() {
     const arr = this.clueArr.filter(item => checkPermission([item.pUrl]))
-    this.listQuery.clueType = arr[0].value
+    this.$nextTick(() => {
+      if (arr[0]) {
+        this.listQuery.clueType = arr[0].value
+      }
+    })
+    // this.listQuery.clueType = arr[0].value
     return arr
   }
   // 分配、批量分配
@@ -772,15 +777,20 @@ export default class extends Vue {
       let { data: res } = await UpdateFollowerByHighSeas(params)
       if (res.success) {
         if (res.data.flag) {
-          (this.$refs.PublicClueTable as any).toggleRowSelection()
-          this.$message.success('分配成功')
+          try {
+            (this.$refs.PublicClueTable as any).toggleRowSelection()
+            this.$message.success('分配成功')
+          } catch (error) {
+            return error
+          } finally {
+            setTimeout(() => {
+              this.getLists()
+            }, delayTime)
+          }
         } else {
           this.$message.warning(res.data.msg)
         }
         this.showDialog = false
-        setTimeout(() => {
-          this.getLists()
-        }, delayTime)
       } else {
         this.$message.error(res.errorMsg)
       }
