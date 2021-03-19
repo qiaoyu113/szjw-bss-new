@@ -273,7 +273,7 @@ export default class extends Vue {
   private disabledCheck(row:any, index:number) {
     let selfId = this.allowData.id
     let allIds = row.roleIds
-    return !allIds.includes(selfId)
+    return !(allIds.includes(selfId) || row.isShare)
   }
 
   // 分页
