@@ -971,7 +971,7 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'cityName',
+      key: 'carCityName',
       label: '车辆所在城市',
       rules: [2]
     },
