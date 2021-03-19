@@ -191,10 +191,6 @@ export default class extends Vue {
       label: '角色'
     },
     {
-      key: 'userStatus',
-      label: '用户状态'
-    },
-    {
       key: 'status',
       label: '帐号状态',
       slot: true
