@@ -60,8 +60,10 @@
       active-name="用户管理"
     >
       <div class="subTitle">
-        <!-- v-permission="['/v3/base/user/create']" -->
-        <router-link :to="{path: '/roleSystem/addUser'}">
+        <router-link
+          v-permission="['/v3/base/user/create']"
+          :to="{path: '/roleSystem/addUser'}"
+        >
           <el-button
             class="createUser"
             icon="el-icon-plus"

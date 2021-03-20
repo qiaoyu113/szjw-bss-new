@@ -46,7 +46,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/user',
         noCache: true,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: '/v3/base/user/page/list'
       }
     },
     {
@@ -55,7 +55,7 @@ const presetRouter: RouteConfig = {
       name: 'addUser',
       meta: {
         title: 'addUserNew',
-        activeMenu: '/roleSystem/addUser',
+        activeMenu: '/v3/base/user/create',
         noCache: true,
         hidden: true,
         icon: '',
