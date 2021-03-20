@@ -123,7 +123,7 @@ export default class extends Vue {
     } else if (this.busiType === 2) {
       url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/84f5f3686f5849699d896cd57807c049'
     } else if (this.busiType === 3) {
-      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/ad24027b505644849e653a9f09f61c90'
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/51a23329a9ab4efab64cbc31da7d6734'
     }
     window.location.href = url
   }
