@@ -163,6 +163,10 @@
         <template v-slot:namePhone="{row}">
           {{ row.name }}<br>{{ row.phone }}
         </template>
+        <template v-slot:payIntentionMoney="{row}">
+          {{ row.payIntentionMoney === true?'是':'' }}
+          {{ row.payIntentionMoney === false?'否':'' }}
+        </template>
 
         <template v-slot:remark="{row}">
           <el-popover
@@ -938,7 +942,8 @@ export default class extends Vue {
     {
       key: 'payIntentionMoney',
       label: '是否交意向金',
-      rules: [2]
+      rules: [2],
+      slot: true
     },
     {
       key: 'remark',
@@ -1168,7 +1173,13 @@ export default class extends Vue {
       return item
     })
     params.onlyMe = params.onlyMe ? 1 : 0
-    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    if (this.listQuery.clueType <= 2) {
+      delete params.intentModel
+      params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    } else {
+      delete params.carType
+      params.intentModel = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    }
     // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
     params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
     params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item !== '').join(',')
