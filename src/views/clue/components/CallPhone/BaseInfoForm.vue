@@ -637,7 +637,7 @@ export default class extends Vue {
             marketClueWSXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueWSXDetailBaseInfoVO)
-          this.otherQuery = marketClueWSXDetailOtherInfoVO
+          marketClueWSXDetailOtherInfoVO && (this.otherQuery = marketClueWSXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -649,7 +649,7 @@ export default class extends Vue {
             marketClueLCXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueLCXDetailBaseInfoVO)
-          this.otherQuery = marketClueLCXDetailOtherInfoVO
+          marketClueLCXDetailOtherInfoVO && (this.otherQuery = marketClueLCXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -661,7 +661,7 @@ export default class extends Vue {
             marketClueLZXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueLZXDetailBaseInfoVO)
-          this.otherQuery = marketClueLZXDetailOtherInfoVO
+          marketClueLZXDetailOtherInfoVO && (this.otherQuery = marketClueLZXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
