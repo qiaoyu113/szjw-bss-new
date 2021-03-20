@@ -122,7 +122,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: '/v3/base/role/create',
+            apiUrl: '/v3/base/role/create/1',
             activeMenu: '/roleSystem/wtSystem/role',
             title: 'createRole',
             noCache: true,
