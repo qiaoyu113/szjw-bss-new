@@ -10,7 +10,6 @@ const presetRouter: RouteConfig = {
     title: 'roleSystem',
     icon: 'system',
     apiUrl: 'root'
-
   },
   children: [
     {
@@ -72,7 +71,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/wutong/role/message']
       },
       children: [
         {
@@ -90,7 +89,7 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
+            apiUrl: '/wutong/role/message',
             sysType: 1
           }
         },
@@ -111,7 +110,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: '/v3/base/role/update',
             activeMenu: '/roleSystem/wtSystem/role',
             title: 'editRole',
             noCache: true,
@@ -123,7 +122,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: '/v3/base/role/create',
             activeMenu: '/roleSystem/wtSystem/role',
             title: 'createRole',
             noCache: true,
@@ -161,7 +160,7 @@ const presetRouter: RouteConfig = {
           meta: {
             title: 'roleManage',
             apiUrl: 'root',
-            sysType: 2
+            sysType: 3
           }
         },
         {
@@ -232,7 +231,7 @@ const presetRouter: RouteConfig = {
           meta: {
             title: 'roleManage',
             apiUrl: 'root',
-            sysType: 5
+            sysType: 6
           }
         },
         {
@@ -303,7 +302,7 @@ const presetRouter: RouteConfig = {
           meta: {
             title: 'roleManage',
             apiUrl: 'root',
-            sysType: 3
+            sysType: 7
           }
         },
         {
@@ -374,7 +373,7 @@ const presetRouter: RouteConfig = {
           meta: {
             title: 'roleManage',
             apiUrl: 'root',
-            sysType: 4
+            sysType: 8
           }
         },
         {
