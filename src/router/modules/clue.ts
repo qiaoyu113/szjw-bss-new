@@ -41,7 +41,7 @@ const clueRouter: RouteConfig = {
         apiUrl: '/v2/clue/campaign/getClueCampaignList',
         hidden: true,
         title: 'campaignDetail',
-        noCache: false
+        noCache: true
       }
     },
     {

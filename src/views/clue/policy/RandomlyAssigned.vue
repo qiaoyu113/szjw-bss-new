@@ -69,6 +69,7 @@
     <SetUpDistributionPolicy
       :visible.sync="showPolicy"
       :policy-data="policyData"
+      :clue-type="activeLineType"
       @success="getList"
     />
   </div>
