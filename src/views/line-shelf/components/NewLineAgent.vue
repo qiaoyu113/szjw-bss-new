@@ -288,6 +288,7 @@
       :page="1"
       :limit="12"
     />
+    <ImgDialog />
   </div>
 </template>
 
@@ -297,12 +298,14 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import ImgDialog from './ImgDialog.vue'
 @Component({
   name: 'NewLineAgent',
   components: {
     SectionContainer,
     SelfForm,
-    pagination
+    pagination,
+    ImgDialog
   }
 })
 export default class extends Vue {
@@ -578,9 +581,7 @@ export default class extends Vue {
   }
 }
 .agent-button {
-  // margin: 20px 0;
   margin-right: 20px;
-  // width: 100% !important;
   min-width: 120px;
   border: none;
 }
@@ -681,12 +682,6 @@ export default class extends Vue {
     background: #ccc;
     color: #333;
   }
-  // ::v-deep .active {
-  //   color: #4899d0;
-  // }
-  // ::v-deep .error {
-  //   color: red;
-  // }
   .el-icon-question {
     font-size: 18px;
     line-height: 36px;
