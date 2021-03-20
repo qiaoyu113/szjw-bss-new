@@ -58,7 +58,7 @@
               重置密码
             </el-dropdown-item>
             <el-dropdown-item
-              v-permission="['/v2/base/user/update']"
+              v-permission="['/v3/base/user/update']"
               command="edit"
             >
               编辑
