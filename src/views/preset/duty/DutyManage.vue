@@ -263,7 +263,6 @@ export default class extends Vue {
     const { data } = await dutyList({ dutyParentId })
     this.loading = false
     if (data.success) {
-      console.log(node.level)
       const treeList = data.data.map((item: any) => {
         if (node.level === 2) {
           item.leaf = true
