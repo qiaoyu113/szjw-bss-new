@@ -299,7 +299,7 @@
             prop="cityList"
           >
             <el-cascader
-              :key="dialogForm.dutyId"
+              :key="isResouceShow"
               ref="cityList"
               :options="data3"
               :props="propsCity"
@@ -308,6 +308,7 @@
               clearable
               class="city-cascader"
               :disabled="dialogForm.dutyId === ''"
+              @remove-tag="isResouceShow++"
             />
           </el-form-item>
         </template>
@@ -444,6 +445,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+  private isResouceShow = 0
   private treeKey = 0
   private copyData = {} // 深拷贝data
   private defaultExpandAll: boolean = false;
@@ -751,7 +753,7 @@ export default class extends Vue {
               'parentIds': params.parentIds
             }]
           } else {
-            list = cityList.map((item: any) => ({ parentId: item.data.id, parentIds: `${this.addData.parentIds},${this.addData.id}` }))
+            list = cityList.map((item: any) => ({ parentId: item.data.id, parentIds: `${item.data.parentIds},${item.data.id}` }))
             if (!cityList.some((item : any) => item.data.id === this.addData.id)) {
               list.push({
                 'parentId': this.addData.id,
@@ -765,14 +767,17 @@ export default class extends Vue {
           params.dutyId = this.addData.dutyId
         }
         params.parentId = this.addData.id
-
         const { data } = await submitForm(params)
         if (data.success) {
           this.$message.success(`创建成功`)
           if (this.addData.type === 3) {
             this.getOfficeList()
           } else {
-            this.append(data.data)
+            if (this.addNode.data.id === 16 && this.addNode.level === 1) {
+              this.append2(data.data)
+            } else {
+              this.append(data.data)
+            }
           }
           this.showDialog = false
           this.resetDialog()
@@ -825,6 +830,9 @@ export default class extends Vue {
     } else {
       this.dialogForm.name = ''
     }
+    if (value !== '') {
+      this.isResouceShow++
+    }
   }
   // 获取组织管理列表
   private async getOfficeList(cb: any = () => {}) {
@@ -873,14 +881,15 @@ export default class extends Vue {
       // 请求第一级 初始化
       resolve([
         {
-          id: -1,
+          id: 16,
           name: '大区公共组织',
           type: 1,
           parentId: 0,
           parentIds: '0',
           officeVOs: [],
           userCount: 0,
-          leaf: false
+          leaf: false,
+          datalevel: 1
         },
         {
           id: -2,
@@ -903,7 +912,7 @@ export default class extends Vue {
     const { data } = await getOfficeListPost(postData)
     if (data.success) {
       let arr = data.data
-      if ((node.data.id === -1 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
+      if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
         arr = data.data.map((item: any) => {
           item.leaf = true
           return item
@@ -932,12 +941,19 @@ export default class extends Vue {
         })
         if (data.success) {
           this.$message.success(`删除成功`)
-          this.remove(node, item)
+          if (node.parent.data.datalevel === 1) {
+            this.remove2(node, item)
+          } else {
+            this.remove(node, item)
+          }
         } else {
           this.$message.error(data)
         }
       })
       .catch(() => {})
+  }
+  private remove2(node: any, data: any) {
+    (this.$refs['tree2'] as any).$refs['roleTree'].remove(node)
   }
   // 删除tree 节点
   private remove(node: any, data: any) {
@@ -955,6 +971,18 @@ export default class extends Vue {
       this.$set(this.addData, 'officeVOs', [])
     }
     this.addData.officeVOs.push(newChild)
+  }
+  // append tree节点
+  private append2(data: any) {
+    const newChild = {
+      ...data,
+      leaf: true
+    };
+    (this.$refs['tree2'] as any).$refs['roleTree'].append(newChild, this.addNode)
+    // if (!this.addData.officeVOs) {
+    //   this.$set(this.addData, 'officeVOs', [])
+    // }
+    // this.addData.officeVOs.push(newChild)
   }
   // update tree节点
   private update(item: any) {
@@ -982,6 +1010,9 @@ export default class extends Vue {
     })
     if (this.isAdd) {
       this.changeProps()
+    }
+    if (value !== '') {
+      this.isResouceShow++
     }
   }
   private allowDrop(draggingNode: any, dropNode: any, type: any) {
