@@ -46,8 +46,10 @@
             v-for="(item,index) in itemData"
             :key="index"
           >
-            <span>{{ item.label }}：</span>
-            <span style="color:#242020">{{ item.value }}</span>
+            <template v-if="item.label !== '司机姓名'">
+              <span>{{ item.label }}：</span>
+              <span style="color:#242020">{{ item.value }}</span>
+            </template>
           </li>
         </ul>
       </p>
