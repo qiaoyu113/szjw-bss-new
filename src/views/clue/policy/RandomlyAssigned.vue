@@ -64,12 +64,14 @@
         <template v-slot:Id="{row}">
           {{ row.userGroupId }}/{{ row.busiTypeName }}/{{ row.groupType }}
         </template>
+        <template v-slot:groupUpdate="{row}">
+          {{ row.groupUpdateName }}/{{ row.groupUpdatePhone }}
+        </template>
       </self-table>
     </div>
     <SetUpDistributionPolicy
       :visible.sync="showPolicy"
       :policy-data="policyData"
-      :clue-type="activeLineType"
       @success="getList"
     />
   </div>
@@ -210,7 +212,8 @@ export default class extends Vue {
       width: '120px'
     },
     {
-      key: 'groupUpdateName',
+      key: 'groupUpdate',
+      slot: true,
       label: '设置人'
     },
     {
@@ -284,7 +287,7 @@ export default class extends Vue {
       // if (this.listQuery.city && this.listQuery.city.length > 1) {
       //   params.city = this.listQuery.city
       // }
-      this.listQuery.city && (params.city = +this.listQuery.city)
+      this.listQuery.city && this.listQuery.city.length && (params.city = +this.listQuery.city[0])
       if (params.clueType === 0) {
         let { data: res } = await configurationWTSpecialList(params)
         if (res.success) {
