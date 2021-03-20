@@ -34,7 +34,7 @@
         :is-edit="isEdit"
       />
       <template #rightBox>
-        <div v-permission="[' /v2/clue/campaign/editCampaignData']">
+        <div v-permission="['/v2/clue/campaign/editCampaignData']">
           <div v-if="isEdit">
             <el-button
               type="text"
