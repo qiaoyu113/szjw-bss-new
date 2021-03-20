@@ -90,19 +90,16 @@
                 name="rolemanage_moreMenuItem_dropdown"
               >
                 <el-dropdown-item
-                  v-permission="['/v2/base/role/deleteByRoleId']"
                   @click.native="handleAllowClick(scope.row)"
                 >
                   分配角色
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-permission="['/v2/base/role/deleteByRoleId']"
                   @click.native="deleteRole(scope.row)"
                 >
                   删除
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-permission="['/v1/base/role/update']"
                   @click.native="editRole(scope.row)"
                 >
                   编辑
@@ -345,7 +342,7 @@ export default class extends Vue {
         name = 'roleSystem'
         break
     }
-    this.$router.push({ path: `/${name}/RoleOperate`, query: { id: row.id, sysType: this.$route.meta.sysType } })
+    this.$router.push({ path: `/roleSystem/${name}/roleOperate`, query: { id: row.id, sysType: this.$route.meta.sysType } })
   }
   private deleteRole(item: any) {
     this.$confirm(`您确定要删除“${item.nick}”吗？`, '删除角色', {
