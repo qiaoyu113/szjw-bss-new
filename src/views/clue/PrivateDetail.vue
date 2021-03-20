@@ -1,6 +1,6 @@
 <template>
   <div class="PrivateDetail">
-    <!-- <div class="tabHeader">
+    <div class="tabHeader">
       <el-card
         v-if="clueArray"
         class="box-card"
@@ -21,7 +21,7 @@
           </el-tabs>
         </template>
       </el-card>
-    </div> -->
+    </div>
     <div class="detailContent">
       <el-card class="box-card">
         <SectionContainer
