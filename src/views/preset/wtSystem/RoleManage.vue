@@ -92,7 +92,7 @@
                 <el-dropdown-item
                   @click.native="handleAllowClick(scope.row)"
                 >
-                  分配角色
+                  分配用户
                 </el-dropdown-item>
                 <el-dropdown-item
                   @click.native="deleteRole(scope.row)"
