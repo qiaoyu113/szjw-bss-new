@@ -125,7 +125,7 @@
           /> -->
           <div class="right-btn">
             <el-button
-              v-if="!node.isLeaf"
+              v-if="!node.isLeaf && data.id !== -2"
               v-permission="['/v2/base/office/create']"
               circle
               size="mini"
@@ -176,7 +176,7 @@
               name="organizationmanage_upOffice_btn"
               @click.stop="
                 () => {
-                  upOffice(node, data);
+                  upOffice2(node, data);
                 }
               "
             />
@@ -190,7 +190,7 @@
               name="organizationmanage_downOffice_btn"
               @click.stop="
                 () => {
-                  downOffice(node, data);
+                  downOffice2(node, data);
                 }
               "
             />
@@ -631,6 +631,63 @@ export default class extends Vue {
       }
     )
   }
+  private async upOffice2(node: any, item: any) {
+    // 向上
+    if (this.disabled) {
+      return
+    }
+    const parent = node.parent
+    const children = parent.childNodes
+    const prev = node.previousSibling
+    if (!prev) {
+      this.$message.error(`处于顶端，不能继续上移`)
+      return
+    }
+    this.disabled = true
+    this.sortOffice(
+      {
+        fromId: node.data.id,
+        toId: prev.data.id
+      },
+      () => {
+        let index = children.findIndex((item: any) => item.data.id === node.data.id);
+        ([children[index], children[index - 1]] = [children[index - 1], children[index]])
+        parent.expanded = !parent.expanded
+        this.$nextTick(() => {
+          parent.expanded = !parent.expanded
+        })
+      }
+    )
+  }
+  private async downOffice2(node: any, item: any) {
+    // 下
+    if (this.disabled) {
+      return
+    }
+    const parent = node.parent
+    const next = node.nextSibling
+    const children = parent.childNodes
+    if (!next) {
+      this.$message.error(`处于末端，不能继续下移`)
+      return
+    }
+    this.disabled = true
+
+    this.sortOffice(
+      {
+        fromId: node.data.id,
+        toId: next.data.id
+      },
+      () => {
+        let index = children.findIndex((item: any) => item.data.id === node.data.id);
+        ([children[index], children[index + 1]] = [children[index + 1], children[index]])
+        parent.expanded = !parent.expanded
+        this.$nextTick(() => {
+          parent.expanded = !parent.expanded
+        })
+      }
+    )
+  }
   private async sortOffice(postData: any, callback: any) {
     const { data } = await sortOffice(postData)
     this.disabled = false
@@ -833,7 +890,7 @@ export default class extends Vue {
           parentIds: '0',
           officeVOs: [],
           userCount: 0,
-          leaf: false
+          leaf: true
         }
       ])
       return
@@ -930,8 +987,8 @@ export default class extends Vue {
   private allowDrop(draggingNode: any, dropNode: any, type: any) {
     if (draggingNode.level === dropNode.level + 1) {
       return type === 'inner'
-    } else if (draggingNode.level === dropNode.level) {
-      return type === 'prev' || type === 'next'
+    // } else if (draggingNode.level === dropNode.level) {
+    //   return type === 'prev' || type === 'next'
     } else {
       return false
     }
@@ -942,16 +999,9 @@ export default class extends Vue {
   private handleDrop(draggingNode: any, dropNode: any, type: any, event: any) {
     let params = {
       fromId: draggingNode.data.id,
-      childrenids: dropNode.parent.childNodes.map((item: any) => item.data.id),
-      parentId: dropNode.parent.data.id,
-      parentIds: `${dropNode.parent.data.parentIds},${dropNode.parent.data.id}`
+      toId: dropNode.data.id,
+      toParentIds: dropNode.data.parentIds
     }
-    if (type === 'inner') {
-      params.childrenids = dropNode.childNodes.map((item: any) => item.data.id)
-      params.parentId = dropNode.data.id
-      params.parentIds = `${dropNode.data.parentIds},${dropNode.data.id}`
-    }
-
     const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
     const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
 

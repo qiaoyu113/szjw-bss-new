@@ -475,7 +475,7 @@ export default class extends Vue {
   }
   // 添加角色
   handleAddRole() {
-    this.listQuery.roleId.push({
+    this.listQuery.roleId.unshift({
       roleId: ''
     })
   }
