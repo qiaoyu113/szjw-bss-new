@@ -441,6 +441,7 @@ export default class extends Vue {
   private setQuerys(value: IState) {
     try {
       if (this.clueStatus < 2) {
+        this.WTQuery = { ...this.WTQuery, ...value }
         if (value.expectAddressCity && value.expectAddressCounty) {
           this.WTQuery.intentWork = [
             String(value.expectAddressCity),
@@ -643,8 +644,9 @@ export default class extends Vue {
       if (val.experience === '') {
         Reflect.deleteProperty(val, 'experience')
       }
-      if (val.carType === '') {
+      if (val.carType === '' || !val.hasCar) {
         Reflect.deleteProperty(val, 'carType')
+        Reflect.deleteProperty(val, 'carTypeName')
       }
       let { data: res } = await editClue(val)
       if (res.success) {
