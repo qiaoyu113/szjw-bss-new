@@ -124,7 +124,7 @@
               {{ scope.row.createUserName }}
             </p>
             <p class="noP">
-              {{ scope.row.phone }}
+              {{ scope.row.createUserPhone }}
             </p>
           </template>
           <template v-else>
@@ -418,7 +418,7 @@ export default class extends Vue {
     {
       key: 'createUserName',
       label: '创建人',
-      'width': '100px',
+      'width': '120px',
       slot: true
     },
     {
