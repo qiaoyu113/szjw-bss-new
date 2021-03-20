@@ -82,7 +82,7 @@
                 {{ `${scope.row.followerName}(${scope.row.followerPhone})` }}
               </template>
               <template v-slot:inviteDate="scope">
-                {{ scope.row.inviteDate }}
+                {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
               </template>
 
               <template v-slot:op="scope">
@@ -260,7 +260,7 @@ import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import CallLog from '@/components/OutboundDialog/CallLog.vue'
-import { isPermission } from '@/filters/index'
+import { isPermission, parseTime } from '@/filters/index'
 import {
   FollowUpDiolog,
   SendMessage,
@@ -735,8 +735,10 @@ export default class extends Vue {
                 ? '有' + ';' + this.baseInfoEdio.carTypeName
                 : '否'
             } else {
-              item.value = isNaN(ele[1]) ? ele[1] : String(ele[1])
+              item.value = ele[1] || ' '
             }
+          } else {
+            item.value = ele[1] || ' '
           }
         }
       })
@@ -797,7 +799,11 @@ export default class extends Vue {
 
   // tab切换
   private handleClick(tab: any, event: any) {
-    this.clueId = this.clueArray[+this.clueStatus].clueId || ''
+    this.clueArray.forEach((ele:any) => {
+      if (+ele.code === +this.clueStatus) {
+        this.clueId = ele.clueId
+      }
+    })
     this.getDetailApi()
     this.getDoLog()
   }
@@ -876,9 +882,9 @@ export default class extends Vue {
   }
 
   private handleInterviewClick(row: any, type: number) {
-    console.log(row)
+    let date = parseTime(row.inviteDate, '{y}-{m}-{d} {h}:{i}')
     if (type) {
-      this.$confirm('是否取消面试?', `已邀约面试时间：${row.inviteDate}`, {
+      this.$confirm('是否取消面试?', `已邀约面试时间：${date}`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         customClass: 'InterviewConfirm',
@@ -894,7 +900,7 @@ export default class extends Vue {
           })
         })
     } else {
-      this.$confirm('司机是否爽约?', `已邀约面试时间：${row.inviteDate}`, {
+      this.$confirm('司机是否爽约?', `已邀约面试时间：${date}`, {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         customClass: 'InterviewConfirm',

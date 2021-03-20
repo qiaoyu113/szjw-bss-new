@@ -85,7 +85,12 @@
         :default-sort="{prop: 'createDate', order: 'descending'}"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
-      />
+        @sort-change="sortDate"
+      >
+        <template v-slot:createDate="scope">
+          {{ scope.row.createDate }}
+        </template>
+      </self-table>
     </div>
     <!--新建客群-->
     <el-dialog
@@ -158,6 +163,7 @@
           </el-select>
         </el-form-item>
         <el-form-item
+          v-if="addForm.busiType !== '2'"
           label="邀约语"
           prop="invitation"
         >
@@ -171,6 +177,7 @@
           </el-col>
         </el-form-item>
         <el-form-item
+          v-if="addForm.busiType !== '2'"
           label="面试语"
           prop="interview"
         >
@@ -453,6 +460,10 @@ export default class extends Vue {
     {
       key: 'createDate',
       label: '创建时间',
+      slot: true,
+      attrs: {
+        sortable: true
+      },
       rules: ['root']
     }
   ];
@@ -530,6 +541,21 @@ export default class extends Vue {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
 
+  // 时间排序
+  sortDate({ order }:any) {
+    let isSort = false
+    if (order) {
+      order = order === 'ascending' ? 'asc' : 'desc'
+      this.listQuery.sort = order
+      isSort = true
+    } else {
+      this.listQuery.sort = undefined
+    }
+    // this.getList(order)
+    console.log(order)
+    this.getLists(isSort)
+  }
+
   // 分页
   private handlePageSize(page: PageObj) {
     this.page.page = page.page
@@ -572,7 +598,7 @@ export default class extends Vue {
 
   // 获取列表
   @lock
-  private async getLists() {
+  private async getLists(isSort = false) {
     try {
       this.listLoading = true
       let params: IState = {
@@ -590,6 +616,9 @@ export default class extends Vue {
         if (res.success) {
           res.page = await HandlePages(res.page)
           this.page.total = res.page.total
+          res.data.forEach((i: any) => {
+            i.createName = i.createName + i.createPhone
+          })
           this.tableData = res.data || []
         } else {
           this.tableData = res.data || []
@@ -600,6 +629,9 @@ export default class extends Vue {
         if (res.success) {
           res.page = await HandlePages(res.page)
           this.page.total = res.page.total
+          res.data.forEach((i: any) => {
+            i.createName = i.createName + i.createPhone
+          })
           this.tableData = res.data || []
         } else {
           this.tableData = res.data || []
@@ -610,6 +642,9 @@ export default class extends Vue {
         if (res.success) {
           res.page = await HandlePages(res.page)
           this.page.total = res.page.total
+          res.data.forEach((i: any) => {
+            i.createName = i.createName + i.createPhone
+          })
           this.tableData = res.data || []
         } else {
           this.tableData = res.data || []
@@ -620,6 +655,9 @@ export default class extends Vue {
         if (res.success) {
           res.page = await HandlePages(res.page)
           this.page.total = res.page.total
+          res.data.forEach((i: any) => {
+            i.createName = i.createName + i.createPhone
+          })
           this.tableData = res.data || []
         } else {
           this.tableData = res.data || []
