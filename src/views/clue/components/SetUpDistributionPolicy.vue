@@ -81,25 +81,27 @@ import { getGroupInfoByCityCodeAndProductLine, GetSpecifiedRoleList } from '@/ap
 })
 export default class extends Vue {
   @Prop({ default: () => {} }) policyData: any
+  @Prop({ default: 0 }) clueType!: number
   private queryInfo: any = {
     group: [],
     notReceiveIds: [],
     cityCode: '',
-    busiLine: ''
+    busiLine: '',
+    clueType: ''
   }
   private userGroupList: any = [] // 小组列表
   private chosenList:any = [] // 已经选择人员
   private teamMemberList: any = [] // 人员数组
   // 获取小组
   async getUserGroupList() {
-    let code = this.queryInfo.clueType
-    const { busiType, cityCode } = this.policyData
+    let code = this.clueType
+    if (this.clueType > 1) {
+      code = 5
+    }
+    const { cityCode } = this.policyData
     try {
-      let params:any = {
-        busiLine: busiType,
-        cityCode: cityCode
-      }
-      let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
+      let { data: res } = await getGroupInfoByCityCodeAndProductLine({ busiLine: String(code),
+        cityCode: cityCode })
       if (res.success) {
         this.userGroupList = res.data.map((item:any) => ({
           id: item.id,
@@ -148,10 +150,19 @@ export default class extends Vue {
     }
   }
   // 获取组内人员
-  async getTeamMember(cityCode:number, groupId: any) {
+  async getTeamMember(cityCode:number, groupId: any, clueType:any = 0) {
     try {
+      let roleTypes = [1, 4]
+      //  业务线大于1 的属于雷鸟
+      if (clueType > 1) {
+        if (clueType === 2) {
+          roleTypes = [11]
+        } else {
+          roleTypes = [12]
+        }
+      }
       let params:any = {
-        roleTypes: [1, 4],
+        roleTypes,
         groupId,
         cityCode,
         uri: '/v2/clueH5/list/queryFollowerList'
