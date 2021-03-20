@@ -118,6 +118,19 @@
             导入线索
           </el-button>
         </template>
+        <template #createUserName="scope">
+          <template v-if="scope.row.createUserName || scope.row.phone">
+            <p class="noP">
+              {{ scope.row.createUserName }}
+            </p>
+            <p class="noP">
+              {{ scope.row.phone }}
+            </p>
+          </template>
+          <template v-else>
+            暂无数据
+          </template>
+        </template>
       </self-table>
     </div>
     <!-- 新建Campaign -->
@@ -405,7 +418,8 @@ export default class extends Vue {
     {
       key: 'createUserName',
       label: '创建人',
-      'width': '100px'
+      'width': '100px',
+      slot: true
     },
     {
       key: 'createDate',
@@ -764,6 +778,10 @@ export default class extends Vue {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
+    }
+    .noP {
+      padding: 0;
+      margin: 0;
     }
   }
 </style>
