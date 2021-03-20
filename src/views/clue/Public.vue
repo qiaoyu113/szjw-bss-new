@@ -688,8 +688,8 @@ export default class extends Vue {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
         if (item.key === 'cityCode' && this.listQuery.cityCode) {
           params.cityCode = this.listQuery.cityCode[1] || ''
-        } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
-          params.carCity = this.listQuery.carCity[1]
+        } else if (item.key === 'carCity' && this.listQuery.carCity) {
+          params.carCity = this.listQuery.carCity[1] || ''
         } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
           let createDateStart = new Date(this.listQuery.createTime[0])
           let createDateEnd = new Date(this.listQuery.createTime[1])
