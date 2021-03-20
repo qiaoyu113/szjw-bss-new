@@ -23,7 +23,7 @@
       <makeCall
         ref="callPhone"
         :phone="phone"
-        :call-id="callId"
+        :call-id="clueId"
         @random="random"
       />
       <div>
@@ -61,6 +61,7 @@ import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { FollowForm, baseInfoForm } from '../index'
 import { PhoneModule } from '@/store/modules/phone'
 import SectionContainer from '@/components/SectionContainer/index.vue'
+import { delayTime } from '@/settings'
 interface IState {
   [key: string]: any;
 }
@@ -150,7 +151,9 @@ export default class extends Vue {
           message: '保存失败'
         })
       }
-      this.$emit('success');
+      setTimeout(() => {
+        this.$emit('success')
+      }, delayTime);
       (this.$parent as any).getDetailApi()
     } catch (err) {
       console.log(err, 'fail')
