@@ -163,6 +163,24 @@
         <template v-slot:namePhone="{row}">
           {{ row.name }}<br>{{ row.phone }}
         </template>
+
+        <template v-slot:remark="{row}">
+          <el-popover
+            v-if="row.remark"
+            placement="top-start"
+            title=""
+            width="200"
+            trigger="hover"
+            :content="row.remark"
+          >
+            <div
+              slot="reference"
+              class="text-partition"
+            >
+              {{ row.remark }}
+            </div>
+          </el-popover>
+        </template>
         <template v-slot:followerName="{row}">
           {{ row.followerName }}<br>{{ row.followerPhone }}
         </template>
@@ -925,6 +943,7 @@ export default class extends Vue {
     {
       key: 'remark',
       label: '跟进备注',
+      slot: true,
       rules: ['root']
     },
     {
@@ -1609,6 +1628,13 @@ export default class extends Vue {
     .mt20{
       margin-top: 20px;
     }
+  }
+  .text-partition{
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 </style>

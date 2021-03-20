@@ -23,7 +23,7 @@
       <makeCall
         ref="callPhone"
         :phone="phone"
-        :clue-id="clueId"
+        :call-id="callId"
         @random="random"
       />
       <div>
@@ -127,30 +127,34 @@ export default class extends Vue {
   }
 
   allSuccess(res:boolean[]) {
-    console.log(res)
-    if (res[0] && res[1]) {
-      this.$message({
-        type: 'success',
-        message: '保存成功!'
-      })
-      this.show = false
-    } else if (!res[0] && res[1]) {
-      this.$message({
-        type: 'warning',
-        message: '备注信息保存成功，基础信息保存失败'
-      })
-    } else if (res[0] && !res[1]) {
-      this.$message({
-        type: 'warning',
-        message: '基础信息保存成功，备注信息保存失败'
-      })
-    } else {
-      this.$message({
-        type: 'warning',
-        message: '保存失败'
-      })
+    try {
+      if (res[0] && res[1]) {
+        this.$message({
+          type: 'success',
+          message: '保存成功!'
+        })
+        this.show = false
+      } else if (!res[0] && res[1]) {
+        this.$message({
+          type: 'warning',
+          message: '备注信息保存成功，基础信息保存失败'
+        })
+      } else if (res[0] && !res[1]) {
+        this.$message({
+          type: 'warning',
+          message: '基础信息保存成功，备注信息保存失败'
+        })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '保存失败'
+        })
+      }
+      this.$emit('success');
+      (this.$parent as any).getDetailApi()
+    } catch (err) {
+      console.log(err, 'fail')
     }
-    (this.$parent as any).getDetailApi()
   }
 
   random(val:string) {

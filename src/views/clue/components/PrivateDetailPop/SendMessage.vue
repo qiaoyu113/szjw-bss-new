@@ -46,8 +46,10 @@
             v-for="(item,index) in itemData"
             :key="index"
           >
-            <span>{{ item.label }}：</span>
-            <span style="color:#242020">{{ item.value }}</span>
+            <template v-if="item.label !== '司机姓名'">
+              <span>{{ item.label }}：</span>
+              <span style="color:#242020">{{ item.value }}</span>
+            </template>
           </li>
         </ul>
       </p>
@@ -143,14 +145,7 @@ export default class extends Vue {
       col: 24,
       tagAttrs: {
         placeholder: '请选择面试时间',
-        clearable: true,
-        format: 'yyyy-MM-dd HH:mm',
-        'value-format': 'yyyy-MM-dd HH:mm',
-        'picker-options': {
-          disabledDate: (time:Date) => {
-            return time.getTime() < new Date().getTime()
-          }
-        }
+        clearable: true
       }
     },
     {
@@ -236,7 +231,7 @@ export default class extends Vue {
   }
 
   // 短信模板预览
-  @Watch('dialogPopQuery', { deep: true })
+  @Watch('dialogPopQuery', { deep: true, immediate: true })
   changeQuery(val: any, oldVal: any) {
     let arr: string[] = []
     this.sendFormItem.forEach((ele: any) => {
@@ -263,8 +258,10 @@ export default class extends Vue {
   }
 
   private defineData(val: number) {
-    this.dialogPopQuery.interviewDate = this.baseInfo.inviteDate
     this.dialogPopQuery.driverName = this.baseInfo.name
+    if (this.baseInfo.status === 30) {
+      this.dialogPopQuery.interviewDate = new Date(this.baseInfo.inviteDate).getTime()
+    }
   }
 
   // 短信预览是否显示
@@ -307,7 +304,9 @@ export default class extends Vue {
             }
           }
         }
-        this.itemData.push(item)
+        this.$nextTick(() => {
+          this.itemData.push(item)
+        })
       }
     })
   }
