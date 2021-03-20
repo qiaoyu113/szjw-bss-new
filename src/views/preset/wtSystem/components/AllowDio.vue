@@ -137,7 +137,7 @@ export default class extends Vue {
     {
       key: 'officeId',
       type: 'officeId',
-      label: '组织结构:',
+      label: '组织架构',
       slot: true,
       col: 24
     },
