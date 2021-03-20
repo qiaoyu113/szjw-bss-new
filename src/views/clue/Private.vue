@@ -511,7 +511,7 @@ export default class extends Vue {
         recordId: '雷鸟租赁C导入模板'
       },
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/ce168afed219417b8567915a0ce89237',
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/8f9dfbf8c1c0409c8318e8c543df7a3e',
         recordId: '雷鸟租赁B导入模板'
       }
     ]
