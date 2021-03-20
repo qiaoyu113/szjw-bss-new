@@ -222,7 +222,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v3/base/authority/list/role'
+            apiUrl: '/v3/base/authority/list/6'
           }
         },
         {
@@ -293,7 +293,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v3/base/authority/list/'
+            apiUrl: '/v3/base/authority/list/7'
           }
         },
         {
@@ -364,7 +364,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v3/base/authority/list/data'
+            apiUrl: '/v3/base/authority/list/8'
           }
         },
         {
