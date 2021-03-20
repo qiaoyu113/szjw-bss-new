@@ -125,7 +125,7 @@
           /> -->
           <div class="right-btn">
             <el-button
-              v-if="!node.isLeaf"
+              v-if="!node.isLeaf && data.id !== -2"
               v-permission="['/v2/base/office/create']"
               circle
               size="mini"
@@ -890,7 +890,7 @@ export default class extends Vue {
           parentIds: '0',
           officeVOs: [],
           userCount: 0,
-          leaf: false
+          leaf: true
         }
       ])
       return
@@ -987,8 +987,8 @@ export default class extends Vue {
   private allowDrop(draggingNode: any, dropNode: any, type: any) {
     if (draggingNode.level === dropNode.level + 1) {
       return type === 'inner'
-    } else if (draggingNode.level === dropNode.level) {
-      return type === 'prev' || type === 'next'
+    // } else if (draggingNode.level === dropNode.level) {
+    //   return type === 'prev' || type === 'next'
     } else {
       return false
     }
@@ -999,16 +999,9 @@ export default class extends Vue {
   private handleDrop(draggingNode: any, dropNode: any, type: any, event: any) {
     let params = {
       fromId: draggingNode.data.id,
-      childrenids: dropNode.parent.childNodes.map((item: any) => item.data.id),
-      parentId: dropNode.parent.data.id,
-      parentIds: `${dropNode.parent.data.parentIds},${dropNode.parent.data.id}`
+      toId: dropNode.data.id,
+      toParentIds: dropNode.data.parentIds
     }
-    if (type === 'inner') {
-      params.childrenids = dropNode.childNodes.map((item: any) => item.data.id)
-      params.parentId = dropNode.data.id
-      params.parentIds = `${dropNode.data.parentIds},${dropNode.data.id}`
-    }
-
     const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
     const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
 
