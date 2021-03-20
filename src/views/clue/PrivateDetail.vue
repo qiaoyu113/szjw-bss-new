@@ -36,7 +36,7 @@
           >
             <span />
             <el-button
-              v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
+              v-if="showBtn"
               v-permission="['/v2/market-clue/detail/makeCall']"
               type="text"
               @click="callPhoneDio = true"
@@ -44,7 +44,7 @@
               打电话
             </el-button>
             <el-button
-              v-if="baseInfoEdio.status === 10 || baseInfoEdio.status === 20"
+              v-if="showBtn"
               v-permission="['/v2/market-clue/followClue']"
               type="text"
               @click="followUpDio = true"
@@ -346,6 +346,10 @@ export default class extends Vue {
     {
       key: 'inviteFailReasonName',
       label: '邀约失败原因'
+    },
+    {
+      key: 'intentDegreeName',
+      label: '意向度'
     },
     {
       key: 'remark',
@@ -756,6 +760,14 @@ export default class extends Vue {
       return newArr
     } else {
       return this.otherInfoColumns
+    }
+  }
+
+  get showBtn() {
+    if (+this.clueStatus < 2) {
+      return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20)
+    } else {
+      return true
     }
   }
 
