@@ -585,14 +585,16 @@ export default class extends Vue {
     try {
       if (this.clueStatus < 2) {
         this.WTQuery = { ...this.WTQuery, ...value }
-        this.WTQuery.intentWork = [
-          String(value.expectAddressCity),
-          String(value.expectAddressCounty)
-        ]
+        if (value.expectAddressCity && value.expectAddressCounty) {
+          this.WTQuery.intentWork = [
+            String(value.expectAddressCity),
+            String(value.expectAddressCounty)
+          ]
 
-        if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
-          this.WTQuery.intentWork.pop()
-          this.WTQuery.intentWork.push(this.countryValue)
+          if (this.WTQuery.intentWork[1] === '0' && this.countryValue) {
+            this.WTQuery.intentWork.pop()
+            this.WTQuery.intentWork.push(this.countryValue)
+          }
         }
       } else if (this.clueStatus === 2) {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
