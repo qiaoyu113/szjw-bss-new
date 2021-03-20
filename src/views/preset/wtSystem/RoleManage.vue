@@ -311,16 +311,16 @@ export default class extends Vue {
       case 1:
         name = 'wtSystem'
         break
-      case 2:
+      case 3:
         name = 'lnSystem'
         break
-      case 3:
+      case 7:
         name = 'clueSystem'
         break
-      case 4:
+      case 8:
         name = 'dataSystem'
         break
-      case 5:
+      case 6:
         name = 'roleSystem'
         break
     }
@@ -332,16 +332,16 @@ export default class extends Vue {
       case 1:
         name = 'wtSystem'
         break
-      case 2:
+      case 3:
         name = 'lnSystem'
         break
-      case 3:
+      case 7:
         name = 'clueSystem'
         break
-      case 4:
+      case 8:
         name = 'dataSystem'
         break
-      case 5:
+      case 6:
         name = 'roleSystem'
         break
     }
