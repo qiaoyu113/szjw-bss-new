@@ -72,7 +72,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/wt']
       },
       children: [
         {
@@ -81,7 +81,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/1'
           }
         },
         {
@@ -142,7 +142,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/lnSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/ln']
       },
       children: [
         {
@@ -151,7 +151,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/3'
           }
         },
         {
@@ -213,7 +213,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/role']
       },
       children: [
         {
@@ -222,7 +222,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/role'
           }
         },
         {
@@ -284,7 +284,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/clueSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/clue']
       },
       children: [
         {
@@ -293,7 +293,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/'
           }
         },
         {
@@ -355,7 +355,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/dataSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/data']
       },
       children: [
         {
@@ -364,7 +364,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/data'
           }
         },
         {
