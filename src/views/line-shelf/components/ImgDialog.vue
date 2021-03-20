@@ -1,15 +1,10 @@
 <template>
-  <SelfDialog
-    class="dasdadad"
-    title="设置分配policy"
-    v-bind="$attrs"
-    :width="'40%'"
-    destroy-on-close
-    :confirm="onConfirm"
-    v-on="$listeners"
-  >
-    <div>'eqhejhqjehq</div>
-  </SelfDialog>
+  <el-dialog
+    width="30%"
+    title="内层 Dialog"
+    :visible.sync="innerVisible"
+    append-to-body
+  />
 </template>
 
 <script lang="ts">
@@ -17,7 +12,10 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 
 @Component({
-  name: 'ImgDialog'
+  name: 'ImgDialog',
+  components: {
+    SelfDialog
+  }
 })
 export default class extends Vue {
   onConfirm(callback: Function) {

@@ -281,14 +281,15 @@
       </el-button>
     </div>
     <!-- 分页 -->
+    <!-- :operation-list="operationList" -->
     <pagination
       v-show="true"
-      :operation-list="operationList"
+      :operation-list="[]"
       :total="1000"
       :page="1"
       :limit="12"
     />
-    <ImgDialog />
+    <ImgDialog :visible.sync="showImgDialog" />
   </div>
 </template>
 
@@ -309,6 +310,7 @@ import ImgDialog from './ImgDialog.vue'
   }
 })
 export default class extends Vue {
+  showImgDialog= true
   private baseItem = [
     {
       type: 7,
