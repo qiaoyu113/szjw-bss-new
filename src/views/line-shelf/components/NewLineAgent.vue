@@ -45,13 +45,13 @@
         >
           <div class="curation-title">
             <span>仓库图片(12)</span>
-            <div>
+            <div class="img-container">
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
               >
               <div class="mask-img">
-                <span>预览1</span>
+                <span>预览</span>
               </div>
             </div>
           </div>
@@ -62,11 +62,14 @@
         >
           <div class="curation-title">
             <span>货物图片(1)</span>
-            <div>
+            <div class="img-container">
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
               >
+              <div class="mask-img">
+                <span>预览</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -76,11 +79,14 @@
         >
           <div class="curation-title">
             <span>装货图片(2)</span>
-            <div class="img-ccc">
+            <div class="img-container">
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
               >
+              <div class="mask-img">
+                <span>预览</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -90,7 +96,7 @@
         >
           <div class="curation-title">
             <span>讲解视频(1)</span>
-            <div>
+            <div class="img-container">
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
@@ -592,29 +598,31 @@ export default class extends Vue {
       color: #838383;
       line-height: 26px;
       width: 95px;
-      // margin-right: 12px;
       display: inline-block;
     }
-    div {
+    .img-container {
       flex: 1;
       width: 260px;
       max-width: 260px;
       height: 160px;
       border-radius: 5px;
       overflow: hidden;
-    }
-    img:hover .mask-img{
-      background: #649CEE;
+      &:hover .mask-img{
+        height: 32px;
+
+      }
     }
     img {
       width: 100%;
-      // display: none;
       height: 100%;
     }
     .mask-img{
       position: absolute;
+      max-width: 260px;
+      border-radius: 5px;
       width: calc(100% - 95px);
-      height: 32px;
+      height: 0px;
+      transition: all .7s;
       background: rgba(0,0,0,0.40);
       bottom: 0;
       left: 95;
