@@ -176,7 +176,7 @@
               name="organizationmanage_upOffice_btn"
               @click.stop="
                 () => {
-                  upOffice(node, data);
+                  upOffice2(node, data);
                 }
               "
             />
@@ -190,7 +190,7 @@
               name="organizationmanage_downOffice_btn"
               @click.stop="
                 () => {
-                  downOffice(node, data);
+                  downOffice2(node, data);
                 }
               "
             />
@@ -627,6 +627,63 @@ export default class extends Vue {
             next.data.id
           )
           next1.expanded = nextExpaned
+        })
+      }
+    )
+  }
+  private async upOffice2(node: any, item: any) {
+    // 向上
+    if (this.disabled) {
+      return
+    }
+    const parent = node.parent
+    const children = parent.childNodes
+    const prev = node.previousSibling
+    if (!prev) {
+      this.$message.error(`处于顶端，不能继续上移`)
+      return
+    }
+    this.disabled = true
+    this.sortOffice(
+      {
+        fromId: node.data.id,
+        toId: prev.data.id
+      },
+      () => {
+        let index = children.findIndex((item: any) => item.data.id === node.data.id);
+        ([children[index], children[index - 1]] = [children[index - 1], children[index]])
+        parent.expanded = !parent.expanded
+        this.$nextTick(() => {
+          parent.expanded = !parent.expanded
+        })
+      }
+    )
+  }
+  private async downOffice2(node: any, item: any) {
+    // 下
+    if (this.disabled) {
+      return
+    }
+    const parent = node.parent
+    const next = node.nextSibling
+    const children = parent.childNodes
+    if (!next) {
+      this.$message.error(`处于末端，不能继续下移`)
+      return
+    }
+    this.disabled = true
+
+    this.sortOffice(
+      {
+        fromId: node.data.id,
+        toId: next.data.id
+      },
+      () => {
+        let index = children.findIndex((item: any) => item.data.id === node.data.id);
+        ([children[index], children[index + 1]] = [children[index + 1], children[index]])
+        parent.expanded = !parent.expanded
+        this.$nextTick(() => {
+          parent.expanded = !parent.expanded
         })
       }
     )
