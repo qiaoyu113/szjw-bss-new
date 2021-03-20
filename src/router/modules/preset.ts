@@ -9,11 +9,7 @@ const presetRouter: RouteConfig = {
   meta: {
     title: 'roleSystem',
     icon: 'system',
-    apiUrl: ['/v1/base/user/menu', '/v2/base/user/create', '/v2/base/user/update',
-      '/v2/base/role/create', '/v2/base/role/list', '/v1/base/authority/list', '/v2/base/duty/list',
-      '/v1/base/office/list', '/v1/base/role/update', '/v2/base/role/getByRoleId', '/v2/line/label/configManager', '/v1/product/product/list/page',
-      '/v1/product/product/system/setting'
-    ]
+    apiUrl: 'root'
 
   },
   children: [
@@ -38,7 +34,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/dutymanage',
         noCache: false,
         icon: '',
-        apiUrl: '/v2/base/duty/list'
+        apiUrl: 'root'
       }
     },
     {
@@ -50,7 +46,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/user',
         noCache: true,
         icon: '',
-        apiUrl: '/v1/base/user/page/list'
+        apiUrl: 'root'
       }
     },
     {
@@ -63,7 +59,7 @@ const presetRouter: RouteConfig = {
         noCache: true,
         hidden: true,
         icon: '',
-        apiUrl: '/v3/base/user/create'
+        apiUrl: 'root'
       }
     },
     {
@@ -76,7 +72,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: ['/v1/base/authority/list', '/wutong/role/message']
+        apiUrl: 'root'
       },
       children: [
         {
@@ -85,7 +81,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: '/v1/base/authority/list'
+            apiUrl: 'root'
           }
         },
         {
@@ -94,7 +90,7 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: '/wutong/role/message',
+            apiUrl: 'root',
             sysType: 1
           }
         },
