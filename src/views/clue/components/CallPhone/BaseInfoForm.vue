@@ -684,6 +684,16 @@ export default class extends Vue {
         val.intentModel = String(val.intentModel)
         val.fancyModel = String(val.fancyModel)
       }
+      if (val.age === '') {
+        Reflect.deleteProperty(val, 'age')
+      }
+      if (val.experience === '') {
+        Reflect.deleteProperty(val, 'experience')
+      }
+      if (val.carType === '' || !val.hasCar) {
+        Reflect.deleteProperty(val, 'carType')
+        Reflect.deleteProperty(val, 'carTypeName')
+      }
       let { data: res } = await editClue(val)
       if (res.success) {
         this.$emit('success', true)
