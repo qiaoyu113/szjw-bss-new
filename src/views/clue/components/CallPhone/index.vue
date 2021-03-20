@@ -23,7 +23,7 @@
       <makeCall
         ref="callPhone"
         :phone="phone"
-        :clue-id="clueId"
+        :call-id="callId"
         @random="random"
       />
       <div>
