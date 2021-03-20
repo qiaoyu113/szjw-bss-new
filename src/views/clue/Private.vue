@@ -292,6 +292,7 @@
       :clue-status="rowStatus.clueType"
       :phone="rowStatus.phone"
       :clue-id="rowStatus.clueId"
+      @success="getLists"
     />
   </div>
 </template>
@@ -1095,11 +1096,11 @@ export default class extends Vue {
   // 重置
   private async handleResetClick(row: IState) {
     (this.$refs['suggestForm'] as any).resetForm()
-    this.getLists()
     // 重新请求小组数据
     this.$nextTick(() => {
-      this.listQuery.citycode = ''
+      this.listQuery.cityCode = ''
       this.cityChange('')
+      this.getLists()
     })
   }
   private async handleResetClicks(row: IState) {
@@ -1207,7 +1208,11 @@ export default class extends Vue {
       let roleTypes = [1, 4]
       //  业务线大于1 的属于雷鸟
       if (this.listQuery.clueType > 1) {
-        roleTypes = [11, 12]
+        if (this.listQuery.clueType === 2) {
+          roleTypes = [11]
+        } else {
+          roleTypes = [12]
+        }
       }
       let params:any = {
         roleTypes,
