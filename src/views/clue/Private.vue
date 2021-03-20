@@ -192,7 +192,7 @@
           <el-button
             v-permission="['/v2/market-clue/list/makeCall']"
             type="text"
-
+            :disabled="hasPhone(scope.row.status)"
             @click="callPhoneClick(scope.row)"
           >
             打电话
@@ -292,6 +292,7 @@
       :clue-status="rowStatus.clueType"
       :phone="rowStatus.phone"
       :clue-id="rowStatus.clueId"
+      @success="getLists"
     />
   </div>
 </template>
@@ -971,7 +972,7 @@ export default class extends Vue {
       rules: [0, 1]
     },
     {
-      key: 'cityName',
+      key: 'carCityName',
       label: '车辆所在城市',
       rules: [2]
     },
@@ -1097,7 +1098,7 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     // 重新请求小组数据
     this.$nextTick(() => {
-      this.listQuery.citycode = ''
+      this.listQuery.cityCode = ''
       this.cityChange('')
       this.getLists()
     })
@@ -1207,7 +1208,11 @@ export default class extends Vue {
       let roleTypes = [1, 4]
       //  业务线大于1 的属于雷鸟
       if (this.listQuery.clueType > 1) {
-        roleTypes = [11, 12]
+        if (this.listQuery.clueType === 2) {
+          roleTypes = [11]
+        } else {
+          roleTypes = [12]
+        }
       }
       let params:any = {
         roleTypes,
@@ -1290,10 +1295,10 @@ export default class extends Vue {
           ...clue
         ])
         this.sourceOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...sources
         ])
         this.inviteStatusOptions.push(...[
@@ -1311,10 +1316,10 @@ export default class extends Vue {
           ...intentDegreeOptions
         ])
         this.inviteFailReasonOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
+          // {
+          //   label: '全部',
+          //   value: ''
+          // },
           ...inviteFailReasonOptions
         ])
         this.demandOptions.push(...[
@@ -1503,7 +1508,7 @@ export default class extends Vue {
     this.listQuery.gmGroupId = ''
     this.listQuery.haveCar = ''
     this.gmGroupList.splice(1)
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     if (value[1]) {
       this.getGroup(value[1])
@@ -1515,7 +1520,7 @@ export default class extends Vue {
 
   // 加盟小组改变
   private gmChanges(value:any) {
-    this.listQuery.followerId.splice(0)
+    this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     this.getGmOptions(this.listQuery.cityCode[1], value)
   }
@@ -1533,6 +1538,14 @@ export default class extends Vue {
    }
    get importClue() {
      return this.distributionPremission[this.listQuery.clueType]
+   }
+   // 限制
+   hasPhone(status:any) {
+     if (this.listQuery.clueType > 1) {
+       return false
+     } else {
+       return !(status === 10 || status === 20)
+     }
    }
 }
 </script>

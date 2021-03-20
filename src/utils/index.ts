@@ -500,7 +500,11 @@ async function getGmOptions(cityCode:number, busiType:number, groupId:number, cl
     let roleTypes = [1, 4]
     //  业务线大于1 的属于雷鸟
     if (clueType > 1) {
-      roleTypes = [11, 12]
+      if (clueType === 2) {
+        roleTypes = [11]
+      } else {
+        roleTypes = [12]
+      }
     }
     let params:any = {
       roleTypes,
