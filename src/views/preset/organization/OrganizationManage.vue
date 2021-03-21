@@ -31,7 +31,6 @@
           <div class="right-btn">
             <el-button
               v-if="data.type !== 5"
-              v-permission="['/v2/base/office/create']"
               circle
               size="mini"
               name="organizationmanage_appendOffice_btn"
@@ -45,7 +44,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v2/base/office/delete']"
               circle
               size="mini"
               name="organizationmanage_deleteOffice_btn"
@@ -60,7 +58,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v2/base/office/update']"
               circle
               size="mini"
               icon="el-icon-edit"
@@ -74,7 +71,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-top"
@@ -88,7 +84,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-bottom"
@@ -126,7 +121,6 @@
           <div class="right-btn">
             <el-button
               v-if="!node.isLeaf && data.id !== -2"
-              v-permission="['/v2/base/office/create']"
               circle
               size="mini"
               name="organizationmanage_appendOffice_btn"
@@ -140,7 +134,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v2/base/office/delete']"
               circle
               size="mini"
               name="organizationmanage_deleteOffice_btn"
@@ -155,7 +148,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v2/base/office/update']"
               circle
               size="mini"
               icon="el-icon-edit"
@@ -169,7 +161,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-top"
@@ -183,7 +174,6 @@
 
             <el-button
               v-if="data.type !== 1"
-              v-permission="['/v1/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-bottom"
