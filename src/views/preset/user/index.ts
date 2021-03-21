@@ -27,7 +27,7 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
           disabled: true
         },
         {
-          value: '12,1,1',
+          value: '16,1,1',
           label: '总部组织',
           type: 1,
           leaf: true
