@@ -368,7 +368,14 @@ export default class extends Vue {
       dutyId: '',
       officeLevel: ''
     }
-    let lastArr:any[] = val[val.length - 1].split(',')
+    let lastNode = val[val.length - 1]
+    let lastArr:any[] = []
+    if (typeof lastNode === 'number') {
+      lastArr = [lastNode]
+    } else {
+      lastArr = lastNode.split(',')
+    }
+
     let officeLevel = 1
     if (lastArr[1] > 3) {
       officeLevel = 3

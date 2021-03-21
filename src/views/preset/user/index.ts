@@ -27,10 +27,10 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
           disabled: true
         },
         {
-          value: 0,
+          value: '12,1,1',
           label: '总部组织',
-          leaf: true,
-          disabled: true
+          type: 1,
+          leaf: true
         }
       ]
       return arr

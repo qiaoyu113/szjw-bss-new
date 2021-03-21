@@ -178,7 +178,7 @@ export default class extends Vue {
     this.getLists()
   }
   getLists() {
-    if (this.listQuery.officeId.length > 0) {
+    if (this.listQuery.officeId && this.listQuery.officeId.length > 0) {
       this.listQuery.officeId1 = this.listQuery.officeId.map((item:string | number) => {
         if (typeof item === 'number') {
           return item
