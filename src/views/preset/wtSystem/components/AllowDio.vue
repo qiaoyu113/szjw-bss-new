@@ -26,6 +26,7 @@
           <el-cascader
             v-model="listQuery.officeId"
             placeholder="请选择"
+            clearable
             :props="{
               lazy: true,
               checkStrictly: true,
@@ -263,14 +264,17 @@ export default class extends Vue {
   private async getLists() {
     try {
       let officeId:any[] = []
-      this.listQuery.officeId.forEach((item:any) => {
-        if (typeof item === 'number') {
-          officeId.push(item)
-        } else {
-          let id:number = Number(item.split('-')[0])
-          officeId.push(id)
-        }
-      })
+      if (Array.isArray(this.listQuery.officeId)) {
+        this.listQuery.officeId.forEach((item:any) => {
+          if (typeof item === 'number') {
+            officeId.push(item)
+          } else {
+            let id:number = Number(item.split(',')[0])
+            officeId.push(id)
+          }
+        })
+      }
+
       this.listLoading = true
       let params:IState = { ...this.page, officeId: [] }
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
