@@ -1,5 +1,6 @@
 import { Message } from 'element-ui'
 import { getDutyAndRoleList, getOfficeByCurrentUserV2 as getOfficeByCurrentUser } from '@/api/system'
+import { getOfficeList } from '@/api/preset'
 interface IState {
   [key: string]: any;
 }
@@ -13,6 +14,61 @@ export const GetOfficeByCurrentUser = async() => {
       let officeArr:[] = []
       officeArr.push(...(brrs as []))
       return officeArr
+    } else {
+      Message.error(res.errorMsg)
+      return []
+    }
+  } catch (err) {
+    console.log(`get office fail:${err}`)
+    return []
+  } finally {
+    //
+  }
+}
+
+export const GetOfficeByCurrentUser1 = async(node:any) => {
+  try {
+    let params:IState = {
+      flag: true
+    }
+    if (node.level === 0) {
+      let arr = [
+        {
+          value: 16,
+          label: '城市组织',
+          leaf: false,
+          type: 2,
+          disabled: true
+        },
+        {
+          value: -1,
+          label: '大区公共组织',
+          type: 2,
+          leaf: false,
+          disabled: true
+        },
+        {
+          value: -2,
+          label: '总部组织',
+          leaf: true,
+          disabled: true
+        }
+      ]
+      return arr
+    } else if (node.level === 1) {
+      params.parentId = node.value
+    } else {
+      params.parentId = node.value.split('-')[0]
+    }
+    let { data: res } = await getOfficeList(params)
+    if (res.success) {
+      let arr:[] = res.data.map((item:IState) => ({
+        value: `${item.id}-${item.type}-${item.dutyId}`,
+        label: item.name,
+        disabled: item.type === 3,
+        leaf: false
+      }))
+      return arr
     } else {
       Message.error(res.errorMsg)
       return []
