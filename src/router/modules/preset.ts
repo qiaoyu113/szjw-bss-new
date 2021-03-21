@@ -10,7 +10,6 @@ const presetRouter: RouteConfig = {
     title: 'roleSystem',
     icon: 'system',
     apiUrl: 'root'
-
   },
   children: [
     {
@@ -72,7 +71,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/wtSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/wt', '/v3/base/role/list/1']
       },
       children: [
         {
@@ -81,7 +80,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/1'
           }
         },
         {
@@ -90,7 +89,7 @@ const presetRouter: RouteConfig = {
           name: 'RoleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
+            apiUrl: '/v3/base/role/list/1',
             sysType: 1
           }
         },
@@ -111,7 +110,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: '/v1/base/role/update/1',
             activeMenu: '/roleSystem/wtSystem/role',
             title: 'editRole',
             noCache: true,
@@ -123,7 +122,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: '/v3/base/role/create/1',
             activeMenu: '/roleSystem/wtSystem/role',
             title: 'createRole',
             noCache: true,
@@ -142,7 +141,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/lnSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/ln', '/v3/base/role/list/3']
       },
       children: [
         {
@@ -151,7 +150,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/3'
           }
         },
         {
@@ -160,8 +159,8 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
-            sysType: 2
+            apiUrl: ['/v3/base/role/list/3'],
+            sysType: 3
           }
         },
         {
@@ -182,7 +181,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/update/3'],
             activeMenu: '/roleSystem/lnSystem/role',
             title: 'editRole',
             noCache: true,
@@ -194,7 +193,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/create/3'],
             activeMenu: '/roleSystem/lnSystem/role',
             title: 'createRole',
             noCache: true,
@@ -213,7 +212,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/role', '/v3/base/role/list/6']
       },
       children: [
         {
@@ -222,7 +221,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/6'
           }
         },
         {
@@ -231,8 +230,8 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
-            sysType: 5
+            apiUrl: ['/v3/base/role/list/6'],
+            sysType: 6
           }
         },
         {
@@ -253,9 +252,9 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
             activeMenu: '/roleSystem/roleSystem/role',
             title: 'editRole',
+            apiUrl: ['/v1/base/role/update/6'],
             noCache: true,
             hidden: true
           }
@@ -265,7 +264,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/create/6'],
             activeMenu: '/roleSystem/roleSystem/role',
             title: 'createRole',
             noCache: true,
@@ -284,7 +283,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/clueSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/clue', '/v3/base/role/list/7']
       },
       children: [
         {
@@ -293,7 +292,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/7'
           }
         },
         {
@@ -302,8 +301,8 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
-            sysType: 3
+            apiUrl: ['/v3/base/role/list/7'],
+            sysType: 7
           }
         },
         {
@@ -324,7 +323,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/update/7'],
             activeMenu: '/roleSystem/clueSystem/role',
             title: 'editRole',
             noCache: true,
@@ -336,7 +335,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/create/7'],
             activeMenu: '/roleSystem/clueSystem/role',
             title: 'createRole',
             noCache: true,
@@ -355,7 +354,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/dataSystem/authority',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: ['/v3/base/authority/list/data', '/v3/base/role/list/8']
       },
       children: [
         {
@@ -364,7 +363,7 @@ const presetRouter: RouteConfig = {
           name: 'AuthoritySystem',
           meta: {
             title: 'authoritySystem',
-            apiUrl: 'root'
+            apiUrl: '/v3/base/authority/list/8'
           }
         },
         {
@@ -373,8 +372,8 @@ const presetRouter: RouteConfig = {
           name: 'roleManage',
           meta: {
             title: 'roleManage',
-            apiUrl: 'root',
-            sysType: 4
+            apiUrl: ['/v3/base/role/list/8'],
+            sysType: 8
           }
         },
         {
@@ -395,7 +394,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleOperate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/update/8'],
             activeMenu: '/roleSystem/dataSystem/role',
             title: 'editRole',
             noCache: true,
@@ -407,7 +406,7 @@ const presetRouter: RouteConfig = {
           component: () => import(/* webpackChunkName: "user" */ '@/views/preset/wtSystem/RoleOperate.vue'),
           name: 'RoleCreate',
           meta: {
-            apiUrl: 'root',
+            apiUrl: ['/v1/base/role/create/8'],
             activeMenu: '/roleSystem/dataSystem/role',
             title: 'createRole',
             noCache: true,

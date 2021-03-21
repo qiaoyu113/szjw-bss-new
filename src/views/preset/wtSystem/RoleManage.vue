@@ -31,6 +31,7 @@
             重置
           </el-button>
           <el-button
+            v-permission="['/v1/base/role/create/8','/v1/base/role/create/1','/v1/base/role/create/3','/v1/base/role/create/7','/v1/base/role/create/6']"
             size="small"
             :class="isPC ? '' : 'btnMobile'"
             type="primary"
@@ -90,16 +91,19 @@
                 name="rolemanage_moreMenuItem_dropdown"
               >
                 <el-dropdown-item
+                  v-permission="['/v3/base/role/distributeRoleToUser']"
                   @click.native="handleAllowClick(scope.row)"
                 >
-                  分配角色
+                  分配用户
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-permission="['/v1/base/role/deleteByAuthId/8','/v1/base/role/deleteByAuthId/1','/v1/base/role/deleteByAuthId/3','/v1/base/role/deleteByAuthId/7','/v1/base/role/deleteByAuthId/6']"
                   @click.native="deleteRole(scope.row)"
                 >
                   删除
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-permission="['/v1/base/role/update/8','/v1/base/role/update/1','/v1/base/role/update/3','/v1/base/role/update/7','/v1/base/role/update/6']"
                   @click.native="editRole(scope.row)"
                 >
                   编辑
@@ -308,16 +312,16 @@ export default class extends Vue {
       case 1:
         name = 'wtSystem'
         break
-      case 2:
+      case 3:
         name = 'lnSystem'
         break
-      case 3:
+      case 7:
         name = 'clueSystem'
         break
-      case 4:
+      case 8:
         name = 'dataSystem'
         break
-      case 5:
+      case 6:
         name = 'roleSystem'
         break
     }
@@ -329,16 +333,16 @@ export default class extends Vue {
       case 1:
         name = 'wtSystem'
         break
-      case 2:
+      case 3:
         name = 'lnSystem'
         break
-      case 3:
+      case 7:
         name = 'clueSystem'
         break
-      case 4:
+      case 8:
         name = 'dataSystem'
         break
-      case 5:
+      case 6:
         name = 'roleSystem'
         break
     }

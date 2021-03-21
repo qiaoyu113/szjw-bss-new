@@ -201,7 +201,7 @@ export default class extends Vue {
     padding-right: 0px;
   }
    .selfTable >>> .emptyText{
-     color: aquamarine;
+     color: #D9001B;
      font-weight: bold;
      font-size: 20px;
    }
