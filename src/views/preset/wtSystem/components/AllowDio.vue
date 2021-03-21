@@ -279,7 +279,7 @@ export default class extends Vue {
       let params:IState = { ...this.page, officeId: [] }
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
-      this.listQuery.officeId.length > 0 && (params.officeId.push(...officeId))
+      this.listQuery.officeId.length > 0 && (params.officeId.push(officeId.pop()))
       params.url = '/v3/base/user/page/list'
       Reflect.deleteProperty(params, 'total')
       const { data } = await GetUserListsV3(params)
