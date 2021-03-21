@@ -1128,7 +1128,10 @@ export default class extends Vue {
     })
   }
   private async handleResetClicks(row: IState) {
-    (this.$refs['suggestForm'] as any).resetForm()
+    this.$nextTick(() => {
+      (this.$refs['suggestForm'] as any).resetForm()
+      this.listQuery.cityCode = []
+    })
   }
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
