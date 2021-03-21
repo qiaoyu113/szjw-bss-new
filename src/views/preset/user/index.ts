@@ -35,7 +35,11 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
       ]
       return arr
     } else if (node.level === 1) {
-      params.parentId = node.value
+      if (node.isLeaf) {
+        params.parentId = node.value.split(',')[0]
+      } else {
+        params.parentId = node.value
+      }
     } else {
       params.parentId = node.value.split(',')[0]
     }

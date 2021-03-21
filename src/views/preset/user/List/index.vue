@@ -18,6 +18,7 @@
         <el-cascader
           v-model="listQuery.officeId"
           placeholder="请选择"
+          clearable
           :props="{
             lazy: true,
             checkStrictly: true,
@@ -187,6 +188,8 @@ export default class extends Vue {
         }
       }
       )
+    } else {
+      this.listQuery.officeId1 = []
     }
 
     (this.$refs.userlist as any).getLists()
