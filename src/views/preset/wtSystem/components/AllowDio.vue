@@ -96,7 +96,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { roleList, distributeRoleToUser, GetUserListsV3 } from '@/api/preset'
 import userList from '../../user/components/UserLists.vue'
-import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId, GetOfficeByCurrentUser1 } from '../../user/index'
+import { GetOfficeByCurrentUser1 } from '../../user/index'
 interface IState {
   [key: string]: any;
 }
@@ -118,8 +118,6 @@ export default class extends Vue {
   @Prop({ required: false }) showDialog!: boolean;
   @Prop({ default: {} }) allowData!: IState;
 
-  private officeArr = [] // 组织架构列表
-  private roleArr = [] // 角色列表
   private pageSize:number[] = [10, 20, 50, 100, 150, 200]
   private canSumbit:boolean = true
   private listLoading: boolean = false;
@@ -230,26 +228,11 @@ export default class extends Vue {
     }
   }
 
-  // 组织架构发生变化
-  async handleOfficeIdChange(val:number[]) {
-    this.listQuery.roleId = [{ roleId: [] }]
-    let params:IState = GetRoleParamsByOfficeId(val, this.officeArr)
-    try {
-      this.roleArr = []
-      let result = await GetDutyAndRoleList(params)
-      this.roleArr.push(...result)
-    } catch (err) {
-      this.roleArr = []
-    } finally {
-      //
-    }
-  }
   checkPhone(value:string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
   }
   openDio(value:any) {
     this.listQuery.sysType = this.$route.meta.sysType
-    this.getOffice()
   }
   // 查询
   handleFilterClick() {
@@ -346,16 +329,7 @@ export default class extends Vue {
     (this.$refs['searchForm'] as any).resetForm()
     this.tableData.splice(0, this.tableData.length)
   }
-  async getOffice() {
-    try {
-      let result = await GetOfficeByCurrentUser()
-      this.officeArr.push(...result)
-    } catch (err) {
-      this.officeArr = []
-    } finally {
-      //
-    }
-  }
+
   async moreTreeData(node:any, resolve:Function) {
     let data = await GetOfficeByCurrentUser1(node)
 
