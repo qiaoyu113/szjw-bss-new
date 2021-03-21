@@ -9,7 +9,7 @@ const presetRouter: RouteConfig = {
   meta: {
     title: 'roleSystem',
     icon: 'system',
-    apiUrl: 'root',
+    apiUrl: ['/v3/base/office/list', '/v3/base/duty/list', '/v3/base/user/page/list', '/v3/base/authority/list/wt', '/v3/base/role/list/1', '/v3/base/authority/list/ln', '/v3/base/role/list/3', '/v3/base/authority/list/role', '/v3/base/role/list/6', '/v3/base/authority/list/clue', '/v3/base/role/list/7', '/v3/base/authority/list/data', '/v3/base/role/list/8'],
     alwaysShow: true
   },
   children: [
