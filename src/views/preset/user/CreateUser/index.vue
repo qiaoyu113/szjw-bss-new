@@ -162,7 +162,7 @@ import { isValidPassWord, lock } from '@/utils/index'
 import { GetUserDetail, UpdateUser, CreateUser } from '@/api/preset'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
-import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId, GetOfficeByCurrentUser1 } from '../index'
+import { GetDutyAndRoleList, GetOfficeByCurrentUser1 } from '../index'
 interface IState {
   [key: string]: any;
 }
@@ -317,13 +317,14 @@ export default class extends Vue {
             roleName: item
           })
         })
-        let officeIds = this.getTreeSelectOffice(this.officeArr, result.officeId)
+
+        // let officeIds = this.getTreeSelectOffice(this.officeArr, result.officeId)
         this.sourcePhone = result.mobile
         this.listQuery = {
           id: result.id,
           userName: result.nickName,
           mobile: result.mobile,
-          officeId: officeIds,
+          // officeId: officeIds,
           roleNames,
           passwd: '123456789qQ',
           confirmPassword: '123456789qQ',
@@ -524,8 +525,6 @@ export default class extends Vue {
   async mounted() {
     this.userId = +this.$route.query.userId || ''
     if (this.userId) {
-      delete this.rules.officeId
-      delete this.rules.roleId
       let add = {
         key: 'confirmPassword',
         type: 'confirmPassword',
@@ -536,20 +535,17 @@ export default class extends Vue {
     }
 
     try {
-      let result = await GetOfficeByCurrentUser()
-      this.officeArr.push(...result)
       this.getUserDetail()
     } catch (err) {
-      this.officeArr = []
+      //
     } finally {
       //
     }
   }
   async moreTreeData(node:any, resolve:Function) {
     let data = await GetOfficeByCurrentUser1(node)
-
     let arr:any = data
-    if (data.length === 0) {
+    if (arr.length === 0) {
       arr = undefined
     }
     return resolve(arr)

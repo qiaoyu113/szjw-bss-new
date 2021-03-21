@@ -325,7 +325,7 @@ export default class extends Vue {
         name = 'roleSystem'
         break
     }
-    this.$router.push({ path: `/roleSystem/${name}/RoleCreate`, query: { sysType: this.$route.meta.sysType } })
+    this.$router.push({ path: `/roleSystem/${name}/roleCreate`, query: { sysType: this.$route.meta.sysType } })
   }
   private editRole(row: any) {
     let name = 'wtSystem'
