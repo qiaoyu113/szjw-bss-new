@@ -82,7 +82,7 @@
                 {{ `${scope.row.followerName}(${scope.row.followerPhone})` }}
               </template>
               <template v-slot:inviteDate="scope">
-                {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+                {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}' + textDes(scope.row.operationType)) }}
               </template>
 
               <template v-slot:op="scope">
@@ -361,7 +361,8 @@ export default class extends Vue {
     {
       key: 'inviteDate',
       label: '邀约面试时间',
-      slot: true
+      slot: true,
+      width: '150px'
     },
     {
       key: 'inviteName',
@@ -770,6 +771,14 @@ export default class extends Vue {
       return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20)
     } else {
       return true
+    }
+  }
+
+  private textDes(val:number) {
+    if (val) {
+      return val === 1 ? '(已取消)' : '(已爽约)'
+    } else {
+      return ''
     }
   }
 
