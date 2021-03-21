@@ -395,7 +395,8 @@ export default class extends Vue {
     toDo: false, // 代办事项
     sort: '', // 排序方式
     clueType: 0,
-    createTime: ''
+    createTime: '',
+    demandType: '' // 需求类型
   };
   private tableData: any[] = [];
   // options
@@ -640,7 +641,6 @@ export default class extends Vue {
       key: 'demandType',
       tagAttrs: {
         placeholder: '请选择',
-        filterable: true,
         clearable: true
       },
       rules: [2],
