@@ -164,8 +164,7 @@
           {{ row.name }}<br>{{ row.phone }}
         </template>
         <template v-slot:payIntentionMoney="{row}">
-          {{ row.payIntentionMoney === true?'是':'' }}
-          {{ row.payIntentionMoney === false?'否':'' }}
+          {{ row.payIntentionMoney === true?'是':'否' }}
         </template>
 
         <template v-slot:remark="{row}">
@@ -423,6 +422,7 @@ export default class extends Vue {
   private followTypeOptins: any[] = [] // 跟进情况
   private inviteFailReasonOptions: any[] = [] // 邀约失败原因
   private clueArr:IState[] = []
+  private activeFollowTypeOptins= [] // 跟进情况的全量
   private page: PageObj = {
     page: 1,
     limit: 30,
@@ -1124,6 +1124,15 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     // 重新请求小组数据
     this.$nextTick(() => {
+      // 处理跟进情况
+      this.listQuery.inviteStatus = ''
+      if (this.listQuery.clueType === 2) {
+        const arr = this.activeFollowTypeOptins.slice(0, 4)
+        this.followTypeOptins.splice(0, 4, ...arr)
+      } else {
+        const arr = this.activeFollowTypeOptins.slice(-4)
+        this.followTypeOptins.splice(0, 4, ...arr)
+      }
       this.listQuery.cityCode = ''
       this.cityChange('')
       this.getLists()
@@ -1296,7 +1305,7 @@ export default class extends Vue {
    */
   async getBaseInfo() {
     try {
-      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_type', 'Intentional_compartment', 'demand_type']
+      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_mark_status', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
@@ -1307,7 +1316,7 @@ export default class extends Vue {
           '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
         ]
-        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
+        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_mark_status: followType } = res.data
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
@@ -1319,7 +1328,8 @@ export default class extends Vue {
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
         this.carTypeOptions.push(...carTypeOptions)
-        this.followTypeOptins.push(...followTypeOptins)
+        this.activeFollowTypeOptins = followTypeOptins
+        // this.followTypeOptins.push(...followTypeOptins)
         this.clueArr.push(...clueType)
         this.listQuery.clueType = clueType[0].value
         this.clueOptions.push(...[
@@ -1580,6 +1590,49 @@ export default class extends Vue {
        return false
      } else {
        return !(status === 10 || status === 20)
+     }
+   }
+   @Watch('listQuery.inviteStatus')
+   inviteStatusChange(value:any) {
+     const clueType = this.listQuery.clueType
+     if (clueType <= 1) {
+       const inx = this.formItem.findIndex(item => item.key === 'intentDegree')
+       if (value === '1') {
+         this.formItem.splice(inx, 2)
+         this.listQuery.intentDegree = ''
+         this.listQuery.inviteFailReason = []
+       } else {
+         if (inx === -1) {
+           const arr = [ {
+             type: 2,
+             label: '意向度',
+             key: 'intentDegree',
+             tagAttrs: {
+               placeholder: '请选择',
+               filterable: true,
+               clearable: true
+             },
+             rules: [0, 1],
+             options: this.intentDegreeOptions
+           },
+           {
+             type: 2,
+             label: '邀约失败原因',
+             key: 'inviteFailReason',
+             tagAttrs: {
+               placeholder: '请选择',
+               filterable: true,
+               clearable: true,
+               multiple: true,
+               collapseTags: true
+             },
+             rules: [0, 1],
+             options: this.inviteFailReasonOptions
+           } ]
+           const inxs = this.formItem.findIndex(item => item.key === 'inviteStatus')
+           this.formItem.splice(inxs + 1, 0, ...arr)
+         }
+       }
      }
    }
 }
