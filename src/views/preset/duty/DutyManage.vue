@@ -19,6 +19,7 @@
           <div class="right-btn">
             <el-button
               v-if="showAppend(node, data)"
+              v-permission="['/v3/base/duty/create']"
               circle
               size="mini"
               icon="el-icon-circle-plus-outline"
@@ -31,6 +32,7 @@
             />
             <el-button
               v-if="node.level !== 1"
+              v-permission="['/v3/base/duty/delete']"
               circle
               size="mini"
               class="delete"
@@ -43,6 +45,7 @@
               "
             />
             <el-button
+              v-permission="['/v3/base/duty/update']"
               circle
               size="mini"
               icon="el-icon-edit"

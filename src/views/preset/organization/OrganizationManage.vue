@@ -31,6 +31,7 @@
           <div class="right-btn">
             <el-button
               v-if="data.type !== 5"
+              v-permission="['/v3/base/office/create']"
               circle
               size="mini"
               name="organizationmanage_appendOffice_btn"
@@ -44,6 +45,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/delete']"
               circle
               size="mini"
               name="organizationmanage_deleteOffice_btn"
@@ -58,6 +60,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/update']"
               circle
               size="mini"
               icon="el-icon-edit"
@@ -71,6 +74,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-top"
@@ -84,6 +88,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-bottom"
@@ -121,6 +126,7 @@
           <div class="right-btn">
             <el-button
               v-if="!node.isLeaf && data.id !== -2"
+              v-permission="['/v3/base/office/create']"
               circle
               size="mini"
               name="organizationmanage_appendOffice_btn"
@@ -134,6 +140,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/delete']"
               circle
               size="mini"
               name="organizationmanage_deleteOffice_btn"
@@ -148,6 +155,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/update']"
               circle
               size="mini"
               icon="el-icon-edit"
@@ -161,6 +169,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-top"
@@ -174,6 +183,7 @@
 
             <el-button
               v-if="data.type !== 1"
+              v-permission="['/v3/base/office/sort']"
               circle
               size="mini"
               icon="el-icon-bottom"
@@ -409,6 +419,7 @@ import { RoleTree } from '../components'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetArea } from '@/api/common'
 import { lock } from '@/utils/index'
+import { UserModule } from '@/store/modules/user'
 import {
   getOfficeListPost,
   createOffice,
@@ -1051,7 +1062,9 @@ export default class extends Vue {
       })
   }
   private allowDrag(node: any) {
-    return node.level === 3 && node.data.type === 3
+    const url = '/v3/base/office/drag'
+    const roles = UserModule.roles.some(role => role === url)
+    return node.level === 3 && node.data.type === 3 && roles
   }
   private openItem(list: any) {
     const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
