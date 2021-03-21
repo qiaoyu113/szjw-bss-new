@@ -27,7 +27,7 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
           disabled: true
         },
         {
-          value: -2,
+          value: 0,
           label: '总部组织',
           leaf: true,
           disabled: true
@@ -37,12 +37,12 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
     } else if (node.level === 1) {
       params.parentId = node.value
     } else {
-      params.parentId = node.value.split('-')[0]
+      params.parentId = node.value.split(',')[0]
     }
     let { data: res } = await getOfficeList(params)
     if (res.success) {
       let arr:[] = res.data.map((item:IState) => ({
-        value: `${item.id}-${item.type}-${item.dutyId}`,
+        value: `${item.id},${item.type},${item.dutyId}`,
         label: item.name,
         disabled: item.type === 3
       }))
