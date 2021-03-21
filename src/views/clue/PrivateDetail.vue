@@ -222,7 +222,7 @@
         >
           <CallLog
             class="CallLog"
-            :business-id="+clueStatus"
+            :business-id="clueId"
           />
         </SectionContainer>
       </el-card>

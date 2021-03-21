@@ -682,20 +682,21 @@ export default class extends Vue {
       if (this.clueStatus < 2) {
         val.expectAddressCity = val.intentWork[0]
         val.expectAddressCounty = val.intentWork[1]
+        if (val.age === '') {
+          Reflect.deleteProperty(val, 'age')
+        }
+        if (val.experience === '') {
+          Reflect.deleteProperty(val, 'experience')
+        }
+        if (val.carType === '' || !val.hasCar) {
+          Reflect.deleteProperty(val, 'carType')
+          Reflect.deleteProperty(val, 'carTypeName')
+        }
       } else if (+this.clueStatus === 4) {
         val.intentModel = String(val.intentModel)
         val.fancyModel = String(val.fancyModel)
       }
-      if (val.age === '') {
-        Reflect.deleteProperty(val, 'age')
-      }
-      if (val.experience === '') {
-        Reflect.deleteProperty(val, 'experience')
-      }
-      if (val.carType === '' || !val.hasCar) {
-        Reflect.deleteProperty(val, 'carType')
-        Reflect.deleteProperty(val, 'carTypeName')
-      }
+
       let { data: res } = await editClue(val)
       if (res.success) {
         this.$emit('success', true)
