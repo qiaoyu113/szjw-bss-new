@@ -391,8 +391,8 @@ export default class extends Vue {
       let params:any = {
         ...this.listQuery,
         nickName: this.listQuery.userName,
-        officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1],
-        roleIds: roleId.filter((item:any) => item.split('-')[0])
+        officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1].split('-')[0],
+        roleIds: roleId.filter((item:any) => item)
       }
       params.confirmPassword = params.passwd
       delete params.id
