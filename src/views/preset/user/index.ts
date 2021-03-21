@@ -90,9 +90,9 @@ export const deeploopRole = (arrs:any[]) => {
   arrs.forEach(item => {
     if (item.childDuty === null || item.childDuty.length === 0) {
       delete item.childDuty
-      if (item.dutyLevel < 3) {
-        item.disabled = true
-      }
+      // if (item.dutyLevel < 3) {
+      //   item.disabled = true
+      // }
     } else {
       let crr = deeploopRole(item.childDuty)
       item.childDuty = crr
