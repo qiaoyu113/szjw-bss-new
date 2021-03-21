@@ -183,7 +183,7 @@ export default class extends Vue {
         if (typeof item === 'number') {
           return item
         } else {
-          return item.split('-')[0]
+          return item.split(',')[0]
         }
       }
       )

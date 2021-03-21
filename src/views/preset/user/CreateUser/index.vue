@@ -368,7 +368,7 @@ export default class extends Vue {
       dutyId: '',
       officeLevel: ''
     }
-    let lastArr:any[] = val[val.length - 1]
+    let lastArr:any[] = val[val.length - 1].split(',')
     let officeLevel = 1
     if (lastArr[1] > 3) {
       officeLevel = 3
@@ -400,7 +400,7 @@ export default class extends Vue {
       let params:any = {
         ...this.listQuery,
         nickName: this.listQuery.userName,
-        officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1].split('-')[0],
+        officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1].split(',')[0],
         roleIds: roleId.filter((item:any) => item)
       }
       params.confirmPassword = params.passwd
