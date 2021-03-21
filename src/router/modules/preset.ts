@@ -22,7 +22,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/organizationmanage',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: '/v3/base/office/list'
       }
     },
     {
@@ -34,7 +34,7 @@ const presetRouter: RouteConfig = {
         activeMenu: '/roleSystem/dutymanage',
         noCache: false,
         icon: '',
-        apiUrl: 'root'
+        apiUrl: '/v3/base/duty/list'
       }
     },
     {
