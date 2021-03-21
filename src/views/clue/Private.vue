@@ -381,6 +381,7 @@ export default class extends Vue {
     phone: '', // 手机号
     hasCar: '', // 是否有车
     haveCar: '',
+    // inviteStatus: '',
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
     followerId: '', // 跟进人
@@ -397,6 +398,7 @@ export default class extends Vue {
     clueType: 0,
     createTime: '',
     demandType: '' // 需求类型
+
   };
   private tableData: any[] = [];
   // options
@@ -825,7 +827,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '跟进情况',
-      key: 'haveCar',
+      key: 'inviteStatus',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
