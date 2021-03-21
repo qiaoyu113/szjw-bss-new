@@ -34,17 +34,25 @@
           />
         </template>
         <template slot="officeId">
-          <el-cascader
-            v-model="listQuery.officeId"
-            :disabled="!!userId"
-            placeholder="请选择"
-            :props="{
-              lazy: true,
-              checkStrictly: true,
-              lazyLoad: moreTreeData
-            }"
-            @change="handleOfficeIdChange"
-          />
+          <template v-if="!!userId">
+            <el-input
+              v-model="listQuery.officeName"
+              :disabled="true"
+            />
+          </template>
+          <template v-else>
+            <el-cascader
+              v-model="listQuery.officeId"
+              :disabled="!!userId"
+              placeholder="请选择"
+              :props="{
+                lazy: true,
+                checkStrictly: true,
+                lazyLoad: moreTreeData
+              }"
+              @change="handleOfficeIdChange"
+            />
+          </template>
         </template>
         <template slot="roleId">
           <el-row
@@ -183,6 +191,7 @@ export default class extends Vue {
     userName: '',
     mobile: '',
     officeId: [],
+    officeName: '',
     roleId: [{ roleId: '' }],
     roleNames: [],
     passwd: 'Aa123456',
@@ -318,13 +327,12 @@ export default class extends Vue {
           })
         })
 
-        // let officeIds = this.getTreeSelectOffice(this.officeArr, result.officeId)
         this.sourcePhone = result.mobile
         this.listQuery = {
           id: result.id,
           userName: result.nickName,
           mobile: result.mobile,
-          // officeId: officeIds,
+          officeName: result.officeNames,
           roleNames,
           passwd: '123456789qQ',
           confirmPassword: '123456789qQ',
