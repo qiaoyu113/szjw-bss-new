@@ -23,7 +23,7 @@
         :list-query="listQuery"
         :form-item="formItem"
         label-width="140px"
-        :rules="rules"
+        :rules="userId ? rules2: rules1"
         @onPass="handlePassClick"
       >
         <template slot="userName">
@@ -38,13 +38,11 @@
             v-model="listQuery.officeId"
             :disabled="!!userId"
             placeholder="请选择"
-            :props=" {
+            :props="{
+              lazy: true,
               checkStrictly: true,
-              value: 'id',
-              label: 'name',
-              children: 'officeVOs'
+              lazyLoad: moreTreeData
             }"
-            :options="officeArr"
             @change="handleOfficeIdChange"
           />
         </template>
@@ -120,7 +118,7 @@
         >
           <el-input
             v-model.trim="listQuery.mobile"
-            :disabled="listQuery.id!==''"
+            :disabled="!!userId"
             maxlength="11"
             placeholder="请输入"
           />
@@ -161,11 +159,10 @@
 import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { isValidPassWord, lock } from '@/utils/index'
-import { addUser, modifyUser } from '@/api/system'
 import { GetUserDetail, UpdateUser, CreateUser } from '@/api/preset'
 import { delayTime } from '@/settings'
 import { SettingsModule } from '@/store/modules/settings'
-import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../index'
+import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId, GetOfficeByCurrentUser1 } from '../index'
 interface IState {
   [key: string]: any;
 }
@@ -230,7 +227,7 @@ export default class extends Vue {
       slot: true
     }
   ]
-  private rules:any ={
+  private rules1:any ={
     userName: [
       { required: true, message: '请输入姓名', trigger: 'blur' },
       { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
@@ -238,6 +235,12 @@ export default class extends Vue {
     mobile: [
       { required: true, message: '请输入手机号', trigger: 'blur' },
       { validator: this.validatePhone, trigger: 'blur' }
+    ],
+    officeId: [
+      { required: true, message: '请选择组织机构', trigger: 'blur' }
+    ],
+    roleId: [
+      { required: true, message: '请选择角色', trigger: 'blur' }
     ],
     passwd: [
       { required: true, message: '请输入密码', trigger: 'blur' },
@@ -248,6 +251,12 @@ export default class extends Vue {
       { required: true, message: '请输入确认密码', trigger: 'blur' },
       { min: 8, max: 16, message: '长度在 8 到 16 个字符', trigger: 'blur' },
       { validator: this.validateConfirmPassword, trigger: 'blur' }
+    ]
+  }
+  private rules2:any ={
+    userName: [
+      { required: true, message: '请输入姓名', trigger: 'blur' },
+      { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
     ]
   }
 
@@ -344,9 +353,21 @@ export default class extends Vue {
   }
 
   // 组织架构发生变化
-  async handleOfficeIdChange(val:number[]) {
-    this.listQuery.roleId = [{ roleId: [] }]
-    let params:IState = GetRoleParamsByOfficeId(val, this.officeArr)
+  async handleOfficeIdChange(val:any[]) {
+    this.listQuery.roleId = [{ roleId: '' }]
+    let params:IState = {
+      dutyId: '',
+      officeLevel: ''
+    }
+    let lastArr:any[] = val[val.length - 1]
+    let officeLevel = 1
+    if (lastArr[1] > 3) {
+      officeLevel = 3
+    } else {
+      officeLevel = lastArr[1]
+    }
+    params.dutyId = lastArr[2]
+    params.officeLevel = officeLevel
     try {
       this.roleArr = []
       let result = await GetDutyAndRoleList(params)
@@ -366,11 +387,12 @@ export default class extends Vue {
       this.listQuery.roleId.forEach((item:IState) => {
         roleId.push(Number(item.roleId[item.roleId.length - 1]))
       })
+
       let params:any = {
         ...this.listQuery,
         nickName: this.listQuery.userName,
         officeId: this.listQuery.officeId[this.listQuery.officeId.length - 1],
-        roleIds: roleId
+        roleIds: roleId.filter((item:any) => item.split('-')[0])
       }
       params.confirmPassword = params.passwd
       delete params.id
@@ -502,6 +524,8 @@ export default class extends Vue {
   async mounted() {
     this.userId = +this.$route.query.userId || ''
     if (this.userId) {
+      delete this.rules.officeId
+      delete this.rules.roleId
       let add = {
         key: 'confirmPassword',
         type: 'confirmPassword',
@@ -509,13 +533,6 @@ export default class extends Vue {
         slot: true
       }
       this.formItem.push(add)
-    } else {
-      this.rules.roleId = [
-        { required: true, message: '请选择角色', trigger: 'blur' }
-      ]
-      this.rules.officeId = [
-        { required: true, message: '请选择组织机构', trigger: 'blur' }
-      ]
     }
 
     try {
@@ -527,6 +544,15 @@ export default class extends Vue {
     } finally {
       //
     }
+  }
+  async moreTreeData(node:any, resolve:Function) {
+    let data = await GetOfficeByCurrentUser1(node)
+
+    let arr:any = data
+    if (data.length === 0) {
+      arr = undefined
+    }
+    return resolve(arr)
   }
 }
 </script>

@@ -101,3 +101,11 @@ export const deleteRole = (id:number) =>
       roleId: id
     }
   })
+
+// 分级获取组织架构
+export const getOfficeList = (data:any) =>
+  request({
+    url: `${baseURL}/v3/base/office/list`,
+    method: 'post',
+    data
+  })

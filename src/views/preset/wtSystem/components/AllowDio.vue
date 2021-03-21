@@ -26,14 +26,11 @@
           <el-cascader
             v-model="listQuery.officeId"
             placeholder="请选择"
-            :props=" {
+            :props="{
+              lazy: true,
               checkStrictly: true,
-              value: 'id',
-              label: 'name',
-              children: 'officeVOs'
+              lazyLoad: moreTreeData
             }"
-            :options="officeArr"
-            @change="handleOfficeIdChange"
           />
         </template>
         <div
@@ -99,7 +96,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { roleList, distributeRoleToUser, GetUserListsV3 } from '@/api/preset'
 import userList from '../../user/components/UserLists.vue'
-import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId } from '../../user/index'
+import { GetOfficeByCurrentUser, GetDutyAndRoleList, GetRoleParamsByOfficeId, GetOfficeByCurrentUser1 } from '../../user/index'
 interface IState {
   [key: string]: any;
 }
@@ -282,11 +279,20 @@ export default class extends Vue {
 
   private async getLists() {
     try {
+      let officeId:any[] = []
+      this.listQuery.officeId.forEach((item:any) => {
+        if (typeof item === 'number') {
+          officeId.push(item)
+        } else {
+          let id:number = Number(item.split('-')[0])
+          officeId.push(id)
+        }
+      })
       this.listLoading = true
       let params:IState = { ...this.page, officeId: [] }
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
-      this.listQuery.officeId.length > 0 && (params.officeId.push(...this.listQuery.officeId))
+      this.listQuery.officeId.length > 0 && (params.officeId.push(...officeId))
       params.url = '/v3/base/user/page/list'
       Reflect.deleteProperty(params, 'total')
       const { data } = await GetUserListsV3(params)
@@ -349,6 +355,15 @@ export default class extends Vue {
     } finally {
       //
     }
+  }
+  async moreTreeData(node:any, resolve:Function) {
+    let data = await GetOfficeByCurrentUser1(node)
+
+    let arr:any = data
+    if (data.length === 0) {
+      arr = undefined
+    }
+    return resolve(arr)
   }
 }
 </script>
