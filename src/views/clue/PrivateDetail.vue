@@ -86,7 +86,7 @@
               </template>
 
               <template v-slot:contact="scope">
-                {{ scope.row.contact ? '是' : '否' }}
+                {{ isTrueOrFalse(scope.row.contact) }}
               </template>
               <template v-slot:op="scope">
                 <div
@@ -784,6 +784,14 @@ export default class extends Vue {
       return val === 1 ? '(已取消)' : '(已爽约)'
     } else {
       return ''
+    }
+  }
+
+  private isTrueOrFalse(val:null | boolean) {
+    if (typeof val === 'boolean') {
+      return val ? '是' : '否'
+    } else {
+      return '暂无数据'
     }
   }
 
