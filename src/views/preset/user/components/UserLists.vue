@@ -172,7 +172,7 @@ export default class extends Vue {
       this.listQuery.status !== '' && (params.status = this.listQuery.status)
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
-      this.listQuery.officeId && this.listQuery.officeId.length > 0 && (params.officeId = this.listQuery.officeId[this.listQuery.officeId.length - 1])
+      this.listQuery.officeId1 && this.listQuery.officeId1.length > 0 && (params.officeId = this.listQuery.officeId1[this.listQuery.officeId1.length - 1])
       this.listQuery.roleId !== '' && (params.roleId = this.listQuery.roleId)
       this.listQuery.roleName && (params.roleName = this.listQuery.roleName)
       let { data: res } = await GetUserListsV3(params)

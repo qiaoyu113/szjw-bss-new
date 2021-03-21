@@ -18,13 +18,11 @@
         <el-cascader
           v-model="listQuery.officeId"
           placeholder="请选择"
-          :props=" {
+          :props="{
+            lazy: true,
             checkStrictly: true,
-            value: 'id',
-            label: 'name',
-            children: 'officeVOs'
+            lazyLoad: moreTreeData
           }"
-          :options="officeArr"
         />
       </template>
       <div
@@ -88,7 +86,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import UserList from '../components/UserLists.vue'
 import TableHeader from '@/components/TableHeader/index.vue'
-import { GetOfficeByCurrentUser } from '../index'
+import { GetOfficeByCurrentUser1 } from '../index'
 interface IState {
   [key: string]: any;
 }
@@ -106,9 +104,9 @@ export default class extends Vue {
     mobile: '',
     nickName: '',
     officeId: [],
+    officeId1: [],
     roleName: ''
   }
-  private officeArr:IState[] = []
   private formItem:any[] = [
     {
       type: 1,
@@ -178,10 +176,19 @@ export default class extends Vue {
 
   async mounted() {
     this.getLists()
-    let result = await GetOfficeByCurrentUser()
-    this.officeArr.push(...result)
   }
   getLists() {
+    if (this.listQuery.officeId.length > 0) {
+      this.listQuery.officeId1 = this.listQuery.officeId.map((item:string | number) => {
+        if (typeof item === 'number') {
+          return item
+        } else {
+          return item.split('-')[0]
+        }
+      }
+      )
+    }
+
     (this.$refs.userlist as any).getLists()
   }
 
@@ -216,6 +223,14 @@ export default class extends Vue {
   // 查询
   handleFilterClick() {
     this.getLists()
+  }
+  async moreTreeData(node:any, resolve:Function) {
+    let data = await GetOfficeByCurrentUser1(node)
+    let arr:any = data
+    if (arr.length === 0) {
+      arr = undefined
+    }
+    return resolve(arr)
   }
 }
 </script>
