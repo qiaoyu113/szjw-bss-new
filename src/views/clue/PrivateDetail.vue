@@ -85,6 +85,9 @@
                 {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}' + textDes(scope.row.operationType)) }}
               </template>
 
+              <template v-slot:contact="scope">
+                {{ isTrueOrFalse(scope.row.contact) }}
+              </template>
               <template v-slot:op="scope">
                 <div
                   :key="clueStatus"
@@ -398,7 +401,8 @@ export default class extends Vue {
     },
     {
       key: 'contact',
-      label: '是否联系上'
+      label: '是否联系上',
+      slot: true
     },
     {
       key: 'remark',
@@ -437,7 +441,8 @@ export default class extends Vue {
     },
     {
       key: 'contact',
-      label: '是否联系的上'
+      label: '是否联系的上',
+      slot: true
     },
     {
       key: 'remark',
@@ -779,6 +784,14 @@ export default class extends Vue {
       return val === 1 ? '(已取消)' : '(已爽约)'
     } else {
       return ''
+    }
+  }
+
+  private isTrueOrFalse(val:null | boolean) {
+    if (typeof val === 'boolean') {
+      return val ? '是' : '否'
+    } else {
+      return '暂无数据'
     }
   }
 
