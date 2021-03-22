@@ -300,13 +300,7 @@ export default class extends Vue {
     this.allowData = item
     this.showAllow = true
   }
-  private goUserPage(id: string) {
-    this.$router.push(
-      { name: 'ShowUser',
-        query: { id: id }
-      })
-  }
-  private goCreateUser() {
+  private sysTypeRoute() {
     let name = 'wtSystem'
     switch (this.$route.meta.sysType) {
       case 1:
@@ -325,27 +319,18 @@ export default class extends Vue {
         name = 'roleSystem'
         break
     }
+    return name
+  }
+  private goUserPage(id: string) {
+    let name = this.sysTypeRoute()
+    this.$router.push({ path: `/roleSystem/${name}/showUser`, query: { id: id } })
+  }
+  private goCreateUser() {
+    let name = this.sysTypeRoute()
     this.$router.push({ path: `/roleSystem/${name}/roleCreate`, query: { sysType: this.$route.meta.sysType } })
   }
   private editRole(row: any) {
-    let name = 'wtSystem'
-    switch (this.$route.meta.sysType) {
-      case 1:
-        name = 'wtSystem'
-        break
-      case 3:
-        name = 'lnSystem'
-        break
-      case 7:
-        name = 'clueSystem'
-        break
-      case 8:
-        name = 'dataSystem'
-        break
-      case 6:
-        name = 'roleSystem'
-        break
-    }
+    let name = this.sysTypeRoute()
     this.$router.push({ path: `/roleSystem/${name}/roleOperate`, query: { id: row.id, sysType: this.$route.meta.sysType } })
   }
   private deleteRole(item: any) {
