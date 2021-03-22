@@ -36,6 +36,13 @@ export const getOfficeListPost = (data: any) =>
     method: 'post',
     data
   })
+// 组织管理列表（异步加载）
+export const getOfficeListAll = (params: any) =>
+  request({
+    url: `${baseURL}/v3/base/office/getAllChildrenWithNumber`,
+    method: 'get',
+    params
+  })
 // 组织管理-创建组织
 export const createOffice = (data: any = {}) =>
   request({

@@ -23,11 +23,11 @@
             :name="'type_' + data.type"
           />
           <span class="mr10">{{ node.label }}</span>
-          <!-- <el-badge
+          <el-badge
             type="primary"
             :value="data.userCount"
             class="mr10"
-          /> -->
+          />
           <div class="right-btn">
             <el-button
               v-if="data.type !== 5"
@@ -118,11 +118,11 @@
             :name="'type_' + data.type"
           />
           <span class="mr10">{{ node.label }}</span>
-          <!-- <el-badge
+          <el-badge
             type="primary"
             :value="data.userCount"
             class="mr10"
-          /> -->
+          />
           <div class="right-btn">
             <el-button
               v-if="!node.isLeaf && data.id !== -2"
@@ -421,13 +421,13 @@ import { GetArea } from '@/api/common'
 import { lock } from '@/utils/index'
 import { UserModule } from '@/store/modules/user'
 import {
-  getOfficeListPost,
   createOffice,
   sortOffice,
   updateOffice,
   deleteOffice,
   createAll,
-  officeDrag
+  officeDrag,
+  getOfficeListAll
 } from '@/api/role-system'
 import {
   getOfficeList,
@@ -874,54 +874,46 @@ export default class extends Vue {
   // 获取组织管理列表（第二课tree）
   // getOfficeListPost
   private async getOfficeListPost(node: any, resolve: any) {
-    let postData = {
-      type: [2],
+    let postData: IState = {
+      // type: [2],
       parentId: undefined
     }
-    if (node.level === 0) {
-      // 请求第一级 初始化
-      resolve([
-        {
-          id: 16,
-          name: '大区公共组织',
-          type: 1,
-          parentId: 0,
-          parentIds: '0',
-          officeVOs: [],
-          userCount: 0,
-          leaf: false,
-          datalevel: 1
-        },
-        {
-          id: -2,
-          name: '总部组织',
-          type: 1,
-          parentId: 0,
-          parentIds: '0',
-          officeVOs: [],
-          userCount: 0,
-          leaf: true
-        }
-      ])
-      return
-    } else if (node.level === 1) {
-      postData.type = [2]
+    if (node.level === 1 || node.level === 0) {
+      postData.parentId = 16
     } else {
       postData.parentId = node.data.id
       postData.type = []
     }
-    const { data } = await getOfficeListPost(postData)
-    if (data.success) {
-      let arr = data.data
-      if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
-        arr = data.data.map((item: any) => {
-          item.leaf = true
-          return item
-        })
+    try {
+      const { data } = await getOfficeListAll(postData)
+      if (data.success) {
+        let arr = data.data
+        if (node.level === 0) {
+          arr[0].name = '大区公共组织'
+          arr.push({
+            id: -2,
+            name: '总部组织',
+            type: 1,
+            parentId: 0,
+            parentIds: '0',
+            officeVOs: [],
+            userCount: 0,
+            leaf: true
+          })
+        } else if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
+          arr = data.data[0].officeVOs.map((item: any) => {
+            item.leaf = true
+            return item
+          })
+        }
+        resolve(arr || [])
+      } else {
+        this.$message.error(data)
       }
-      resolve(arr || [])
-    } else {
-      this.$message.error(data)
+    } catch (err) {
+      console.log(err)
+      // eslint-disable-next-line
+      node.loading = false
     }
   }
   // 展开所有节点
