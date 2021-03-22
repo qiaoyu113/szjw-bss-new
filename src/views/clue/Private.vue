@@ -121,6 +121,7 @@
         <el-select
           v-if="hasShow"
           v-model="listQuery.sort"
+          v-permission="['/v2/market-clue/list/order']"
           placeholder="排序方式"
           size="small"
           clearable
@@ -325,7 +326,8 @@ import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
 import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListB,
   GetClueLZXPrivateSeaPoolListC,
   UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
-  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC
+  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC,
+  GetClueWSSpecialXPrivateSeaPoolList
 } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import CallPhone from './components/CallPhone/index.vue'
@@ -1308,9 +1310,9 @@ export default class extends Vue {
       let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_mark_status', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
+        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSSpecialXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         const clueTypePremission = [
-          '/v2/market-clue/getCluePrivateSeaPoolList',
+          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
           '/v2/market-clue/getClueLCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
@@ -1589,7 +1591,7 @@ export default class extends Vue {
      if (this.listQuery.clueType > 1) {
        return false
      } else {
-       return !(status === 10 || status === 20)
+       return !(status === 10 || status === 20 || status === 30)
      }
    }
    @Watch('listQuery.inviteStatus')
