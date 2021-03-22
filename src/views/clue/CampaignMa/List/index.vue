@@ -25,9 +25,8 @@
           @change="handleBusiTypeChange"
         >
           <el-radio-button
-            v-for="item in busiTypeArrs"
+            v-for="item in busiTypeArrs1"
             :key="item.value"
-            v-permission="[`${item.url}`]"
             :label="item.value"
           >
             {{ item.label }}
@@ -179,6 +178,7 @@ import { HandlePages, lock } from '@/utils/index'
 import AddCampaign from './components/addCampaign.vue'
 import ImportClue from './components/impotClue.vue'
 import { delayTime } from '@/settings'
+import { isPermission } from '@/filters/index'
 import {
   today,
   yesterday,
@@ -230,26 +230,27 @@ export default class extends Vue {
   // 导入线索
   private showDialog1:boolean = false;
   // 业务类型列表
+  private busiTypeArrs1:any[] = []
   private busiTypeArrs:any[] = [
     {
       label: '梧桐专车',
       value: 0,
-      url: '/v2/clue/campaign/getClueCampaignList-0'
+      pUrl: ['/v2/clue/campaign/getClueCampaignList-0']
     },
     {
       label: '梧桐共享',
       value: 1,
-      url: '/v2/clue/campaign/getClueCampaignList-1'
+      pUrl: ['/v2/clue/campaign/getClueCampaignList-1']
     },
     {
       label: '雷鸟车池',
       value: 2,
-      url: '/v2/clue/campaign/getClueCampaignList-2'
+      pUrl: ['/v2/clue/campaign/getClueCampaignList-2']
     },
     {
       label: '雷鸟租赁',
       value: 3,
-      url: '/v2/clue/campaign/getClueCampaignList-3'
+      pUrl: ['/v2/clue/campaign/getClueCampaignList-3']
     }
   ]
   private formItem:any[] = [
@@ -712,6 +713,14 @@ export default class extends Vue {
     this.getUserGroupSelectList(this.listQuery.clueType)
     this.getLists()
   }
+  _isPermission(values:any[]) {
+    let arr = isPermission(values)
+    if (arr.length > 0) {
+      this.listQuery.clueType = arr[0].value
+      console.log('xxxx:', arr[0].value)
+    }
+    return arr
+  }
   // 初始化公共列表
   init() {
     this.areaAddress()
@@ -726,6 +735,7 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getLists()
+    this.busiTypeArrs1 = this._isPermission(this.busiTypeArrs)
   }
 }
 </script>
