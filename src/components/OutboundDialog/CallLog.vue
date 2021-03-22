@@ -89,10 +89,7 @@ export default class extends Vue {
     this.page.limit = page.limit
     this.getLists()
   }
-  // @Watch('businessId', { immediate: true })
-  // handleBusinessIdChange() {
-  //   this.getLists()
-  // }
+
   // 获取列表
   async getLists() {
     try {
