@@ -135,7 +135,7 @@ export default class extends Vue {
     { label: '金杯', value: 1 },
     { label: '依维柯', value: 10 },
     { label: '4.2米厢货', value: 2 },
-    { label: '面包', value: 35 },
+    { label: '面包', value: 48 },
     { label: '其他', value: 45 }
   ];
 
@@ -207,7 +207,7 @@ export default class extends Vue {
         'value-format': 'yyyy-MM-dd HH:mm',
         'picker-options': {
           disabledDate: (time:Date) => {
-            return time.getTime() < new Date().getTime()
+            return time.getTime() <= Date.now() - 86400000
           }
         }
       }
@@ -248,7 +248,7 @@ export default class extends Vue {
       col: 24,
       tagAttrs: {
         type: 'textarea',
-        placeholder: '选填，最多输入100个字',
+        placeholder: '最多输入100个字',
         maxlength: '100',
         showWordLimit: true
       }
@@ -389,7 +389,7 @@ export default class extends Vue {
       col: 24,
       tagAttrs: {
         type: 'textarea',
-        placeholder: '选填，最多输入100个字',
+        placeholder: '最多输入100个字',
         maxlength: '100',
         showWordLimit: true
       }
