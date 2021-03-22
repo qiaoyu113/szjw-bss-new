@@ -323,7 +323,7 @@ export default class extends Vue {
   }
   private goUserPage(id: string) {
     let name = this.sysTypeRoute()
-    this.$router.push({ path: `/roleSystem/${name}/showUser`, query: { id: id, redirect: this.$route.fullPath } })
+    this.$router.push({ path: `/roleSystem/${name}/showUser`, query: { id: id } })
   }
   private goCreateUser() {
     let name = this.sysTypeRoute()
