@@ -18,7 +18,7 @@
       <div slot="tabGroup">
         <el-radio-group
           v-model="listQuery.clueType"
-          style="margin-bottom: 30px;"
+          style="margin-bottom: 30px"
           @change="handleResetClick"
         >
           <el-radio-button
@@ -40,10 +40,12 @@
           <el-button
             type="primary"
             :plain="item.name !== listQuery.status"
-            @click="() => {
-              listQuery.status = item.name
-              handleFilterClick()
-            }"
+            @click="
+              () => {
+                listQuery.status = item.name
+                handleFilterClick()
+              }
+            "
           >
             {{ item.text }}
           </el-button>
@@ -73,7 +75,7 @@
           v-permission="['/v2/market-clue/updateFollowerByPrivateSeas']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
-          :disabled="multipleSelection.length > 0 ? false :true"
+          :disabled="multipleSelection.length > 0 ? false : true"
           @click="handleMulDistributionClick"
         >
           批量转线索
@@ -92,7 +94,7 @@
           v-permission="['/v2/market-clue/privatePool/export']"
           type="primary"
           size="small"
-          :disabled="times === 10 ? false :true"
+          :disabled="times === 10 ? false : true"
           :class="isPC ? '' : 'btnMobile'"
           @click="_exportFile"
         >
@@ -144,8 +146,8 @@
         :index="true"
         :page="page"
         row-key="marketClueId"
-        style="overflow: initial;"
-        :style="tableData.length ===0 ? 'margin-bottom: 30px;':''"
+        style="overflow: initial"
+        :style="tableData.length === 0 ? 'margin-bottom: 30px;' : ''"
         :default-sort="{prop: 'createDate', order: 'descending'}"
         :func="filterCheck"
         @onPageSize="handlePageSize"
@@ -153,7 +155,7 @@
       >
         <template v-slot:intoPoolNum="scope">
           <template v-if="scope.header">
-            <div style="line-height:1.2">
+            <div style="line-height: 1.2">
               入池次数<br>(该线索类型)
             </div>
           </template>
@@ -165,8 +167,8 @@
           {{ row.name }}<br>{{ row.phone }}
         </template>
         <template v-slot:payIntentionMoney="{row}">
-          {{ row.payIntentionMoney === true?'是':'' }}
-          {{ row.payIntentionMoney === false?'否':'' }}
+          {{ row.payIntentionMoney === true ? '是' : '' }}
+          {{ row.payIntentionMoney === false ? '否' : '' }}
         </template>
 
         <template v-slot:remark="{row}">
@@ -193,7 +195,8 @@
           {{ row.followerDate }}<br>{{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
-          {{ row.hasCar ? '有' : '无' }}{{ row.carTypeName? '/'+row.carTypeName:'' }}
+          {{ row.hasCar ? '有' : '无'
+          }}{{ row.carTypeName ? '/' + row.carTypeName : '' }}
         </template>
         <template v-slot:notFollowDay="{row}">
           <el-link
@@ -230,7 +233,7 @@
           <el-button
             v-permission="['/v2/market-clue/updateFollowerByPrivateSeas']"
             type="text"
-            :disabled=" (scope.row.status === 40 || scope.row.status === 50)"
+            :disabled="scope.row.status === 40 || scope.row.status === 50"
             @click="handleDistributionClick(scope.row)"
           >
             转线索
@@ -296,9 +299,7 @@
             仅支持XLS/XLSX文件格式
           </div>
         </el-upload>
-        <div
-          class="dialog_tit"
-        >
+        <div class="dialog_tit">
           上传成功后，该线索会自动分配给导入人
         </div>
         <el-link
@@ -324,18 +325,34 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
-import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListB,
+import {
+  GetClueWSXPrivateSeaPoolList,
+  GetClueLCXPrivateSeaPoolList,
+  GetClueLZXPrivateSeaPoolListB,
   GetClueLZXPrivateSeaPoolListC,
-  UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
-  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC,
-  GetClueWSSpecialXPrivateSeaPoolList
+  UpdateFollowerByPrivateSeas,
+  GetClueWSSpecialXPrivateSeaPoolList,
+  ExportFirmiana,
+  ExportBirdTruck,
+  ExportBirdRental,
+  UploadExcelFirmianaZC,
+  UploadExcelBirdGX,
+  UploadExcelLNB,
+  UploadExcelLNC
 } from '@/api/clue'
-import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
+import {
+  today,
+  yesterday,
+  sevenday,
+  thirtyday
+} from '@/views/driver-freight/components/date'
 import CallPhone from './components/CallPhone/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList, GetSpecifiedRoleList,
+import {
+  GetDictionaryList,
+  GetSpecifiedRoleList,
   getGroupInfoByCityCodeAndProductLine
 } from '@/api/common'
 import { delayTime } from '@/settings'
@@ -343,24 +360,24 @@ import { exportFileTip } from '@/utils/exportTip'
 import { checkPermission } from '@/utils/permission'
 
 interface IState {
-  [key: string]: any;
+  [key: string]: any
 }
 interface PageObj {
-  page: number;
-  limit: number;
-  total?: number;
+  page: number
+  limit: number
+  total?: number
 }
 interface formItem {
-  [key: string]: any;
-  type?: number | string;
-  label?: string;
-  key?: string;
-  col?: number;
-  tagAttrs?: object;
-  listeners?: object;
-  options?: IState[];
-  slot?:boolean,
-  w?:string
+  [key: string]: any
+  type?: number | string
+  label?: string
+  key?: string
+  col?: number
+  tagAttrs?: object
+  listeners?: object
+  options?: IState[]
+  slot?: boolean
+  w?: string
 }
 @Component({
   name: 'PrivateClue',
@@ -372,9 +389,9 @@ interface formItem {
   }
 })
 export default class extends Vue {
-  times:number = 10;
-  private listLoading: boolean = false;
-  private toDoValue: number = 0;
+  times: number = 10
+  private listLoading: boolean = false
+  private toDoValue: number = 0
   private gmGroupList = [{ label: '全部', value: '' }] // 加盟小组
   private listQuery: IState = {
     cityCode: '', // 所属城市
@@ -400,15 +417,14 @@ export default class extends Vue {
     clueType: 0,
     createTime: '',
     demandType: '' // 需求类型
-
-  };
-  private tableData: any[] = [];
+  }
+  private tableData: any[] = []
   // options
   private hasCarList: IState[] = [
     { label: '全部', value: '' },
     { label: '有', value: 1 },
     { label: '无', value: 0 }
-  ];
+  ]
   private sortOptions: IState[] = [
     { label: '按照未跟进天数倒序', value: 'notFollowStartDate:asc' },
     { label: '按照未跟进天数正序', value: 'notFollowStartDate:desc' },
@@ -417,27 +433,22 @@ export default class extends Vue {
   ]
   private followerListOptions: IState[] = [] // 跟进人
   private demandOptions: any[] = [] // 需求类型
-  private sourceOptions:any[] = [] // 来源渠道列表
-  private clueOptions:any[] = [] // 线索归属
+  private sourceOptions: any[] = [] // 来源渠道列表
+  private clueOptions: any[] = [] // 线索归属
   private inviteStatusOptions: any[] = [] // 邀约情况
   private intentDegreeOptions: any[] = [] // 意向度
   private carTypeOptions: any[] = [] // 车型
   private followTypeOptins: any[] = [] // 跟进情况
   private inviteFailReasonOptions: any[] = [] // 邀约失败原因
-  private clueArr:IState[] = []
-  private activeFollowTypeOptins= [] // 跟进情况的全量
+  private clueArr: IState[] = []
+  private activeFollowTypeOptins = [] // 跟进情况的全量
   private page: PageObj = {
     page: 1,
     limit: 30,
     total: 0
-  };
-  private shortcuts = [
-    today,
-    yesterday,
-    sevenday,
-    thirtyday
-  ]
-  private btns:any[] = [
+  }
+  private shortcuts = [today, yesterday, sevenday, thirtyday]
+  private btns: any[] = [
     {
       name: '',
       text: '全部',
@@ -508,31 +519,35 @@ export default class extends Vue {
   downloadFile() {
     const fileList = [
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/9aad173773eb4ab0aee22bdb1b2e5b2f',
+        fileUrl:
+          'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/9aad173773eb4ab0aee22bdb1b2e5b2f',
         recordId: '梧桐专车导入模板'
       },
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/a6e4f7b4d35d4761851fc142f591fd58',
+        fileUrl:
+          'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/a6e4f7b4d35d4761851fc142f591fd58',
         recordId: '梧桐共享导入模板'
       },
       {},
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/6a4eb42e42594e2992747d345275044f',
+        fileUrl:
+          'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/6a4eb42e42594e2992747d345275044f',
         recordId: '雷鸟租赁C导入模板'
       },
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/8f9dfbf8c1c0409c8318e8c543df7a3e',
+        fileUrl:
+          'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/8f9dfbf8c1c0409c8318e8c543df7a3e',
         recordId: '雷鸟租赁B导入模板'
       }
     ]
     const index = this.listQuery.clueType
     this.download(fileList[index])
   }
-  filterCheck({ status }:any) {
+  filterCheck({ status }: any) {
     return !(status === 40 || status === 50)
   }
   // 下载文件
-  download(row:any) {
+  download(row: any) {
     if (!row.fileUrl) {
       return
     }
@@ -552,7 +567,7 @@ export default class extends Vue {
     phone: '',
     clueId: ''
   }
-  callPhoneClick(row:any) {
+  callPhoneClick(row: any) {
     const { clueId, clueType, phone } = row
     this.rowStatus = {
       clueId,
@@ -850,7 +865,10 @@ export default class extends Vue {
       },
       listeners: {
         input: () => {
-          this.listQuery.notFollowDay = this.listQuery.notFollowDay.replace(/[^\d]/g, '')
+          this.listQuery.notFollowDay = this.listQuery.notFollowDay.replace(
+            /[^\d]/g,
+            ''
+          )
         }
       },
       rules: ['root']
@@ -900,7 +918,7 @@ export default class extends Vue {
       w: '0px',
       rules: ['root']
     }
-  ];
+  ]
   private columns: any[] = [
     {
       key: 'clueId',
@@ -1024,16 +1042,16 @@ export default class extends Vue {
       width: this.isPC ? '180px' : '50px',
       rules: ['root']
     }
-  ];
+  ]
   // dialog
-  private showDialog:boolean = false; // 弹框
-  private title:string = '';
-  private rows:IState[] = []; // 弹框选中的数据
-  private multipleSelection:IState[] = [];// 多选选中
-  private dialogListQuery:IState = {
+  private showDialog: boolean = false // 弹框
+  private title: string = ''
+  private rows: IState[] = [] // 弹框选中的数据
+  private multipleSelection: IState[] = [] // 多选选中
+  private dialogListQuery: IState = {
     followerId: []
-  };
-  private validateFollow(rule:any, value:any, callback:Function) {
+  }
+  private validateFollow(rule: any, value: any, callback: Function) {
     if (value === '') {
       callback(new Error('请选择跟进人!'))
     } else if (value.length === 2) {
@@ -1042,15 +1060,15 @@ export default class extends Vue {
       callback()
     }
   }
-  private rules:IState = {
+  private rules: IState = {
     followerId: [
       { required: true, message: '请选择跟进人', trigger: 'blur' },
       { validator: this.validateFollow, trigger: 'change' }
     ]
-  };
+  }
 
   // 获取选择分配人
-  private dialogFormItem:any[] = [
+  private dialogFormItem: any[] = [
     {
       type: 8,
       col: 18,
@@ -1062,7 +1080,8 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: (node:any, resolve:any) => showCityGroupPerson(node, resolve, this.listQuery.clueType)
+          lazyLoad: (node: any, resolve: any) =>
+            showCityGroupPerson(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',
@@ -1070,8 +1089,8 @@ export default class extends Vue {
     }
   ]
   // 导入文件
-  private uploadDialog: boolean = false;
-  private fileList: any[] = [];
+  private uploadDialog: boolean = false
+  private fileList: any[] = []
 
   // 判断是否是PC
   get isPC() {
@@ -1080,30 +1099,40 @@ export default class extends Vue {
   // formitem 筛选
   get formItems() {
     return this.formItem.filter((item: any) => {
-      return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
+      return (
+        item.rules.includes('root') ||
+        item.rules.includes(this.listQuery.clueType)
+      )
     })
   }
   // formitem 筛选
   get tableColumns() {
     return this.columns.filter((item: any) => {
-      return item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)
+      return (
+        item.rules.includes('root') ||
+        item.rules.includes(this.listQuery.clueType)
+      )
     })
   }
   // 表格按钮
   get tableBtn() {
     return this.btns.filter((item: any) => {
-      return item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
+      return (
+        item.uri.includes('root') || item.uri.includes(this.listQuery.clueType)
+      )
     })
   }
 
   get hasShow() {
     const status = this.listQuery.status
-    return (status === '10' || status === '20')
+    return status === '10' || status === '20'
   }
   // 跳转详情页
-  goDetail({ clueType, phone, clueId }:any) {
+  goDetail({ clueType, phone, clueId }: any) {
     const query = {
-      clueType, phone, clueId
+      clueType,
+      phone,
+      clueId
     }
     this.$router.push({
       path: '/clue/privateDetail',
@@ -1130,11 +1159,14 @@ export default class extends Vue {
       this.listQuery.carType = []
       // 处理跟进情况
       this.listQuery.inviteStatus = ''
+      const obj = { label: '全部', value: '' }
       if (this.listQuery.clueType === 2) {
-        const arr = this.activeFollowTypeOptins.slice(0, 4)
+        let arr:any = this.activeFollowTypeOptins.slice(0, 4)
+        arr.unshift(obj)
         this.followTypeOptins.splice(0, 4, ...arr)
       } else {
-        const arr = this.activeFollowTypeOptins.slice(-4)
+        let arr:any = this.activeFollowTypeOptins.slice(-4)
+        arr.unshift(obj)
         this.followTypeOptins.splice(0, 4, ...arr)
       }
       this.listQuery.cityCode = ''
@@ -1174,18 +1206,31 @@ export default class extends Vue {
       return params
     }
     this.formItem.map((item: any) => {
-      if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
+      if (
+        item.rules.includes('root') ||
+        item.rules.includes(this.listQuery.clueType)
+      ) {
         if (item.key === 'cityCode' && this.listQuery.cityCode) {
           params.cityCode = this.listQuery.cityCode[1] || ''
-        } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
+        } else if (
+          item.key === 'carCity' &&
+          this.listQuery.carCity &&
+          this.listQuery.carCity.length > 0
+        ) {
           params.carCity = this.listQuery.carCity[1]
-        } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
+        } else if (
+          item.key === 'createTime' &&
+          this.listQuery.createTime &&
+          this.listQuery.createTime.length > 0
+        ) {
           let createDateStart = new Date(this.listQuery.createTime[0])
           let createDateEnd = new Date(this.listQuery.createTime[1])
           params.startDate = createDateStart.setHours(0, 0, 0) || undefined
           params.endDate = createDateEnd.setHours(23, 59, 59, 999) || undefined
         } else {
-          (this.listQuery[item.key] !== '' && this.listQuery[item.key] !== undefined) && (params[item.key] = this.listQuery[item.key])
+          this.listQuery[item.key] !== '' &&
+            this.listQuery[item.key] !== undefined &&
+            (params[item.key] = this.listQuery[item.key])
         }
       }
       return item
@@ -1193,14 +1238,22 @@ export default class extends Vue {
     params.onlyMe = params.onlyMe ? 1 : 0
     if (this.listQuery.clueType <= 2) {
       delete params.intentModel
-      params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+      params.carType =
+        Array.isArray(this.listQuery.carType) &&
+        this.listQuery.carType.filter(item => item !== '').join(',')
     } else {
       delete params.carType
-      params.intentModel = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+      params.intentModel =
+        Array.isArray(this.listQuery.carType) &&
+        this.listQuery.carType.filter(item => item !== '').join(',')
     }
     // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
-    params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
-    params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item !== '').join(',')
+    params.inviteFailReason =
+      Array.isArray(this.listQuery.inviteFailReason) &&
+      this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
+    params.sourceChannel =
+      Array.isArray(this.listQuery.sourceChannel) &&
+      this.listQuery.sourceChannel.filter(item => item !== '').join(',')
 
     for (const key in params) {
       if (Object.prototype.hasOwnProperty.call(params, key)) {
@@ -1214,9 +1267,10 @@ export default class extends Vue {
   private async getLists(isTodo = false) {
     try {
       this.listLoading = true
-      const submitForm = this.clueArr.find((item: any) => {
-        return item.value === this.listQuery.clueType
-      }) || {}
+      const submitForm =
+        this.clueArr.find((item: any) => {
+          return item.value === this.listQuery.clueType
+        }) || {}
       if (!submitForm.searchUrl) return
       if (!isTodo) {
         this.listQuery.toDo = false
@@ -1240,7 +1294,7 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
-  titleChang(title:any) {
+  titleChang(title: any) {
     this.btns.forEach(item => {
       if (item.name === '') {
         item.num = title.all
@@ -1251,7 +1305,7 @@ export default class extends Vue {
     this.toDoValue = title.toDoCount
   }
   // 获取跟进人列表
-  async getGmOptions(cityCode:any, groupId:any) {
+  async getGmOptions(cityCode: any, groupId: any) {
     try {
       let roleTypes = [1, 4]
       //  业务线大于1 的属于雷鸟
@@ -1262,13 +1316,14 @@ export default class extends Vue {
           roleTypes = [12]
         }
       }
-      let params:any = {
+      let params: any = {
         roleTypes,
         uri: '/v2/clueH5/list/queryFollowerList',
         groupId,
         cityCode
       }
-      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+      this.listQuery.busiType !== '' &&
+        (params.busiType = this.listQuery.busiType)
       if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
         params.cityCode = this.listQuery.workCity[1]
       }
@@ -1284,7 +1339,7 @@ export default class extends Vue {
           }
         })
         if (this.listQuery.clueType > 1) {
-          arr = arr.filter((item:any) => item.status === 1)
+          arr = arr.filter((item: any) => item.status === 1)
         }
         this.followerListOptions.push(...arr)
       } else {
@@ -1310,75 +1365,147 @@ export default class extends Vue {
    */
   async getBaseInfo() {
     try {
-      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_mark_status', 'Intentional_compartment', 'demand_type']
+      let params = [
+        'source_channel',
+        'clue_attribution',
+        'mkt_clue_type',
+        'invite_status',
+        'intent_degree',
+        'invite_fail_reason',
+        'follow_mark_status',
+        'Intentional_compartment',
+        'demand_type'
+      ]
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSSpecialXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
+        const searchArr = [
+          GetClueWSXPrivateSeaPoolList,
+          GetClueWSSpecialXPrivateSeaPoolList,
+          GetClueLCXPrivateSeaPoolList,
+          GetClueLZXPrivateSeaPoolListC,
+          GetClueLZXPrivateSeaPoolListB
+        ]
+
         const clueTypePremission = [
-          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
+          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueLCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
         ]
-        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_mark_status: followType } = res.data
-        let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let intentDegreeOptions = intentDegree.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let inviteFailReasonOptions = inviteFailReason.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
-        let clueType = mktClueType.map((item:any, index:number) => ({ label: item.dictLabel, value: Number(item.dictValue), searchUrl: searchArr[index], pUrl: clueTypePremission[index] }))
-        let carTypeOptions = IntentionalCompartment.map((item:any, index:number) => ({ label: item.dictLabel, value: item.dictValue }))
-        let followTypeOptins = followType.map((item:any, index:number) => ({ label: item.dictLabel, value: item.dictValue }))
-        let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
+
+        let {
+          clue_attribution: clueAttribution,
+          source_channel: sourceChannel,
+          mkt_clue_type: mktClueType,
+          Intentional_compartment: IntentionalCompartment,
+          demand_type: demandType,
+          invite_status: inviteStatus,
+          intent_degree: intentDegree,
+          invite_fail_reason: inviteFailReason,
+          follow_mark_status: followType
+        } = res.data
+        let clue = clueAttribution.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let sources = sourceChannel.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let inviteStatusOptions = inviteStatus.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let intentDegreeOptions = intentDegree.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let inviteFailReasonOptions = inviteFailReason.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let clueType = mktClueType.map((item: any, index: number) => ({
+          label: item.dictLabel,
+          value: Number(item.dictValue),
+          searchUrl: searchArr[index],
+          pUrl: clueTypePremission[item.dictValue]
+        }))
+
+        let carTypeOptions = IntentionalCompartment.map(
+          (item: any, index: number) => ({
+            label: item.dictLabel,
+            value: item.dictValue
+          })
+        )
+        let followTypeOptins = followType.map((item: any, index: number) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
+        let demand = demandType.map((item: any) => ({
+          label: item.dictLabel,
+          value: item.dictValue
+        }))
 
         this.carTypeOptions.push(...carTypeOptions)
         this.activeFollowTypeOptins = followTypeOptins
         // this.followTypeOptins.push(...followTypeOptins)
         this.clueArr.push(...clueType)
         this.listQuery.clueType = clueType[0].value
-        this.clueOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
-          ...clue
-        ])
-        this.sourceOptions.push(...[
-          // {
-          //   label: '全部',
-          //   value: ''
-          // },
-          ...sources
-        ])
-        this.inviteStatusOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
-          ...inviteStatusOptions
-        ])
-        this.intentDegreeOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
-          ...intentDegreeOptions
-        ])
-        this.inviteFailReasonOptions.push(...[
-          // {
-          //   label: '全部',
-          //   value: ''
-          // },
-          ...inviteFailReasonOptions
-        ])
-        this.demandOptions.push(...[
-          {
-            label: '全部',
-            value: ''
-          },
-          ...demand
-        ])
+        this.clueOptions.push(
+          ...[
+            {
+              label: '全部',
+              value: ''
+            },
+            ...clue
+          ]
+        )
+        this.sourceOptions.push(
+          ...[
+            // {
+            //   label: '全部',
+            //   value: ''
+            // },
+            ...sources
+          ]
+        )
+        this.inviteStatusOptions.push(
+          ...[
+            {
+              label: '全部',
+              value: ''
+            },
+            ...inviteStatusOptions
+          ]
+        )
+        this.intentDegreeOptions.push(
+          ...[
+            {
+              label: '全部',
+              value: ''
+            },
+            ...intentDegreeOptions
+          ]
+        )
+        this.inviteFailReasonOptions.push(
+          ...[
+            // {
+            //   label: '全部',
+            //   value: ''
+            // },
+            ...inviteFailReasonOptions
+          ]
+        )
+        this.demandOptions.push(
+          ...[
+            {
+              label: '全部',
+              value: ''
+            },
+            ...demand
+          ]
+        )
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -1392,7 +1519,7 @@ export default class extends Vue {
     (this.$refs.dialogDriverClue as any).submitForm()
   }
   // 表单验证通过
-  handlePassClick(val:boolean) {
+  handlePassClick(val: boolean) {
     this.updateFollower()
   }
   // 分配、批量分配
@@ -1403,8 +1530,8 @@ export default class extends Vue {
         this.$message.warning('请选择跟进人')
         return false
       }
-      let params:IState = {
-        clueId: this.rows.map((item:any) => item.clueId + ''),
+      let params: IState = {
+        clueId: this.rows.map((item: any) => item.clueId + ''),
         followerId: +this.dialogListQuery.followerId[2]
       }
       let { data: res } = await UpdateFollowerByPrivateSeas(params)
@@ -1444,13 +1571,13 @@ export default class extends Vue {
     this.rows.splice(0, len)
   }
   // 分配
-  handleDistributionClick(row:IState) {
+  handleDistributionClick(row: IState) {
     this.rows.push(row)
     this.title = '转线索'
     this.showDialog = true
   }
   // 多选选中
-  handleSelectionChange(val:any) {
+  handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
   // 批量分配
@@ -1479,27 +1606,35 @@ export default class extends Vue {
     formData.append('file', param.file)
     const clueType = this.listQuery.clueType
     let fileUpload = null
-    const arr = [UploadExcelFirmianaZC, UploadExcelBirdGX, undefined, UploadExcelLNC, UploadExcelLNB]
+    const arr = [
+      UploadExcelFirmianaZC,
+      UploadExcelBirdGX,
+      undefined,
+      UploadExcelLNC,
+      UploadExcelLNB
+    ]
     fileUpload = arr[clueType]
-    fileUpload && fileUpload(formData).then(({ data } : any) => {
-      if (data.success) {
-        this.$notify({
-          title: '',
-          message: '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
-          duration: 0,
-          offset: 70
-        })
-        this.uploadDialog = false
-        this.handleResetClick({})
-      } else {
-        this.$message({
-          showClose: true,
-          duration: 0,
-          message: data.errorMsg,
-          type: 'error'
-        })
-      }
-    })
+    fileUpload &&
+      fileUpload(formData).then(({ data }: any) => {
+        if (data.success) {
+          this.$notify({
+            title: '',
+            message:
+              '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
+            duration: 0,
+            offset: 70
+          })
+          this.uploadDialog = false
+          this.handleResetClick({})
+        } else {
+          this.$message({
+            showClose: true,
+            duration: 0,
+            message: data.errorMsg,
+            type: 'error'
+          })
+        }
+      })
   }
   // 导出文件
   _exportFile() {
@@ -1509,7 +1644,7 @@ export default class extends Vue {
    * 导出
    */
   @lock
-  private async handleExportClick(sucFun:Function) {
+  private async handleExportClick(sucFun: Function) {
     let params: any = this.getParams()
     delete params.page
     delete params.limit
@@ -1526,7 +1661,7 @@ export default class extends Vue {
     }
   }
   // 获取城市下的加盟小组
-  async getGroup(cityCode:string) {
+  async getGroup(cityCode: string) {
     let code = this.listQuery.clueType
     if (this.listQuery.clueType > 1) {
       code = 5
@@ -1539,10 +1674,11 @@ export default class extends Vue {
       // this.
       this.gmGroupList.splice(1)
       if (data.success) {
-        let arr = data.data.map((item:any) => {
+        let arr = data.data.map((item: any) => {
           const { id: value, name: label } = item
           return {
-            value, label
+            value,
+            label
           }
         })
         this.gmGroupList.push(...arr)
@@ -1552,7 +1688,7 @@ export default class extends Vue {
     }
   }
   @Watch('listQuery.cityCode')
-  private cityChange(value:any) {
+  private cityChange(value: any) {
     this.listQuery.gmGroupId = ''
     this.listQuery.haveCar = ''
     this.gmGroupList.splice(1)
@@ -1567,7 +1703,7 @@ export default class extends Vue {
   }
 
   // 加盟小组改变
-  private gmChanges(value:any) {
+  private gmChanges(value: any) {
     this.listQuery.followerId = ''
     this.followerListOptions.splice(0)
     this.getGmOptions(this.listQuery.cityCode[1], value)
@@ -1576,74 +1712,78 @@ export default class extends Vue {
     this.getBaseInfo()
     this.getGmOptions('', '')
   }
-   // 权限
-   private distributionPremission:any = {
-     0: ['/v2/market-clue/privatePool/firmiana/import/private'],
-     1: ['/v2/market-clue/privatePool/firmiana/import/shared'],
-     2: [''],
-     3: ['/v2/market-clue/privatePool/thunderBirdRental/import/c'],
-     4: ['/v2/market-clue/privatePool/thunderBirdRental/import/b']
-   }
-   get importClue() {
-     return this.distributionPremission[this.listQuery.clueType]
-   }
-   // 限制
-   hasPhone(status:any) {
-     if (this.listQuery.clueType > 1) {
-       return false
-     } else {
-       return !(status === 10 || status === 20 || status === 30)
-     }
-   }
-   @Watch('listQuery.inviteStatus')
-   inviteStatusChange(value:any) {
-     const clueType = this.listQuery.clueType
-     if (clueType <= 1) {
-       const inx = this.formItem.findIndex(item => item.key === 'intentDegree')
-       if (value === '1') {
-         this.formItem.splice(inx, 2)
-         this.listQuery.intentDegree = ''
-         this.listQuery.inviteFailReason = []
-       } else {
-         if (inx === -1) {
-           const arr = [ {
-             type: 2,
-             label: '意向度',
-             key: 'intentDegree',
-             tagAttrs: {
-               placeholder: '请选择',
-               filterable: true,
-               clearable: true
-             },
-             rules: [0, 1],
-             options: this.intentDegreeOptions
-           },
-           {
-             type: 2,
-             label: '邀约失败原因',
-             key: 'inviteFailReason',
-             tagAttrs: {
-               placeholder: '请选择',
-               filterable: true,
-               clearable: true,
-               multiple: true,
-               collapseTags: true
-             },
-             rules: [0, 1],
-             options: this.inviteFailReasonOptions
-           } ]
-           const inxs = this.formItem.findIndex(item => item.key === 'inviteStatus')
-           this.formItem.splice(inxs + 1, 0, ...arr)
-         }
-       }
-     }
-   }
+  // 权限
+  private distributionPremission: any = {
+    0: ['/v2/market-clue/privatePool/firmiana/import/private'],
+    1: ['/v2/market-clue/privatePool/firmiana/import/shared'],
+    2: [''],
+    3: ['/v2/market-clue/privatePool/thunderBirdRental/import/c'],
+    4: ['/v2/market-clue/privatePool/thunderBirdRental/import/b']
+  }
+  get importClue() {
+    return this.distributionPremission[this.listQuery.clueType]
+  }
+  // 限制
+  hasPhone(status: any) {
+    if (this.listQuery.clueType > 1) {
+      return false
+    } else {
+      return !(status === 10 || status === 20 || status === 30)
+    }
+  }
+  @Watch('listQuery.inviteStatus')
+  inviteStatusChange(value: any) {
+    const clueType = this.listQuery.clueType
+    if (clueType <= 1) {
+      const inx = this.formItem.findIndex(item => item.key === 'intentDegree')
+      if (value === '1') {
+        this.formItem.splice(inx, 2)
+        this.listQuery.intentDegree = ''
+        this.listQuery.inviteFailReason = []
+      } else {
+        if (inx === -1) {
+          const arr = [
+            {
+              type: 2,
+              label: '意向度',
+              key: 'intentDegree',
+              tagAttrs: {
+                placeholder: '请选择',
+                filterable: true,
+                clearable: true
+              },
+              rules: [0, 1],
+              options: this.intentDegreeOptions
+            },
+            {
+              type: 2,
+              label: '邀约失败原因',
+              key: 'inviteFailReason',
+              tagAttrs: {
+                placeholder: '请选择',
+                filterable: true,
+                clearable: true,
+                multiple: true,
+                collapseTags: true
+              },
+              rules: [0, 1],
+              options: this.inviteFailReasonOptions
+            }
+          ]
+          const inxs = this.formItem.findIndex(
+            item => item.key === 'inviteStatus'
+          )
+          this.formItem.splice(inxs + 1, 0, ...arr)
+        }
+      }
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
 .PrivateClue {
-  .el-radio-group{
-    margin-bottom: 0!important;
+  .el-radio-group {
+    margin-bottom: 0 !important;
   }
   .btnPc {
     width: 100%;
@@ -1678,31 +1818,31 @@ export default class extends Vue {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
-  .table_top{
+  .table_top {
     display: flex;
     margin-bottom: 20px;
     justify-content: flex-end;
   }
-  .uploadForm{
+  .uploadForm {
     padding-left: 20px;
-    .upload_tit{
+    .upload_tit {
       margin-bottom: 20px;
       font-size: 16px;
     }
-    .el-upload__tip{
+    .el-upload__tip {
       font-size: 12px;
       margin-top: 7px;
     }
-    .dialog_tit{
+    .dialog_tit {
       margin-top: 30px;
       color: #606266;
     }
-    .mt20{
+    .mt20 {
       margin-top: 20px;
     }
   }
-  .text-partition{
-    overflow : hidden;
+  .text-partition {
+    overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1714,12 +1854,12 @@ export default class extends Vue {
 .PrivateClue >>> .el-badge {
   margin-right: 30px;
 }
-.PrivateClue >>> .el-badge .el-badge__content{
+.PrivateClue >>> .el-badge .el-badge__content {
   right: 0;
   transform: translateY(-50%) translateX(50%);
   z-index: 10;
 }
-.PrivateClue .table_top >>> .el-checkbox-button__inner{
-  border-radius: 4px!important;
+.PrivateClue .table_top >>> .el-checkbox-button__inner {
+  border-radius: 4px !important;
 }
 </style>
