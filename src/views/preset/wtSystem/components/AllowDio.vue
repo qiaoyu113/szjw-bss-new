@@ -264,6 +264,7 @@ export default class extends Vue {
   private async getLists() {
     try {
       let officeId:any[] = []
+      let params:IState = { ...this.page, officeId: [] }
       if (Array.isArray(this.listQuery.officeId)) {
         this.listQuery.officeId.forEach((item:any) => {
           if (typeof item === 'number') {
@@ -274,9 +275,19 @@ export default class extends Vue {
           }
         })
       }
+      if (this.listQuery.officeId && this.listQuery.officeId.length > 0) {
+        let firstLevel = this.listQuery.officeId[0]
+        if (firstLevel === 16) {
+          params.flag = 3
+        } else if (firstLevel === -1) {
+          params.flag = 2
+        } else {
+          params.flag = 1
+        }
+      }
 
       this.listLoading = true
-      let params:IState = { ...this.page, officeId: [] }
+
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
       this.listQuery.officeId.length > 0 && (params.officeId.push(officeId.pop()))
