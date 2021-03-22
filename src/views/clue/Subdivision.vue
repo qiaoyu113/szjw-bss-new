@@ -552,7 +552,6 @@ export default class extends Vue {
       this.listQuery.sort = undefined
     }
     // this.getList(order)
-    console.log(order)
     this.getLists(isSort)
   }
 
@@ -710,6 +709,7 @@ export default class extends Vue {
   }
 
   mounted() {
+    this.listQuery.clueType = this.clueArr[0].value
     this.getLists()
     this.getDictionary()
     this.getDutyListByLevel()
