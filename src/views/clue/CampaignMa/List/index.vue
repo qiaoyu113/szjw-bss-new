@@ -100,6 +100,22 @@
             暂无数据
           </template>
         </template>
+        <template v-slot:regionName="scope">
+          <template v-if="scope.row.regionName">
+            {{ scope.row.regionName }}
+          </template>
+          <template v-else>
+            全部
+          </template>
+        </template>
+        <template v-slot:cityName="scope">
+          <template v-if="scope.row.cityName">
+            {{ scope.row.cityName }}
+          </template>
+          <template v-else>
+            全部
+          </template>
+        </template>
         <template v-slot:op="scope">
           <el-button
             type="text"
@@ -357,12 +373,14 @@ export default class extends Vue {
     {
       key: 'regionName',
       label: '所属区域',
-      'width': '80px'
+      'width': '80px',
+      slot: true
     },
     {
       key: 'cityName',
       label: '城市',
-      'width': '100px'
+      'width': '100px',
+      slot: true
     },
     {
       key: 'deliveryPlatform',
@@ -657,6 +675,10 @@ export default class extends Vue {
           label: item.name
         }
       })
+      this.cityList.push({
+        label: '全部',
+        value: '0'
+      })
       this.cityList.push(...nodes)
     }
   }
@@ -717,7 +739,6 @@ export default class extends Vue {
     let arr = isPermission(values)
     if (arr.length > 0) {
       this.listQuery.clueType = arr[0].value
-      console.log('xxxx:', arr[0].value)
     }
     return arr
   }
