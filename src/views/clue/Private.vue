@@ -1299,6 +1299,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       if (arr[0]) {
         this.listQuery.clueType = arr[0].value
+        this.getLists()
       }
     })
     return arr
@@ -1377,8 +1378,6 @@ export default class extends Vue {
           },
           ...demand
         ])
-
-        this.getLists()
       } else {
         this.$message.error(res.errorMsg)
       }
