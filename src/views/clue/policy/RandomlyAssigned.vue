@@ -7,18 +7,6 @@
       :list-query="listQuery"
     >
       <template #clueType>
-        <ul ref="clueRef">
-          <li
-            v-for="item in clueType"
-            :key="item.id"
-            v-permission="[`${item.url}`]"
-            :data-cluetype="item.id"
-            :class="{active: item.id === activeLineType}"
-            @click="switchLineType(item.id)"
-          >
-            {{ item.name }}
-          </li>
-        </ul> -->
         <el-radio-group
           ref="clueRef"
           v-model="activeLineType"
