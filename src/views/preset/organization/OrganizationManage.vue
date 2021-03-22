@@ -120,7 +120,7 @@
           <span class="mr10">{{ node.label }}</span>
           <el-badge
             type="primary"
-            :value="data.userCount"
+            :value="node.level === 1 && data.id === -2 ? userCount : data.userCount"
             class="mr10"
           />
           <div class="right-btn">
@@ -518,7 +518,7 @@ export default class extends Vue {
   };
   private isAdd: boolean = false;
   private disabled: boolean = false;
-
+  private userCount: number = 0;
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -844,6 +844,7 @@ export default class extends Vue {
     if (data.success) {
       this.treeKey = +new Date()
       this.data = JSON.parse(JSON.stringify(data.data))
+      this.userCount = this.data[0].userCount
       const list = data.data[0].officeVOs
       const fact = (list: any) => {
         for (let index = 0; index < list.length; index++) {
@@ -894,6 +895,10 @@ export default class extends Vue {
         let arr = data.data
         if (node.level === 0) {
           arr[0].name = '大区公共组织'
+          arr[0].id = 16
+          arr[0].type = 1
+          arr[0].parentIds = '0'
+          arr[0].officeVOs = []
           arr.push({
             id: -2,
             name: '总部组织',
