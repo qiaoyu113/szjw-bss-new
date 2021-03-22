@@ -739,7 +739,7 @@ export default class extends Vue {
               item.value = `${this.baseInfoEdio.beforeFollowerName}(${this.baseInfoEdio.beforeFollowerPhone})`
             } else if (item.key === 'hasCar') {
               item.value = ele[1]
-                ? '有' + ';' + this.baseInfoEdio.carTypeName
+                ? '有' + (this.baseInfoEdio.carTypeName ? ';' + this.baseInfoEdio.carTypeName : '')
                 : '否'
             } else {
               item.value = ele[1] || ' '
