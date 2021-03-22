@@ -23,11 +23,11 @@
             :name="'type_' + data.type"
           />
           <span class="mr10">{{ node.label }}</span>
-          <!-- <el-badge
+          <el-badge
             type="primary"
             :value="data.userCount"
             class="mr10"
-          /> -->
+          />
           <div class="right-btn">
             <el-button
               v-if="data.type !== 5"
@@ -118,11 +118,11 @@
             :name="'type_' + data.type"
           />
           <span class="mr10">{{ node.label }}</span>
-          <!-- <el-badge
+          <el-badge
             type="primary"
             :value="data.userCount"
             class="mr10"
-          /> -->
+          />
           <div class="right-btn">
             <el-button
               v-if="!node.isLeaf && data.id !== -2"
@@ -421,13 +421,13 @@ import { GetArea } from '@/api/common'
 import { lock } from '@/utils/index'
 import { UserModule } from '@/store/modules/user'
 import {
-  getOfficeListPost,
   createOffice,
   sortOffice,
   updateOffice,
   deleteOffice,
   createAll,
-  officeDrag
+  officeDrag,
+  getOfficeListAll
 } from '@/api/role-system'
 import {
   getOfficeList,
@@ -567,26 +567,27 @@ export default class extends Vue {
         toId: prev.data.id
       },
       () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return prev.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(node.data)),
-          JSON.parse(JSON.stringify(prev.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let prev1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            prev.data.id
-          )
-          prev1.expanded = prevExpaned
-        })
+        // const children = parent.data.officeVOs || parent.data
+        // const index = children.findIndex((item: any) => {
+        //   return prev.data.id === item.id
+        // })
+        // children.splice(
+        //   index,
+        //   2,
+        //   JSON.parse(JSON.stringify(node.data)),
+        //   JSON.parse(JSON.stringify(prev.data))
+        // )
+        // this.$nextTick(() => {
+        //   let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     node.data.id
+        //   )
+        //   node1.expanded = nodeExpaned
+        //   let prev1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     prev.data.id
+        //   )
+        //   prev1.expanded = prevExpaned
+        // })
+        this.getOfficeList()
       }
     )
   }
@@ -611,26 +612,27 @@ export default class extends Vue {
         toId: next.data.id
       },
       () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return node.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(next.data)),
-          JSON.parse(JSON.stringify(node.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let next1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            next.data.id
-          )
-          next1.expanded = nextExpaned
-        })
+        // const children = parent.data.officeVOs || parent.data
+        // const index = children.findIndex((item: any) => {
+        //   return node.data.id === item.id
+        // })
+        // children.splice(
+        //   index,
+        //   2,
+        //   JSON.parse(JSON.stringify(next.data)),
+        //   JSON.parse(JSON.stringify(node.data))
+        // )
+        // this.$nextTick(() => {
+        //   let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     node.data.id
+        //   )
+        //   node1.expanded = nodeExpaned
+        //   let next1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     next.data.id
+        //   )
+        //   next1.expanded = nextExpaned
+        // })
+        this.getOfficeList()
       }
     )
   }
@@ -771,14 +773,10 @@ export default class extends Vue {
         const { data } = await submitForm(params)
         if (data.success) {
           this.$message.success(`创建成功`)
-          if (this.addData.type === 3) {
-            this.getOfficeList()
+          if (this.addNode.data.id === 16 && this.addNode.level === 1) {
+            this.append2(data.data)
           } else {
-            if (this.addNode.data.id === 16 && this.addNode.level === 1) {
-              this.append2(data.data)
-            } else {
-              this.append(data.data)
-            }
+            this.getOfficeList()
           }
           this.showDialog = false
           this.resetDialog()
@@ -799,7 +797,8 @@ export default class extends Vue {
         const { data } = await updateOffice(params)
         if (data.success) {
           this.$message.success(`编辑成功`)
-          this.update(this.dialogForm)
+          // this.update(this.dialogForm)
+          this.getOfficeList()
           this.showDialog = false
           this.resetDialog()
         } else {
@@ -837,6 +836,8 @@ export default class extends Vue {
   }
   // 获取组织管理列表
   private async getOfficeList(cb: any = () => {}) {
+    const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
+    const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
     this.loading = true
     const { data } = await getOfficeList()
     this.loading = false
@@ -866,6 +867,9 @@ export default class extends Vue {
           officeVOs: [...list]
         }
       ]
+      this.$nextTick(() => {
+        this.openItem(openList)
+      })
       cb()
     } else {
       this.$message.error(data)
@@ -874,54 +878,46 @@ export default class extends Vue {
   // 获取组织管理列表（第二课tree）
   // getOfficeListPost
   private async getOfficeListPost(node: any, resolve: any) {
-    let postData = {
-      type: [2],
+    let postData: IState = {
+      // type: [2],
       parentId: undefined
     }
-    if (node.level === 0) {
-      // 请求第一级 初始化
-      resolve([
-        {
-          id: 16,
-          name: '大区公共组织',
-          type: 1,
-          parentId: 0,
-          parentIds: '0',
-          officeVOs: [],
-          userCount: 0,
-          leaf: false,
-          datalevel: 1
-        },
-        {
-          id: -2,
-          name: '总部组织',
-          type: 1,
-          parentId: 0,
-          parentIds: '0',
-          officeVOs: [],
-          userCount: 0,
-          leaf: true
-        }
-      ])
-      return
-    } else if (node.level === 1) {
-      postData.type = [2]
+    if (node.level === 1 || node.level === 0) {
+      postData.parentId = 16
     } else {
       postData.parentId = node.data.id
       postData.type = []
     }
-    const { data } = await getOfficeListPost(postData)
-    if (data.success) {
-      let arr = data.data
-      if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
-        arr = data.data.map((item: any) => {
-          item.leaf = true
-          return item
-        })
+    try {
+      const { data } = await getOfficeListAll(postData)
+      if (data.success) {
+        let arr = data.data
+        if (node.level === 0) {
+          arr[0].name = '大区公共组织'
+          arr.push({
+            id: -2,
+            name: '总部组织',
+            type: 1,
+            parentId: 0,
+            parentIds: '0',
+            officeVOs: [],
+            userCount: 0,
+            leaf: true
+          })
+        } else if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
+          arr = data.data[0].officeVOs.map((item: any) => {
+            item.leaf = true
+            return item
+          })
+        }
+        resolve(arr || [])
+      } else {
+        this.$message.error(data)
       }
-      resolve(arr || [])
-    } else {
-      this.$message.error(data)
+    } catch (err) {
+      console.log(err)
+      // eslint-disable-next-line
+      node.loading = false
     }
   }
   // 展开所有节点
@@ -945,7 +941,8 @@ export default class extends Vue {
           if (node.parent.data.datalevel === 1) {
             this.remove2(node, item)
           } else {
-            this.remove(node, item)
+            // this.remove(node, item)
+            this.getOfficeList()
           }
         } else {
           this.$message.error(data)

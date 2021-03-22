@@ -15,8 +15,8 @@
           <span class="mr10">{{ node.label }}</span>
           <div class="right-btn">
             <el-button
-              v-if="data.authType !== 5 && data.authType !== 1 && node.level !== 6"
-              v-permission="['/v1/base/authority/create/3']"
+              v-if="(Number(node.level) === 5 && Number(data.authType) !== 5) || (Number(data.authType) !== 5 && Number(data.authType) !== 1 && Number(node.level) !== 6)"
+              v-permission="['/v1/base/authority/create/1']"
               circle
               size="mini"
               icon="el-icon-circle-plus-outline"
@@ -29,7 +29,7 @@
             />
             <el-button
               v-if="node.level !== 1 && node.level !== 2"
-              v-permission="['/v1/base/authority/deleteByAuthId/3']"
+              v-permission="['/v1/base/authority/deleteByAuthId/1']"
               circle
               size="mini"
               class="delete"
@@ -43,7 +43,7 @@
             />
             <el-button
               v-if="node.level !== 1 && node.level !== 2"
-              v-permission="['/v1/base/authority/update/3']"
+              v-permission="['/v1/base/authority/update/1']"
               circle
               size="mini"
               icon="el-icon-edit"
@@ -164,11 +164,7 @@ import '@/styles/tree-line.scss'
 export default class extends Vue {
   private loading: boolean = false;
   private data: any = [];
-  private authList: any = [
-    { name: '分类', value: '3' },
-    { name: '页面', value: '4' },
-    { name: '功能', value: '5' }
-  ]
+  private authList: any = []
   private defaultProps: any = {
     children: 'childAuth',
     label: 'authName'
@@ -295,39 +291,30 @@ export default class extends Vue {
     this.dialogTit = '新建权限'
     this.activeName = String(data.authType + 1)
     this.dialogForm.authType = ''
-    if (node.level === 2) {
+    if (Number(node.level) === 2) {
       this.authList = [
-        { name: '分类', value: '3' },
-        { name: '页面', value: '4' },
-        { name: '功能', value: '5' }
+        { name: '分类', value: '3' }
       ]
     }
-    if (node.level === 3) {
-      if (data.authType === 3) {
+    if (Number(node.level) === 3) {
+      this.authList = [
+        { name: '分类', value: '3' },
+        { name: '页面', value: '4' }
+      ]
+    }
+    if (Number(node.level) === 4) {
+      if (Number(data.authType) === 3) {
         this.authList = [
-          { name: '分类', value: '3' },
           { name: '页面', value: '4' }
         ]
       }
-      if (data.authType === 4) {
+      if (Number(data.authType) === 4) {
         this.authList = [
           { name: '功能', value: '5' }
         ]
       }
     }
-    if (node.level === 4) {
-      if (data.authType === 3) {
-        this.authList = [
-          { name: '页面', value: '4' }
-        ]
-      }
-      if (data.authType === 4) {
-        this.authList = [
-          { name: '功能', value: '5' }
-        ]
-      }
-    }
-    if (node.level === 5) {
+    if (Number(node.level) === 5) {
       this.authList = [
         { name: '功能', value: '5' }
       ]
@@ -343,32 +330,30 @@ export default class extends Vue {
     this.dialogForm = Object.assign(this.dialogForm, data)
     this.activeName = String(data.authType)
     this.dialogForm.authType = data.authType
-    if (node.level === 2 || node.level === 3) {
+    if (Number(node.level) === 3) {
       this.authList = [
-        { name: '分类', value: '3' },
-        { name: '页面', value: '4' },
-        { name: '功能', value: '5' }
+        { name: '分类', value: '3' }
       ]
     }
-    if (node.level === 4) {
+    if (Number(node.level) === 4) {
       this.authList = [
         { name: '分类', value: '3' },
         { name: '页面', value: '4' }
       ]
     }
-    if (node.level === 5) {
-      if (node.parent.data.authType === 3) {
+    if (Number(node.level) === 5) {
+      if (Number(data.authType) === 4) {
         this.authList = [
           { name: '页面', value: '4' }
         ]
       }
-      if (node.parent.data.authType === 4) {
+      if (Number(data.authType) === 5) {
         this.authList = [
           { name: '功能', value: '5' }
         ]
       }
     }
-    if (node.level === 6) {
+    if (Number(node.level) === 6) {
       this.authList = [
         { name: '功能', value: '5' }
       ]
