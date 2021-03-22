@@ -177,6 +177,7 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: 'root',
             activeMenu: '/roleSystem/lnSystem/role'
+
           }
         },
         {
@@ -249,6 +250,7 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: 'root',
             activeMenu: '/roleSystem/roleSystem/role'
+
           }
         },
         {
@@ -321,6 +323,7 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: 'root',
             activeMenu: '/roleSystem/clueSystem/role'
+
           }
         },
         {
@@ -393,6 +396,7 @@ const presetRouter: RouteConfig = {
             icon: '',
             apiUrl: 'root',
             activeMenu: '/roleSystem/dataSystem/role'
+
           }
         },
         {
