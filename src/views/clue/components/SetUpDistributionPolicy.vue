@@ -95,8 +95,10 @@ export default class extends Vue {
   // 获取小组
   async getUserGroupList() {
     let code = this.clueType
-    if (this.clueType > 1) {
-      code = 5
+    if (this.clueType === 2) {
+      code = 175
+    } else if (this.clueType === 3) {
+      code = 176
     }
     const { cityCode } = this.policyData
     try {

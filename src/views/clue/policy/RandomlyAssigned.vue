@@ -153,7 +153,6 @@ export default class extends Vue {
         //   lazyLoad: this.cityList
         // }
       },
-      url: '',
       options: this.cityList,
       col: 8,
       label: '城市',
@@ -169,12 +168,6 @@ export default class extends Vue {
   ]
   // 获取获取城市列表
   async cityDetail() {
-    const aa = checkPermission(['/v2/market-clue/config/city'])
-    if (!aa) {
-      const { city: value, cityName: label } = this.tableData[0]
-      this.cityList.push({ value, label })
-      return
-    }
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
@@ -288,12 +281,18 @@ export default class extends Vue {
   private async getList(this:any, order?:string) {
     try {
       this.listLoading = true
+      // const submitForm = this.clueArr.find((item: any) => {
+      //   return item.id === this.listQuery.clueType
+      // }) || {}
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
         clueType: this.activeLineType,
         order: order || ''
       }
+      // if (this.listQuery.city && this.listQuery.city.length > 1) {
+      //   params.city = this.listQuery.city
+      // }
       this.listQuery.city && this.listQuery.city.length && (params.city = +this.listQuery.city[0])
       if (params.clueType === 0) {
         let { data: res } = await configurationWTSpecialList(params)
@@ -336,9 +335,6 @@ export default class extends Vue {
           this.$message.error(res.errorMsg)
         }
       }
-      if (!this.cityList[0]) {
-        this.cityDetail()
-      }
     } catch (err) {
       console.log(`get list fail:${err}`)
     } finally {
@@ -352,6 +348,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       this.getList()
     })
+    this.cityDetail()
   }
 }
 </script>
