@@ -169,7 +169,8 @@ export default class extends Vue {
         page: +this.page.page,
         url: '/v3/base/user/page/list'
       }
-      if (this.listQuery.officeId1.length > 0) {
+
+      if (this.listQuery.officeId1 && this.listQuery.officeId1.length > 0) {
         let firstLevel = this.listQuery.officeId1[0]
         if (firstLevel === 16) {
           params.flag = 3
@@ -183,6 +184,7 @@ export default class extends Vue {
       this.listQuery.status !== '' && (params.status = this.listQuery.status)
       this.listQuery.nickName && (params.nickName = this.listQuery.nickName)
       this.listQuery.mobile && (params.mobile = this.listQuery.mobile)
+
       this.listQuery.officeId1 && this.listQuery.officeId1.length > 0 && (params.officeId = this.listQuery.officeId1[this.listQuery.officeId1.length - 1])
       this.listQuery.roleId !== '' && (params.roleId = this.listQuery.roleId)
       this.listQuery.roleName && (params.roleName = this.listQuery.roleName)
