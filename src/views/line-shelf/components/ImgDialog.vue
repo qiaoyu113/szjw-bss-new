@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-image-viewer
+    <ImgDialogs
       v-if="showImgViewer"
       style="z-index:3000"
       :on-close="closeViewer"
@@ -15,12 +15,13 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
+// import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
+import ImgDialogs from '@/views/line-shelf/components/ImgDialogs.vue'
 
 @Component({
   name: 'ImgDialog',
   components: {
-    ElImageViewer
+    ImgDialogs
   }
 })
 export default class extends Vue {
