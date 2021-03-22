@@ -193,6 +193,9 @@ export default class extends Vue {
 
   private toLastView(visitedViews: ITagView[], view: ITagView) {
     const latestView = visitedViews.slice(-1)[0]
+    if (view.name === 'ShowUser' && latestView && latestView.path) {
+      return this.$router.replace({ path: latestView.path })
+    }
     if (latestView) {
       this.$router.push(latestView)
     } else {

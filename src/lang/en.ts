@@ -162,7 +162,14 @@ export default {
     adjustmentList: 'adjustmentList',
     configManager: 'configManager',
     driverClond: 'driverClond',
-    selfDriverTag: 'selfDriverTag'
+    selfDriverTag: 'selfDriverTag',
+    wtSystem: 'WtSystem',
+    lnSystem: 'LnSystem',
+    clueSystem: 'ClueSystem',
+    dataSystem: 'DataSystem',
+    authoritySystem: 'AuthoritySystem',
+    roleSystem: 'RoleSystem',
+    addUserNew: 'addUser'
   },
   navbar: {
     logOut: 'Log Out',

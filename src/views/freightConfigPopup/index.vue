@@ -1,7 +1,7 @@
 <script lang="ts">
 import { ElNotificationComponent } from 'element-ui/types/notification'
 import { Component, Vue } from 'vue-property-decorator'
-import { showConfirmations } from '@/api/freight.ts'
+import { showConfirmations } from '@/api/freight'
 @Component({
   name: 'FreightConfigPopup'
 })
