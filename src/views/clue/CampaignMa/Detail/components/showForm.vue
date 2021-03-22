@@ -25,6 +25,22 @@
       <template v-slot:createUserName="{row}">
         {{ row.createUserName }}{{ row.createUserPhone }}
       </template>
+      <template v-slot:areCityName="{row}">
+        <template v-if="row.areCityName">
+          {{ row.areCityName }}
+        </template>
+        <template v-else>
+          全部
+        </template>
+      </template>
+      <template v-slot:cityName="{row}">
+        <template v-if="row.cityName">
+          {{ row.cityName }}
+        </template>
+        <template v-else>
+          全部
+        </template>
+      </template>
     </self-form>
   </div>
 </template>
@@ -57,14 +73,16 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 7,
+      type: 'areCityName',
       label: '所属大区',
-      key: 'areCityName'
+      key: 'areCityName',
+      slot: true
     },
     {
-      type: 7,
+      type: 'cityName',
       label: '城市',
-      key: 'cityName'
+      key: 'cityName',
+      slot: true
     },
     {
       type: 7,
