@@ -567,26 +567,27 @@ export default class extends Vue {
         toId: prev.data.id
       },
       () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return prev.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(node.data)),
-          JSON.parse(JSON.stringify(prev.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let prev1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            prev.data.id
-          )
-          prev1.expanded = prevExpaned
-        })
+        // const children = parent.data.officeVOs || parent.data
+        // const index = children.findIndex((item: any) => {
+        //   return prev.data.id === item.id
+        // })
+        // children.splice(
+        //   index,
+        //   2,
+        //   JSON.parse(JSON.stringify(node.data)),
+        //   JSON.parse(JSON.stringify(prev.data))
+        // )
+        // this.$nextTick(() => {
+        //   let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     node.data.id
+        //   )
+        //   node1.expanded = nodeExpaned
+        //   let prev1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     prev.data.id
+        //   )
+        //   prev1.expanded = prevExpaned
+        // })
+        this.getOfficeList()
       }
     )
   }
@@ -611,26 +612,27 @@ export default class extends Vue {
         toId: next.data.id
       },
       () => {
-        const children = parent.data.officeVOs || parent.data
-        const index = children.findIndex((item: any) => {
-          return node.data.id === item.id
-        })
-        children.splice(
-          index,
-          2,
-          JSON.parse(JSON.stringify(next.data)),
-          JSON.parse(JSON.stringify(node.data))
-        )
-        this.$nextTick(() => {
-          let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            node.data.id
-          )
-          node1.expanded = nodeExpaned
-          let next1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
-            next.data.id
-          )
-          next1.expanded = nextExpaned
-        })
+        // const children = parent.data.officeVOs || parent.data
+        // const index = children.findIndex((item: any) => {
+        //   return node.data.id === item.id
+        // })
+        // children.splice(
+        //   index,
+        //   2,
+        //   JSON.parse(JSON.stringify(next.data)),
+        //   JSON.parse(JSON.stringify(node.data))
+        // )
+        // this.$nextTick(() => {
+        //   let node1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     node.data.id
+        //   )
+        //   node1.expanded = nodeExpaned
+        //   let next1 = (this.$refs['tree'] as any).$refs['roleTree'].getNode(
+        //     next.data.id
+        //   )
+        //   next1.expanded = nextExpaned
+        // })
+        this.getOfficeList()
       }
     )
   }
@@ -771,14 +773,10 @@ export default class extends Vue {
         const { data } = await submitForm(params)
         if (data.success) {
           this.$message.success(`创建成功`)
-          if (this.addData.type === 3) {
-            this.getOfficeList()
+          if (this.addNode.data.id === 16 && this.addNode.level === 1) {
+            this.append2(data.data)
           } else {
-            if (this.addNode.data.id === 16 && this.addNode.level === 1) {
-              this.append2(data.data)
-            } else {
-              this.append(data.data)
-            }
+            this.getOfficeList()
           }
           this.showDialog = false
           this.resetDialog()
@@ -799,7 +797,8 @@ export default class extends Vue {
         const { data } = await updateOffice(params)
         if (data.success) {
           this.$message.success(`编辑成功`)
-          this.update(this.dialogForm)
+          // this.update(this.dialogForm)
+          this.getOfficeList()
           this.showDialog = false
           this.resetDialog()
         } else {
@@ -837,6 +836,8 @@ export default class extends Vue {
   }
   // 获取组织管理列表
   private async getOfficeList(cb: any = () => {}) {
+    const nodes = (this.$refs['tree'] as any).$refs['roleTree'].store._getAllNodes()
+    const openList = nodes.filter((item: any) => item.expanded).map((item: any) => item.data.id)
     this.loading = true
     const { data } = await getOfficeList()
     this.loading = false
@@ -866,6 +867,9 @@ export default class extends Vue {
           officeVOs: [...list]
         }
       ]
+      this.$nextTick(() => {
+        this.openItem(openList)
+      })
       cb()
     } else {
       this.$message.error(data)
@@ -937,7 +941,8 @@ export default class extends Vue {
           if (node.parent.data.datalevel === 1) {
             this.remove2(node, item)
           } else {
-            this.remove(node, item)
+            // this.remove(node, item)
+            this.getOfficeList()
           }
         } else {
           this.$message.error(data)
