@@ -518,6 +518,8 @@ export default class extends Vue {
           return true
         }
       })
+      this.listQuery.clueType = this.clueArr[0].value
+      this.getLists()
     } else {
       this.$message.error(data)
     }
@@ -709,8 +711,6 @@ export default class extends Vue {
   }
 
   mounted() {
-    this.listQuery.clueType = this.clueArr[0].value
-    this.getLists()
     this.getDictionary()
     this.getDutyListByLevel()
   }
