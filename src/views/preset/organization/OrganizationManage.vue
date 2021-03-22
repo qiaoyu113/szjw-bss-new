@@ -518,7 +518,7 @@ export default class extends Vue {
   };
   private isAdd: boolean = false;
   private disabled: boolean = false;
-
+  private userCount: number = 0;
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -844,6 +844,7 @@ export default class extends Vue {
     if (data.success) {
       this.treeKey = +new Date()
       this.data = JSON.parse(JSON.stringify(data.data))
+      this.userCount = this.data[0].userCount
       const list = data.data[0].officeVOs
       const fact = (list: any) => {
         for (let index = 0; index < list.length; index++) {
@@ -901,7 +902,7 @@ export default class extends Vue {
             parentId: 0,
             parentIds: '0',
             officeVOs: [],
-            userCount: 0,
+            userCount: this.userCount,
             leaf: true
           })
         } else if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
