@@ -331,14 +331,14 @@ import {
   GetClueLZXPrivateSeaPoolListB,
   GetClueLZXPrivateSeaPoolListC,
   UpdateFollowerByPrivateSeas,
+  GetClueWSSpecialXPrivateSeaPoolList,
   ExportFirmiana,
   ExportBirdTruck,
   ExportBirdRental,
   UploadExcelFirmianaZC,
   UploadExcelBirdGX,
   UploadExcelLNB,
-  UploadExcelLNC,
-  GetClueWSSpecialXPrivateSeaPoolList
+  UploadExcelLNC
 } from '@/api/clue'
 import {
   today,
@@ -1385,13 +1385,15 @@ export default class extends Vue {
           GetClueLZXPrivateSeaPoolListC,
           GetClueLZXPrivateSeaPoolListB
         ]
+
         const clueTypePremission = [
-          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
+          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueLCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
         ]
+
         let {
           clue_attribution: clueAttribution,
           source_channel: sourceChannel,
@@ -1427,8 +1429,9 @@ export default class extends Vue {
           label: item.dictLabel,
           value: Number(item.dictValue),
           searchUrl: searchArr[index],
-          pUrl: clueTypePremission[index]
+          pUrl: clueTypePremission[item.dictValue]
         }))
+
         let carTypeOptions = IntentionalCompartment.map(
           (item: any, index: number) => ({
             label: item.dictLabel,
