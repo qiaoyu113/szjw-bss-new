@@ -32,6 +32,9 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .top-tabrs {
   font-size: 18px;
+  border-bottom: 8px solid #f7f8f9;
+  padding: 0 12px;
+  padding-top: 8px;
   ::v-deep .is-active {
     color: #f9932c !important;
   }

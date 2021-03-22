@@ -12,7 +12,7 @@
         class="el-image-viewer__btn el-image-viewer__close"
         @click="hide"
       >
-        <i class="el-icon-circle-close" />
+        <i class="el-icon-close" />
       </span>
       <!-- ARROW -->
       <template v-if="!isSingle">
@@ -96,7 +96,7 @@ const Mode = {
 const mousewheelEventName = isFirefox() ? 'DOMMouseScroll' : 'mousewheel'
 
 export default {
-  name: 'ImgDialogs',
+  name: 'SelfImageViewer',
 
   props: {
     urlList: {
@@ -323,5 +323,11 @@ export default {
 }
 .right-arow {
   right: 15%;
+}
+.el-image-viewer__close{
+  top: 18%;
+  right: 17%;
+  color: #fff;
+  font-size: 48px;
 }
 </style>

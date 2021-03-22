@@ -43,12 +43,17 @@
           :span="6"
           class="curation-col"
         >
-          <div class="curation-title">
+          <div
+            class="curation-title"
+          >
             <span>仓库图片(12)</span>
-            <div class="img-container">
+            <div
+              class="img-container"
+            >
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
+                @click="showImgViewer = true"
               >
               <div class="mask-img">
                 <span>预览</span>
@@ -62,10 +67,13 @@
         >
           <div class="curation-title">
             <span>货物图片(1)</span>
-            <div class="img-container">
+            <div
+              class="img-container"
+            >
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
+                @click="showImgViewer = true"
               >
               <div class="mask-img">
                 <span>预览</span>
@@ -79,10 +87,13 @@
         >
           <div class="curation-title">
             <span>装货图片(2)</span>
-            <div class="img-container">
+            <div
+              class="img-container"
+            >
               <img
                 src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
                 alt=""
+                @click="showImgViewer = true"
               >
               <div class="mask-img">
                 <span>预览</span>
@@ -289,7 +300,11 @@
       :page="1"
       :limit="12"
     />
-    <ImgDialog :visible.sync="showImgDialog" />
+    <SelfImageViewer
+      v-show="showImgViewer"
+      :on-close="closeViewer"
+      :url-list="imgPreviewList"
+    />
   </div>
 </template>
 
@@ -299,6 +314,8 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
+
 import ImgDialog from './ImgDialog.vue'
 @Component({
   name: 'NewLineAgent',
@@ -306,7 +323,7 @@ import ImgDialog from './ImgDialog.vue'
     SectionContainer,
     SelfForm,
     pagination,
-    ImgDialog
+    SelfImageViewer
   }
 })
 export default class extends Vue {
@@ -553,6 +570,15 @@ export default class extends Vue {
       key: 'lineName'
     }
   ]
+  imgPreviewList=[
+    'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
+    'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg',
+    'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF'
+  ]
+  showImgViewer = false
+  closeViewer() {
+    this.showImgViewer = false
+  }
 }
 </script>
 
@@ -668,6 +694,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .new-line-container {
   overflow: hidden;
+  // padding: 0 12px;
   ::v-deep .SectionContainer {
     margin-top: 8px;
     box-shadow: none;

@@ -1,14 +1,11 @@
 <template>
   <div>
-    <ImgDialogs
+    <SelfImageViewer
       v-if="showImgViewer"
       style="z-index:3000"
       :on-close="closeViewer"
       :url-list="imgPreviewList"
     />
-    <button @click="showImgViewer=true">
-      dsafafdsfasdf
-    </button>
   </div>
 </template>
 
@@ -16,12 +13,12 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 // import ElImageViewer from 'element-ui/packages/image/src/image-viewer.vue'
-import ImgDialogs from '@/views/line-shelf/components/ImgDialogs.vue'
+import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
 
 @Component({
   name: 'ImgDialog',
   components: {
-    ImgDialogs
+    SelfImageViewer
   }
 })
 export default class extends Vue {
