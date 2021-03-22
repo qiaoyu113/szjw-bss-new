@@ -150,8 +150,9 @@ export default class extends Vue {
     }
   }
   // 获取组内人员
-  async getTeamMember(cityCode:number, groupId: any, clueType:any = 0) {
+  async getTeamMember(cityCode:number, groupId: any) {
     try {
+      let clueType = this.clueType
       let roleTypes = [1, 4]
       //  业务线大于1 的属于雷鸟
       if (clueType > 1) {

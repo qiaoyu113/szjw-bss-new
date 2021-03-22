@@ -189,10 +189,14 @@
           </el-popover>
         </template>
         <template v-slot:followerName="{row}">
-          {{ row.followerName }}<br>{{ row.followerPhone }}
+          {{ row.followerName }}<br>
+          {{ row.followerPhone }}
         </template>
         <template v-slot:followDate="{row}">
-          {{ row.followerDate }}<br>{{ row.allocatedDate }}
+          <template v-if="row.status !== 10 ">
+            {{ row.followerDate }}<br>
+          </template>
+          {{ row.allocatedDate }}
         </template>
         <template v-slot:hasCar="{row}">
           {{ row.hasCar ? '有' : '无'
