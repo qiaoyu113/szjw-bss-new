@@ -17,6 +17,7 @@
       :destroy-on-close="true"
       :other="other(true)"
       top="5vh"
+      :stop-confirm="stopConfirm"
       @closed="handleDialogClosed"
     >
       <!-- fullscreen -->
@@ -91,6 +92,7 @@ export default class extends Vue {
   private ApiBase:boolean = false
   private ApiFollow:boolean = false
 
+  private stopConfirm:boolean = false
   get show() {
     return this.showDialog
   }
@@ -116,15 +118,19 @@ export default class extends Vue {
   // 弹窗打开请求接口
   @Watch('showDialog')
   changeDio(value: number) {
-    if (value) {
+    try {
+      if (value) {
+        setTimeout(() => {
+          (this.$refs['callPhone'] as any).handleCallClick()
+        }, 10)
+      }
       setTimeout(() => {
-        (this.$refs['callPhone'] as any).handleCallClick()
+        (this.$refs['baseInfo'] as any).$emit('show', value);
+        (this.$refs['followform'] as any).$emit('show', value)
       }, 10)
+    } catch (err) {
+      console.log(err, 'fail')
     }
-    setTimeout(() => {
-      (this.$refs['baseInfo'] as any).$emit('show', value);
-      (this.$refs['followform'] as any).$emit('show', value)
-    }, 10)
   }
 
   allSuccess(res:boolean[]) {
@@ -153,8 +159,7 @@ export default class extends Vue {
       }
       setTimeout(() => {
         this.$emit('success')
-      }, delayTime);
-      (this.$parent as any).getDetailApi()
+      }, delayTime)
     } catch (err) {
       console.log(err, 'fail')
     }
@@ -164,25 +169,21 @@ export default class extends Vue {
     this.callId = val
   }
 
-  // 弹框确认
-  private confirm() {
-    (this.$refs['baseInfo'] as any).submitsForm();
-    (this.$refs['followform'] as any).submitForms()
-    setTimeout(() => {
-      this.canSend()
-    }, 0)
-  }
-
   private other(type = false) {
-    return () => {
-      (this.$refs['baseInfo'] as any).submitsForm();
-      (this.$refs['followform'] as any).submitForms()
-      setTimeout(() => {
-        this.canSend()
-        if (type) {
-          (this.$refs['callPhone'] as any).handleHangUp()
+    return async() => {
+      await (this.$refs['baseInfo'] as any).submitsForm()
+      await (this.$refs['followform'] as any).submitForms()
+      this.canSend()
+      if (type) {
+        this.stopConfirm = false;
+        (this.$refs['callPhone'] as any).handleHangUp()
+      } else {
+        if (this.status === 3) {
+          this.stopConfirm = true
+        } else {
+          this.stopConfirm = false
         }
-      }, 0)
+      }
     }
   }
 

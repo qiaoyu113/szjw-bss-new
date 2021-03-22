@@ -145,7 +145,12 @@ export default class extends Vue {
       col: 24,
       tagAttrs: {
         placeholder: '请选择面试时间',
-        clearable: true
+        clearable: true,
+        'picker-options': {
+          disabledDate: (time:Date) => {
+            return time.getTime() <= Date.now() - 86400000
+          }
+        }
       }
     },
     {
@@ -176,7 +181,9 @@ export default class extends Vue {
       label: '联系电话',
       col: 24,
       tagAttrs: {
-        placeholder: '请输入联系电话'
+        placeholder: '请输入联系电话',
+        maxlength: '11',
+        showWordLimit: true
       }
     }
   ];

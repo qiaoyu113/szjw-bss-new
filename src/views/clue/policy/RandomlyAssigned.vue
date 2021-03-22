@@ -18,7 +18,22 @@
           >
             {{ item.name }}
           </li>
-        </ul>
+        </ul> -->
+        <el-radio-group
+          ref="clueRef"
+          v-model="activeLineType"
+          size="medium"
+          @change="switchLineType"
+        >
+          <el-radio-button
+            v-for="item in clueType"
+            :key="item.id"
+            v-permission="[`${item.url}`]"
+            :label="item.id"
+          >
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
       </template>
       <template #btnc>
         <div class="btnPc">
@@ -168,6 +183,12 @@ export default class extends Vue {
   ]
   // 获取获取城市列表
   async cityDetail() {
+    const aa = checkPermission(['/v2/market-clue/config/city'])
+    if (!aa) {
+      const { city: value, cityName: label } = this.tableData[0]
+      this.cityList.push({ value, label })
+      return
+    }
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
@@ -281,18 +302,12 @@ export default class extends Vue {
   private async getList(this:any, order?:string) {
     try {
       this.listLoading = true
-      // const submitForm = this.clueArr.find((item: any) => {
-      //   return item.id === this.listQuery.clueType
-      // }) || {}
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
         clueType: this.activeLineType,
         order: order || ''
       }
-      // if (this.listQuery.city && this.listQuery.city.length > 1) {
-      //   params.city = this.listQuery.city
-      // }
       this.listQuery.city && this.listQuery.city.length && (params.city = +this.listQuery.city[0])
       if (params.clueType === 0) {
         let { data: res } = await configurationWTSpecialList(params)
@@ -335,6 +350,9 @@ export default class extends Vue {
           this.$message.error(res.errorMsg)
         }
       }
+      if (!this.cityList[0]) {
+        this.cityDetail()
+      }
     } catch (err) {
       console.log(`get list fail:${err}`)
     } finally {
@@ -342,13 +360,19 @@ export default class extends Vue {
     }
   }
   mounted() {
-    const ele:any = this.$refs['clueRef']
-    const inx = ele.firstElementChild.dataset.cluetype
-    this.activeLineType = Number(inx)
-    this.$nextTick(() => {
-      this.getList()
-    })
-    this.cityDetail()
+    let inx = 0
+    try {
+      const ele:any = this.$refs['clueRef']
+      inx = ele.$el && ele.$el.firstElementChild.firstElementChild._value
+    } catch (error) {
+      return error
+    } finally {
+      this.$nextTick(() => {
+        this.activeLineType = Number(inx)
+        this.getList()
+        this.cityDetail()
+      })
+    }
   }
 }
 </script>
