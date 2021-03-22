@@ -427,7 +427,8 @@ import {
   deleteOffice,
   createAll,
   officeDrag,
-  getOfficeListAll
+  getOfficeListAll,
+  getOfficeListPost
 } from '@/api/role-system'
 import {
   getOfficeList,
@@ -844,7 +845,7 @@ export default class extends Vue {
     if (data.success) {
       this.treeKey = +new Date()
       this.data = JSON.parse(JSON.stringify(data.data))
-      this.userCount = this.data[0].userCount
+      // this.userCount = this.data[0].userCount
       const list = data.data[0].officeVOs
       const fact = (list: any) => {
         for (let index = 0; index < list.length; index++) {
@@ -890,6 +891,19 @@ export default class extends Vue {
       postData.type = []
     }
     try {
+      if (node.level === 0) {
+        try {
+          const { data: treeData } = await getOfficeListPost({
+            flag: 1,
+            type: [1]
+          })
+          if (treeData.success) {
+            this.userCount = treeData.data[0].userCount || 0
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
       const { data } = await getOfficeListAll(postData)
       if (data.success) {
         let arr = data.data
