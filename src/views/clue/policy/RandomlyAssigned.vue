@@ -7,11 +7,12 @@
       :list-query="listQuery"
     >
       <template #clueType>
-        <ul>
+        <ul ref="clueRef">
           <li
             v-for="item in clueType"
             :key="item.id"
             v-permission="[`${item.url}`]"
+            :data-cluetype="item.id"
             :class="{active: item.id === activeLineType}"
             @click="switchLineType(item.id)"
           >
@@ -87,6 +88,7 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { getOfficeByType, getOfficeByTypeAndOfficeId, GetDictionaryCity } from '@/api/common'
 import { HandlePages, lock } from '@/utils/index'
 import { configurationWTShareList, configurationWTSpecialList, configurationLCList, configurationLZList } from '@/api/clue'
+import { checkPermission } from '@/utils/permission'
 interface PageObj {
   page: number
   limit: number
@@ -153,7 +155,7 @@ export default class extends Vue {
       },
       options: this.cityList,
       col: 8,
-      label: '司机城市',
+      label: '城市',
       key: 'city'
     },
     {
@@ -279,6 +281,9 @@ export default class extends Vue {
   private async getList(this:any, order?:string) {
     try {
       this.listLoading = true
+      // const submitForm = this.clueArr.find((item: any) => {
+      //   return item.id === this.listQuery.clueType
+      // }) || {}
       let params:IState = {
         page: this.page.page,
         limit: this.page.limit,
@@ -337,7 +342,12 @@ export default class extends Vue {
     }
   }
   mounted() {
-    this.getList()
+    const ele:any = this.$refs['clueRef']
+    const inx = ele.firstElementChild.dataset.cluetype
+    this.activeLineType = Number(inx)
+    this.$nextTick(() => {
+      this.getList()
+    })
     this.cityDetail()
   }
 }
