@@ -616,9 +616,9 @@ export default class extends Vue {
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
         this.carTypeOptions.push(...carTypeOptions)
-        console.log(clueType)
+        // console.log(clueType)
         this.clueArr.push(...clueType)
-        this.listQuery.clueType = clueType[0].value
+        // this.listQuery.clueType = clueType[0].value
         this.clueOptions.push(...[
           {
             label: '全部',
@@ -640,7 +640,6 @@ export default class extends Vue {
           },
           ...demand
         ])
-        this.getLists()
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -688,8 +687,8 @@ export default class extends Vue {
       if (item.rules.includes('root') || item.rules.includes(this.listQuery.clueType)) {
         if (item.key === 'cityCode' && this.listQuery.cityCode) {
           params.cityCode = this.listQuery.cityCode[1] || ''
-        } else if (item.key === 'carCity' && this.listQuery.carCity && this.listQuery.carCity.length > 0) {
-          params.carCity = this.listQuery.carCity[1]
+        } else if (item.key === 'carCity' && this.listQuery.carCity) {
+          params.carCity = this.listQuery.carCity[1] || ''
         } else if (item.key === 'createTime' && this.listQuery.createTime && this.listQuery.createTime.length > 0) {
           let createDateStart = new Date(this.listQuery.createTime[0])
           let createDateEnd = new Date(this.listQuery.createTime[1])
@@ -757,6 +756,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       if (arr[0]) {
         this.listQuery.clueType = arr[0].value
+        this.getLists()
       }
     })
     // this.listQuery.clueType = arr[0].value

@@ -226,10 +226,18 @@ export const UpdateFollowerByPrivateSeas = (data: any) =>
     method: 'post',
     data
   })
-// 私海池线索 梧桐线索列表
+// 私海池线索 梧桐线索列表 共享
 export const GetClueWSXPrivateSeaPoolList = (data: any) =>
   request({
     url: `/carrier_center/v2/market-clue/getClueWSShareXPrivateSeaPoolList`,
+    method: 'post',
+    data
+  })
+  // getClueWSSpecialXPrivateSeaPoolList
+// 专车
+export const GetClueWSSpecialXPrivateSeaPoolList = (data: any) =>
+  request({
+    url: `/carrier_center/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList`,
     method: 'post',
     data
   })

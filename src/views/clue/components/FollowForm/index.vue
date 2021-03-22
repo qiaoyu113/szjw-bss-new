@@ -323,7 +323,7 @@ export default class extends Vue {
       col: 24,
       tagAttrs: {
         type: 'textarea',
-        placeholder: '选填，最多输入100个字',
+        placeholder: '最多输入100个字',
         maxlength: '100',
         showWordLimit: true
       }
@@ -761,7 +761,7 @@ export default class extends Vue {
     if (this.clueStatus < 2) {
       return this.sendWtFollow(this.dialogPopQuery)
     } else if (this.clueStatus === 2) {
-      this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
+      return this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
     } else if (this.clueStatus === 3) {
       return this.sendRentalFollow(this.dialogPopQueryBirdC)
     } else {
