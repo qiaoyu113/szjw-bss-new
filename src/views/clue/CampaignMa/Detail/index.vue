@@ -71,7 +71,7 @@ import ThunderbirdPool from './components/thunderbirdPool.vue'
 import ThunderbirdRental from './components/thunderbirdRental.vue'
 import { EditCampaignData } from '@/api/clue'
 import CallLog from '@/components/OutboundDialog/CallLog.vue'
-import { divisionFunc } from './components/index'
+import { divisionFunc, accMulFunc } from './components/index'
 interface IState {
   [key: string]: any;
 }
@@ -122,8 +122,8 @@ export default class extends Vue {
         actualCost: +item.actualCost1,
         clickNum: +item.clickNum1,
         showNum: +item.showNum1,
-        showClickRate: divisionFunc(item.showNum1, item.clickNum1),
-        clickClueRate: divisionFunc(item.clueNum, item.clickNum1),
+        showClickRate: accMulFunc(divisionFunc(item.clickNum1, item.showNum1), 100),
+        clickClueRate: accMulFunc(divisionFunc(item.clueNum, item.clickNum1), 100),
         clickCost: divisionFunc(item.actualCost, item.clickNum1)
       }))
       params.editFormList = obj

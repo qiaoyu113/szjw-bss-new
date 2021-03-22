@@ -9,7 +9,8 @@ const clueRouter: RouteConfig = {
   meta: {
     title: 'clueTitle',
     icon: 'delivery',
-    apiUrl: 'root'
+    apiUrl: ['/v2/market-clue/user-group', '/v2/clue/campaign/getClueCampaignList', '/v2/market-clue/reflow_conf/list', '/v2/market-clue/config/list', '/v2/market-clue/list-wt-special/getToAllotWTClueList', '/v2/market-clue/list-wt-share/getToAllotWTClueList', '/v2/market-clue/list-ln-carPool/getToAllotLNCarPoolClueList',
+      '/v2/market-clue/list-ln-hire-c/getToAllotLNLeaseClueList', '/v2/market-clue/list-ln-hire-b/getToAllotLNLeaseClueList', '/v2/market-clue/getCluePrivateSeaPoolList', '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList', '/v2/market-clue/getClueLCXPrivateSeaPoolList', '/v2/market-clue/getClueLZCXPrivateSeaPoolList', '/v2/market-clue/getClueLZBXPrivateSeaPoolList']
   },
   children: [
     {

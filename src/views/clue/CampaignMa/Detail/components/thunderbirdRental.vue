@@ -59,7 +59,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { CampaignDataGroupToThunderBirdRental } from '@/api/clue'
-import { sumFunc, divisionFunc, isInteger } from './index'
+import { sumFunc, divisionFunc, accMulFunc } from './index'
 interface IState {
   [key: string]: any;
 }
@@ -215,7 +215,7 @@ export default class extends Vue {
         sums[column.property] = sumFunc(sumArr)
       } else if (percentArr.length > 0) {
         let percent:number = this.percentFunc(sums, column.property)
-        sums[index] = isInteger(percent * 100) + '%'
+        sums[index] = accMulFunc(percent, 100) + '%'
       } else if (costArr.length > 0) {
         let coast:number = this.coastFunc(sums, column.property)
         sums[index] = coast

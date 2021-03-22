@@ -218,6 +218,7 @@
           :md="true"
         >
           <CallLog
+            ref="callLog"
             class="CallLog"
             :business-id="+clueStatus"
           />
@@ -1002,7 +1003,8 @@ export default class extends Vue {
     this.clueId = (this.$route as any).query.clueId
     await this.getClueId(this.phone)
     await this.getDetailApi()
-    this.getDoLog()
+    this.getDoLog();
+    (this.$refs.callLog as any).getLists()
   }
 }
 </script>
