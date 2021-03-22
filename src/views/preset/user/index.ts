@@ -37,10 +37,16 @@ export const GetOfficeByCurrentUser1 = async(node:any) => {
     } else if (node.level === 1) {
       if (node.isLeaf) {
         params.parentId = node.value.split(',')[0]
+      } else if (node.value === -1) {
+        params.type = [node.data.type]
+        delete params.flag
       } else {
         params.parentId = node.value
       }
     } else {
+      if (node.parent.value === -1) {
+        delete params.flag
+      }
       params.parentId = node.value.split(',')[0]
     }
     let { data: res } = await getOfficeList(params)
