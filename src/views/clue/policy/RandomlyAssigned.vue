@@ -358,7 +358,6 @@ export default class extends Vue {
       this.$nextTick(() => {
         this.activeLineType = Number(inx)
         this.getList()
-        this.cityDetail()
       })
     }
   }
@@ -367,31 +366,6 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .configuration-container {
-  ul {
-    margin: 0;
-    padding: 0;
-    li {
-      list-style: none;
-
-      float: left;
-      width: 120px;
-      line-height: 32px;
-      text-align: center;
-      border: 1px solid #eee;
-      color: #333;
-      user-select: none;
-    }
-    & li:nth-child(1) {
-      border-radius: 10px 0 0 10px;
-    }
-    & li:last-child {
-      border-radius: 0 10px 10px 0;
-    }
-    .active {
-      border-color: #1890ff;
-      color: #1890ff;
-    }
-  }
   .configuration-self-form {
     background: #fff;
     margin-left: 0px !important;
