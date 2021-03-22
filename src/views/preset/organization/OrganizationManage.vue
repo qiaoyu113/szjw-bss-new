@@ -120,7 +120,7 @@
           <span class="mr10">{{ node.label }}</span>
           <el-badge
             type="primary"
-            :value="data.userCount"
+            :value="node.level === 1 && data.id === -2 ? userCount : data.userCount"
             class="mr10"
           />
           <div class="right-btn">
@@ -895,6 +895,10 @@ export default class extends Vue {
         let arr = data.data
         if (node.level === 0) {
           arr[0].name = '大区公共组织'
+          arr[0].id = 16
+          arr[0].type = 1
+          arr[0].parentIds = '0'
+          arr[0].officeVOs = []
           arr.push({
             id: -2,
             name: '总部组织',
@@ -902,7 +906,7 @@ export default class extends Vue {
             parentId: 0,
             parentIds: '0',
             officeVOs: [],
-            userCount: this.userCount,
+            userCount: 0,
             leaf: true
           })
         } else if ((node.data.id === 16 && node.level === 1) || (node.parent.data.id === -2 && node.level === 2)) {
