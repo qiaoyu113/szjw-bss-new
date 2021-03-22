@@ -121,6 +121,7 @@
         <el-select
           v-if="hasShow"
           v-model="listQuery.sort"
+          v-permission="['/v2/market-clue/list/order']"
           placeholder="排序方式"
           size="small"
           clearable
@@ -162,6 +163,9 @@
         </template>
         <template v-slot:namePhone="{row}">
           {{ row.name }}<br>{{ row.phone }}
+        </template>
+        <template v-slot:payIntentionMoney="{row}">
+          {{ row.payIntentionMoney === true?'是':'否' }}
         </template>
 
         <template v-slot:remark="{row}">
@@ -322,7 +326,8 @@ import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
 import { GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListB,
   GetClueLZXPrivateSeaPoolListC,
   UpdateFollowerByPrivateSeas, ExportFirmiana, ExportBirdTruck, ExportBirdRental,
-  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC
+  UploadExcelFirmianaZC, UploadExcelBirdGX, UploadExcelLNB, UploadExcelLNC,
+  GetClueWSSpecialXPrivateSeaPoolList
 } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import CallPhone from './components/CallPhone/index.vue'
@@ -377,6 +382,7 @@ export default class extends Vue {
     phone: '', // 手机号
     hasCar: '', // 是否有车
     haveCar: '',
+    // inviteStatus: '',
     carType: [], // 车型
     gmGroupId: '', // 加盟小组
     followerId: '', // 跟进人
@@ -391,7 +397,9 @@ export default class extends Vue {
     toDo: false, // 代办事项
     sort: '', // 排序方式
     clueType: 0,
-    createTime: ''
+    createTime: '',
+    demandType: '' // 需求类型
+
   };
   private tableData: any[] = [];
   // options
@@ -416,6 +424,7 @@ export default class extends Vue {
   private followTypeOptins: any[] = [] // 跟进情况
   private inviteFailReasonOptions: any[] = [] // 邀约失败原因
   private clueArr:IState[] = []
+  private activeFollowTypeOptins= [] // 跟进情况的全量
   private page: PageObj = {
     page: 1,
     limit: 30,
@@ -511,7 +520,7 @@ export default class extends Vue {
         recordId: '雷鸟租赁C导入模板'
       },
       {
-        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel_template/ce168afed219417b8567915a0ce89237',
+        fileUrl: 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/8f9dfbf8c1c0409c8318e8c543df7a3e',
         recordId: '雷鸟租赁B导入模板'
       }
     ]
@@ -636,7 +645,6 @@ export default class extends Vue {
       key: 'demandType',
       tagAttrs: {
         placeholder: '请选择',
-        filterable: true,
         clearable: true
       },
       rules: [2],
@@ -821,7 +829,7 @@ export default class extends Vue {
     {
       type: 2,
       label: '跟进情况',
-      key: 'haveCar',
+      key: 'inviteStatus',
       tagAttrs: {
         placeholder: '请选择',
         filterable: true,
@@ -938,7 +946,8 @@ export default class extends Vue {
     {
       key: 'payIntentionMoney',
       label: '是否交意向金',
-      rules: [2]
+      rules: [2],
+      slot: true
     },
     {
       key: 'remark',
@@ -1117,13 +1126,26 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     // 重新请求小组数据
     this.$nextTick(() => {
+      this.listQuery.carType = []
+      // 处理跟进情况
+      this.listQuery.inviteStatus = ''
+      if (this.listQuery.clueType === 2) {
+        const arr = this.activeFollowTypeOptins.slice(0, 4)
+        this.followTypeOptins.splice(0, 4, ...arr)
+      } else {
+        const arr = this.activeFollowTypeOptins.slice(-4)
+        this.followTypeOptins.splice(0, 4, ...arr)
+      }
       this.listQuery.cityCode = ''
       this.cityChange('')
       this.getLists()
     })
   }
   private async handleResetClicks(row: IState) {
-    (this.$refs['suggestForm'] as any).resetForm()
+    this.$nextTick(() => {
+      (this.$refs['suggestForm'] as any).resetForm()
+      this.listQuery.cityCode = []
+    })
   }
   private oninputOnlyNum(value: string) {
     this.listQuery.phone = value.replace(/[^\d]/g, '')
@@ -1168,7 +1190,13 @@ export default class extends Vue {
       return item
     })
     params.onlyMe = params.onlyMe ? 1 : 0
-    params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    if (this.listQuery.clueType <= 2) {
+      delete params.intentModel
+      params.carType = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    } else {
+      delete params.carType
+      params.intentModel = Array.isArray(this.listQuery.carType) && this.listQuery.carType.filter(item => item !== '').join(',')
+    }
     // params.followerId = Array.isArray(this.listQuery.followerId) && this.listQuery.followerId.filter(item => item === '').join(',')
     params.inviteFailReason = Array.isArray(this.listQuery.inviteFailReason) && this.listQuery.inviteFailReason.filter(item => item !== '').join(',')
     params.sourceChannel = Array.isArray(this.listQuery.sourceChannel) && this.listQuery.sourceChannel.filter(item => item !== '').join(',')
@@ -1271,6 +1299,7 @@ export default class extends Vue {
     this.$nextTick(() => {
       if (arr[0]) {
         this.listQuery.clueType = arr[0].value
+        this.getLists()
       }
     })
     return arr
@@ -1280,18 +1309,18 @@ export default class extends Vue {
    */
   async getBaseInfo() {
     try {
-      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_type', 'Intentional_compartment', 'demand_type']
+      let params = ['source_channel', 'clue_attribution', 'mkt_clue_type', 'invite_status', 'intent_degree', 'invite_fail_reason', 'follow_mark_status', 'Intentional_compartment', 'demand_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
+        const searchArr = [GetClueWSXPrivateSeaPoolList, GetClueWSSpecialXPrivateSeaPoolList, GetClueLCXPrivateSeaPoolList, GetClueLZXPrivateSeaPoolListC, GetClueLZXPrivateSeaPoolListB]
         const clueTypePremission = [
-          '/v2/market-clue/getCluePrivateSeaPoolList',
+          '/v2/market-clue/getClueWSShareXPrivateSeaPoolList',
           '/v2/market-clue/getClueWSSpecialXPrivateSeaPoolList',
           '/v2/market-clue/getClueLCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZCXPrivateSeaPoolList',
           '/v2/market-clue/getClueLZBXPrivateSeaPoolList'
         ]
-        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_type: followType } = res.data
+        let { clue_attribution: clueAttribution, source_channel: sourceChannel, mkt_clue_type: mktClueType, Intentional_compartment: IntentionalCompartment, demand_type: demandType, invite_status: inviteStatus, intent_degree: intentDegree, invite_fail_reason: inviteFailReason, follow_mark_status: followType } = res.data
         let clue = clueAttribution.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let sources = sourceChannel.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
         let inviteStatusOptions = inviteStatus.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
@@ -1303,7 +1332,8 @@ export default class extends Vue {
         let demand = demandType.map((item:any) => ({ label: item.dictLabel, value: item.dictValue }))
 
         this.carTypeOptions.push(...carTypeOptions)
-        this.followTypeOptins.push(...followTypeOptins)
+        this.activeFollowTypeOptins = followTypeOptins
+        // this.followTypeOptins.push(...followTypeOptins)
         this.clueArr.push(...clueType)
         this.listQuery.clueType = clueType[0].value
         this.clueOptions.push(...[
@@ -1348,8 +1378,6 @@ export default class extends Vue {
           },
           ...demand
         ])
-
-        this.getLists()
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -1563,7 +1591,50 @@ export default class extends Vue {
      if (this.listQuery.clueType > 1) {
        return false
      } else {
-       return !(status === 10 || status === 20)
+       return !(status === 10 || status === 20 || status === 30)
+     }
+   }
+   @Watch('listQuery.inviteStatus')
+   inviteStatusChange(value:any) {
+     const clueType = this.listQuery.clueType
+     if (clueType <= 1) {
+       const inx = this.formItem.findIndex(item => item.key === 'intentDegree')
+       if (value === '1') {
+         this.formItem.splice(inx, 2)
+         this.listQuery.intentDegree = ''
+         this.listQuery.inviteFailReason = []
+       } else {
+         if (inx === -1) {
+           const arr = [ {
+             type: 2,
+             label: '意向度',
+             key: 'intentDegree',
+             tagAttrs: {
+               placeholder: '请选择',
+               filterable: true,
+               clearable: true
+             },
+             rules: [0, 1],
+             options: this.intentDegreeOptions
+           },
+           {
+             type: 2,
+             label: '邀约失败原因',
+             key: 'inviteFailReason',
+             tagAttrs: {
+               placeholder: '请选择',
+               filterable: true,
+               clearable: true,
+               multiple: true,
+               collapseTags: true
+             },
+             rules: [0, 1],
+             options: this.inviteFailReasonOptions
+           } ]
+           const inxs = this.formItem.findIndex(item => item.key === 'inviteStatus')
+           this.formItem.splice(inxs + 1, 0, ...arr)
+         }
+       }
      }
    }
 }

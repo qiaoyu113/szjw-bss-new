@@ -600,8 +600,10 @@ export default class extends Vue {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
         this.BirdQuery = { ...this.BirdQuery, ...value }
-        this.BirdQuery.intentModel = +this.BirdQuery.intentModel
-        this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
+        if (this.BirdQuery.intentModel && this.BirdQuery.fancyModel) {
+          this.BirdQuery.intentModel = +this.BirdQuery.intentModel
+          this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
+        }
       } else {
         if (value.intentModel) {
           value.intentModel = (value.intentModel).split(',').map((ele:any) => {
@@ -635,7 +637,7 @@ export default class extends Vue {
             marketClueWSXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueWSXDetailBaseInfoVO)
-          this.otherQuery = marketClueWSXDetailOtherInfoVO
+          marketClueWSXDetailOtherInfoVO && (this.otherQuery = marketClueWSXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -647,7 +649,7 @@ export default class extends Vue {
             marketClueLCXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueLCXDetailBaseInfoVO)
-          this.otherQuery = marketClueLCXDetailOtherInfoVO
+          marketClueLCXDetailOtherInfoVO && (this.otherQuery = marketClueLCXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -659,7 +661,7 @@ export default class extends Vue {
             marketClueLZXDetailOtherInfoVO
           } = res.data
           this.setQuerys(marketClueLZXDetailBaseInfoVO)
-          this.otherQuery = marketClueLZXDetailOtherInfoVO
+          marketClueLZXDetailOtherInfoVO && (this.otherQuery = marketClueLZXDetailOtherInfoVO)
         } else {
           this.$message.warning(res.errorMsg)
         }
@@ -680,20 +682,21 @@ export default class extends Vue {
       if (this.clueStatus < 2) {
         val.expectAddressCity = val.intentWork[0]
         val.expectAddressCounty = val.intentWork[1]
+        if (val.age === '') {
+          Reflect.deleteProperty(val, 'age')
+        }
+        if (val.experience === '') {
+          Reflect.deleteProperty(val, 'experience')
+        }
+        if (val.carType === '' || !val.hasCar) {
+          Reflect.deleteProperty(val, 'carType')
+          Reflect.deleteProperty(val, 'carTypeName')
+        }
       } else if (+this.clueStatus === 4) {
         val.intentModel = String(val.intentModel)
         val.fancyModel = String(val.fancyModel)
       }
-      if (val.age === '') {
-        Reflect.deleteProperty(val, 'age')
-      }
-      if (val.experience === '') {
-        Reflect.deleteProperty(val, 'experience')
-      }
-      if (val.carType === '' || !val.hasCar) {
-        Reflect.deleteProperty(val, 'carType')
-        Reflect.deleteProperty(val, 'carTypeName')
-      }
+
       let { data: res } = await editClue(val)
       if (res.success) {
         this.$emit('success', true)

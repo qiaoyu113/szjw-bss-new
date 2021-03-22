@@ -82,9 +82,12 @@
                 {{ `${scope.row.followerName}(${scope.row.followerPhone})` }}
               </template>
               <template v-slot:inviteDate="scope">
-                {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}') }}
+                {{ scope.row.inviteDate | parseTime('{y}-{m}-{d} {h}:{i}' + textDes(scope.row.operationType)) }}
               </template>
 
+              <template v-slot:contact="scope">
+                {{ isTrueOrFalse(scope.row.contact) }}
+              </template>
               <template v-slot:op="scope">
                 <div
                   :key="clueStatus"
@@ -220,7 +223,7 @@
           <CallLog
             ref="callLog"
             class="CallLog"
-            :business-id="+clueStatus"
+            :business-id="clueId"
           />
         </SectionContainer>
       </el-card>
@@ -362,7 +365,8 @@ export default class extends Vue {
     {
       key: 'inviteDate',
       label: '邀约面试时间',
-      slot: true
+      slot: true,
+      width: '150px'
     },
     {
       key: 'inviteName',
@@ -398,7 +402,8 @@ export default class extends Vue {
     },
     {
       key: 'contact',
-      label: '是否联系上'
+      label: '是否联系上',
+      slot: true
     },
     {
       key: 'remark',
@@ -437,7 +442,8 @@ export default class extends Vue {
     },
     {
       key: 'contact',
-      label: '是否联系的上'
+      label: '是否联系的上',
+      slot: true
     },
     {
       key: 'remark',
@@ -733,7 +739,7 @@ export default class extends Vue {
               item.value = `${this.baseInfoEdio.beforeFollowerName}(${this.baseInfoEdio.beforeFollowerPhone})`
             } else if (item.key === 'hasCar') {
               item.value = ele[1]
-                ? '有' + ';' + this.baseInfoEdio.carTypeName
+                ? '有' + (this.baseInfoEdio.carTypeName ? ';' + this.baseInfoEdio.carTypeName : '')
                 : '否'
             } else {
               item.value = ele[1] || ' '
@@ -771,6 +777,22 @@ export default class extends Vue {
       return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20)
     } else {
       return true
+    }
+  }
+
+  private textDes(val:number) {
+    if (val) {
+      return val === 1 ? '(已取消)' : '(已爽约)'
+    } else {
+      return ''
+    }
+  }
+
+  private isTrueOrFalse(val:null | boolean) {
+    if (typeof val === 'boolean') {
+      return val ? '是' : '否'
+    } else {
+      return '暂无数据'
     }
   }
 

@@ -761,7 +761,7 @@ export default class extends Vue {
     if (this.clueStatus < 2) {
       return this.sendWtFollow(this.dialogPopQuery)
     } else if (this.clueStatus === 2) {
-      this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
+      return this.sendBirdCarFollow(this.dialogPopQueryBirdCar)
     } else if (this.clueStatus === 3) {
       return this.sendRentalFollow(this.dialogPopQueryBirdC)
     } else {
