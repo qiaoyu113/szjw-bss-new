@@ -7,18 +7,33 @@
       :list-query="listQuery"
     >
       <template #clueType>
-        <ul ref="clueRef">
+        <!-- <ul ref="clueRef">
           <li
-            v-for="item in clueType"
+
             :key="item.id"
-            v-permission="[`${item.url}`]"
+
             :data-cluetype="item.id"
             :class="{active: item.id === activeLineType}"
             @click="switchLineType(item.id)"
           >
             {{ item.name }}
           </li>
-        </ul>
+        </ul> -->
+        <el-radio-group
+          ref="clueRef"
+          v-model="activeLineType"
+          size="medium"
+          @change="switchLineType"
+        >
+          <el-radio-button
+            v-for="item in clueType"
+            :key="item.id"
+            v-permission="[`${item.url}`]"
+            :label="item.id"
+          >
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
       </template>
       <template #btnc>
         <div class="btnPc">
@@ -180,7 +195,7 @@ export default class extends Vue {
     }
   }
   switchLineType(val: number) {
-    this.activeLineType = val
+    // this.activeLineType = val
     this.getList()
   }
 
@@ -342,13 +357,19 @@ export default class extends Vue {
     }
   }
   mounted() {
-    const ele:any = this.$refs['clueRef']
-    const inx = ele.firstElementChild.dataset.cluetype
-    this.activeLineType = Number(inx)
-    this.$nextTick(() => {
-      this.getList()
-    })
-    this.cityDetail()
+    let inx = 0
+    try {
+      const ele:any = this.$refs['clueRef']
+      inx = ele.$el && ele.$el.firstElementChild.firstElementChild._value
+    } catch (error) {
+      return error
+    } finally {
+      this.$nextTick(() => {
+        this.activeLineType = Number(inx)
+        this.getList()
+        this.cityDetail()
+      })
+    }
   }
 }
 </script>
