@@ -160,7 +160,7 @@ export default class extends Vue {
           'margin-right': '10px'
         }
         }, [
-          h('span', {}, '通话状态:正在通过中...'),
+          h('span', {}, '通话状态:正在通话中...'),
           h('span', {
             attrs: {
               id: 'phoneTime'

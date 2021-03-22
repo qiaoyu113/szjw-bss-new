@@ -252,6 +252,7 @@
       :clue-status="+clueStatus"
       :phone="baseInfoEdio.phone"
       :clue-id="clueId"
+      @success="getApi"
     />
   </div>
 </template>
@@ -774,7 +775,7 @@ export default class extends Vue {
 
   get showBtn() {
     if (+this.clueStatus < 2) {
-      return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20)
+      return (this.baseInfoEdio.status === 10 || this.baseInfoEdio.status === 20 || this.baseInfoEdio.status === 30)
     } else {
       return true
     }
@@ -794,6 +795,10 @@ export default class extends Vue {
     } else {
       return '暂无数据'
     }
+  }
+
+  private getApi() {
+    this.getDetailApi()
   }
 
   private showMore() {
