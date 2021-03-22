@@ -1126,6 +1126,7 @@ export default class extends Vue {
     (this.$refs['suggestForm'] as any).resetForm()
     // 重新请求小组数据
     this.$nextTick(() => {
+      this.listQuery.carType = []
       // 处理跟进情况
       this.listQuery.inviteStatus = ''
       if (this.listQuery.clueType === 2) {
