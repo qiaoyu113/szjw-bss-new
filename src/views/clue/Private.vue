@@ -165,7 +165,8 @@
           {{ row.name }}<br>{{ row.phone }}
         </template>
         <template v-slot:payIntentionMoney="{row}">
-          {{ row.payIntentionMoney === true?'是':'否' }}
+          {{ row.payIntentionMoney === true?'是':'' }}
+          {{ row.payIntentionMoney === false?'否':'' }}
         </template>
 
         <template v-slot:remark="{row}">
