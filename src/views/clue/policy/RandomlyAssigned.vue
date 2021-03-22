@@ -7,18 +7,6 @@
       :list-query="listQuery"
     >
       <template #clueType>
-        <!-- <ul ref="clueRef">
-          <li
-
-            :key="item.id"
-
-            :data-cluetype="item.id"
-            :class="{active: item.id === activeLineType}"
-            @click="switchLineType(item.id)"
-          >
-            {{ item.name }}
-          </li>
-        </ul> -->
         <el-radio-group
           ref="clueRef"
           v-model="activeLineType"
@@ -168,7 +156,6 @@ export default class extends Vue {
         //   lazyLoad: this.cityList
         // }
       },
-      url: '',
       options: this.cityList,
       col: 8,
       label: '城市',
@@ -202,7 +189,7 @@ export default class extends Vue {
     }
   }
   switchLineType(val: number) {
-    // this.activeLineType = val
+    this.activeLineType = val
     this.getList()
   }
 
