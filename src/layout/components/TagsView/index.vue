@@ -193,7 +193,7 @@ export default class extends Vue {
 
   private toLastView(visitedViews: ITagView[], view: ITagView) {
     const latestView = visitedViews.slice(-1)[0]
-    if (view.name === 'ShowUser' && latestView && latestView.path) {
+    if ((['roleManage', 'RoleCreate', 'RoleOperate', 'ShowUser'].includes((view.name) as string)) && latestView) {
       return this.$router.replace({ path: latestView.path })
     }
     if (latestView) {

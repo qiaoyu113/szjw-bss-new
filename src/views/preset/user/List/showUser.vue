@@ -22,12 +22,7 @@ export default class extends Vue {
     roleId: ''
   }
   mounted() {
-    this.listQuery.roleId = +this.$route.query.id
-    let redirect = this.$route.query.redirect
-    if (redirect) {
-      this.$route.meta.redirect = redirect
-      // this.$set(this.$route.meta, 'redirect', redirect)
-    }
+    this.listQuery.roleId = +this.$route.query.id;
     (this.$refs['userlist'] as any).deteleOp();
     (this.$refs['userlist'] as any).getLists()
   }
