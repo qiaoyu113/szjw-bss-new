@@ -651,6 +651,7 @@ export default class extends Vue {
       let params = {
         dictType: 'region'
       }
+
       let { data: res } = await GetDictionary(params)
       if (res.success) {
         const nodes = res.data.map(function(item: any) {
@@ -747,7 +748,7 @@ export default class extends Vue {
   }
   activated() {
     this.getLists()
-    this.getUserGroupSelectList(this.listQuery.clueType)
+    // this.getUserGroupSelectList(this.listQuery.clueType)
   }
   mounted() {
     this.init()

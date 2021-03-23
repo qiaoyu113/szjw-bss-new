@@ -113,6 +113,7 @@
           <el-select
             v-model="addForm.busiType"
             placeholder="请选择"
+            @change="handleBusiTypeChange"
           >
             <el-option
               v-for="(sub,index) in clueArr"
@@ -707,6 +708,15 @@ export default class extends Vue {
   cancel(formName: any) {
     this.dialogFormVisible = false;
     (this.$refs[formName] as any).resetFields()
+  }
+  // 新建客群，业务线改变
+  handleBusiTypeChange() {
+    this.addForm.type = ''
+    this.addForm.portraitLabel = ''
+    this.addForm.allocationType = ''
+    this.addForm.invitation = ''
+    this.addForm.interview = ''
+    this.addForm.remark = ''
   }
 
   mounted() {
