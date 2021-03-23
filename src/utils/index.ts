@@ -546,7 +546,6 @@ export async function showCityGroupPersonLine(node: any, resolve: any, clueType:
 async function getGmOptionsForLine(cityCode:number, busiType:number, groupId:number, clueType:number = 0) {
   try {
     let roleTypes = getLineType(clueType)
-    debugger
     let params:any = {
       roleTypes,
       cityCode,
@@ -580,7 +579,6 @@ async function getCityGroupForLine(cityCode:number, clueType:any = 0) {
       busiLine: busiLine.toString(),
       cityCode
     }
-    debugger
     let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
     if (res.success) {
       return res.data.map((item:any) => ({
