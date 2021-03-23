@@ -712,6 +712,7 @@ export default class extends Vue {
   }
 
   async sendRentalFollow(value: IState) {
+    console.log(value, 555)
     try {
       let params: IState = {
         clueId: this.clueId
@@ -728,11 +729,10 @@ export default class extends Vue {
           params.remark = remark
           break
         case 7:
-          params.fancyCar =
-            fancyCar instanceof Array ? String(fancyCar) : fancyCar
           remark !== '' && (params.remark = remark)
           break
         case 8:
+          params.fancyCar = fancyCar instanceof Array ? String(fancyCar) : fancyCar
           remark !== '' && (params.remark = remark)
           break
       }
