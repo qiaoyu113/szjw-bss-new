@@ -1384,8 +1384,8 @@ export default class extends Vue {
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         const searchArr = [
-          GetClueWSXPrivateSeaPoolList,
           GetClueWSSpecialXPrivateSeaPoolList,
+          GetClueWSXPrivateSeaPoolList,
           GetClueLCXPrivateSeaPoolList,
           GetClueLZXPrivateSeaPoolListC,
           GetClueLZXPrivateSeaPoolListB
