@@ -457,10 +457,10 @@ export default class extends Vue {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
         if (value.intentModel) {
-          value.intentModel = +value.intentModel
+          value.intentModel = this.setCarC(+value.intentModel)
         }
         if (value.fancyModel) {
-          value.fancyModel = +value.fancyModel
+          value.fancyModel = this.setCarC(+value.fancyModel)
         }
         this.BirdQuery = { ...this.BirdQuery, ...value }
       } else {
@@ -492,6 +492,11 @@ export default class extends Vue {
     let arrs:number[] = this.carOptions.map((item:IState) => +item.value)
     let brr = arr.filter((item:number) => arrs.includes(item))
     return brr
+  }
+
+  private setCarC(val:number) {
+    let arrs:number[] = this.carOptions.map((item:IState) => +item.value)
+    return arrs.includes(val) ? val : ''
   }
 
   private countryValue = ''; // 如果是多次打开弹框 会缓存区id，如果详情数据返回的区id有问题，默认选中该区

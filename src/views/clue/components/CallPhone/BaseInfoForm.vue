@@ -603,10 +603,10 @@ export default class extends Vue {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
         if (value.intentModel) {
-          value.intentModel = +value.intentModel
+          value.intentModel = this.setCarC(+value.intentModel)
         }
         if (value.fancyModel) {
-          value.fancyModel = +value.fancyModel
+          value.fancyModel = this.setCarC(+value.fancyModel)
         }
         this.BirdQuery = { ...this.BirdQuery, ...value }
       } else {
@@ -614,6 +614,7 @@ export default class extends Vue {
           value.intentModel = (value.intentModel).split(',').map((ele:any) => {
             return +ele
           })
+          value.intentModel = this.setCar(value.intentModel)
         } else {
           value.intentModel = []
         }
@@ -621,6 +622,7 @@ export default class extends Vue {
           value.fancyModel = value.fancyModel.split(',').map((ele:any) => {
             return +ele
           })
+          value.fancyModel = this.setCar(value.fancyModel)
         } else {
           value.fancyModel = []
         }
@@ -629,6 +631,17 @@ export default class extends Vue {
     } catch (err) {
       console.log('fail:', err)
     }
+  }
+
+  private setCar(arr:[]) {
+    let arrs:number[] = this.carOptions.map((item:IState) => +item.value)
+    let brr = arr.filter((item:number) => arrs.includes(item))
+    return brr
+  }
+
+  private setCarC(val:number) {
+    let arrs:number[] = this.carOptions.map((item:IState) => +item.value)
+    return arrs.includes(val) ? val : ''
   }
 
   // 详情获取
