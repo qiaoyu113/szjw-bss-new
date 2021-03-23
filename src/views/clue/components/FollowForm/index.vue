@@ -769,16 +769,16 @@ export default class extends Vue {
     }
   }
 
-  sendFollow() {
-    let obj:IState = {
-      0: followClueToFirmiana,
-      1: followClueToFirmiana,
-      2: followClueToThunderBirdTruckPool,
-      3: followClueToThunderBirdRental,
-      4: followClueToThunderBirdRental
-    }
-    return obj[this.clueStatus]
-  }
+  // sendFollow() {
+  //   let obj:IState = {
+  //     0: followClueToFirmiana,
+  //     1: followClueToFirmiana,
+  //     2: followClueToThunderBirdTruckPool,
+  //     3: followClueToThunderBirdRental,
+  //     4: followClueToThunderBirdRental
+  //   }
+  //   return obj[this.clueStatus]
+  // }
 
   resetForms() {
     (this.$refs[this.formStatus] as any).resetForm()
