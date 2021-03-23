@@ -52,7 +52,7 @@
               添加线下跟进
             </el-button>
             <el-button
-              v-if="(baseInfoEdio.status === 10 || baseInfoEdio.status === 20 || baseInfoEdio.status === 30) && Number(clueStatus) < 2 "
+              v-if="([10,20,30].includes( baseInfoEdio.status)) && Number(clueStatus) < 2 "
               v-permission="['/v2/market-clue/sendMessage']"
               type="text"
               @click="messageDio = true"
@@ -95,7 +95,7 @@
                 >
                   <el-button
                     v-permission="['/v2/market-clue/cancelInterview']"
-                    :disabled="!(scope.row.inviteStatus === 1 && !scope.row.operationType)"
+                    :disabled="!(scope.row.inviteStatus)"
                     type="text"
                     @click="handleInterviewClick(scope.row,1)"
                   >
@@ -103,7 +103,7 @@
                   </el-button>
                   <el-button
                     v-permission="['/v2/market-clue/clueBreakAnAppointment']"
-                    :disabled="!(scope.row.inviteStatus === 1 && !scope.row.operationType)"
+                    :disabled="!(scope.row.inviteStatus)"
                     type="text"
                     @click="handleInterviewClick(scope.row,0)"
                   >
