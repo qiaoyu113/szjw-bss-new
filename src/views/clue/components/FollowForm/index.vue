@@ -468,7 +468,7 @@ export default class extends Vue {
       case 6:
         arr.splice(1, 0, ...this.poptabBirdC1)
         break
-      case 8:
+      case 7:
         arr.splice(1, 0, ...this.poptabBirdC2)
         break
     }
@@ -712,6 +712,7 @@ export default class extends Vue {
   }
 
   async sendRentalFollow(value: IState) {
+    console.log(value, 555)
     try {
       let params: IState = {
         clueId: this.clueId
@@ -728,8 +729,7 @@ export default class extends Vue {
           params.remark = remark
           break
         case 7:
-          params.fancyCar =
-            fancyCar instanceof Array ? String(fancyCar) : fancyCar
+          params.fancyCar = fancyCar instanceof Array ? String(fancyCar) : fancyCar
           remark !== '' && (params.remark = remark)
           break
         case 8:

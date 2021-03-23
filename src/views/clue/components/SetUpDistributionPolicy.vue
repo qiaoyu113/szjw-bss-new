@@ -96,9 +96,9 @@ export default class extends Vue {
   async getUserGroupList() {
     let code = this.clueType
     if (this.clueType === 2) {
-      code = 175
+      code = 178
     } else if (this.clueType === 3) {
-      code = 176
+      code = 5
     }
     const { cityCode } = this.policyData
     try {
