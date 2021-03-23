@@ -17,18 +17,18 @@ const systemRouter: RouteConfig = {
 
   },
   children: [
-    {
-      path: 'user', /* 用户管理new */
-      component: () => import(/* webpackChunkName: "user" */ '@/views/system/user/List/index.vue'),
-      name: 'User',
-      meta: {
-        title: 'user',
-        activeMenu: '/system/user',
-        noCache: true,
-        icon: '',
-        apiUrl: '/v1/base/user/menu'
-      }
-    },
+    // {
+    //   path: 'user', /* 用户管理new */
+    //   component: () => import(/* webpackChunkName: "user" */ '@/views/system/user/List/index.vue'),
+    //   name: 'User',
+    //   meta: {
+    //     title: 'user',
+    //     activeMenu: '/system/user',
+    //     noCache: true,
+    //     icon: '',
+    //     apiUrl: '/v1/base/user/menu'
+    //   }
+    // },
     {
       path: 'addUser', /* 创建用户new */
       component: () => import(/* webpackChunkName: "user" */ '@/views/system/user/CreateUser/index.vue'),
@@ -93,18 +93,18 @@ const systemRouter: RouteConfig = {
     //     noCache: true
     //   }
     // },
-    {
-      path: 'rolemanage', /* 角色管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/RoleManage.vue'),
-      name: 'RoleManage',
-      meta: {
-        title: 'roleManage',
-        activeMenu: '/system/rolemanage',
-        noCache: false,
-        icon: '',
-        apiUrl: '/v2/base/role/list'
-      }
-    },
+    // {
+    //   path: 'rolemanage', /* 角色管理 */
+    //   component: () => import(/* webpackChunkName: "driver" */ '@/views/system/RoleManage.vue'),
+    //   name: 'RoleManage',
+    //   meta: {
+    //     title: 'roleManage',
+    //     activeMenu: '/system/rolemanage',
+    //     noCache: false,
+    //     icon: '',
+    //     apiUrl: '/v2/base/role/list'
+    //   }
+    // },
     {
       path: 'seatmanage', /* 坐席管理 */
       component: () => import(/* webpackChunkName: "driver" */ '@/views/system/SeatManage.vue'),
@@ -155,42 +155,42 @@ const systemRouter: RouteConfig = {
         noCache: true
       }
     },
-    {
-      path: 'organizationmanage', /* 组织管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/OrganizationManage.vue'),
-      name: 'OrganizationManage',
-      meta: {
-        title: 'organizationManage',
-        activeMenu: '/system/organizationmanage',
-        noCache: false,
-        icon: '',
-        apiUrl: '/v1/base/office/list'
-      }
-    },
-    {
-      path: 'dutymanage', /* 职责管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/DutyManage.vue'),
-      name: 'DutyManage',
-      meta: {
-        title: 'dutyManage',
-        activeMenu: '/system/dutymanage',
-        noCache: false,
-        icon: '',
-        apiUrl: '/v2/base/duty/list'
-      }
-    },
-    {
-      path: 'permissionmanage', /* 权限管理 */
-      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/PermissionManage.vue'),
-      name: 'PermissionManage',
-      meta: {
-        title: 'permissionManage',
-        activeMenu: '/system/permissionmanage',
-        noCache: false,
-        icon: '',
-        apiUrl: '/v1/base/authority/list'
-      }
-    },
+    // {
+    //   path: 'organizationmanage', /* 组织管理 */
+    //   component: () => import(/* webpackChunkName: "driver" */ '@/views/system/OrganizationManage.vue'),
+    //   name: 'OrganizationManage',
+    //   meta: {
+    //     title: 'organizationManage',
+    //     activeMenu: '/system/organizationmanage',
+    //     noCache: false,
+    //     icon: '',
+    //     apiUrl: '/v1/base/office/list'
+    //   }
+    // },
+    // {
+    //   path: 'dutymanage', /* 职责管理 */
+    //   component: () => import(/* webpackChunkName: "driver" */ '@/views/system/DutyManage.vue'),
+    //   name: 'DutyManage',
+    //   meta: {
+    //     title: 'dutyManage',
+    //     activeMenu: '/system/dutymanage',
+    //     noCache: false,
+    //     icon: '',
+    //     apiUrl: '/v2/base/duty/list'
+    //   }
+    // },
+    // {
+    //   path: 'permissionmanage', /* 权限管理 */
+    //   component: () => import(/* webpackChunkName: "driver" */ '@/views/system/PermissionManage.vue'),
+    //   name: 'PermissionManage',
+    //   meta: {
+    //     title: 'permissionManage',
+    //     activeMenu: '/system/permissionmanage',
+    //     noCache: false,
+    //     icon: '',
+    //     apiUrl: '/v1/base/authority/list'
+    //   }
+    // },
     {
       path: 'configManager', /* 配置管理 */
       component: () => import(/* webpackChunkName: "driver" */ '@/views/system/configManager/index.vue'),

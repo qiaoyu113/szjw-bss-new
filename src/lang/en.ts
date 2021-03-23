@@ -173,6 +173,14 @@ export default {
     BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa',
     campaignDetail: 'campaignDetail'
+    selfDriverTag: 'selfDriverTag',
+    wtSystem: 'WtSystem',
+    lnSystem: 'LnSystem',
+    clueSystem: 'ClueSystem',
+    dataSystem: 'DataSystem',
+    authoritySystem: 'AuthoritySystem',
+    roleSystem: 'RoleSystem',
+    addUserNew: 'addUser'
   },
   navbar: {
     logOut: 'Log Out',

@@ -100,12 +100,21 @@
           </template>
         </template>
       </el-table-column>
+      <div
+        v-if="empty"
+        slot="empty"
+      >
+        <p class="emptyText">
+          请筛选用户~
+        </p>
+      </div>
     </el-table>
     <pagination
       v-show="page.total>0"
       :operation-list="operationList"
       :total="page.total"
       :page.sync="page.page"
+      :page-sizes="pageSize"
       :limit.sync="page.limit"
       @olclick="handleOlClick"
       @pagination="handlePageSizeChange"
@@ -137,10 +146,12 @@ interface PageObj {
 export default class extends Vue {
   @Prop({ default: () => [] }) tableData!:any[]
   @Prop({ default: () => [] }) columns!:any[]
+  @Prop({ default: () => [10, 20, 30, 40, 50] }) pageSize?:any[]
   @Prop({ default: () => disabledCheckBox }) func!:Function
   @Prop({ default: true }) index!:boolean
   @Prop({ default: true }) isP30!:boolean
   @Prop({ default: false }) indexes!:boolean;
+  @Prop({ default: false }) empty?:boolean;
   @Prop({ default: () => SettingsModule.tableHeight }) height!:number;
   @Prop({ default: () => [
     { icon: 'el-icon-phone', name: '1', color: '#999' },
@@ -201,4 +212,9 @@ export default class extends Vue {
     padding-left: 0px;
     padding-right: 0px;
   }
+   .selfTable >>> .emptyText{
+     color: #D9001B;
+     font-weight: bold;
+     font-size: 20px;
+   }
 </style>
