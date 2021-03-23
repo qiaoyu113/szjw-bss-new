@@ -328,7 +328,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import { HandlePages, lock, showCityGroupPerson, showWork } from '@/utils/index'
+import { HandlePages, lock, showCityGroupPersonLine, showWork } from '@/utils/index'
 import {
   GetClueWSXPrivateSeaPoolList,
   GetClueLCXPrivateSeaPoolList,
@@ -362,6 +362,7 @@ import {
 import { delayTime } from '@/settings'
 import { exportFileTip } from '@/utils/exportTip'
 import { checkPermission } from '@/utils/permission'
+import { getLineType, getLineRoleType } from '@/utils/settings'
 
 interface IState {
   [key: string]: any
@@ -1085,7 +1086,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: (node: any, resolve: any) =>
-            showCityGroupPerson(node, resolve, this.listQuery.clueType)
+            showCityGroupPersonLine(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',
@@ -1312,18 +1313,10 @@ export default class extends Vue {
   // 获取跟进人列表
   async getGmOptions(cityCode: any, groupId: any) {
     try {
-      let roleTypes = [1, 4]
-      //  业务线大于1 的属于雷鸟
-      if (this.listQuery.clueType > 1) {
-        if (this.listQuery.clueType === 2) {
-          roleTypes = [11]
-        } else {
-          roleTypes = [12]
-        }
-      }
+      let roleTypes = getLineRoleType(this.listQuery.clueType)
       let params: any = {
         roleTypes,
-        uri: '/v2/clueH5/list/queryFollowerList',
+        uri: '/floowdUser',
         groupId,
         cityCode
       }
@@ -1667,13 +1660,10 @@ export default class extends Vue {
   }
   // 获取城市下的加盟小组
   async getGroup(cityCode: string) {
-    let code = this.listQuery.clueType
-    if (this.listQuery.clueType > 1) {
-      code = 5
-    }
+    const busiLine = getLineType(this.listQuery.clueType)
     try {
       const { data } = await getGroupInfoByCityCodeAndProductLine({
-        busiLine: [code].toString(),
+        busiLine: busiLine.toString(),
         cityCode: cityCode
       })
       // this.
