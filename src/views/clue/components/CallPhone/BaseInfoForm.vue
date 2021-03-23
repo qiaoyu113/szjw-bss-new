@@ -731,21 +731,9 @@ export default class extends Vue {
     (this.$refs['baseInfoForm'] as any).submitForm()
   }
 
-  mounted() {
-    this.$nextTick(() => {
-      this.$on('show', (val:boolean) => {
-        if (val) {
-          this.getOptions()
-          this.getDetailApi()
-        } else {
-          (this.$refs['baseInfoForm'] as any).resetForm()
-          setTimeout(() => {
-            (this.$refs['baseInfoForm'] as any).clearValidate()
-          }, 10)
-          this.optionsCarType.splice(0, this.optionsCarType.length)
-        }
-      })
-    })
+  dioChange() {
+    this.getOptions()
+    this.getDetailApi()
   }
 }
 </script>

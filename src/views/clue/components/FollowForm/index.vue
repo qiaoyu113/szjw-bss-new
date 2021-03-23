@@ -789,16 +789,8 @@ export default class extends Vue {
     }, 10)
   }
 
-  mounted() {
-    this.$nextTick(() => {
-      this.$on('show', (val:boolean) => {
-        if (val) {
-          this.getOptionInfo()
-        } else {
-          this.resetForms()
-        }
-      })
-    })
+  dioChange() {
+    this.getOptionInfo()
   }
 }
 </script>

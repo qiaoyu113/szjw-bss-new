@@ -195,8 +195,7 @@ export default {
     RandomlyAssigned: '随机分配policy设置',
     BackflowPolicy: '回流policy设置',
     campaignList: 'Campaign管理',
-    campaignDetail: 'Campaign详情'
-    marketClue: '待市场分配线索',
+    campaignDetail: 'Campaign详情',
     wtSystem: '梧桐系统',
     lnSystem: '雷鸟系统',
     clueSystem: '线索管理系统',
