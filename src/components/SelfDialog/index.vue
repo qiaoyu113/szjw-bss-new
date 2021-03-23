@@ -70,7 +70,6 @@ export default class extends Vue {
   @Prop({ default: false }) private other!: any;
   @Prop({ default: false }) private confirm!: any;
   @Prop({ default: false }) private sumbitAgain!: boolean;
-  @Prop({ default: false }) private stopConfirm?: boolean;
 
   get show() {
     return this.visible
@@ -87,9 +86,6 @@ export default class extends Vue {
     }
   }
   private onConfirm() {
-    if (this.stopConfirm) {
-      return
-    }
     this.confirm && typeof this.confirm === 'function' ? this.confirm(() => {
       this.show = false
     }) : this.hideDialog()

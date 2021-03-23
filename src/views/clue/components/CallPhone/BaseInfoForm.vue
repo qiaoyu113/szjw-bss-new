@@ -599,11 +599,13 @@ export default class extends Vue {
       } else if (this.clueStatus === 2) {
         this.BirdCarQuery = { ...this.BirdCarQuery, ...value }
       } else if (this.clueStatus === 3) {
-        this.BirdQuery = { ...this.BirdQuery, ...value }
-        if (this.BirdQuery.intentModel && this.BirdQuery.fancyModel) {
-          this.BirdQuery.intentModel = +this.BirdQuery.intentModel
-          this.BirdQuery.fancyModel = +this.BirdQuery.fancyModel
+        if (value.intentModel) {
+          value.intentModel = +value.intentModel
         }
+        if (value.fancyModel) {
+          value.fancyModel = +value.fancyModel
+        }
+        this.BirdQuery = { ...this.BirdQuery, ...value }
       } else {
         if (value.intentModel) {
           value.intentModel = (value.intentModel).split(',').map((ele:any) => {
