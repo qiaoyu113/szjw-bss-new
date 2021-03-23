@@ -655,7 +655,9 @@ export default class extends Vue {
   }
   // 重置
   private async handleResetClick(row: IState) {
-    (this.$refs['suggestForm'] as any).resetForm()
+    (this.$refs['suggestForm'] as any).resetForm();
+    (this.$refs.PublicClueTable as any).toggleRowSelection()
+
     this.page.page = 1
     this.getLists()
   }
