@@ -17,9 +17,9 @@ enum configLineTypes {
 const lineType:configLineType = {
   WTZC: [0],
   WTGX: [1],
-  LNCC: [175],
-  LNZLB: [176],
-  LNZLC: [176]
+  LNCC: [178],
+  LNZLB: [5],
+  LNZLC: [5]
 }
 
 const roleType:configLineType = {
