@@ -2,7 +2,7 @@
   <div class="cpmplate-container">
     <line-layout :active.sync="active" />
     <new-line-agent v-if="active==='0'" />
-    <RedundantLine />
+    <RedundantLine v-else />
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import RedundantLine from './RedundantLine.vue'
   }
 })
 export default class extends Vue {
-  private active: string = '0'
+  private active: string = '1'
   mounted() {}
 }
 </script>
