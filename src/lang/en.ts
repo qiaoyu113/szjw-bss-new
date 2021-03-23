@@ -172,8 +172,7 @@ export default {
     RandomlyAssigned: 'Randomly assign policy settings',
     BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa',
-    campaignDetail: 'campaignDetail'
-    selfDriverTag: 'selfDriverTag',
+    campaignDetail: 'campaignDetail',
     wtSystem: 'WtSystem',
     lnSystem: 'LnSystem',
     clueSystem: 'ClueSystem',
