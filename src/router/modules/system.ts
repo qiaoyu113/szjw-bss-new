@@ -12,7 +12,7 @@ const systemRouter: RouteConfig = {
     apiUrl: ['/v1/base/user/menu', '/v2/base/user/create', '/v2/base/user/update',
       '/v2/base/role/create', '/v2/base/role/list', '/v1/base/authority/list', '/v2/base/duty/list',
       '/v1/base/office/list', '/v1/base/role/update', '/v2/base/role/getByRoleId', '/v2/line/label/configManager', '/v1/product/product/list/page',
-      '/v1/product/product/system/setting'
+      '/v1/product/product/system/setting', '/v3/base/agent/manage'
     ]
 
   },
@@ -105,6 +105,17 @@ const systemRouter: RouteConfig = {
     //     apiUrl: '/v2/base/role/list'
     //   }
     // },
+    {
+      path: 'seatmanage', /* 坐席管理 */
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/system/SeatManage.vue'),
+      name: 'SeatManage',
+      meta: {
+        title: 'seatManage',
+        noCache: false,
+        icon: '',
+        apiUrl: '/v3/base/agent/manage'
+      }
+    },
     {
       path: 'createrole',
       component: () => import(/* webpackChunkName: "driver" */ '@/views/system/CreateRole.vue'),

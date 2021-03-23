@@ -275,11 +275,11 @@ export default class extends Vue {
         return
       }
       const postData = {
-        ...this.ruleForm
+        ...this.ruleForm,
+        sysType: this.sysType
       }
       postData.authorities = this.getCheckedNodes()
       postData.dutyId = postData.dutyId.slice(0).pop()
-      postData.sysType = this.$route.query.sysType
       const { data } = await createRole(postData)
       if (data.success) {
         this.$message.success(`创建成功`)
@@ -305,7 +305,8 @@ export default class extends Vue {
   // 编辑角色提交
   private async submitEditForm() {
     const postData = {
-      ...this.ruleForm
+      ...this.ruleForm,
+      sysType: this.sysType
     }
     postData.roleId = postData.id
     postData.authorities = this.getCheckedNodes()
