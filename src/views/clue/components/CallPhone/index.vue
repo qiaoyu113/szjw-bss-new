@@ -117,14 +117,12 @@ export default class extends Vue {
   changeDio(value: number) {
     try {
       if (value) {
-        setTimeout(() => {
-          (this.$refs['callPhone'] as any).handleCallClick()
-        }, 10)
+        this.$nextTick(() => {
+          (this.$refs['callPhone'] as any).handleCallClick();
+          (this.$refs['baseInfo'] as any).dioChange();
+          (this.$refs['followform'] as any).dioChange()
+        })
       }
-      setTimeout(() => {
-        (this.$refs['baseInfo'] as any).$emit('show', value);
-        (this.$refs['followform'] as any).$emit('show', value)
-      }, 10)
     } catch (err) {
       console.log(err, 'fail')
     }
