@@ -96,7 +96,10 @@ export default class extends Vue {
   ];
 
   get queryAndItem() {
-    let item:IState = {}
+    let item:IState = {
+      formItem: this.WTItem,
+      query: this.WTQuery
+    }
     if (this.clueStatus < 2) {
       item.formItem = this.WTItem
       item.query = this.WTQuery

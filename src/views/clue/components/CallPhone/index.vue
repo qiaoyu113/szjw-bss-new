@@ -166,17 +166,22 @@ export default class extends Vue {
   }
 
   private other(type = false) {
-    return async(done:Function) => {
-      await (this.$refs['baseInfo'] as any).submitsForm()
-      await (this.$refs['followform'] as any).submitForms()
+    return (done:Function) => {
+      (this.$refs['baseInfo'] as any).submitsForm();
+      (this.$refs['followform'] as any).submitForms()
       this.canSend()
-      if (type) {
-        done();
-        (this.$refs['callPhone'] as any).handleHangUp()
-      } else {
-        if (this.status === 1) {
-          done()
-        }
+      console.log(this.passBase && this.passFollow)
+      if (this.passBase && this.passFollow) {
+        setTimeout(() => {
+          if (type) {
+            done();
+            (this.$refs['callPhone'] as any).handleHangUp()
+          } else {
+            if (this.status === 1) {
+              done()
+            }
+          }
+        })
       }
     }
   }
