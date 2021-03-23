@@ -54,6 +54,12 @@ export const setrandomPolicy = (data:any) => request({
   method: 'post',
   data
 })
+// 获取小组下的人员
+export const setPolicypeople = (params:any) => request({
+  url: `/base_center/auth/v2/user/getUserListByOfficeGroupId`,
+  method: 'get',
+  params
+})
 // 不接受线索人员Ids 查询人员信息
 export const searchInformation = (params:any) => request({
   url: `${baseUrl}/v2/market-clue/user-group/updatePolicy/getUserInfoList`,
