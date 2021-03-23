@@ -105,7 +105,7 @@
             {{ scope.row.regionName }}
           </template>
           <template v-else>
-            全部
+            暂无数据
           </template>
         </template>
         <template v-slot:cityName="scope">
@@ -113,7 +113,7 @@
             {{ scope.row.cityName }}
           </template>
           <template v-else>
-            全部
+            暂无数据
           </template>
         </template>
         <template v-slot:op="scope">
@@ -674,10 +674,6 @@ export default class extends Vue {
           value: +item.code,
           label: item.name
         }
-      })
-      this.cityList.push({
-        label: '全部',
-        value: '0'
       })
       this.cityList.push(...nodes)
     }
