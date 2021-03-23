@@ -204,7 +204,7 @@
         </template>
         <template v-slot:notFollowDay="{row}">
           <el-link
-            v-if="row.notFollowDay >= 2"
+            v-if="hasRed(row)"
             :underline="false"
             type="danger"
           >
@@ -1771,6 +1771,13 @@ export default class extends Vue {
           this.formItem.splice(inxs + 1, 0, ...arr)
         }
       }
+    }
+  }
+  hasRed({ status, followingReflowedDayNum, followedReflowedDayNum, notFollowDay }:any) {
+    if (status === 20) {
+      return followingReflowedDayNum && followingReflowedDayNum - notFollowDay <= 2
+    } else if (status === 10) {
+      return followedReflowedDayNum && followedReflowedDayNum - notFollowDay <= 2
     }
   }
 }

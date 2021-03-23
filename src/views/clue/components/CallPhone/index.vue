@@ -58,7 +58,9 @@ import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
-import { FollowForm, baseInfoForm } from '../index'
+// import { FollowForm, baseInfoForm } from '../index'
+import FollowForm from '../FollowForm/index.vue'
+import baseInfoForm from './BaseInfoForm.vue'
 import { PhoneModule } from '@/store/modules/phone'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import { delayTime } from '@/settings'
@@ -117,14 +119,12 @@ export default class extends Vue {
   changeDio(value: number) {
     try {
       if (value) {
-        setTimeout(() => {
-          (this.$refs['callPhone'] as any).handleCallClick()
-        }, 10)
+        this.$nextTick(() => {
+          (this.$refs['callPhone'] as any).handleCallClick();
+          (this.$refs['baseInfo'] as any).dioChange();
+          (this.$refs['followform'] as any).dioChange()
+        })
       }
-      setTimeout(() => {
-        (this.$refs['baseInfo'] as any).$emit('show', value);
-        (this.$refs['followform'] as any).$emit('show', value)
-      }, 10)
     } catch (err) {
       console.log(err, 'fail')
     }

@@ -195,7 +195,15 @@ export default {
     RandomlyAssigned: '随机分配policy设置',
     BackflowPolicy: '回流policy设置',
     campaignList: 'Campaign管理',
-    campaignDetail: 'Campaign详情'
+    campaignDetail: 'Campaign详情',
+    wtSystem: '梧桐系统',
+    lnSystem: '雷鸟系统',
+    clueSystem: '线索管理系统',
+    dataSystem: '数据管理系统',
+    authoritySystem: '权限管理',
+    roleSystem: '权限管理系统',
+    showUser: '查看用户列表',
+    addUserNew: '创建用户'
   },
   navbar: {
     setPassword: '修改密码',
