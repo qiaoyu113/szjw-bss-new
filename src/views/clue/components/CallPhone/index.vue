@@ -120,9 +120,14 @@ export default class extends Vue {
     try {
       if (value) {
         this.$nextTick(() => {
-          (this.$refs['callPhone'] as any).handleCallClick();
-          (this.$refs['baseInfo'] as any).dioChange();
-          (this.$refs['followform'] as any).dioChange()
+          try {
+            (this.$refs['callPhone'] as any).handleCallClick()
+          } catch (err) {
+            console.log('打电话失败')
+          } finally {
+            (this.$refs['baseInfo'] as any).dioChange();
+            (this.$refs['followform'] as any).dioChange()
+          }
         })
       }
     } catch (err) {
