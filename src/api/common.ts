@@ -165,14 +165,3 @@ export const GetInfoByUserId = () =>
     url: `/base_center/auth/v3/agent/getInfoByUserId`,
     method: 'get'
   })
-
-// 线索管理接口
-
-// 获取城市下的小组
-export const clueGetCityGroup = (params:any) =>
-  request({
-    url: '/v3/base/user/getStaffInfoByCityAndProductLineAndGroup',
-    method: 'get',
-    params
-  })
-// 获取小组下的人员

@@ -17,7 +17,6 @@
       :destroy-on-close="true"
       :other="other(true)"
       top="5vh"
-      :stop-confirm="stopConfirm"
       @closed="handleDialogClosed"
     >
       <!-- fullscreen -->
@@ -91,8 +90,6 @@ export default class extends Vue {
 
   private ApiBase:boolean = false
   private ApiFollow:boolean = false
-
-  private stopConfirm:boolean = false
   get show() {
     return this.showDialog
   }
@@ -140,7 +137,6 @@ export default class extends Vue {
           type: 'success',
           message: '保存成功!'
         })
-        this.show = false
       } else if (!res[0] && res[1]) {
         this.$message({
           type: 'warning',
@@ -170,19 +166,22 @@ export default class extends Vue {
   }
 
   private other(type = false) {
-    return async() => {
-      await (this.$refs['baseInfo'] as any).submitsForm()
-      await (this.$refs['followform'] as any).submitForms()
+    return (done:Function) => {
+      (this.$refs['baseInfo'] as any).submitsForm();
+      (this.$refs['followform'] as any).submitForms()
       this.canSend()
-      if (type) {
-        this.stopConfirm = false;
-        (this.$refs['callPhone'] as any).handleHangUp()
-      } else {
-        if (this.status === 3) {
-          this.stopConfirm = true
-        } else {
-          this.stopConfirm = false
-        }
+      console.log(this.passBase && this.passFollow)
+      if (this.passBase && this.passFollow) {
+        setTimeout(() => {
+          if (type) {
+            done();
+            (this.$refs['callPhone'] as any).handleHangUp()
+          } else {
+            if (this.status === 1) {
+              done()
+            }
+          }
+        })
       }
     }
   }

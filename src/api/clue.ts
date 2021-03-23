@@ -485,3 +485,11 @@ export const UserGroupExport = (data: any) =>
     method: 'post',
     data
   })
+
+// 获取小组下的人员
+export const clueGetCityGroup = (params:any) =>
+  request({
+    url: '/base_center/auth/v2/user/getUserListByOfficeGroupId',
+    method: 'get',
+    params
+  })

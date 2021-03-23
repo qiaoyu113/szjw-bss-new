@@ -30,7 +30,7 @@
           {{ row.areCityName }}
         </template>
         <template v-else>
-          全部
+          暂无数据
         </template>
       </template>
       <template v-slot:cityName="{row}">
@@ -38,7 +38,7 @@
           {{ row.cityName }}
         </template>
         <template v-else>
-          全部
+          暂无数据
         </template>
       </template>
     </self-form>
