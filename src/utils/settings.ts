@@ -32,12 +32,14 @@ const roleType:configLineType = {
 // 业务线
 const lineTypeArr = [[0], [1], [175], [176], [176]]
 // vvvv
-const roleTypeArr = [[0], [1], [175], [176], [176]]
+const roleTypeArr = [[1, 9], [1, 10], [11], [12, 13], [12, 13]]
 export const getLineType = (clueType:number) => {
-  let str = configLineTypes[clueType]
-  return lineType[str]
+  // let str = configLineTypes[clueType]
+  // return lineType[str]
+  return lineTypeArr[clueType]
 }
 export const getLineRoleType = (clueType:number) => {
-  let str = configLineTypes[clueType]
-  return roleType[str]
+  // let str = configLineTypes[clueType]
+  // return roleType[str]
+  return roleTypeArr[clueType]
 }
