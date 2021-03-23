@@ -172,7 +172,14 @@ export default {
     RandomlyAssigned: 'Randomly assign policy settings',
     BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa',
-    campaignDetail: 'campaignDetail'
+    campaignDetail: 'campaignDetail',
+    wtSystem: 'WtSystem',
+    lnSystem: 'LnSystem',
+    clueSystem: 'ClueSystem',
+    dataSystem: 'DataSystem',
+    authoritySystem: 'AuthoritySystem',
+    roleSystem: 'RoleSystem',
+    addUserNew: 'addUser'
   },
   navbar: {
     logOut: 'Log Out',
