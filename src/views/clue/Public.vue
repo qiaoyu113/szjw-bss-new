@@ -133,7 +133,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import { HandlePages, lock, showCityGroupPerson, showWork, validatorNumberRange } from '@/utils/index'
+import { HandlePages, lock, showCityGroupPersonLine, showWork, validatorNumberRange } from '@/utils/index'
 import { GetToAllotWT, GetToAllotLNCarPool, GetToAllotLNLease, UpdateFollowerByHighSeas } from '@/api/clue'
 import { today, yesterday, sevenday, thirtyday } from '@/views/driver-freight/components/date'
 import SelfTable from '@/components/Base/SelfTable.vue'
@@ -549,7 +549,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: (node:any, resolve:any) => showCityGroupPerson(node, resolve, this.listQuery.clueType)
+          lazyLoad: (node:any, resolve:any) => showCityGroupPersonLine(node, resolve, this.listQuery.clueType)
         }
       },
       label: '选择跟进人',

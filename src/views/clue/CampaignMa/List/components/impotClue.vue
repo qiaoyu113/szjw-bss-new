@@ -117,13 +117,13 @@ export default class extends Vue {
   handleDownloadClick() {
     let url:string = ''
     if (this.busiType === 0) {
-      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/7f29dcd2006d4e56821bc154a034efa3'
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/导入模板（梧桐专车）.xlsx'
     } else if (this.busiType === 1) {
-      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/1f9649663617406b9413f1d3496fbfbf'
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/导入模板（梧桐共享）.xlsx'
     } else if (this.busiType === 2) {
-      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/excel/84f5f3686f5849699d896cd57807c049'
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/导入模板（雷鸟车池）.xlsx'
     } else if (this.busiType === 3) {
-      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/51a23329a9ab4efab64cbc31da7d6734'
+      url = 'https://qizhiniao-dev.oss-cn-beijing.aliyuncs.com/img/导入模板（雷鸟租赁）.xlsx'
     }
     window.location.href = url
   }
