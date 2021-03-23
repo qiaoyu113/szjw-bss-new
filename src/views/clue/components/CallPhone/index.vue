@@ -170,7 +170,6 @@ export default class extends Vue {
       (this.$refs['baseInfo'] as any).submitsForm();
       (this.$refs['followform'] as any).submitForms()
       this.canSend()
-      console.log(this.passBase && this.passFollow)
       if (this.passBase && this.passFollow) {
         setTimeout(() => {
           if (type) {
