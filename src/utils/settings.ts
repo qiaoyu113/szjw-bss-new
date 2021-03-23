@@ -22,11 +22,11 @@ const lineType:configLineType = {
 }
 
 const roleType:configLineType = {
-  WTZC: [0],
-  WTGX: [1],
-  LNCC: [5],
-  LNZLB: [5],
-  LNZLC: [5]
+  WTZC: [1, 9],
+  WTGX: [1, 10],
+  LNCC: [11],
+  LNZLB: [12, 13],
+  LNZLC: [12, 13]
 }
 
 // 业务线
@@ -39,5 +39,5 @@ export const getLineType = (clueType:number) => {
 }
 export const getLineRoleType = (clueType:number) => {
   let str = configLineTypes[clueType]
-  return lineType[str]
+  return roleType[str]
 }

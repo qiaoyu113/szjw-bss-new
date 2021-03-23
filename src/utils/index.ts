@@ -8,7 +8,7 @@ import {
   GetSpecifiedRoleList
 } from '@/api/common'
 import { clueGetCityGroup } from '@/api/clue'
-import { getLineType } from './settings'
+import { getLineType, getLineRoleType } from './settings'
 let context = new Vue()
 
 export const parseTime = (
@@ -545,7 +545,7 @@ export async function showCityGroupPersonLine(node: any, resolve: any, clueType:
 // 线索下获取小组下的人
 async function getGmOptionsForLine(cityCode:number, busiType:number, groupId:number, clueType:number = 0) {
   try {
-    let roleTypes = getLineType(clueType)
+    let roleTypes = getLineRoleType(clueType)
     let params:any = {
       roleTypes,
       cityCode,
