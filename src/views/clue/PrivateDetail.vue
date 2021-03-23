@@ -264,6 +264,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import DetailItem from '@/components/DetailItem/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
+import { HandlePages, lock } from '@/utils/index'
 import CallLog from '@/components/OutboundDialog/CallLog.vue'
 import { isPermission, parseTime } from '@/filters/index'
 import {
@@ -1013,10 +1014,12 @@ export default class extends Vue {
     try {
       let params: IState = { ...this.logPage }
       params.clueId = this.clueId
+      Reflect.deleteProperty(params, 'total')
       let { data: res } = await getClueDetailLogs(params)
       if (res.success) {
+        res.page = await HandlePages(res.page)
+        this.logPage.total = res.page.total
         this.logData = res.data
-        this.logPage = { ...res.page }
       } else {
         this.$message.warning(res.errorMsg)
       }
