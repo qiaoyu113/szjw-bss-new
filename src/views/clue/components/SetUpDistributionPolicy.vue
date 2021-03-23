@@ -71,8 +71,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { setrandomPolicy, searchInformation } from '@/api/clue'
-import { getGroupInfoByCityCodeAndProductLine, GetSpecifiedRoleList } from '@/api/common'
+import { setrandomPolicy, searchInformation, setPolicypeople } from '@/api/clue'
+import { getGroupInfoByCityCodeAndProductLine } from '@/api/common'
 @Component({
   name: 'SetUpDistributionPolicy',
   components: {
@@ -155,22 +155,22 @@ export default class extends Vue {
   async getTeamMember(cityCode:number, groupId: any) {
     try {
       let clueType = this.clueType
-      let roleTypes = [1, 4]
-      //  业务线大于1 的属于雷鸟
-      if (clueType > 1) {
-        if (clueType === 2) {
-          roleTypes = [11]
-        } else {
-          roleTypes = [12]
-        }
-      }
+      // let roleTypes = [1, 4]
+      // //  业务线大于1 的属于雷鸟
+      // if (clueType > 1) {
+      //   if (clueType === 2) {
+      //     roleTypes = [11]
+      //   } else {
+      //     roleTypes = [12]
+      //   }
+      // }
       let params:any = {
-        roleTypes,
-        groupId,
-        cityCode,
-        uri: '/v2/clueH5/list/queryFollowerList'
+        // roleTypes,
+        groupId
+        // cityCode,
+        // uri: '/v2/clueH5/list/queryFollowerList'
       }
-      const { data: res } = await GetSpecifiedRoleList(params)
+      const { data: res } = await setPolicypeople(params)
       if (res.success) {
         this.teamMemberList = res.data.map(function(item: any) {
           return {
