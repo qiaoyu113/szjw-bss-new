@@ -6,7 +6,7 @@
       :confirm="confirm"
       width="650px"
       :sumbit-again="submitLoading"
-      @closed="handleDialogClosed"
+      :destroy-on-close="true"
     >
       <FollowForm
         ref="followform"
@@ -51,17 +51,10 @@ export default class extends Vue {
   @Watch('showDialog')
   onShowDialog(val: boolean) {
     if (val) {
-      if (this.showDialog) {
-        setTimeout(() => {
-          (this.$refs['followform'] as any).getOptionInfo()
-        }, 10)
-      }
+      this.$nextTick(() => {
+        (this.$refs['followform'] as any).dioChange()
+      })
     }
-  }
-
-  // 弹窗关闭
-  private handleDialogClosed() {
-    (this.$refs['followform'] as any).resetForms()
   }
 
   // 弹框确认
