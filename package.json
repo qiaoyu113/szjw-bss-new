@@ -118,9 +118,7 @@
   "bugs": {
     "url": "https://github.com/armour/vue-typescript-admin-template/issues"
   },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
+ 
   "keywords": [
     "vue",
     "typescript",
