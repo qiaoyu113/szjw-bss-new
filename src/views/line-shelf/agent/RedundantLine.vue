@@ -13,10 +13,14 @@
           <el-button
             type="primary"
             style="margin-left: 120px"
+            @click="showDialog = true"
           >
             批量下架
           </el-button>
-          <el-button type="primary">
+          <el-button
+            type="primary"
+            @click="openIgnore"
+          >
             批量忽略
           </el-button>
           <el-button
@@ -30,7 +34,7 @@
     </self-form>
     <div class="table-container">
       <SelfTable
-        style="padding:30px 10px"
+        style="padding: 30px 10px"
         :is-p30="false"
         :columns="columns"
         :table-data="tableData"
@@ -52,6 +56,36 @@
         </template>
       </SelfTable>
     </div>
+    <SelfDialog
+      :visible.sync="showDialog"
+      :title="dialogTitle"
+      :width="'40%'"
+      :confirm="confirm"
+      :destroy-on-close="true"
+      @closed="handleClosed"
+    >
+      <div style="margin: 20px 0">
+        已选择XX条线路，确认忽略
+      </div>
+      <el-form
+        ref="ruleForm"
+        :model="dialogForm"
+        :rules="rules"
+        label-width="80px"
+        class="demo-ruleForm"
+      >
+        <el-form-item
+          label="活动名称"
+          prop="desc"
+        >
+          <el-input
+            v-model="dialogForm.desc"
+            type="textarea"
+            placeholder="如：客户无用车需求"
+          />
+        </el-form-item>
+      </el-form>
+    </SelfDialog>
   </div>
 </template>
 
@@ -60,7 +94,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineAgent } from '../components'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import SelfDialog from '@/components/SelfDialog'
+import SelfDialog from '@/components/SelfDialog/index.vue'
 
 @Component({
   name: 'Agent',
@@ -68,10 +102,12 @@ import SelfDialog from '@/components/SelfDialog'
     LineLayout,
     NewLineAgent,
     SelfForm,
-    SelfTable
+    SelfTable,
+    SelfDialog
   }
 })
 export default class extends Vue {
+  showVideo = false
   private active: string = '0'
   formItem = [
     {
@@ -162,6 +198,15 @@ export default class extends Vue {
     page: 1,
     total: 50
   }
+  showDialog:boolean= false
+  dialogForm ={
+    desc: ''
+  }
+  rules= {
+    desc: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ]
+  }
   mounted() {}
   multipleSelection= []
   resetFrom(this:any) {
@@ -169,6 +214,27 @@ export default class extends Vue {
   }
   private handleSelectionChange(val: any) {
     this.multipleSelection = val
+  }
+  confirm(callBack:Function) {
+    callBack()
+  }
+  handleClosed() {
+  }
+  async openIgnore() {
+    const err = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      this.$message({
+        type: 'success',
+        message: '取消成功'
+      })
+    }).catch(() => {
+    })
+  }
+  get dialogTitle() {
+    return '批量忽略'
   }
 }
 </script>

@@ -119,16 +119,20 @@
     </section-container>
     <section-container title="标签信息">
       <el-form
-        ref="form"
+        ref="lineFormRef"
         :model="form"
-        label-width="90px"
+        :rules="rules"
         class="lable-form"
+        label-width="80px"
       >
         <el-row :gutter="10">
-          <el-col :span="7">
-            <el-form-item label="是否爆款">
+          <el-col :span="6">
+            <el-form-item
+              label="是否爆款"
+              prop="explosion"
+            >
               <el-select
-                v-model="form.region1"
+                v-model="form.explosion"
                 placeholder="请选择"
               >
                 <el-option
@@ -146,22 +150,28 @@
             <el-form-item
               label="线路肥瘦"
               class="question-item"
+              prop="lineM"
+              label-width="100px"
             >
-              <el-tooltip
-                placement="top"
-                effect="light"
-                popper-class="new-line-popper"
-              >
-                <div slot="content">
-                  说明：<br>
-                  北京市<br>
-                  专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
-                  共享司机：次肥、中瘦、极瘦
-                </div>
-                <i class="el-icon-question" />
-              </el-tooltip>
+              <template #label>
+                <span>线路肥瘦&nbsp;</span>
+                <el-tooltip
+                  placement="top"
+                  effect="light"
+                  popper-class="new-line-popper"
+                >
+                  <div slot="content">
+                    说明：<br>
+                    北京市<br>
+                    专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
+                    共享司机：次肥、中瘦、极瘦
+                  </div>
+                  <i class="el-icon-question" />
+                </el-tooltip>
+              </template>
+
               <el-select
-                v-model="form.region1"
+                v-model="form.lineM"
                 placeholder="请选择活动区域"
               >
                 <el-option
@@ -179,23 +189,27 @@
             <el-form-item
               label="是否万金油"
               class="question-item"
+              prop="Panacea"
+              label-width="120px"
             >
-              <el-tooltip
-                placement="top"
-                effect="light"
-                popper-class="new-line-popper"
-              >
-                <template #content>
-                  提示<br>
-                  如：4.2米干厢货晚上干活，4.2米白天活，金杯下午活
-                </template>
-                <i
-                  class="el-icon-question"
-                  style=""
-                />
-              </el-tooltip>
+              <template #label>
+                <span>是否万金油</span>
+                <el-tooltip
+                  placement="top"
+                  effect="light"
+                  popper-class="new-line-popper"
+                >
+                  <template #content>
+                    提示<br>
+                    如：4.2米干厢货晚上干活，4.2米白天活，金杯下午活
+                  </template>
+                  <i
+                    class="el-icon-question"
+                  />
+                </el-tooltip>
+              </template>
               <el-select
-                v-model="form.region"
+                v-model="form.Panacea"
                 placeholder="请选择活动区域"
               >
                 <el-option
@@ -216,6 +230,7 @@
             <el-form-item
               class="checkbox-all"
               label-width="100%"
+              prop="sellingPoint"
             >
               <template #label>
                 卖点(多选)：
@@ -224,7 +239,7 @@
                 </span>
               </template>
               <el-checkbox-group
-                v-model="form.ccc"
+                v-model="form.sellingPoint"
                 size="mini"
               >
                 <el-checkbox-button
@@ -280,6 +295,7 @@
       <el-button
         class="agent-button"
         type="primary"
+        @click="checkError"
       >
         检查不通过
       </el-button>
@@ -287,6 +303,7 @@
       <el-button
         class="agent-button"
         type="primary"
+        @click="checkSuccess"
       >
         检查通过
       </el-button>
@@ -305,6 +322,40 @@
       :on-close="closeViewer"
       :url-list="imgPreviewList"
     />
+    <SelfDialog
+      :visible.sync="showDialog"
+      title="检查不通过"
+      :width="'40%'"
+      :confirm="confirm"
+      :destroy-on-close="true"
+      @closed="handleClosed"
+    >
+      <div style="margin: 20px 0">
+        提示：检查不通过后，外线销售在H5的线路管理中操作“激活线路”，提交后需要再次检查线路
+      </div>
+      <el-form
+        ref="ruleForm"
+        :model="dialogForm"
+        :rules="rules"
+        :label-width="'60px'"
+      >
+        <el-form-item
+          label="原因"
+          prop="type"
+        >
+          <el-checkbox-group v-model="dialogForm.type">
+            <el-checkbox
+              label="项目策展信息(卖点、爆款、肥瘦、万金油)"
+              name="type"
+            />
+            <el-checkbox
+              label="线路基础信息(除策展信息)"
+              name="type"
+            />
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+    </SelfDialog>
   </div>
 </template>
 
@@ -314,7 +365,9 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
+import { VideoWeb } from '../components/index'
 
 import ImgDialog from './ImgDialog.vue'
 @Component({
@@ -323,7 +376,9 @@ import ImgDialog from './ImgDialog.vue'
     SectionContainer,
     SelfForm,
     pagination,
-    SelfImageViewer
+    SelfImageViewer,
+    SelfDialog,
+    VideoWeb
   }
 })
 export default class extends Vue {
@@ -412,11 +467,10 @@ export default class extends Vue {
     }
   ]
   private form = {
-    name: '',
-    region: '',
-    region1: '',
-    region2: '',
-    ccc: []
+    explosion: '',
+    lineM: '',
+    Panacea: '',
+    sellingPoint: []
   }
   private cities = ['上海', '北京', '广州', '深圳']
   private deliveryItem = [
@@ -576,8 +630,52 @@ export default class extends Vue {
     'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF'
   ]
   showImgViewer = false
+  showDialog:boolean =false
+  dialogForm={
+    type: []
+  }
+  rules ={
+    type: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ],
+    explosion: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ],
+    lineM: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ],
+    Panacea: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ],
+    sellingPoint: [
+      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    ]
+
+  }
+  checkError() {
+    this.showDialog = true
+  }
   closeViewer() {
     this.showImgViewer = false
+  }
+  async confirm(this:any) {
+    try {
+      await this.$refs['ruleForm'].validate()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  handleClosed() {}
+  async checkSuccess(this:any) {
+    try {
+      await this.$refs['lineFormRef'].validate()
+      this.$message({
+        type: 'success',
+        message: '检查通过'
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 </script>
@@ -713,7 +811,7 @@ export default class extends Vue {
   }
   .el-icon-question {
     font-size: 18px;
-    line-height: 36px;
+    vertical-align: middle;
     margin-right: 6px;
     color: #656565;
   }
@@ -730,9 +828,6 @@ export default class extends Vue {
       padding: 0 !important;
       margin-right: 6px;
     }
-    .el-select {
-      width: calc(100% - 50px);
-    }
   }
   .checkbox-all {
     display: flex;
@@ -746,7 +841,8 @@ export default class extends Vue {
   }
 }
 .group-check {
-  margin: 20px 0 0 20px;
+ margin-top: 20px;
+ margin-bottom: 20px;
 }
 </style>
 <style lang="scss">
