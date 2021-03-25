@@ -9,7 +9,7 @@ const driverCloud: RouteConfig = {
   meta: {
     title: 'driverClond',
     icon: 'driver-cloud',
-    apiUrl: 'root'
+    apiUrl: ['/v2/driver/label-sync/list', '/v2/clueH5/waitAllocate/list', '/v2/clueH5/list']
   },
   children: [
     {

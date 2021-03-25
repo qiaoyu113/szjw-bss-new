@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie'
 import { Message } from 'element-ui'
+import local from '@/views/i18n-demo/local'
 
 // App
 const sidebarStatusKey = 'sidebar_status'
@@ -45,6 +46,7 @@ export const setUser = (user: any) => {
   localStorage.setItem('uuid', user.uuid)
   localStorage.setItem('roleName', user.roleName)
   localStorage.setItem('avatar', user.avatar)
+  localStorage.setItem('userId', user.id)
   localStorage.setItem('isWeakPwd', String(user.isWeakPwd))
 }
 export const removeToken = () => Cookies.remove(tokenKey)

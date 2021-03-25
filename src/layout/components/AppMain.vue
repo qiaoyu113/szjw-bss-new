@@ -11,6 +11,7 @@
         <router-view :key="key" />
       </keep-alive>
     </transition>
+    <init-phone />
   </section>
 </template>
 
@@ -18,9 +19,13 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { TagsViewModule } from '@/store/modules/tags-view'
 import { SettingsModule } from '@/store/modules/settings'
+import InitPhone from '@/components/OutboundDialog/InitPhone.vue'
 
 @Component({
-  name: 'AppMain'
+  name: 'AppMain',
+  components: {
+    InitPhone
+  }
 })
 export default class extends Vue {
   get cachedViews() {
@@ -46,6 +51,12 @@ export default class extends Vue {
     SettingsModule.ChangeIsPC({ key: 'tableHeight', value })
   }
 
+  // mounted() {
+  //   let makePhoneDom = document.getElementById('makePhone')
+  //   if (!(makePhoneDom as HTMLElement).hasChildNodes()) {
+  //     this.getInfoByUserId()
+  //   }
+  // }
   created() {
     if (/Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)) {
       this.isPC = false

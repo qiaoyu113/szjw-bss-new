@@ -17,7 +17,7 @@
         <slot />
       </div>
       <div
-        v-if="showConfirmButton || showCancelButton"
+        v-if="showConfirmButton || showCancelButton || showOtherButton"
         slot="footer"
         class="dialog-footer"
       >

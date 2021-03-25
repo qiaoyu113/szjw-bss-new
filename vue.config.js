@@ -61,7 +61,7 @@ module.exports = {
   },
   // other configuration
   configureWebpack: {
-    plugins: [
+    plugins: process.env.NODE_ENV === 'production' ? [
       new SentryWebpackPlugin({
         // sentry-cli configuration
         authToken: 'e4512f5bd6fc49ab81461a62ad5e278070cbd248ece94bcfaf10eb91d47dc8a9',
@@ -75,7 +75,7 @@ module.exports = {
         ignore: ['node_modules', 'webpack.config.js'],
         urlPrefix: '~/js' //  线上对应的url资源的相对路径 比如我的域名是 http://XXX  .com/,静态资源都在 static文件夹里面,
       })
-    ]
+    ] : []
   },
   chainWebpack(config) {
     // provide the app's title in webpack's name field, so that

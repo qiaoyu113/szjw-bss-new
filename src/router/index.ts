@@ -21,8 +21,10 @@ import customerFreight from './modules/customer-freight'
 import freightRouter from './modules/freight'
 import driverAccountRouter from './modules/driver-account'
 import driverCloudRouter from './modules/driver-cloud'
+import presetRouter from './modules/preset'
 // import customerRouter from './modules/customer'
 import lineShelf from './modules/line-shelf'
+import clueRouter from './modules/clue'
 
 Vue.use(Router)
 
@@ -238,11 +240,15 @@ export const asyncRoutes: RouteConfig[] = [
   customerFreight,
   // 运费管理
   freightRouter,
+  // 线索管理
+  clueRouter,
   driverAccountRouter,
   // 司机云
   driverCloudRouter,
   // 系统管理
   systemRouter,
+  // 权限管理
+  presetRouter,
   {
     path: '*',
     redirect: '/401',

@@ -7,6 +7,8 @@ import {
   getGroupInfoByCityCodeAndProductLine,
   GetSpecifiedRoleList
 } from '@/api/common'
+import { clueGetCityGroup } from '@/api/clue'
+import { getLineType, getLineRoleType } from './settings'
 let context = new Vue()
 
 export const parseTime = (
@@ -435,19 +437,21 @@ async function cityDetail(params: any, node: any) {
 }
 
 // 获取城市、小组、跟进人
-export async function showCityGroupPerson(node: any, resolve: any) {
+export async function showCityGroupPerson(node: any, resolve: any, clueType:any) {
   if (node.level === 0) {
     let citys = await getOpenCitys()
     resolve(citys)
   } else if (node.level === 1) {
-    let groups = await GroupInfoByCityCodeAndProductLine(+node.value)
+    console.log(+node.value)
+    let groups = await GroupInfoByCityCodeAndProductLine(+node.value, clueType)
     resolve(groups)
   } else if (node.level === 2) {
     let [groupId, busiType] = node.value.split(',')
-    let users = await getGmOptions(node.parent.value, busiType, groupId)
+    let users = await getGmOptions(node.parent.value, busiType, groupId, clueType)
     resolve(users)
   }
 }
+
 // 获取开通城市
 async function getOpenCitys() {
   try {
@@ -467,10 +471,15 @@ async function getOpenCitys() {
   }
 }
 // 获取小组
-async function GroupInfoByCityCodeAndProductLine(cityCode:number) {
+async function GroupInfoByCityCodeAndProductLine(cityCode:number, clueType:any = 0) {
   try {
+    //  业务线大于1 的属于雷鸟
+    let busiLine = [0, 1]
+    if (clueType > 1) {
+      busiLine = [5]
+    }
     let params:any = {
-      busiLine: [0, 1].toString(),
+      busiLine: busiLine.toString(),
       cityCode
     }
     let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
@@ -489,10 +498,12 @@ async function GroupInfoByCityCodeAndProductLine(cityCode:number) {
   }
 }
 // 获取小组下的人
-async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
+async function getGmOptions(cityCode:number, busiType:number, groupId:number, clueType:any = 0) {
   try {
+    let roleTypes = [1, 4]
+    //  业务线大于1 的属于雷鸟
     let params:any = {
-      roleTypes: [1, 4],
+      roleTypes,
       cityCode,
       busiType,
       groupId,
@@ -514,5 +525,72 @@ async function getGmOptions(cityCode:number, busiType:number, groupId:number) {
     }
   } catch (err) {
     console.log(err)
+  }
+}
+// 线索管理下获取 城市小组 跟进人
+export async function showCityGroupPersonLine(node: any, resolve: any, clueType:any) {
+  if (node.level === 0) {
+    let citys = await getOpenCitys()
+    resolve(citys)
+  } else if (node.level === 1) {
+    let groups = await getCityGroupForLine(+node.value, clueType)
+    resolve(groups)
+  } else if (node.level === 2) {
+    let [groupId, busiType] = node.value.split(',')
+    let users = await getGmOptionsForLine(node.parent.value, busiType, groupId, clueType)
+    resolve(users)
+  }
+}
+
+// 线索下获取小组下的人
+async function getGmOptionsForLine(cityCode:number, busiType:number, groupId:number, clueType:number = 0) {
+  try {
+    let roleTypes = getLineRoleType(clueType)
+    let params:any = {
+      roleTypes,
+      cityCode,
+      busiType,
+      groupId,
+      uri: '/floowdUser'
+    }
+    let { data: res } = await GetSpecifiedRoleList(params)
+    if (res.success) {
+      return res.data.map(function(item: any) {
+        return {
+          label: item.status === 2 ? item.name + `(停用)` : item.name + `(${item.mobile})`,
+          value: item.id,
+          disabled: item.status === 2,
+          leaf: true
+        }
+      })
+    } else {
+      context.$message.error(res.errorMsg)
+    }
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+// 线索管理获取小组
+async function getCityGroupForLine(cityCode:number, clueType:any = 0) {
+  try {
+    let busiLine = getLineType(clueType)
+    let params:any = {
+      busiLine: busiLine.toString(),
+      cityCode
+    }
+    let { data: res } = await getGroupInfoByCityCodeAndProductLine(params)
+    if (res.success) {
+      return res.data.map((item:any) => ({
+        value: item.id + ',' + item.dutyId,
+        label: item.name
+      }))
+    } else {
+      context.$message.error(res.errorMsg)
+    }
+  } catch (err) {
+    console.log(`get group fail:${err}`)
+  } finally {
+    //
   }
 }
