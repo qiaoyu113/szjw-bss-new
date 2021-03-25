@@ -30,93 +30,7 @@
         :list-query="baseInfo"
       />
     </section-container>
-    <section-container title="仓策展信息">
-      <self-form
-        :form-item="curationItem"
-        :list-query="baseInfo"
-      />
-      <el-row
-        :gutter="10"
-        class="curation-row"
-      >
-        <el-col
-          :span="6"
-          class="curation-col"
-        >
-          <div
-            class="curation-title"
-          >
-            <span>仓库图片(12)</span>
-            <div
-              class="img-container"
-            >
-              <img
-                src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
-                alt=""
-                @click="showImgViewer = true"
-              >
-              <div class="mask-img">
-                <span>预览</span>
-              </div>
-            </div>
-          </div>
-        </el-col>
-        <el-col
-          :span="6"
-          class="curation-col"
-        >
-          <div class="curation-title">
-            <span>货物图片(1)</span>
-            <div
-              class="img-container"
-            >
-              <img
-                src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
-                alt=""
-                @click="showImgViewer = true"
-              >
-              <div class="mask-img">
-                <span>预览</span>
-              </div>
-            </div>
-          </div>
-        </el-col>
-        <el-col
-          :span="6"
-          class="curation-col"
-        >
-          <div class="curation-title">
-            <span>装货图片(2)</span>
-            <div
-              class="img-container"
-            >
-              <img
-                src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
-                alt=""
-                @click="showImgViewer = true"
-              >
-              <div class="mask-img">
-                <span>预览</span>
-              </div>
-            </div>
-          </div>
-        </el-col>
-        <el-col
-          :span="6"
-          class="curation-col"
-        >
-          <div class="curation-title">
-            <span>讲解视频(1)</span>
-            <div class="img-container">
-              <img
-                src="https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF"
-                alt=""
-              >
-            </div>
-          </div>
-        </el-col>
-      </el-row>
-    </section-container>
+    <CuratorialInformation />
     <section-container title="标签信息">
       <el-form
         ref="lineFormRef"
@@ -256,7 +170,6 @@
         </el-row>
       </el-form>
     </section-container>
-
     <section-container title="配送信息">
       <self-form
         :form-item="deliveryItem"
@@ -288,6 +201,8 @@
         class="agent-button"
         type="info"
         plain
+        :loading="isSkip"
+        @click="skipCheck"
       >
         跳过暂不检查
       </el-button>
@@ -317,11 +232,7 @@
       :page="1"
       :limit="12"
     />
-    <SelfImageViewer
-      v-show="showImgViewer"
-      :on-close="closeViewer"
-      :url-list="imgPreviewList"
-    />
+
     <SelfDialog
       :visible.sync="showDialog"
       title="检查不通过"
@@ -366,19 +277,15 @@ import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
-import { VideoWeb } from '../components/index'
-
-import ImgDialog from './ImgDialog.vue'
+import CuratorialInformation from '../agent/CuratorialInformation.vue'
 @Component({
   name: 'NewLineAgent',
   components: {
     SectionContainer,
     SelfForm,
     pagination,
-    SelfImageViewer,
     SelfDialog,
-    VideoWeb
+    CuratorialInformation
   }
 })
 export default class extends Vue {
@@ -396,7 +303,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '线路编号:',
-      key: 'lineNo',
+      key: 'lineId',
       col: 4,
       tagAttrs: {
         class: 'active'
@@ -415,41 +322,21 @@ export default class extends Vue {
       type: 7,
       col: 4,
       label: '线路分类:',
-      key: 'lineType'
+      key: 'lineCategory'
     },
     {
       type: 7,
       col: 4,
 
       label: '外线销售:',
-      key: 'lineType'
+      key: 'lineSaleName'
     },
     {
       type: 7,
       col: 4,
 
       label: '客推经理:',
-      key: 'lineType'
-    }
-  ]
-  private curationItem = [
-    {
-      type: 7,
-      label: '仓名称:',
-      key: 'lineName',
-      col: 4,
-      tagAttrs: {
-        class: 'active'
-      }
-    },
-    {
-      type: 7,
-      label: '仓位置:',
-      key: 'lineNo',
-      col: 4,
-      tagAttrs: {
-        class: 'active'
-      }
+      key: 'aaa'
     }
   ]
   private baseInfo = {
@@ -477,52 +364,52 @@ export default class extends Vue {
     {
       type: 7,
       label: '车型:',
-      key: 'lineName'
+      key: 'carVal'
     },
     {
       type: 7,
       label: '配送区域:',
-      key: 'lineName'
+      key: 'deliveryAreaName'
     },
     {
       type: 7,
       label: '详细地址',
-      key: 'lineName'
+      key: 'districtArea'
     },
     {
       type: 7,
       label: '是否走禁行:',
-      key: 'lineName'
+      key: 'distributionWay'
     },
     {
       type: 7,
       label: '是否走限行:',
-      key: 'lineName'
+      key: 'distributionWay'
     },
     {
       type: 7,
       label: '油电要求:',
-      key: 'lineName'
+      key: 'oilElectricityRequirementName'
     },
     {
       type: 7,
       label: '装卸要求:',
-      key: 'lineName'
+      key: 'handlingDifficulty'
     },
     {
       type: 7,
       label: '是否走高速:',
-      key: 'lineName'
+      key: 'runSpeed'
     },
     {
       type: 7,
       label: '是否需要回单:',
-      key: 'lineName'
+      key: 'returnBill'
     },
     {
       type: 7,
       label: '服务要求和备注:',
-      key: 'lineName'
+      key: 'distance'
     }
   ]
   private deliveryInfo = {}
@@ -530,12 +417,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '配送时间:',
-      key: 'lineName'
+      key: 'deliveryTime'
     },
     {
       type: 7,
       label: '预计月出车天数:',
-      key: 'lineName'
+      key: 'monthNum'
     },
     {
       type: 7,
@@ -545,12 +432,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '预计工作时间:',
-      key: 'lineName'
+      key: 'timeDiff'
     },
     {
       type: 7,
       label: '配送数量:',
-      key: 'lineName'
+      key: 'aa'
     },
     {
       type: 7,
@@ -563,32 +450,32 @@ export default class extends Vue {
     {
       type: 7,
       label: '货物类型:',
-      key: 'lineName'
+      key: 'cargoTypeName'
     },
     {
       type: 7,
       label: '货物件数:',
-      key: 'lineName'
+      key: 'cargoNum'
     },
     {
       type: 7,
       label: '是否需要搬运:',
-      key: 'lineName'
+      key: 'carry'
     },
     {
       type: 7,
       label: '货物体积:',
-      key: 'lineName'
+      key: 'aa'
     },
     {
       type: 7,
       label: '货物重量:',
-      key: 'lineName'
+      key: 'aa'
     },
     {
       type: 7,
       label: '其他上岗要求:',
-      key: 'lineName'
+      key: 'dutyRemark'
     }
   ]
   private goodsInfo = {}
@@ -596,40 +483,35 @@ export default class extends Vue {
     {
       type: 7,
       label: '单趟报价:',
-      key: 'lineName'
+      key: 'everyTripGuaranteed'
     },
     {
       type: 7,
       label: '单趟提成报价:',
-      key: 'lineName'
+      key: 'everyUnitPrice'
     },
     {
       type: 7,
       label: '预计月报价:',
-      key: 'lineName'
+      key: 'shipperOffer'
     },
     {
       type: 7,
       label: '计价方式:',
-      key: 'lineName'
+      key: 'incomeSettlementMethodName'
     },
     {
       type: 7,
       label: '结算周期:',
-      key: 'lineName'
+      key: 'settlementCycleName'
     },
     {
       type: 7,
       label: '结算天数:',
-      key: 'lineName'
+      key: 'settlementDays'
     }
   ]
-  imgPreviewList=[
-    'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-    'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg',
-    'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF'
-  ]
-  showImgViewer = false
+
   showDialog:boolean =false
   dialogForm={
     type: []
@@ -655,9 +537,6 @@ export default class extends Vue {
   checkError() {
     this.showDialog = true
   }
-  closeViewer() {
-    this.showImgViewer = false
-  }
   async confirm(this:any) {
     try {
       await this.$refs['ruleForm'].validate()
@@ -666,6 +545,7 @@ export default class extends Vue {
     }
   }
   handleClosed() {}
+
   async checkSuccess(this:any) {
     try {
       await this.$refs['lineFormRef'].validate()
@@ -676,6 +556,20 @@ export default class extends Vue {
     } catch (error) {
       console.log(error)
     }
+  }
+  private isSkip = false
+  skipCheck() {
+    // const ele = document.querySelector('.app-main').scrollTo(0, 1000)
+    // if (!this.isSkip) {
+    //   this.isSkip = true
+    //   // setTimeout(() => {
+    //   //   console.log('fasdfsa')
+    //   //   this.isSkip = false
+    //   // }, 2500)
+    // }
+  }
+  getLineDetail() {
+    console.log('eqweq')
   }
 }
 </script>
@@ -711,60 +605,7 @@ export default class extends Vue {
   min-width: 120px;
   border: none;
 }
-.curation-row {
-  padding: 15px;
-}
-.curation-col {
-  position: relative;
-  .curation-title {
-    display: flex;
-    font-size: 0;
-    position: relative;
-    span {
-      font-size: 14px;
-      color: #838383;
-      line-height: 26px;
-      width: 95px;
-      display: inline-block;
-    }
-    .img-container {
-      flex: 1;
-      width: 260px;
-      max-width: 260px;
-      height: 160px;
-      border-radius: 5px;
-      overflow: hidden;
-      &:hover .mask-img{
-        height: 32px;
 
-      }
-    }
-    img {
-      width: 100%;
-      height: 100%;
-    }
-    .mask-img{
-      position: absolute;
-      max-width: 260px;
-      border-radius: 5px;
-      width: calc(100% - 95px);
-      height: 0px;
-      transition: all .7s;
-      background: rgba(0,0,0,0.40);
-      bottom: 0;
-      left: 95;
-      z-index: 1;
-      text-align: center;
-      overflow: hidden;
-      span{
-        line-height: 32px;
-        color: #FFF;
-        letter-spacing:1px;
-      }
-    }
-  }
-
-}
 // 按钮组的样式
 .check-label {
   margin-right: 20px;

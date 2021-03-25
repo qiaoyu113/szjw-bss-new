@@ -21,7 +21,7 @@
       <div class="el-image-viewer__canvas autoflex">
         <video
           class="aa-vadio"
-          src="../../../../../mda-kedja19a18h7eass.mp4"
+          :src="videoSrc"
           controls="controls"
           preload
           autoplay
@@ -53,6 +53,10 @@ export default {
     show: {
       type: Boolean,
       default: false
+    },
+    videoSrc: {
+      type: String,
+      default: ''
     }
   },
   data() {

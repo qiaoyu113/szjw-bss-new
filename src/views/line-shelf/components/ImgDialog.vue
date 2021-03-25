@@ -1,7 +1,7 @@
 <template>
   <div>
     <SelfImageViewer
-      v-if="showImgViewer"
+      v-show="showImgViewer"
       style="z-index:3000"
       :on-close="closeViewer"
       :url-list="imgPreviewList"

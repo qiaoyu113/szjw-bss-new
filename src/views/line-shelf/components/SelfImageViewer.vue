@@ -21,14 +21,14 @@
           :class="{'is-disabled': !infinite && isFirst}"
           @click="prev"
         >
-          <i class="el-icon-arrow-left" />
+          <i class="el-icon-back" />
         </span>
         <span
           class="el-image-viewer__btn el-image-viewer__next right-arow"
           :class="{'is-disabled': !infinite && isLast}"
           @click="next"
         >
-          <i class="el-icon-arrow-right" />
+          <i class="el-icon-right" />
         </span>
       </template>
       <!-- ACTIONS -->
@@ -42,12 +42,6 @@
             class="el-icon-zoom-in"
             @click="handleActions('zoomIn')"
           />
-          <!-- <i class="el-image-viewer__actions__divider" /> -->
-          <!-- <i
-            :class="mode.icon"
-            @click="toggleMode"
-          /> -->
-          <!-- <i class="el-image-viewer__actions__divider" /> -->
           <i
             class="el-icon-refresh-left"
             @click="handleActions('anticlocelise')"
@@ -195,10 +189,6 @@ export default {
       this._keyDownHandler = rafThrottle(e => {
         const keyCode = e.keyCode
         switch (keyCode) {
-          // ESC
-          case 27:
-            this.hide()
-            break
           // SPACE
           case 32:
             this.toggleMode()
@@ -215,7 +205,6 @@ export default {
         }
       })
       // 滚轮缩放
-      // ===
       on(document, 'keydown', this._keyDownHandler)
       on(document, mousewheelEventName, this._mouseWheelHandler)
     },
@@ -320,14 +309,26 @@ export default {
 }
 .left-arow {
   left: 15%;
+  width: 60px;
+  height: 60px;
+  font-size: 38px;
+
 }
 .right-arow {
   right: 15%;
+  width: 60px;
+  height: 60px;
+  font-size: 38px;
+
 }
 .el-image-viewer__close{
   top: 18%;
   right: 17%;
   color: #fff;
-  font-size: 48px;
+  font-weight: 700;
+  font-size: 53px;
+}
+.el-image-viewer__actions__inner{
+  font-size: 28px;
 }
 </style>
