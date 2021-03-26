@@ -50,12 +50,12 @@
                 placeholder="请选择"
               >
                 <el-option
-                  label="区域一"
-                  value="shanghai"
+                  label="是"
+                  value="1"
                 />
                 <el-option
-                  label="区域二"
-                  value="beijing"
+                  label="否"
+                  value="0"
                 />
               </el-select>
             </el-form-item>
@@ -173,25 +173,25 @@
     <section-container title="配送信息">
       <self-form
         :form-item="deliveryItem"
-        :list-query="deliveryInfo"
+        :list-query="baseInfo"
       />
     </section-container>
     <section-container title="配送要求">
       <self-form
         :form-item="deliveryDemandItme"
-        :list-query="deliveryDemandInfo"
+        :list-query="baseInfo"
       />
     </section-container>
     <section-container title="货物信息">
       <self-form
-        :form-item="deliveryDemandItme"
-        :list-query="deliveryDemandInfo"
+        :form-item="goodsItem"
+        :list-query="baseInfo"
       />
     </section-container>
     <section-container title="结算信息">
       <self-form
-        :form-item="deliveryDemandItme"
-        :list-query="deliveryDemandInfo"
+        :form-item="SettlementItem"
+        :list-query="baseInfo"
       />
     </section-container>
 
@@ -223,14 +223,14 @@
         检查通过
       </el-button>
     </div>
-    <!-- 分页 -->
-    <!-- :operation-list="operationList" -->
     <pagination
       v-show="true"
       :operation-list="[]"
-      :total="1000"
-      :page="1"
-      :limit="12"
+      :page-sizes="[1]"
+      :total="page.total"
+      :page="page.page"
+      :limit="page.limit"
+      @pagination="skipCheck"
     />
 
     <SelfDialog
@@ -278,6 +278,7 @@ import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import CuratorialInformation from '../agent/CuratorialInformation.vue'
+import { getNewLineDetail } from '@/api/line-shelf'
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -312,7 +313,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '窗口期:',
-      key: 'windowDate',
+      key: 'recruitWindowPeriod',
       col: 4,
       tagAttrs: {
         class: 'error'
@@ -322,7 +323,7 @@ export default class extends Vue {
       type: 7,
       col: 4,
       label: '线路分类:',
-      key: 'lineCategory'
+      key: 'lineCategoryName'
     },
     {
       type: 7,
@@ -336,7 +337,7 @@ export default class extends Vue {
       col: 4,
 
       label: '客推经理:',
-      key: 'aaa'
+      key: 'customerRetirementManager'
     }
   ]
   private baseInfo = {
@@ -364,12 +365,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '车型:',
-      key: 'carVal'
+      key: 'carTypeName'
     },
     {
       type: 7,
       label: '配送区域:',
-      key: 'deliveryAreaName'
+      key: 'lineArea'
     },
     {
       type: 7,
@@ -379,12 +380,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '是否走禁行:',
-      key: 'distributionWay'
+      key: 'isBehavior'
     },
     {
       type: 7,
       label: '是否走限行:',
-      key: 'distributionWay'
+      key: 'isRestriction'
     },
     {
       type: 7,
@@ -394,7 +395,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '装卸要求:',
-      key: 'handlingDifficulty'
+      key: 'handlingDifficultyName'
     },
     {
       type: 7,
@@ -409,7 +410,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '服务要求和备注:',
-      key: 'distance'
+      key: 'serviceRequirementName'
     }
   ]
   private deliveryInfo = {}
@@ -417,7 +418,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '配送时间:',
-      key: 'deliveryTime'
+      key: 'deliveryWeekCycle'
     },
     {
       type: 7,
@@ -427,7 +428,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '每日出车趟数:',
-      key: 'lineName'
+      key: 'dayNum'
     },
     {
       type: 7,
@@ -437,12 +438,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '配送数量:',
-      key: 'aa'
+      key: 'deliveryNum'
     },
     {
       type: 7,
       label: '配送里程:',
-      key: 'lineName'
+      key: 'distributionMileage'
     }
   ]
   private deliveryDemandInfo = {}
@@ -465,12 +466,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '货物体积:',
-      key: 'aa'
+      key: 'volume'
     },
     {
       type: 7,
       label: '货物重量:',
-      key: 'aa'
+      key: 'goodsWeight'
     },
     {
       type: 7,
@@ -534,18 +535,29 @@ export default class extends Vue {
     ]
 
   }
+  page={
+    limit: 1,
+    page: 1,
+    total: 50
+  }
+  mounted() {
+    this.getLineDetail()
+  }
   checkError() {
     this.showDialog = true
   }
   async confirm(this:any) {
     try {
       await this.$refs['ruleForm'].validate()
+      this.showDialog = false
+      this.getLineDetail(true)
+      this.dialogForm = { type: [] }
     } catch (error) {
       console.log(error)
     }
   }
   handleClosed() {}
-
+  // 检查通过
   async checkSuccess(this:any) {
     try {
       await this.$refs['lineFormRef'].validate()
@@ -553,23 +565,38 @@ export default class extends Vue {
         type: 'success',
         message: '检查通过'
       })
+      this.$refs['lineFormRef'].resetFields()
+      this.getLineDetail(true)
     } catch (error) {
       console.log(error)
     }
   }
+  // 滚动到页面顶部
+  scrollTo() {
+    const ele:any = document.querySelector('.app-main')
+    ele.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   private isSkip = false
   skipCheck() {
-    // const ele = document.querySelector('.app-main').scrollTo(0, 1000)
-    // if (!this.isSkip) {
-    //   this.isSkip = true
-    //   // setTimeout(() => {
-    //   //   console.log('fasdfsa')
-    //   //   this.isSkip = false
-    //   // }, 2500)
-    // }
+    this.getLineDetail(true)
   }
-  getLineDetail() {
-    console.log('eqweq')
+  // 获取详情数据
+  async getLineDetail(isAdd :boolean = false) {
+    if (isAdd) {
+      this.page.page += 1
+    }
+    let params = {
+      limit: 1,
+      page: this.page.page
+    }
+    try {
+      const { data } = await getNewLineDetail(params)
+      this.baseInfo = data.data
+      // 页面滚动到具体的位置
+      this.scrollTo()
+    } catch (error) {
+      return error
+    }
   }
 }
 </script>

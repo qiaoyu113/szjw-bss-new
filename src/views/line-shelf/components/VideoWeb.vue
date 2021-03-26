@@ -86,14 +86,14 @@ export default {
 <style lang="scss" scoped>
 
 .el-image-viewer__close{
-  top: 18%;
-  right: 17%;
+  top: 20%;
+  right: 11%;
   color: #fff;
   font-size: 48px;
 }
 .aa-vadio{
-  width: 960px;
-  height:540px;
+  width: 56%;
+  height:45%;
   border: none;
   z-index: 12;
 }
