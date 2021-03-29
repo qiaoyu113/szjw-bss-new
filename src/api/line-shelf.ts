@@ -34,7 +34,9 @@ export const goods = (params: any) =>
 // 已完成新线维护 Tab
 export const getFinishedLine = (data :any) => {
   return request({
-    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`
+    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`,
+    method: 'post',
+    data
   })
 }
 // 获取代办维护数据

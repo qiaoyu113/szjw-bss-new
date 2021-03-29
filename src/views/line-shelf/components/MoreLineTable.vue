@@ -91,6 +91,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
 import { getFinishedMoreLine } from '@/api/line-shelf'
+import { getLanguage } from '@/utils/cookies'
 interface IState {
   [key: string]: any;
 }
