@@ -29,6 +29,9 @@
         <template v-if="row.areCityName">
           {{ row.areCityName }}
         </template>
+        <template v-else-if="[0,'0'].includes(row.areCity)">
+          全部
+        </template>
         <template v-else>
           暂无数据
         </template>
@@ -36,6 +39,9 @@
       <template v-slot:cityName="{row}">
         <template v-if="row.cityName">
           {{ row.cityName }}
+        </template>
+        <template v-else-if="[0,'0'].includes(row.city)">
+          全部
         </template>
         <template v-else>
           暂无数据
