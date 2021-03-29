@@ -449,6 +449,32 @@ export default class extends Vue {
       key: 'createTime'
     },
     {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        multiple: true,
+        'collapse-tags': true
+      },
+      label: '是否邀约成功',
+      key: 'isInvite',
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '是',
+          value: true
+        },
+        {
+          label: '否',
+          value: false
+        }
+      ]
+    },
+    {
       type: 'status',
       col: 24,
       slot: true,
@@ -796,6 +822,7 @@ export default class extends Vue {
       let { data: res } = await GetDriverClueList(params)
       if (res.success) {
         this.tableData = res.data || []
+        // eslint-disable-next-line
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.btns.forEach(item => {

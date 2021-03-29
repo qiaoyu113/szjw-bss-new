@@ -34,7 +34,13 @@ export const goods = (params: any) =>
 // 已完成新线维护 Tab
 export const getFinishedLine = (data :any) => {
   return request({
-    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`,
+    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`
+  })
+}
+// 获取代办维护数据
+export const getNewLineDetail = (data:any) => {
+  return request({
+    url: '/mock/153/get/newLIne/agent',
     method: 'post',
     data
   })
@@ -47,3 +53,23 @@ export const getFinishedMoreLine = (data :any) => {
     data
   })
 }
+// 获取an余线路列表
+export const getReaundanLineList = (data:any) =>
+  request({
+    url: '/mock/153/get/agent/list',
+    method: 'post',
+    data
+  })
+// 忽略 批量忽略线路
+export const passLine = (data:any) =>
+  request({
+    url: '/mock/153/pass/RedundantlineIgnored',
+    method: 'post',
+    data
+  })
+export const offShelf = (data:any) =>
+  request({
+    url: '/mock/153/redundant/offshelf',
+    method: 'post',
+    data
+  })
