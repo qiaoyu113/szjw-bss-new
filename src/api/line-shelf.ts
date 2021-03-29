@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 let prefix2 = '/mock/237'
-
+let prefix3 = '/mock/153'
 // 基础
 export const awitDetail = (params: any) =>
   request({
@@ -30,3 +30,20 @@ export const goods = (params: any) =>
     method: 'get',
     params
   })
+
+// 已完成新线维护 Tab
+export const getFinishedLine = (data :any) => {
+  return request({
+    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`,
+    method: 'post',
+    data
+  })
+}
+// 已完成冗余线路维护  Tab
+export const getFinishedMoreLine = (data :any) => {
+  return request({
+    url: `${prefix3}/v3/line/shelf/maintenance/queryLineListByConditionsQuery`,
+    method: 'post',
+    data
+  })
+}

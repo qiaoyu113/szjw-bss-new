@@ -1,385 +1,355 @@
 <template>
-  <div class="p15">
-    <h2 style="color:red">
-      线路快照:线路运营操作检查线路时候的线路信息的快照,作为评判的依据
-    </h2>
-    <SectionContainer
-      title="基础信息"
-      :md="true"
-    >
-      <Basics
-        :line-infor="lineInfor"
+  <div
+    class="cpmplate-container"
+  >
+    <line-layout :active.sync="active" />
+    <div v-show="active-0===0">
+      <newLine-table
         :form-item="formItem"
-      />
-    </SectionContainer>
-    <SectionContainer
-      title="配送信息"
-      :md="true"
-    >
-      <self-form
-        label-suffix=" :"
-        :list-query="listQuery"
-        :form-item="formItem1"
-        size="small"
-        class="p15 SuggestForm"
-        :pc-col="6"
-      />
-    </SectionContainer>
-    <SectionContainer
-      title="配送时间信息"
-      :md="true"
-    >
-      <SelfForm />
-    </SectionContainer>
-    <SectionContainer
-      title="结算信息"
-      :md="true"
-    >
-      <self-form
-        label-suffix=" :"
-        :list-query="listQuery"
-        :form-item="formItem3"
-      />
-    </SectionContainer>
-    <SectionContainer
-      title="货物信息"
-      :md="true"
-    >
-      <self-form
-        label-suffix=" :"
-        :list-query="listQuery"
-        :form-item="formItem4"
-      />
-    </SectionContainer>
-    <SectionContainer
-      title="标签信息"
-      :md="true"
-    >
-      <self-form
-        label-suffix=" :"
-        :list-query="listQuery"
-        :form-item="formItem5"
-      />
-    </SectionContainer>
-    <SectionContainer
-      title="现场信息"
-      :md="true"
-    >
-      <SelfForm />
-    </SectionContainer>
-    <SectionContainer
-      title="操作日志"
-      :md="true"
-    >
-      <table-date
         :columns="columns"
-        :table-data="tableData"
+        :page="page"
       />
-    </SectionContainer>
+    </div>
+
+    <div v-show="active-0===1">
+      <MoreLineTable
+        :form-item="formItem1"
+        :columns="columns1"
+        :page="page"
+      />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import Basics from '../components/LineShelfForm/BasicsInfor.vue'
-import TableDate from '../components/LineShelfForm/tableDate.vue'
-import SelfForm from '@/components/Base/SelfForm.vue'
-import SectionContainer from '@/components/SectionContainer/index.vue'
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { awitDetail, distribution, settlemen, goods } from '@/api/line-shelf'
-interface IState {
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { LineLayout, NewLineTable, MoreLineTable } from '../components'
+import { getFinishedLine } from '@/api/line-shelf'
+import SelfTable from '@/components/Base/SelfTable.vue'
+  interface IState {
   [key: string]: any;
 }
+interface PageObj {
+  page: Number;
+  limit: Number;
+  total?: Number;
+}
 @Component({
-  name: 'Agent',
+  name: 'Complete',
   components: {
-    Basics,
-    SectionContainer,
-    SelfForm,
-    TableDate
+    LineLayout,
+    NewLineTable,
+    MoreLineTable,
+    SelfTable
   }
 })
 export default class extends Vue {
-   private listQuery:IState = {
-     carType: '', // 车型
-     carArea: '', // 配送区域
-     trip: '', // 单趟报价
-     tripCommission: '', // 单趟提成报价
-     goodsType: '', // 货物类型
-     goodsNum: '', // 货物件数
-     ismove: '', // 是否需要搬运
-     size: '', // 货物体积
-     weight: '', // 货物重量
-     other: ''// 其他上岗要求
+  private active: string = '0'
+  private statusActive: number = 0
+  private page: PageObj = {
+    page: 1,
+    limit: 10,
+    total: 120
+  };
 
-   }
-   // 基础信息
-   private lineInfor : IState = [
-     {
-       key: 'lineNameKey',
-       label: '线路名称'
-     },
-     {
-       key: 'lineIdKey',
-       label: '线路编号'
-     },
-     {
-       key: 'projectNameKey',
-       label: '项目名称'
-     },
-     {
-       key: 'proojectIdKey',
-       label: '项目编号'
-     }
-   ]
+  //  新线维护
+  private formItem:any[]=[
+    {
+      type: 1,
+      key: 'agentId',
+      col: 8,
+      label: '代办编号',
+      tagAttrs: {
+        placeholder: '请输入'
+      }
+    },
+    {
+      type: 1,
+      key: 'lineName',
+      col: 8,
+      label: '线路名称',
+      tagAttrs: {
+        placeholder: '请输入名称/编号'
+      }
+    },
+    {
+      type: 2,
+      key: 'result',
+      col: 8,
+      label: '原因',
+      tagAttrs: {
+        placeholder: '请选择原因'
 
-  private formItem :IState[] = []
-  // 配送信息
-  private formItem1 : IState[] = [
-    {
-      type: 7,
-      label: '车型',
-      key: 'carType'
+      },
+      options: [
+        {
+          label: '全部',
+          value: 3
+        },
+        {
+          label: '项目策展信息',
+          value: 1
+        },
+        {
+          label: '线路基础信息',
+          value: 2
+        }
+      ]
     },
     {
-      type: 7,
-      label: '配送区域',
-      key: 'carArea'
+      type: 3,
+      key: 'agencyTime',
+      label: '代办完成时间',
+      col: 12,
+      tagAttrs: {
+        clearable: true,
+        pickerOptions: {
+          shortcuts: [
+            {
+              text: '今天',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近一周',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近一月',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近三月',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                picker.$emit('pick', [start, start])
+              }
+            }
+          ]
+        }
+      }
     },
     {
-      type: 7,
-      label: '详细地址',
-      key: 'carArea'
+      slot: true,
+      label: '检查状态',
+      col: 22,
+      type: 'checkStatus'
     },
     {
-      type: 7,
-      label: '是否走禁行',
-      key: 'carArea'
-    },
-    {
-      type: 7,
-      label: '是否走限行',
-      key: 'carArea'
+      slot: true,
+      col: 2,
+      w: '0px',
+      type: 'btn1'
+
     }
+
   ]
-  // 配送时间信息
-  private formItem2 : IState[] = []
-  // 结算信息
-  private formItem3 : IState[] = [
+  //  新线维护表格
+  private columns: any[] = [
     {
-      type: 7,
-      label: '单趟报价',
-      key: 'trip'
+      key: 'agentId',
+      label: '代办编号'
     },
     {
-      type: 7,
-      label: '单趟提成报价',
-      key: 'tripCommission'
+      key: 'lineName',
+      label: '线路名称',
+      slot: true
     },
     {
-      type: 7,
-      label: '预计月报价',
-      key: 'tripCommission'
+      key: 'lineId',
+      label: '线路编号'
     },
     {
-      type: 7,
-      label: '计价方式',
-      key: 'tripCommission'
+      key: 'lineSnapshotFlag',
+      label: '线路快照',
+      slot: true
     },
     {
-      type: 7,
-      label: '结算周期',
-      key: 'tripCommission'
+      key: 'inspectionStatus',
+      label: '状态', // 检查状态
+      slot: true
     },
     {
-      type: 7,
-      label: '结算天数',
-      key: 'tripCommission'
-    }
-  ]
-  // 货物信息
-  private formItem4 : IState[] = [
-    {
-      type: 7,
-      label: '货物类型',
-      key: 'goodsType'
+      key: 'rejectionReasonsTypeName',
+      label: '原因', // 拒绝原因类型名
+      slot: true
     },
     {
-      type: 7,
-      label: '货物件数',
-      key: 'goodsNum'
+      key: 'rejectionReasons',
+      label: '备注',
+      slot: true,
+      'width': '82px'
     },
     {
-      type: 7,
-      label: '是否需要搬运',
-      key: 'ismove'
+      key: 'updateName',
+      label: '操作人'
     },
     {
-      type: 7,
-      label: '货物体积',
-      key: 'size'
-    },
-    {
-      type: 7,
-      label: '货物重量',
-      key: 'weight'
-    },
-    {
-      type: 7,
-      label: '其他上岗要求',
-      key: 'other'
-    }
-  ]
-  // 标签信息
-  private formItem5:IState[] = [
-    {
-      type: 7,
-      label: '是否爆款',
-      key: 'goodsType'
-    },
-    {
-      type: 7,
-      label: '线路肥瘦',
-      key: 'goodsType'
-    },
-    {
-      type: 7,
-      label: '是否万金油',
-      key: 'goodsType'
-    },
-    {
-      type: 7,
-      label: '卖点',
-      key: 'goodsType'
-    }
-  ]
-  // 操作日志
-  private columns : IState = [
-    {
-      key: 'type',
-      label: '类型'
-    },
-    {
-      key: 'ueserName',
-      label: '用户名'
-    },
-    {
-      key: 'operationTime',
+      key: 'updateDate',
       label: '操作时间'
     },
     {
-      key: 'operationBefore',
-      label: '操作前'
-    },
-    {
-      key: 'operationAfter',
-      label: '操作后'
+      key: 'createDate',
+      label: '代办生成时间'
     }
+
   ]
-    private tableData:IState= [{
-      type: '激活线路',
-      ueserName: '王小虎',
-      operationTime: '2020-01-03 12:00:00',
-      operationBefore: '未开跑下架/已开跑下架',
-      operationAfter: '已上架'
+
+  // 冗余线路盘点
+  private formItem1:any[]=[
+    {
+      type: 1,
+      key: 'agentId',
+      col: 8,
+      label: '代办编号',
+      tagAttrs: {
+        placeholder: '请输入'
+      }
     },
     {
-      type: '下架线路',
-      ueserName: '王小虎',
-      operationTime: '2020-01-03 12:00:00',
-      operationBefore: '已上架/已开跑',
-      operationAfter: '已开跑下架/未来跑下架'
+      type: 1,
+      key: 'lineName',
+      col: 8,
+      label: '线路名称',
+      tagAttrs: {
+        placeholder: '请输入名称/编号'
+      }
     },
     {
-      type: '编辑线路',
-      ueserName: '王小虎',
-      operationTime: '2020-01-03 12:00:00',
-      operationBefore: '',
-      operationAfter: ''
+      type: 3,
+      key: 'agencyTime',
+      label: '代办完成时间',
+      col: 12,
+      tagAttrs: {
+        clearable: true,
+        pickerOptions: {
+          shortcuts: [
+            {
+              text: '今天',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近一周',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近一月',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+                picker.$emit('pick', [start, end])
+              }
+            },
+            {
+              text: '近三月',
+              onClick(picker: any) {
+                const end = new Date()
+                const start = new Date()
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+                picker.$emit('pick', [start, start])
+              }
+            }
+          ]
+        }
+      }
     },
     {
-      type: '创建线路',
-      ueserName: '王小虎',
-      operationTime: '2020-01-03 12:00:00',
-      operationBefore: '',
-      operationAfter: '已上架'
-    }]
+      slot: true,
+      label: '检查状态',
+      col: 22,
+      type: 'checkStatus'
+    },
+    {
+      slot: true,
+      col: 2,
+      w: '0px',
+      type: 'btn1'
 
-    // 获取基础信息
-    private async getInformation() {
-      try {
-        let params = {
-          lineId: 225
-        }
-        const { data: res } = await awitDetail(params)
-        if (res.success) {
-          this.formItem = res.data
-        } else {
-          this.$message.error(res.errorMsg || res.message)
-        }
-      } catch (err) {
-        console.log(err)
-      }
     }
 
-    // 获取配送信息
-    private async getDistribution() {
-      try {
-        let params = {
-          lineId: 225
-        }
-        let { data: res } = await distribution(params)
-        if (res.success) {
-          this.listQuery.carType = res.data.carType
-          this.listQuery.carArea = res.data.carArea
-        } else {
-          this.$message.error(res.errorMsg)
-        }
-      } catch (err) {
-        console.log(`get duty list fail:${err}`)
-      }
-    }
+  ]
 
-    // 获取结算信息
-    private async getSettlement() {
-      try {
-        let params = {
-          lineId: 225
-        }
-        let { data: res } = await settlemen(params)
-        if (res.success) {
-          this.listQuery.trip = res.data.trip + '元'
-          this.listQuery.tripCommission = res.data.tripCommission + '元'
-        }
-      } catch (err) {
-        console.log(`get duty list fail:${err}`)
-      }
-    }
-    //  获取货物信息
-    private async getGoods() {
-      try {
-        let params = {
-          lineId: 121
-        }
-        let { data: res } = await goods(params)
-        if (res.success) {
-          this.listQuery.goodsType = res.data.goodsType
-          this.listQuery.goodsNum = res.data.goodsNum + '件'
-        } else {
-          this.$message.error(res.errorMsg)
-        }
-      } catch (err) {
-        console.log(`get duty list fail:${err}`)
-      }
-    }
-    mounted() {
-      this.getInformation()
-      this.getDistribution()
-      this.getSettlement()
-      this.getGoods()
-    }
+   private columns1: any[] = [
+     {
+       key: 'agentId',
+       label: '代办编号'
+     },
+     {
+       key: 'lineName',
+       label: '线路名称',
+       slot: true
+     },
+     {
+       key: 'lineId',
+       label: '线路编号'
+     },
+     {
+       key: 'agentStatus',
+       label: '状态',
+       slot: true
+
+     },
+     {
+       key: 'shelvesReasons',
+       label: '原因', // 下架原因
+       slot: true,
+       'width': '72px'
+     },
+
+     {
+       key: 'updateName',
+       label: '操作人'
+     },
+     {
+       key: 'updateDate',
+       label: '操作时间'
+     },
+     {
+       key: 'lineCreateDate',
+       label: '线路创造时间'
+     },
+     {
+       key: 'createDate',
+       label: '代办生成时间'
+     }
+
+   ]
+
+  // 获取新线维护列表
+
+  // 获取冗余线路列表
 }
 </script>
 
 <style lang="scss" scoped>
+.cpmplate-container {
+  margin: 15px;
+  background: #fff;
 
+}
 </style>

@@ -31,7 +31,30 @@ const lineShelfRouter: RouteConfig = {
         title: 'complete',
         noCache: false
       }
+    },
+    {
+      path: 'linedetail',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/line-shelf/detail/index.vue'),
+      name: 'LineDetail',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'lineDetail',
+        noCache: false
+      }
+    },
+    {
+      path: 'lineSnapshot',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/line-shelf/detail/index.vue'),
+      name: 'LineSnapshot',
+      meta: {
+        apiUrl: 'root',
+        hidden: true,
+        title: 'lineSnapshot',
+        noCache: false
+      }
     }
+
   ]
 }
 

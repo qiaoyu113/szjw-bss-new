@@ -187,7 +187,9 @@ export default {
     marketClue: '待市场分配线索',
     lineShelf: '线路货架维护',
     complete: '已完成',
-    agent: '代办'
+    agent: '代办',
+    detail: '详情',
+    lineSnapshot: '线路快照'
   },
   navbar: {
     setPassword: '修改密码',
