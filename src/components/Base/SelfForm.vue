@@ -239,6 +239,8 @@ export default class extends Vue {
       if (valid) {
         this.handlePass(valid, args)
       } else {
+        // 没有与通过效验公用一个事件发射，因为不通过事件发射是后续增加的，之前需求可能存在无判断valid的情况
+        this.handleNoPass(valid, args)
         console.log('error submit!!')
         return false
       }
@@ -251,8 +253,15 @@ export default class extends Vue {
   clearValidate(props: Array<string> | string) {
     (this.$refs['ruleForm'] as any).clearValidate(props)
   }
+  validateField(props: [] | string, callback: Function) {
+    (this.$refs['ruleForm'] as any).validateField(props, (errorMessage:string) => {
+      callback(errorMessage)
+    })
+  }
   @Emit('onPass')
   handlePass(isPass: boolean, args: any) {}
+  @Emit('noPass')
+  handleNoPass(isPass: boolean, args: any) {}
 }
 </script>
 

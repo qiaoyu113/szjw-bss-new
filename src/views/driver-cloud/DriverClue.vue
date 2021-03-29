@@ -19,6 +19,10 @@
         size="small"
         label-width="120px"
         :pc-col="8"
+        @onPass="basePass"
+        @noPass="(val) => {
+          passObj.base = val
+        }"
       >
         <template slot="horsepower">
           <el-input
@@ -57,6 +61,10 @@
         size="small"
         label-width="120px"
         :pc-col="8"
+        @onPass="ownerPass"
+        @noPass="(val) => {
+          passObj.owner = val
+        }"
       />
     </SectionContainer>
     <!-- 销售信息 -->
@@ -69,8 +77,9 @@
         <el-form
           ref="sellInfoForm"
           class="tableBox"
+          size="small"
           :model="queryInfo.salesInfo"
-          :rules="rule"
+          :rules="rule.salesRule"
         >
           <div v-if="showLease">
             <el-table
@@ -259,6 +268,10 @@
         label-width="100px"
         :pc-col="24"
         class="picForm"
+        @onPass="picPass"
+        @noPass="(val) => {
+          passObj.pic = val
+        }"
       >
         <template slot="carPic">
           <div
@@ -372,11 +385,15 @@
       <self-form
         ref="expandInfoForm"
         :list-query="queryInfo.expandInfo"
-        :form-item="queryItem.expandItem"
+        :form-item="expandTypes"
         :rules="rule.expandRule"
         size="small"
         label-width="100px"
         :pc-col="6"
+        @onPass="expandPass"
+        @noPass="(val) => {
+          passObj.expand = val
+        }"
       >
         <template slot="giveMoney">
           <div class="moneyBox">
@@ -409,24 +426,33 @@
     </SectionContainer>
     <div class="btnBox">
       <div>
-        <el-button>返回</el-button>
+        <el-button @click="goBack">
+          返回
+        </el-button>
         <el-button
           type="primary"
+          :disabled="canClick"
           @click="checkAll"
         >
           提交
         </el-button>
       </div>
     </div>
+    <sendMessage
+      :show-dialog.sync="showSend"
+      :change-data="changeData"
+      @sureChange="sureSend"
+    />
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
+import sendMessage from './components/changeMessage.vue'
 import { UserModule } from '@/store/modules/user'
 import {
   GetCityByCode,
@@ -435,7 +461,6 @@ import {
 } from '@/api/common'
 import { delayTime } from '@/settings'
 import {
-  HandlePages,
   lock,
   parseTime,
   showCityGroupPerson,
@@ -454,66 +479,36 @@ interface PageObj {
 interface IState {
   [key: string]: any;
 }
+const enum CarNoCheck {
+  oil = '/^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领 A-Z]{1}[A-HJ-NP-Z]{1}[A-Z0-9]{4}[A-Z0-9挂学警港澳]{1}$/',
+  electric = '/[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领 A-Z]{1}[A-HJ-NP-Z]{1}(([0-9]{5}[DF])|([DF][A-HJ-NP-Z0-9][0-9]{4}))$/'
+}
 @Component({
   name: 'createCar',
   components: {
     SelfForm,
     SelfTable,
     SelfDialog,
-    SectionContainer
+    SectionContainer,
+    sendMessage
   }
 })
 export default class extends Vue {
   private myHeaders: any = { Authorization: UserModule.token };
   private picList: object[] = [];
-  handleAvatarSuccess(index: number, type?: string) {
-    let that = this
-    return function(this: any, pres: any, file: any, fileList: any) {
-      if (type) {
-        that.$nextTick(() => {
-          (that.queryInfo as any).picInfo.drivingLicense.splice(
-            index,
-            1,
-            URL.createObjectURL(file.raw)
-          )
-        })
-      } else {
-        if (index < 3) {
-          that.$nextTick(() => {
-            (that.queryInfo as any).picInfo.carPic.splice(
-              index,
-              1,
-              URL.createObjectURL(file.raw)
-            )
-          })
-        } else {
-          setTimeout(() => {
-            that.picList = fileList
-          }, 400)
-        }
-      }
-    }
-  }
-  beforeAvatarUpload(file: any) {
-    const isJPG = file.type === 'image/jpeg' || 'image/jpg' || 'image/png'
-    const isLt5M = file.size / 1024 / 1024 < 5
+  private proxyData:string = ''
 
-    if (!isJPG) {
-      this.$message.error('上传头像图片只能是 JPG 格式!')
-    }
-    if (!isLt5M) {
-      this.$message.error('上传头像图片大小不能超过 5MB!')
-    }
-    return isJPG && isLt5M
-  }
-
-  handleRemove(file: any) {
-    let id = file.uid
-    let arr = this.picList.filter((ele: any) => {
-      return id !== ele.uid
-    })
-    this.picList.splice(0, this.picList.length)
-    this.picList.push(...arr)
+  private showSend:boolean = false
+  private changeData:IState = {
+    oldData: [
+      { name: '车主类型', value: '个人' },
+      { name: '车主姓名', value: '李威山' }
+    ],
+    newData: [
+      { name: '车主类型', value: '公司' },
+      { name: '联系人姓名', value: '李岸婷' },
+      { name: '公司名称', value: '北京驿路星辰' }
+    ]
   }
 
   private disabled: boolean = false;
@@ -539,6 +534,14 @@ export default class extends Vue {
     { label: '运营', value: 0 },
     { label: '非运营', value: 1 }
   ];
+
+  private passObj:IState = {
+    base: false,
+    owner: false,
+    expand: false,
+    pic: false,
+    sell: false
+  }
 
   // 基本信息
   private queryInfo: any = {
@@ -626,7 +629,7 @@ export default class extends Vue {
         tagAttrs: {
           'default-expanded-keys': true,
           'default-checked-keys': true,
-          'node-key': 'householdProvince',
+          'node-key': 'carCity',
           placeholder: '车辆所在城市',
           props: {
             lazy: true,
@@ -653,7 +656,10 @@ export default class extends Vue {
         type: 4,
         options: this.carKindTypeOptions,
         label: '车辆类型',
-        key: 'carKindType'
+        key: 'carKindType',
+        listeners: {
+          change: this.kindChange
+        }
       },
       {
         type: 1,
@@ -787,7 +793,8 @@ export default class extends Vue {
       {
         type: 'carPic',
         slot: true,
-        label: '车辆图片'
+        label: '车辆图片',
+        key: 'carPic'
       },
       {
         type: 'carText',
@@ -796,7 +803,8 @@ export default class extends Vue {
       {
         type: 'carVideo',
         slot: true,
-        label: '车辆信息'
+        label: '车辆信息',
+        key: 'carVideo'
       },
       {
         type: 'videoText',
@@ -805,7 +813,8 @@ export default class extends Vue {
       {
         type: 'drivingLicense',
         slot: true,
-        label: '行驶证照片'
+        label: '行驶证照片',
+        key: 'drivingLicense'
       },
       {
         type: 1,
@@ -824,7 +833,10 @@ export default class extends Vue {
         type: 4,
         options: this.carNatureOptions,
         label: '车辆性质',
-        key: 'carNature'
+        key: 'carNature',
+        listeners: {
+          change: this.changeCarNature
+        }
       },
       // {
       //   type: 1,
@@ -847,7 +859,10 @@ export default class extends Vue {
         type: 5,
         options: [{ label: '', value: 0 }],
         label: '挂靠',
-        key: 'subordinate'
+        key: 'subordinate',
+        tagAttrs: {
+          disabled: true
+        }
       },
       {
         type: 5,
@@ -881,6 +896,7 @@ export default class extends Vue {
       }
     ]
   };
+
   private rule: IState = {
     baseRule: {
       leaseType: [
@@ -891,9 +907,10 @@ export default class extends Vue {
       ],
       brand: [{ required: true, message: '请选择品牌', trigger: 'blur' }],
       carType: [{ required: true, message: '请选择车型', trigger: 'blur' }],
+      carKindType: [{ required: true, message: '请选择车辆类型', trigger: 'blur' }],
       plateNo: [
         { required: true, message: '请输入车牌号', trigger: 'blur' },
-        { validator: this.checkPlateNo, trigger: 'blur' }
+        { validator: this.checkPlateNo, trigger: ['change', 'blur'] }
       ],
       saveCity: [
         { required: true, message: '请选择注册城市', trigger: 'blur' }
@@ -907,38 +924,55 @@ export default class extends Vue {
       carsType: [
         { required: true, message: '请选择车主类型', trigger: 'change' }
       ],
-      carsphone: [{ validator: this.checkPhone, trigger: 'blur' }]
+      carphone: [
+        { required: true, message: '请填写车主手机号', trigger: 'change' },
+        { validator: this.checkPhone, trigger: 'blur' }
+      ],
+      carname: [
+        { required: true, message: '请填写车主姓名', trigger: 'change' }
+      ],
+      companypeoplename: [
+        { required: true, message: '请填写联系人姓名', trigger: 'change' }
+      ],
+      companyname: [
+        { required: true, message: '请填写公司姓名', trigger: 'change' }
+      ],
+      companyphone: [
+        { required: true, message: '请填写联系人姓名', trigger: 'change' },
+        { validator: this.checkPhone, trigger: 'blur' }
+      ]
     },
     salesRule: {
-      money: [{ required: true, message: '请输入意向售价', trigger: 'blur' }],
+      money: [{ required: true, message: '请输入意向售价', trigger: 'change' }],
       leasemoney: [
         { required: true, message: '请输入意向租金', trigger: 'change' }
       ],
       quartermoney: [
-        { required: true, message: '请输入季租租金', trigger: 'blur' }
+        { required: true, message: '请输入季租租金', trigger: 'change' }
       ],
       helfyearmoney: [
-        { required: true, message: '请输入半年租租金', trigger: 'blur' }
+        { required: true, message: '请输入半年租租金', trigger: 'change' }
       ],
       yearmoney: [
-        { required: true, message: '请输入年租租金', trigger: 'blur' }
+        { required: true, message: '请输入年租租金', trigger: 'change' }
       ],
       littermoney: [
-        { required: true, message: '请输入最短租期', trigger: 'blur' }
+        { required: true, message: '请输入最短租期', trigger: 'change' }
       ]
     },
     picRule: {
       carPic: [
-        { required: true, message: '请上传车辆图片', trigger: 'blur' },
-        { validator: this.checkCarPic, trigger: 'blur' }
+        { required: true, message: '请上传车辆图片' },
+        { validator: this.checkCarPic }
       ],
       drivingLicense: [
-        { required: true, message: '请选择上传行驶证', trigger: 'blur' }
+        { required: true, message: '请选择上传行驶证' },
+        { validator: this.checkDrivingLicense }
       ]
     },
     expandRule: {
       carNature: [
-        { required: true, message: '请选择车辆性质', trigger: 'blur' }
+        { required: true, message: '请选择车辆性质', trigger: 'change' }
       ]
     }
   };
@@ -967,13 +1001,58 @@ export default class extends Vue {
     }
     return arr
   }
+
+  get expandTypes() {
+    let item = this.queryItem.expandItem
+    let arr = []
+    if (this.queryInfo.baseInfo.leaseType === 0) {
+      arr = item.filter((ele:any) => ele.key !== 'jishou')
+    } else if (this.queryInfo.baseInfo.leaseType === 1) {
+      arr = item.filter((ele:any) => ele.key !== 'jizu')
+    } else if (this.queryInfo.baseInfo.leaseType === 2) {
+      arr = item
+    } else {
+      arr = item.filter((ele:any) => (ele.key !== 'jizu' && ele.key !== 'jishou'))
+    }
+    return arr
+  }
+
+  get canClick() {
+    const copyData = JSON.stringify(this.proxyData)
+    const realData = JSON.stringify(this.queryInfo)
+    if ((copyData === realData) && this.picList.length === 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  get canSend() {
+    let passArr = Object.values(this.passObj)
+    // return !passArr.some(ele => !ele)
+    return passArr.some(ele => ele)
+  }
+
   times: number = 10;
 
   private checkPlateNo(rule: any, value: any, callback: any) {
-    if (carNoRegExpBest.test(value)) {
-      callback()
-    } else {
-      callback(new Error('请输入正确车牌号'))
+    console.log('has check')
+    if (this.queryInfo.baseInfo.carKindType === '') {
+      callback(new Error('请先选择车辆类型'))
+    } else if (this.queryInfo.baseInfo.carKindType === 0) {
+      let rule:CarNoCheck = CarNoCheck.oil
+      if (new RegExp(rule).test(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确油车车牌号'))
+      }
+    } else if (this.queryInfo.baseInfo.carKindType === 1) {
+      let rule:CarNoCheck = CarNoCheck.electric
+      if (new RegExp(rule).test(value)) {
+        callback()
+      } else {
+        callback(new Error('请输入正确电车车牌号'))
+      }
     }
   }
 
@@ -986,11 +1065,28 @@ export default class extends Vue {
   }
 
   private checkCarPic(rule: any, value: any, callback: any) {
-    console.log(value, 'value')
-    if (phoneRegExp.test(value)) {
+    let picArr = value.filter((ele:any) => ele !== '')
+    if (picArr.length === 3) {
       callback()
     } else {
-      callback(new Error('请输入手机号'))
+      if (picArr.length === 0) {
+        callback(new Error('请上传车辆图片'))
+      } else {
+        callback(new Error('车辆图片最少上传三张'))
+      }
+    }
+  }
+
+  private checkDrivingLicense(rule: any, value: any, callback: any) {
+    let picArr = value.filter((ele:any) => ele !== '')
+    if (picArr.length === 2) {
+      callback()
+    } else {
+      if (picArr.length === 0) {
+        callback(new Error('请上传行驶证照片'))
+      } else {
+        callback(new Error('行驶证照片请上传正反两张'))
+      }
     }
   }
 
@@ -1011,14 +1107,88 @@ export default class extends Vue {
     }
   }
 
-  private checkAll() {
-    (this.$refs['baseInfoForm'] as any).submitForm();
-    (this.$refs['ownerInfoForm'] as any).submitForm();
-    (this.$refs['sellInfoForm'] as any).validate((valid: boolean) => {
-      console.log(valid)
-    });
-    (this.$refs['picInfoForm'] as any).submitForm();
-    (this.$refs['expandInfoForm'] as any).submitForm()
+  private kindChange(val: number) {
+    (this.$refs['baseInfoForm'] as any).validateField('plateNo', (errorMessage: string) => {
+      console.log(errorMessage)
+    })
+  }
+
+  private changeCarNature(val: number) {
+    if (val === 0) {
+      this.queryInfo.expandInfo.subordinate = true
+    } else {
+      this.queryInfo.expandInfo.subordinate = false
+    }
+  }
+
+  private sureSend() {
+    console.log('sendApi')
+  }
+
+  handleAvatarSuccess(index: number, type?: string) {
+    let that = this
+    return function(this: any, pres: any, file: any, fileList: any) {
+      if (type) {
+        that.$nextTick(() => {
+          (that.queryInfo as any).picInfo.drivingLicense.splice(
+            index,
+            1,
+            URL.createObjectURL(file.raw)
+          )
+        })
+      } else {
+        if (index < 3) {
+          that.$nextTick(() => {
+            (that.queryInfo as any).picInfo.carPic.splice(
+              index,
+              1,
+              URL.createObjectURL(file.raw)
+            )
+          })
+        } else {
+          setTimeout(() => {
+            that.picList = fileList
+          }, 400)
+        }
+      }
+    }
+  }
+  beforeAvatarUpload(file: any) {
+    const isJPG = file.type === 'image/jpeg' || 'image/jpg' || 'image/png'
+    const isLt5M = file.size / 1024 / 1024 < 5
+
+    if (!isJPG) {
+      this.$message.error('上传头像图片只能是 JPG 格式!')
+    }
+    if (!isLt5M) {
+      this.$message.error('上传头像图片大小不能超过 5MB!')
+    }
+    return isJPG && isLt5M
+  }
+
+  handleRemove(file: any) {
+    let id = file.uid
+    let arr = this.picList.filter((ele: any) => {
+      return id !== ele.uid
+    })
+    this.picList.splice(0, this.picList.length)
+    this.picList.push(...arr)
+  }
+
+  private basePass(val:boolean) {
+    this.passObj.base = val
+  }
+
+  private ownerPass(val:boolean) {
+    this.passObj.owner = val
+  }
+
+  private expandPass(val:boolean) {
+    this.passObj.expand = val
+  }
+
+  private picPass(val:boolean) {
+    this.passObj.pic = val
   }
 
   private listLoading: boolean = false;
@@ -1090,6 +1260,26 @@ export default class extends Vue {
     }
   }
 
+  goBack() {
+    this.$router.go(-1)
+  }
+
+  private checkAll() {
+    this.showSend = true;
+    (this.$refs['ownerInfoForm'] as any).submitForm();
+    (this.$refs['baseInfoForm'] as any).submitForm()
+    if (this.queryInfo.baseInfo.leaseType !== '') {
+      (this.$refs['sellInfoForm'] as any).validate((valid:boolean) => {
+        this.passObj.sell = valid
+      })
+    }
+    (this.$refs['picInfoForm'] as any).submitForm();
+    (this.$refs['expandInfoForm'] as any).submitForm()
+    if (this.canSend) {
+      console.log(this.queryInfo, this.picList)
+    }
+  }
+
   /**
    * 获取options
    */
@@ -1112,6 +1302,7 @@ export default class extends Vue {
     }
   }
   init() {
+    this.proxyData = JSON.parse(JSON.stringify(this.queryInfo))
     this.getOptions()
   }
   activated() {
@@ -1157,6 +1348,10 @@ export default class extends Vue {
     align-items: center;
   }
   .btnBox {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
     width: 100%;
     text-align: center;
     height: 100px;
@@ -1178,7 +1373,6 @@ export default class extends Vue {
 .createCar .tableBox ::v-deep .el-table tbody tr:hover > td {
   background-color: white !important;
 }
-
 .createCar ::v-deep .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -1199,7 +1393,7 @@ export default class extends Vue {
   height: 120px;
 }
 .createCar .picForm ::v-deep .el-form div:nth-child(-n + 4) .el-form-item {
-  margin-bottom: 0;
+  // margin-bottom: 0;
 }
 .createCar {
   .avatar-uploader .el-upload:hover {
