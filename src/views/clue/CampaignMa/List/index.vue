@@ -666,6 +666,7 @@ export default class extends Vue {
             label: item.dictLabel
           }
         })
+        debugger
         this.regionList.push(...nodes)
       }
     } catch (err) {
@@ -676,7 +677,7 @@ export default class extends Vue {
   async cityDetail() {
     this.cityList.push({
       value: 0,
-      label: '全部'
+      label: '全部城市'
     })
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
