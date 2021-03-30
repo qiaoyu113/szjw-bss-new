@@ -19,7 +19,7 @@ import RedundantLine from './RedundantLine.vue'
   }
 })
 export default class extends Vue {
-  private active: string = '1'
+  private active: string = '0'
   mounted() {}
 }
 </script>

@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 let prefix2 = '/mock/237'
 let prefix3 = '/mock/153'
+const produce = '/line_center'
 // 基础
 export const awitDetail = (params: any) =>
   request({
@@ -56,20 +57,34 @@ export const getFinishedMoreLine = (data :any) => {
 // 获取an余线路列表
 export const getReaundanLineList = (data:any) =>
   request({
-    url: '/mock/153/get/agent/list',
+    url: `${produce}/v3/line/shelf/maintenance/queryLineListByConditionsQuery`,
     method: 'post',
     data
   })
 // 忽略 批量忽略线路
 export const passLine = (data:any) =>
   request({
-    url: '/mock/153/pass/RedundantlineIgnored',
+    url: `${produce}/v3/line/lineShelf/batchIgnoreToDo`,
     method: 'post',
     data
   })
+  // 批量下架代办
 export const offShelf = (data:any) =>
   request({
-    url: '/mock/153/redundant/offshelf',
+    url: `${produce}/v3/line/lineShelf/batchShelfToDo`,
     method: 'post',
     data
   })
+// 检查新线维护待办
+
+export const checkNewlineTodo = (data:any) =>
+  request({
+    url: `${produce}/v3/line/lineShelf/checkTheNewLineMaintenance`,
+    method: 'post',
+    data
+  })
+
+// 下一个代办维护
+export const nextNewLineTodo = () => request({
+  url: `${produce}/v3/line/shelf/maintenance/nextNewLineMaintenance`
+})

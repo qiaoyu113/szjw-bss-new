@@ -10,7 +10,7 @@
         class="curation-row"
       >
         <el-col
-          v-for="(item,index) in ImgArr"
+          v-for="(item,index) in imgArr"
           :key="index"
           :span="6"
           class="curation-col"
@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -85,6 +85,7 @@ import VideoWeb from '../components/VideoWeb.vue'
   }
 })
 export default class extends Vue {
+  @Prop({ default: () => [] }) imgArr!:Array<any>
   showImgViewer = false
   private hasShowVideo = false
   imgPreviewList = [
@@ -97,7 +98,7 @@ export default class extends Vue {
   private curationItem = [
     {
       type: 7,
-      label: '仓名称:',
+      label: '仓名称',
       key: 'warehouseName',
       col: 4,
       tagAttrs: {
@@ -106,7 +107,7 @@ export default class extends Vue {
     },
     {
       type: 7,
-      label: '仓位置:',
+      label: '仓位置',
       key: 'warehouseAreaName',
       col: 4,
       tagAttrs: {
@@ -114,23 +115,9 @@ export default class extends Vue {
       }
     }
   ]
-  private ImgArr = [
-    {
-      imgArr: ['https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-        'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
-      ],
-      tiele: '仓库图片'
-    },
-    {
-      imgArr: [],
-      tiele: '货物图片'
-    }, {
-      imgArr: [],
-      tiele: '装货图片'
-    }
-  ]
+
   showImghandel(index:number) {
-    this.imgPreviewList = this.ImgArr[index].imgArr
+    this.imgPreviewList = this.imgArr[index].imgArr
     this.showImgViewer = true
   }
   private baseInfo = {

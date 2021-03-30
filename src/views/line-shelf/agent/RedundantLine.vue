@@ -135,7 +135,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'lindName',
+      key: 'key',
       label: '线路名称：',
       tagAttrs: {
         placeholder: '请输入名称/编号'
@@ -154,7 +154,7 @@ export default class extends Vue {
   ]
   formData = {
     agentId: '',
-    lindName: '',
+    key: '',
     time: []
   }
   columns = [
@@ -317,10 +317,14 @@ export default class extends Vue {
       const params:any = {}
       params.page = this.page.page
       params.limit = this.page.limit
+      params.agentStatus = 1
+      const { key, agentId } = this.formData
+      key && (params.key = key)
+      agentId && (params.agentId = agentId)
       const timeArr = this.formData.time
       if (timeArr && timeArr.length === 2) {
-        params.startDate = timeArr[0]
-        params.endDate = timeArr[1]
+        params.startCreateDate = timeArr[0]
+        params.endCreateDate = timeArr[1]
       }
       const { data } = await getReaundanLineList(params)
       this.tableData = data.data
