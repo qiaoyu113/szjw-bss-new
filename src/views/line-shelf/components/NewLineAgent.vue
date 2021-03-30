@@ -41,7 +41,10 @@
           :list-query="baseInfo"
         />
       </section-container>
-      <CuratorialInformation :img-arr="imgArr" />
+      <CuratorialInformation
+        :img-arr="imgArr"
+        :depot-curation="depotCuration"
+      />
       <section-container title="标签信息">
         <el-form
           ref="lineFormRef"
@@ -49,6 +52,7 @@
           :rules="rules"
           class="lable-form"
           label-width="80px"
+          @validate="dfasdsad"
         >
           <el-row>
             <el-col :span="6">
@@ -95,7 +99,7 @@
 
                 <el-select
                   v-model="form.labelType"
-                  placeholder="请选择活动区域"
+                  placeholder="请选择"
                 >
                   <el-option
                     v-for="item in labelTypeArr"
@@ -185,7 +189,11 @@
           label-position="top"
           :form-item="deliveryDemandItme"
           :list-query="baseInfo"
-        />
+        >
+          <template #deliveryWeekCycle="scope">
+            {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate }}
+          </template>
+        </self-form>
       </section-container>
       <section-container title="货物信息">
         <self-form
@@ -239,32 +247,50 @@
         @closed="handleClosed"
       >
         <div style="margin: 20px 0">
-          提示：检查不通过后，外线销售在H5的线路管理中操作“激活线路”，提交后需要再次检查线路
+          <el-link
+            :underline="false"
+            type="primary"
+          >
+            提示：检查不通过后，外线销售在H5的线路管理中操作“激活线路”，提交后需要再次检查线路
+          </el-link>
         </div>
         <el-form
-          ref="ruleForm"
+          ref="ruleFormRef"
           :model="dialogForm"
           :rules="rules"
           :label-width="'60px'"
         >
           <el-form-item
-            label="原因"
+            label="原因（多选）"
             prop="type"
           >
             <el-checkbox-group v-model="dialogForm.type">
               <el-checkbox
-                label="0"
+                label="1"
                 name="type"
               >
                 项目策展信息(卖点、爆款、肥瘦、万金油)
               </el-checkbox>
               <el-checkbox
-                label="1"
+                label="2"
                 name="type"
               >
                 线路基础信息(除策展信息)
               </el-checkbox>
             </el-checkbox-group>
+          </el-form-item>
+          <el-form-item
+            label="备注"
+            prop="rejectionReasons"
+            style="margin-top:30px"
+          >
+            <el-input
+              v-model="dialogForm.rejectionReasons"
+              placeholder="如 仓库图片/货物图片不合格"
+              type="textarea"
+              maxlength="150"
+              show-word-limit
+            />
           </el-form-item>
         </el-form>
       </SelfDialog>
@@ -285,6 +311,7 @@ import {
   nextNewLineTodo
 } from '@/api/line-shelf'
 import { GetDictionary } from '@/api/common'
+import { detailByUserId } from '@/api/driver-account'
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -339,7 +366,8 @@ export default class extends Vue {
     }
   ]
   private baseInfo = {
-    checkbox: 'fadfas'
+    checkbox: 'fadfas',
+    distance: ''
   }
   private listQuery = {}
   private hasOption = [
@@ -419,9 +447,10 @@ export default class extends Vue {
   private deliveryInfo = {}
   private deliveryDemandItme = [
     {
-      type: 7,
+      type: 'deliveryWeekCycle',
       label: '配送时间',
-      key: 'deliveryWeekCycle'
+      key: 'deliveryWeekCycle',
+      slot: true
       // slot deliveryStartDate deliveryEndDate
     },
     {
@@ -465,7 +494,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '是否需要搬运',
-      key: 'carry'
+      key: 'carry',
+      filterText: '是:否'
     },
     {
       type: 7,
@@ -534,15 +564,17 @@ export default class extends Vue {
     }
   ]
   showDialog: boolean = false
-  dialogForm = {
-    type: []
+  private dialogForm = {
+    type: [],
+    rejectionReasons: ''
   }
   rules = {
-    type: [{ required: true, message: '请填写活动形式', trigger: 'blur' }],
-    isHot: [{ required: true, message: '请填写活动形式', trigger: 'blur' }],
-    labelType: [{ required: true, message: '请填写活动形式', trigger: 'blur' }],
-    isPanacea: [{ required: true, message: '请填写活动形式', trigger: 'blur' }],
-    sellPoint: [{ required: true, message: '请填写活动形式', trigger: 'blur' }]
+    type: [{ required: true, message: '请选择拒绝原因', trigger: 'blur' }],
+    isHot: [{ required: true, message: '请选择是否爆款', trigger: 'blur' }],
+    labelType: [{ required: true, message: '请选择线路标签', trigger: 'blur' }],
+    isPanacea: [{ required: true, message: '请选择是否万金油', trigger: 'blur' }],
+    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }],
+    rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
   }
   page = {
     limit: 1,
@@ -564,41 +596,68 @@ export default class extends Vue {
   // 检查不通过
   async confirm(this: any) {
     try {
-      await this.$refs['ruleForm'].validate()
+      await this.$refs['ruleFormRef'].validate()
       await this.checkNewlineSure('3', () => {
         this.showDialog = false
         this.getLineDetail()
         this.dialogForm = { type: [] }
+        this.$message({
+          type: 'success',
+          message: '操作成功'
+        })
       })
     } catch (error) {
+      debugger
+      // this.scrollTo()
+      // console.log('fdsafdasd')
       console.log(error)
+    } finally {
+      console.log('fsdf')
     }
   }
-  handleClosed() {}
+  dfasdsad(e:string, s:boolean) {
+    if (!s) {
+      this.scrollTo(300)
+    }
+  }
+  handleClosed(this:any) {
+    this.$refs['ruleFormRef'].resetFields()
+    this.dialogForm = {
+      type: [],
+      rejectionReasons: ''
+    }
+    console.log('fdsaf')
+  }
   // 检查通过
-  async checkSuccess(this: any) {
+  async checkSuccess(this: any, checkType:string) {
     try {
       await this.$refs['lineFormRef'].validate()
-      await this.checkNewlineSure('3')
-      this.$message({
-        type: 'success',
-        message: '检查通过'
+      await this.checkNewlineSure(checkType, () => {
+        this.$message({
+          type: 'success',
+          message: '操作成功'
+        })
+        this.$refs['lineFormRef'].resetFields()
+        this.getLineDetail()
       })
-      this.$refs['lineFormRef'].resetFields()
-      this.getLineDetail()
     } catch (error) {
       console.log(error)
     }
   }
   // 滚动到页面顶部
-  scrollTo() {
+  scrollTo(num:number = 0) {
     const ele: any = document.querySelector('.app-main')
-    ele.scrollTo({ top: 0, behavior: 'smooth' })
+    ele.scrollTo({ top: num, behavior: 'smooth' })
   }
   private isSkip = false
-  private labelTypeArr = []
-  private queryId = {}
-  private hasAgent = true
+  private labelTypeArr = [] // 线路标签
+  private queryId = {} // ID
+  private hasAgent = true // 是否有代办
+  private depotCuration = { // 仓策展信息
+    warehouseName: '',
+    warehouseDistrict: '',
+    videoUrl: ''
+  } // 视频地址
   // 获取详情数据
   async getLineDetail() {
     try {
@@ -610,6 +669,7 @@ export default class extends Vue {
         })
       }
       const { agentId, lineId, projectId } = data.data
+      // 是否有代办
       if (agentId === null) {
         this.hasAgent = true
         return
@@ -625,25 +685,37 @@ export default class extends Vue {
         }
       )
       this.baseInfo = data.data.lineDetailVO
-      const { isHot, isPanacea, labelType } = data.data.lineDetailVO
+      this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
+      const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict } = data.data.lineDetailVO
+      // 获取图片信息
       const {
         sellPoint,
         cargoUrl, // 货物图片
         loadingPictureUrl, // zhunghuo
-        sellPointName,
-        warehousePictureUrl // cangweiz
+        warehousePictureUrl, // cangweiz
+        videoUrl
       } = data.data.projectStrategyInfoVO
       const imgList = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
       this.imgArr.forEach((item, index) => {
         item.imgArr = imgList[index]
       })
+      // 获取视频信息
+      this.depotCuration = {
+        warehouseName,
+        warehouseDistrict,
+        videoUrl
+      }
+      // 仓名称
 
+      // 获取标签信息
       const object = {
         isHot,
         isPanacea,
         labelType,
-        sellPoint: sellPoint.split(',')
+        // 处理字符串为空
+        sellPoint: sellPoint === '' ? [] : sellPoint.split(',')
       }
+      object.sellPoint = object.sellPoint.map((item:string) => Number(item))
       this.form = object
       // 页面滚动到具体的位置
       this.scrollTo()
@@ -685,20 +757,20 @@ export default class extends Vue {
   // 检查新线维护代办
   async checkNewlineSure(checkType: string, callBack:Function) {
     try {
-      const params: any = Object.assign({ checkType }, this.queryId)
-      const { isHot, labelType, isPanacea, sellPoint } = this.form
-      debugger
-      isHot && (params.isHot = isHot)
-      labelType && (params.labelType = labelType)
-      isPanacea && (params.isPanacea = isPanacea)
-      sellPoint && (params.sellPoint = sellPoint.join(','))
+      const params: any = Object.assign({ checkType }, this.queryId, this.form)
+      // const { isHot, labelType, isPanacea, sellPoint } = this.form
+      // isHot && (params.isHot = isHot)
+      // labelType && (params.labelType = labelType)
+      // isPanacea && (params.isPanacea = isPanacea)
+      // sellPoint && (params.sellPoint = sellPoint)
       // 检查不通过
       if (checkType === '3') {
         const rejectionReasons = this.dialogForm.type
-        params.rejectionReasons = rejectionReasons.join(',')
+        params.rejectionReasons = this.dialogForm.rejectionReasons// beiz
         params.rejectionReasonsType =
           rejectionReasons.length === 2 ? 3 : rejectionReasons.join(',')
       }
+
       const { data } = await checkNewlineTodo(params)
       if (data.success) {
         callBack()

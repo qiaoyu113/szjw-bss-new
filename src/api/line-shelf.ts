@@ -64,22 +64,28 @@ export const getReaundanLineList = (data:any) =>
 // 忽略 批量忽略线路
 export const passLine = (data:any) =>
   request({
-    url: `${produce}/v3/line/lineShelf/batchIgnoreToDo`,
+    url: `${produce}/v3/line/shelf/maintenance/batchIgnoreToDo`,
     method: 'post',
-    data
+    data,
+    params: {
+      logoType: 1
+    }
   })
   // 批量下架代办
 export const offShelf = (data:any) =>
   request({
-    url: `${produce}/v3/line/lineShelf/batchShelfToDo`,
-    method: 'post',
+    url: `${produce}/v3/line/shelf/maintenance/batchShelfToDo?logoType=1`,
+    method: 'POST',
     data
+    // params: {
+    //   logoType: 1
+    // }
   })
 // 检查新线维护待办
 
 export const checkNewlineTodo = (data:any) =>
   request({
-    url: `${produce}/v3/line/lineShelf/checkTheNewLineMaintenance`,
+    url: `${produce}/v3/line/shelf/maintenance/checkTheNewLineMaintenance`,
     method: 'post',
     data
   })

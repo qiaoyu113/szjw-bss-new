@@ -2,8 +2,9 @@
   <div>
     <section-container title="仓策展信息">
       <self-form
+        label-position="top"
         :form-item="curationItem"
-        :list-query="baseInfo"
+        :list-query="depotCuration"
       />
       <el-row
         :gutter="10"
@@ -20,7 +21,7 @@
             <div class="img-container">
               <template v-if="item.imgArr[0]">
                 <img
-                  :src="item.imgArr[1]"
+                  :src="item.imgArr[0]"
                   alt=""
                   @click="showImghandel(index)"
                 >
@@ -42,7 +43,7 @@
           class="curation-col"
         >
           <div class="curation-title">
-            <span>讲解视频(1)</span>
+            <span>讲解视频</span>
             <div :class="{'video-box': true ,'no-video-box': !hasvideo}">
               <div
                 v-if="hasvideo"
@@ -63,8 +64,9 @@
       :url-list="imgPreviewList"
     />
     <VideoWeb
+      v-if="hasvideo"
       :show.sync="hasShowVideo"
-      :video-src="videoSrc"
+      :video-src="hasvideo"
     />
   </div>
 </template>
@@ -86,6 +88,7 @@ import VideoWeb from '../components/VideoWeb.vue'
 })
 export default class extends Vue {
   @Prop({ default: () => [] }) imgArr!:Array<any>
+  @Prop({ default: () => {} })depotCuration!:any
   showImgViewer = false
   private hasShowVideo = false
   imgPreviewList = [
@@ -100,7 +103,6 @@ export default class extends Vue {
       type: 7,
       label: '仓名称',
       key: 'warehouseName',
-      col: 4,
       tagAttrs: {
         class: 'active'
       }
@@ -108,8 +110,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '仓位置',
-      key: 'warehouseAreaName',
-      col: 4,
+      key: 'warehouseDistrict',
+
       tagAttrs: {
         class: 'active'
       }
@@ -127,9 +129,8 @@ export default class extends Vue {
   showVideo() {
     this.hasShowVideo = true
   }
-  videoSrc= 'https://vd4.bdstatic-0-576e575c3a53ac79f45327bf8965761a&bcevod_channel=searchbox_feed&pd=1&pt=3&abtest=3000159_2'
   get hasvideo() {
-    return this.videoSrc
+    return this.depotCuration.videoUrl
   }
 }
 </script>
