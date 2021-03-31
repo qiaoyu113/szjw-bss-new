@@ -50,7 +50,7 @@
         :page="page"
         :operation-list="[]"
         row-key="a"
-        @onPageSize="getList"
+        @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
         <template #lineId="scope">
@@ -247,6 +247,11 @@ export default class extends Vue {
   private handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
+  handlePageSize(page:any) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    this.getList()
+  }
   private agentIds:Array<any> = []
   // 批量下架
   batchOffShelfHandler() {
@@ -303,7 +308,6 @@ export default class extends Vue {
       str = `已选择${num}条线路`
       title = '批量忽略线路'
       arr = this.multipleSelection.map((item:any) => item.agentId)
-      debugger
     }
     const err = await this.$confirm(str, title, {
       confirmButtonText: '确定',
