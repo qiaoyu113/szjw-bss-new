@@ -57,13 +57,14 @@
         <template v-slot:lineName="scope">
           <span
             style="color:#649CEE"
-            @click="goLineDteails(scope.row.id)"
-          >线路名称{{ scope.row.id }}</span>
+            @click="goLineDteails(scope.row.lineId)"
+          >线路名称{{ scope.row.lineId }}</span>
         </template>
 
         <template v-slot:agentStatus="scope">
-          <span v-if="scope.row.agentStatus!==1"> 忽略</span>
-          <span v-else> 已下架</span>
+          <span v-if="scope.row.agentStatus===1"> 已下架</span>
+          <span v-if="scope.row.agentStatus===2"> 忽略</span>
+          <span v-else />
         </template>
 
         <template v-slot:shelvesReasons="scope">
@@ -91,6 +92,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
 import { getFinishedMoreLine } from '@/api/line-shelf'
+import { getLanguage } from '@/utils/cookies'
 interface IState {
   [key: string]: any;
 }
@@ -109,9 +111,9 @@ export default class extends Vue {
   private tableData: any[] = [];
   private active: number = 0;
    private status: any[] = [
-     { label: '全部', value: 2, num: '' },
-     { label: '下架', value: 3, num: '' },
-     { label: '忽略', value: 4, num: '' }
+     { label: '全部', value: '', num: '' },
+     { label: '下架', value: 1, num: '' },
+     { label: '忽略', value: 2, num: '' }
    ];
   private listQuery: IState = {
     agentId: '', // 待办ID
@@ -145,21 +147,27 @@ export default class extends Vue {
     try {
       let params: any = {
         limit: this.page.limit,
-        page: this.page.page
+        page: this.page.page,
+        processingStatus: 0
       }
       if (this.listQuery.agencyTime && this.listQuery.agencyTime.length > 1) {
-        params.startDate = new Date(this.listQuery.agencyTime[0]).setHours(0, 0, 0)
-        params.endDate = new Date(this.listQuery.agencyTime[1]).setHours(23, 59, 59)
+        params.startUpdateDate = new Date(this.listQuery.agencyTime[0]).setHours(0, 0, 0)
+        params.endUpdateDate = new Date(this.listQuery.agencyTime[1]).setHours(23, 59, 59)
       }
       this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
-      this.listQuery.lineId !== '' && (params.lineId = this.listQuery.lineId)
-      this.listQuery.checkStatus !== '' && (params.inspectionStatus = this.listQuery.checkStatus)
+      this.listQuery.lineName !== '' && (params.key = this.listQuery.lineName)
+      this.listQuery.checkStatus !== '' && (params.agentStatus = this.listQuery.checkStatus)
       let { data: res } = await getFinishedMoreLine(params)
+      console.log(params)
+
       if (res.success) {
         this.listLoading = false
         this.tableData = res.data
+        this.status[0].num = res.title.all
+        this.status[1].num = res.title.removeShelvesNum
+        this.status[2].num = res.title.ignoreNum
       } else {
-        this.$message.error('出错逻辑')
+        this.$message.error('数据无法访问')
       }
     } catch (err) {
       console.log(`get lists fail:`, err)

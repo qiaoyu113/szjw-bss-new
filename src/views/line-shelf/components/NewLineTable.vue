@@ -120,8 +120,8 @@ export default class extends Vue {
   private tableData: any[] = [];
   // 检查状态按钮
   private status: any[] = [
-    { label: '全部', value: '', num: '999+' },
-    { label: '检查通过', value: 2, num: '88+' },
+    { label: '全部', value: '', num: '' },
+    { label: '检查通过', value: 2, num: '' },
     { label: '检查不通过', value: 3, num: '' }
   ];
 
@@ -160,24 +160,27 @@ export default class extends Vue {
       try {
         let params: any = {
           limit: this.page.limit,
-          page: this.page.page
+          page: this.page.page,
+          inspectionStatus: 4
         }
         if (this.listQuery.agencyTime && this.listQuery.agencyTime.length > 1) {
           params.startDate = new Date(this.listQuery.agencyTime[0]).setHours(0, 0, 0)
           params.endDate = new Date(this.listQuery.agencyTime[1]).setHours(23, 59, 59)
-          console.log(params.startDate, params.endDate)
         }
         this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
-        this.listQuery.lineId !== '' && (params.lineId = this.listQuery.lineId)
-        this.listQuery.linePhone !== '' && (params.linePhone = this.listQuery.linePhone)
+        this.listQuery.lineId !== '' && (params.key = this.listQuery.lineId)
         this.listQuery.checkStatus !== '' && (params.inspectionStatus = this.listQuery.checkStatus)
-        this.listQuery.result !== '' && (params.rejectionReasonsType = this.listQuery.result)
+        this.listQuery.result !== '' && (params.rejectionReasons = this.listQuery.result)
         let { data: res } = await getFinishedLine(params)
+
         if (res.success) {
           this.listLoading = false
           this.tableData = res.data
+          this.status[0].num = res.title.all
+          this.status[1].num = res.title.passedNum
+          this.status[2].num = res.title.failedNum
         } else {
-          this.$message.error('出错逻辑')
+          this.$message.error('出错逻辑  tab详情页接口问题')
         }
       } catch (err) {
         console.log(`get lists fail:`, err)

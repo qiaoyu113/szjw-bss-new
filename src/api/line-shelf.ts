@@ -33,11 +33,14 @@ export const goods = (params: any) =>
     method: 'get',
     params
   })
+let prefix4 = 'line_center'
 
-// 已完成新线维护 Tab
+// 已完成 新线维护 Tab
 export const getFinishedLine = (data :any) => {
   return request({
-    url: `${prefix3}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`
+    url: `${prefix4}/v3/line/shelf/maintenance/queryLineShelfNewCompleted`,
+    method: 'post',
+    data
   })
 }
 // 获取代办维护数据
@@ -51,11 +54,28 @@ export const getNewLineDetail = (data:any) => {
 // 已完成冗余线路维护  Tab
 export const getFinishedMoreLine = (data :any) => {
   return request({
-    url: `${prefix3}/v3/line/shelf/maintenance/queryLineListByConditionsQuery`,
+    url: `${prefix4}/v3/line/shelf/maintenance/queryLineListByConditionsQuery`,
     method: 'post',
     data
   })
 }
+// 获取线路详情信息
+export const getLineDetail = (params :any) => {
+  return request({
+    url: `${prefix4}/v2/line/lineInfo/detail`,
+    method: 'get',
+    params
+  })
+}
+// 获取快照详情信息
+export const getLineSnapshot = (params :any) => {
+  return request({
+    url: `${prefix4}/v3/line/shelf/maintenance/getLineShelfSnapshot`,
+    method: 'get',
+    params
+  })
+}
+
 // 获取an余线路列表
 export const getReaundanLineList = (data:any) =>
   request({
@@ -98,7 +118,7 @@ export const checkNewlineTodo = (data:any) =>
 export const nextNewLineTodo = () => request({
   url: `${produce}/v3/line/shelf/maintenance/nextNewLineMaintenance`
 })
-
+// 获取新的数量
 export const getLineShelfNum = () => {
   return request({
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
