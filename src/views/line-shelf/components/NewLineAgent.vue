@@ -5,280 +5,313 @@
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.toBeCheckedNum }}</span>
         <span class="title">待维护（条）</span>
       </el-col>
       <el-col
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.checkedNum }}</span>
         <span class="title">已维护（条）</span>
       </el-col>
       <el-col
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.checkedTodayNum }}</span>
         <span class="title">今日完成（条）</span>
       </el-col>
     </el-row>
-    <!-- 基础信息  -->
-    <section-container title="基础信息">
-      <self-form
-        :form-item="baseItem"
-        :list-query="baseInfo"
-      />
-    </section-container>
-    <CuratorialInformation />
-    <section-container title="标签信息">
-      <el-form
-        ref="lineFormRef"
-        :model="form"
-        :rules="rules"
-        class="lable-form"
-        label-width="80px"
-      >
-        <el-row :gutter="10">
-          <el-col :span="6">
-            <el-form-item
-              label="是否爆款"
-              prop="explosion"
-            >
-              <el-select
-                v-model="form.explosion"
-                placeholder="请选择"
-              >
-                <el-option
-                  label="是"
-                  value="1"
-                />
-                <el-option
-                  label="否"
-                  value="0"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item
-              label="线路肥瘦"
-              class="question-item"
-              prop="lineM"
-              label-width="100px"
-            >
-              <template #label>
-                <span>线路肥瘦&nbsp;</span>
-                <el-tooltip
-                  placement="top"
-                  effect="light"
-                  popper-class="new-line-popper"
-                >
-                  <div slot="content">
-                    说明：<br>
-                    北京市<br>
-                    专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
-                    共享司机：次肥、中瘦、极瘦
-                  </div>
-                  <i class="el-icon-question" />
-                </el-tooltip>
-              </template>
-
-              <el-select
-                v-model="form.lineM"
-                placeholder="请选择活动区域"
-              >
-                <el-option
-                  label="区域一"
-                  value="shanghai"
-                />
-                <el-option
-                  label="区域二"
-                  value="beijing"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item
-              label="是否万金油"
-              class="question-item"
-              prop="Panacea"
-              label-width="120px"
-            >
-              <template #label>
-                <span>是否万金油</span>
-                <el-tooltip
-                  placement="top"
-                  effect="light"
-                  popper-class="new-line-popper"
-                >
-                  <template #content>
-                    提示<br>
-                    如：4.2米干厢货晚上干活，4.2米白天活，金杯下午活
-                  </template>
-                  <i
-                    class="el-icon-question"
-                  />
-                </el-tooltip>
-              </template>
-              <el-select
-                v-model="form.Panacea"
-                placeholder="请选择活动区域"
-              >
-                <el-option
-                  label="区域一"
-                  value="shanghai"
-                />
-                <el-option
-                  label="区域二"
-                  value="beijing"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col
-            :span="16"
-            class="group-check"
-          >
-            <el-form-item
-              class="checkbox-all"
-              label-width="100%"
-              prop="sellingPoint"
-            >
-              <template #label>
-                卖点(多选)：
-                <span style="font-size:12px;color:#838383">
-                  修改卖点后，将修改该线路的项目下所有的线路的卖点
-                </span>
-              </template>
-              <el-checkbox-group
-                v-model="form.sellingPoint"
-                size="mini"
-              >
-                <el-checkbox-button
-                  v-for="city in cities"
-                  :key="city"
-                  class="check-label"
-                  :label="city"
-                >
-                  {{ city }}
-                </el-checkbox-button>
-              </el-checkbox-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-    </section-container>
-    <section-container title="配送信息">
-      <self-form
-        :form-item="deliveryItem"
-        :list-query="baseInfo"
-      />
-    </section-container>
-    <section-container title="配送要求">
-      <self-form
-        :form-item="deliveryDemandItme"
-        :list-query="baseInfo"
-      />
-    </section-container>
-    <section-container title="货物信息">
-      <self-form
-        :form-item="goodsItem"
-        :list-query="baseInfo"
-      />
-    </section-container>
-    <section-container title="结算信息">
-      <self-form
-        :form-item="SettlementItem"
-        :list-query="baseInfo"
-      />
-    </section-container>
-
-    <!-- 按钮 -->
-    <div class="new-line-btn">
-      <el-button
-        class="agent-button"
-        type="info"
-        plain
-        :loading="isSkip"
-        @click="skipCheck"
-      >
-        跳过暂不检查
-      </el-button>
-
-      <el-button
-        class="agent-button"
-        type="primary"
-        @click="checkError"
-      >
-        检查不通过
-      </el-button>
-
-      <el-button
-        class="agent-button"
-        type="primary"
-        @click="checkSuccess"
-      >
-        检查通过
-      </el-button>
-    </div>
-    <pagination
-      v-show="true"
-      :operation-list="[]"
-      :page-sizes="[1]"
-      :total="page.total"
-      :page="page.page"
-      :limit="page.limit"
-      @pagination="skipCheck"
-    />
-
-    <SelfDialog
-      :visible.sync="showDialog"
-      title="检查不通过"
-      :width="'40%'"
-      :confirm="confirm"
-      :destroy-on-close="true"
-      @closed="handleClosed"
-    >
-      <div style="margin: 20px 0">
-        提示：检查不通过后，外线销售在H5的线路管理中操作“激活线路”，提交后需要再次检查线路
-      </div>
-      <el-form
-        ref="ruleForm"
-        :model="dialogForm"
-        :rules="rules"
-        :label-width="'60px'"
-      >
-        <el-form-item
-          label="原因"
-          prop="type"
+    <template v-if="hasAgent">
+      <div class="no-source">
+        <img
+          src="../../../assets/image/no-source.png"
+          alt=""
         >
-          <el-checkbox-group v-model="dialogForm.type">
-            <el-checkbox
-              label="项目策展信息(卖点、爆款、肥瘦、万金油)"
-              name="type"
+        <div>暂无需要处理的代办，休息一下吧！</div>
+      </div>
+    </template>
+    <template v-else>
+      <!-- 基础信息  -->
+      <section-container title="基础信息">
+        <self-form
+          label-position="top"
+          :form-item="baseItem"
+          :list-query="baseInfo"
+        />
+      </section-container>
+      <CuratorialInformation
+        :img-arr="imgArr"
+        :depot-curation="depotCuration"
+      />
+      <section-container title="标签信息">
+        <el-form
+          ref="lineFormRef"
+          :model="form"
+          :rules="rules"
+          class="lable-form"
+          label-width="80px"
+          @validate="dfasdsad"
+        >
+          <el-row>
+            <el-col :span="6">
+              <el-form-item
+                label="是否爆款"
+                prop="isHot"
+              >
+                <el-select
+                  v-model="form.isHot"
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in hasOption"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item
+                label="线路肥瘦"
+                class="question-item"
+                prop="labelType"
+                label-width="100px"
+              >
+                <template #label>
+                  <span>线路肥瘦&nbsp;</span>
+                  <el-tooltip
+                    placement="top"
+                    effect="light"
+                    popper-class="new-line-popper"
+                  >
+                    <div slot="content">
+                      说明：<br>
+                      北京市<br>
+                      专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
+                      共享司机：次肥、中瘦、极瘦
+                    </div>
+                    <i class="el-icon-question" />
+                  </el-tooltip>
+                </template>
+
+                <el-select
+                  v-model="form.labelType"
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="item in labelTypeArr"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item
+                label="是否万金油"
+                class="question-item"
+                prop="isPanacea"
+                label-width="120px"
+              >
+                <template #label>
+                  <span>是否万金油</span>
+                  <el-tooltip
+                    placement="top"
+                    effect="light"
+                    popper-class="new-line-popper"
+                  >
+                    <template #content>
+                      提示<br>
+                      如：4.2米干厢货晚上干活，4.2米白天活，金杯下午活
+                    </template>
+                    <i class="el-icon-question" />
+                  </el-tooltip>
+                </template>
+                <el-select
+                  v-model="form.isPanacea"
+                  placeholder="请选择活动区域"
+                >
+                  <el-option
+                    v-for="item in hasOption"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col
+              :span="16"
+              class="group-check"
+            >
+              <el-form-item
+                class="checkbox-all"
+                label-width="100%"
+                prop="sellPoint"
+              >
+                <template #label>
+                  卖点(多选)：
+                  <span style="font-size: 12px; color: #838383">
+                    修改卖点后，将修改该线路的项目下所有的线路的卖点
+                  </span>
+                </template>
+                <el-checkbox-group
+                  v-model="form.sellPoint"
+                  size="mini"
+                >
+                  <el-checkbox-button
+                    v-for="item in sellPointColumns"
+                    :key="item.value"
+                    class="check-label"
+                    :label="item.value"
+                  >
+                    {{ item.label }}
+                  </el-checkbox-button>
+                </el-checkbox-group>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+      </section-container>
+      <section-container title="配送信息">
+        <self-form
+          label-position="top"
+          :form-item="deliveryItem"
+          :list-query="baseInfo"
+        />
+      </section-container>
+      <section-container title="配送要求">
+        <self-form
+          label-position="top"
+          :form-item="deliveryDemandItme"
+          :list-query="baseInfo"
+        >
+          <template #deliveryWeekCycle="scope">
+            {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate }}
+          </template>
+        </self-form>
+      </section-container>
+      <section-container title="货物信息">
+        <self-form
+          label-position="top"
+          :form-item="goodsItem"
+          :list-query="baseInfo"
+        />
+      </section-container>
+      <section-container title="结算信息">
+        <self-form
+          label-position="top"
+          :form-item="SettlementItem"
+          :list-query="baseInfo"
+        />
+      </section-container>
+
+      <!-- 按钮 -->
+      <div class="new-line-btn">
+        <el-button
+          class="agent-button"
+          type="info"
+          plain
+          :loading="isSkip"
+          @click="checkSuccess('4')"
+        >
+          跳过暂不检查
+        </el-button>
+
+        <el-button
+          class="agent-button"
+          type="primary"
+          @click="checkError('3')"
+        >
+          检查不通过
+        </el-button>
+
+        <el-button
+          class="agent-button"
+          type="primary"
+          @click="checkSuccess('2')"
+        >
+          检查通过
+        </el-button>
+      </div>
+      <SelfDialog
+        :visible.sync="showDialog"
+        title="检查不通过"
+        :width="'40%'"
+        :confirm="confirm"
+        :destroy-on-close="true"
+        @closed="handleClosed"
+      >
+        <div style="margin: 20px 0">
+          <el-link
+            :underline="false"
+            type="primary"
+          >
+            提示：检查不通过后，外线销售在H5的线路管理中操作“激活线路”，提交后需要再次检查线路
+          </el-link>
+        </div>
+        <el-form
+          ref="ruleFormRef"
+          :model="dialogForm"
+          :rules="rules"
+          :label-width="'60px'"
+        >
+          <el-form-item
+            label="原因（多选）"
+            prop="type"
+          >
+            <el-checkbox-group v-model="dialogForm.type">
+              <el-checkbox
+                label="1"
+                name="type"
+              >
+                项目策展信息(卖点、爆款、肥瘦、万金油)
+              </el-checkbox>
+              <el-checkbox
+                label="2"
+                name="type"
+              >
+                线路基础信息(除策展信息)
+              </el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item
+            label="备注"
+            prop="rejectionReasons"
+            style="margin-top:30px"
+          >
+            <el-input
+              v-model="dialogForm.rejectionReasons"
+              placeholder="如 仓库图片/货物图片不合格"
+              type="textarea"
+              maxlength="150"
+              show-word-limit
             />
-            <el-checkbox
-              label="线路基础信息(除策展信息)"
-              name="type"
-            />
-          </el-checkbox-group>
-        </el-form-item>
-      </el-form>
-    </SelfDialog>
+          </el-form-item>
+        </el-form>
+      </SelfDialog>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import CuratorialInformation from '../agent/CuratorialInformation.vue'
-import { getNewLineDetail } from '@/api/line-shelf'
+import {
+  getNewLineDetail,
+  checkNewlineTodo,
+  nextNewLineTodo
+} from '@/api/line-shelf'
+import { GetDictionary } from '@/api/common'
+import { detailByUserId } from '@/api/driver-account'
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -290,86 +323,81 @@ import { getNewLineDetail } from '@/api/line-shelf'
   }
 })
 export default class extends Vue {
-  showImgDialog= true
+  @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
+  showImgDialog = true
   private baseItem = [
     {
       type: 7,
-      label: '线路名称:',
+      label: '线路名称',
       key: 'lineName',
-      col: 4,
       tagAttrs: {
         class: 'active'
       }
     },
     {
       type: 7,
-      label: '线路编号:',
+      label: '线路编号',
       key: 'lineId',
-      col: 4,
       tagAttrs: {
         class: 'active'
       }
     },
     {
       type: 7,
-      label: '窗口期:',
+      label: '窗口期',
       key: 'recruitWindowPeriod',
-      col: 4,
       tagAttrs: {
         class: 'error'
       }
     },
     {
       type: 7,
-      col: 4,
-      label: '线路分类:',
+      label: '线路分类',
       key: 'lineCategoryName'
     },
     {
       type: 7,
-      col: 4,
-
-      label: '外线销售:',
+      label: '外线销售',
       key: 'lineSaleName'
     },
     {
       type: 7,
-      col: 4,
-
-      label: '客推经理:',
-      key: 'customerRetirementManager'
+      label: '客维经理',
+      key: 'dutyManagerIdName'
     }
   ]
   private baseInfo = {
-    checkbox: 'fadfas'
+    checkbox: 'fadfas',
+    distance: ''
   }
   private listQuery = {}
   private hasOption = [
     {
-      leble: '是',
-      name: '0'
+      label: '是',
+      value: 1
     },
     {
-      leble: '否',
-      name: '1'
+      label: '否',
+      value: 0
     }
   ]
   private form = {
-    explosion: '',
-    lineM: '',
-    Panacea: '',
-    sellingPoint: []
+    isHot: '',
+    labelType: '',
+    isPanacea: '',
+    sellPoint: []
   }
-  private cities = ['上海', '北京', '广州', '深圳']
+  private sellPointColumns = []
   private deliveryItem = [
     {
       type: 7,
-      label: '车型:',
+      label: '车型',
+      labelPosition: 'top',
       key: 'carTypeName'
     },
     {
       type: 7,
-      label: '配送区域:',
+      label: '配送区域',
       key: 'lineArea'
     },
     {
@@ -379,103 +407,110 @@ export default class extends Vue {
     },
     {
       type: 7,
-      label: '是否走禁行:',
-      key: 'isBehavior'
+      label: '是否走禁行',
+      key: 'isBehavior',
+      filterText: '是:否'
     },
     {
       type: 7,
-      label: '是否走限行:',
-      key: 'isRestriction'
+      label: '是否走限行',
+      key: 'isRestriction',
+      filterText: '是:否'
     },
     {
       type: 7,
-      label: '油电要求:',
+      label: '油电要求',
       key: 'oilElectricityRequirementName'
     },
     {
       type: 7,
-      label: '装卸要求:',
+      label: '装卸要求',
       key: 'handlingDifficultyName'
     },
     {
       type: 7,
-      label: '是否走高速:',
-      key: 'runSpeed'
+      label: '是否走高速',
+      key: 'runSpeed',
+      filterText: '是:否'
     },
     {
       type: 7,
-      label: '是否需要回单:',
-      key: 'returnBill'
+      label: '是否需要回单',
+      key: 'returnBill',
+      filterText: '是:否'
     },
     {
       type: 7,
-      label: '服务要求和备注:',
+      label: '服务要求和备注',
       key: 'serviceRequirementName'
     }
   ]
   private deliveryInfo = {}
   private deliveryDemandItme = [
     {
-      type: 7,
-      label: '配送时间:',
-      key: 'deliveryWeekCycle'
+      type: 'deliveryWeekCycle',
+      label: '配送时间',
+      key: 'deliveryWeekCycle',
+      slot: true
+      // slot deliveryStartDate deliveryEndDate
     },
     {
       type: 7,
-      label: '预计月出车天数:',
+      label: '预计月出车天数',
       key: 'monthNum'
     },
     {
       type: 7,
-      label: '每日出车趟数:',
+      label: '每日出车趟数',
       key: 'dayNum'
     },
     {
       type: 7,
-      label: '预计工作时间:',
+      label: '预计工作时间',
       key: 'timeDiff'
     },
     {
       type: 7,
-      label: '配送数量:',
+      label: '配送数量',
       key: 'deliveryNum'
     },
     {
       type: 7,
-      label: '配送里程:',
-      key: 'distributionMileage'
+      label: '配送里程',
+      key: 'distance'
     }
   ]
   private deliveryDemandInfo = {}
   private goodsItem = [
     {
       type: 7,
-      label: '货物类型:',
+      label: '货物类型',
       key: 'cargoTypeName'
     },
     {
       type: 7,
-      label: '货物件数:',
+      label: '货物件数',
       key: 'cargoNum'
     },
     {
       type: 7,
-      label: '是否需要搬运:',
-      key: 'carry'
+      label: '是否需要搬运',
+      key: 'carry',
+      filterText: '是:否'
     },
     {
       type: 7,
-      label: '货物体积:',
+      label: '货物体积',
       key: 'volume'
     },
     {
       type: 7,
-      label: '货物重量:',
+      label: '货物重量',
       key: 'goodsWeight'
     },
     {
       type: 7,
-      label: '其他上岗要求:',
+      label: '其他上岗要求',
       key: 'dutyRemark'
     }
   ]
@@ -483,117 +518,267 @@ export default class extends Vue {
   private SettlementItem = [
     {
       type: 7,
-      label: '单趟报价:',
+      label: '单趟报价',
       key: 'everyTripGuaranteed'
     },
     {
       type: 7,
-      label: '单趟提成报价:',
+      label: '单趟提成报价',
       key: 'everyUnitPrice'
     },
     {
       type: 7,
-      label: '预计月报价:',
+      label: '预计月报价',
       key: 'shipperOffer'
     },
     {
       type: 7,
-      label: '计价方式:',
+      label: '计价方式',
       key: 'incomeSettlementMethodName'
     },
     {
       type: 7,
-      label: '结算周期:',
+      label: '结算周期',
       key: 'settlementCycleName'
     },
     {
       type: 7,
-      label: '结算天数:',
+      label: '结算天数',
       key: 'settlementDays'
     }
   ]
-
-  showDialog:boolean =false
-  dialogForm={
-    type: []
+  private imgArr = [
+    {
+      imgArr: [
+        'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
+        'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
+      ],
+      tiele: '仓库图片'
+    },
+    {
+      imgArr: [],
+      tiele: '货物图片'
+    },
+    {
+      imgArr: [],
+      tiele: '装货图片'
+    }
+  ]
+  showDialog: boolean = false
+  private dialogForm = {
+    type: [],
+    rejectionReasons: ''
   }
-  rules ={
-    type: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
-    ],
-    explosion: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
-    ],
-    lineM: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
-    ],
-    Panacea: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
-    ],
-    sellingPoint: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
-    ]
-
+  rules = {
+    type: [{ required: true, message: '请选择拒绝原因', trigger: 'blur' }],
+    isHot: [{ required: true, message: '请选择是否爆款', trigger: 'blur' }],
+    labelType: [{ required: true, message: '请选择线路标签', trigger: 'blur' }],
+    isPanacea: [{ required: true, message: '请选择是否万金油', trigger: 'blur' }],
+    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }],
+    rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
   }
-  page={
+  page = {
     limit: 1,
     page: 1,
     total: 50
   }
-  mounted() {
-    this.getLineDetail()
+  async mounted() {
+    this.initSource()
+    // this.sellPointColumns = await this.getDictData('selling_points_project')
   }
-  checkError() {
-    this.showDialog = true
-  }
-  async confirm(this:any) {
-    try {
-      await this.$refs['ruleForm'].validate()
-      this.showDialog = false
-      this.getLineDetail(true)
-      this.dialogForm = { type: [] }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  handleClosed() {}
-  // 检查通过
-  async checkSuccess(this:any) {
+  async checkError(this:any) {
     try {
       await this.$refs['lineFormRef'].validate()
-      this.$message({
-        type: 'success',
-        message: '检查通过'
+      this.showDialog = true
+    } catch (error) {
+      return error
+    }
+  }
+  // 检查不通过
+  async confirm(this: any) {
+    try {
+      await this.$refs['ruleFormRef'].validate()
+      await this.checkNewlineSure('3', () => {
+        this.showDialog = false
+        this.getLineDetail()
+        this.dialogForm = { type: [] }
+        this.$message({
+          type: 'success',
+          message: '操作成功'
+        })
       })
-      this.$refs['lineFormRef'].resetFields()
-      this.getLineDetail(true)
+    } catch (error) {
+      debugger
+      // this.scrollTo()
+      // console.log('fdsafdasd')
+      console.log(error)
+    } finally {
+      console.log('fsdf')
+    }
+  }
+  dfasdsad(e:string, s:boolean) {
+    if (!s) {
+      this.scrollTo(300)
+    }
+  }
+  handleClosed(this:any) {
+    this.$refs['ruleFormRef'].resetFields()
+    this.dialogForm = {
+      type: [],
+      rejectionReasons: ''
+    }
+    console.log('fdsaf')
+  }
+  // 检查通过
+  async checkSuccess(this: any, checkType:string) {
+    try {
+      await this.$refs['lineFormRef'].validate()
+      await this.checkNewlineSure(checkType, () => {
+        this.$message({
+          type: 'success',
+          message: '操作成功'
+        })
+        this.$refs['lineFormRef'].resetFields()
+        this.getLineDetail()
+      })
     } catch (error) {
       console.log(error)
     }
   }
   // 滚动到页面顶部
-  scrollTo() {
-    const ele:any = document.querySelector('.app-main')
-    ele.scrollTo({ top: 0, behavior: 'smooth' })
+  scrollTo(num:number = 0) {
+    const ele: any = document.querySelector('.app-main')
+    ele.scrollTo({ top: num, behavior: 'smooth' })
   }
   private isSkip = false
-  skipCheck() {
-    this.getLineDetail(true)
-  }
+  private labelTypeArr = [] // 线路标签
+  private queryId = {} // ID
+  private hasAgent = true // 是否有代办
+  private depotCuration = { // 仓策展信息
+    warehouseName: '',
+    warehouseDistrict: '',
+    videoUrl: ''
+  } // 视频地址
   // 获取详情数据
-  async getLineDetail(isAdd :boolean = false) {
-    if (isAdd) {
-      this.page.page += 1
-    }
-    let params = {
-      limit: 1,
-      page: this.page.page
-    }
+  async getLineDetail() {
     try {
-      const { data } = await getNewLineDetail(params)
-      this.baseInfo = data.data
+      const { data } = await nextNewLineTodo()
+      if (!data.success) {
+        return this.$message({
+          type: 'error',
+          message: data.errorMsg
+        })
+      }
+      const { agentId, lineId, projectId } = data.data
+      // 是否有代办
+      if (agentId === null) {
+        this.hasAgent = true
+        return
+      } else {
+        this.hasAgent = false
+      }
+      this.queryId = Object.assign(
+        {},
+        {
+          agentId,
+          lineId,
+          projectId
+        }
+      )
+      this.baseInfo = data.data.lineDetailVO
+      this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
+      const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict } = data.data.lineDetailVO
+      // 获取图片信息
+      const {
+        sellPoint,
+        cargoUrl, // 货物图片
+        loadingPictureUrl, // zhunghuo
+        warehousePictureUrl, // cangweiz
+        videoUrl
+      } = data.data.projectStrategyInfoVO
+      const imgList = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
+      this.imgArr.forEach((item, index) => {
+        item.imgArr = imgList[index]
+      })
+      // 获取视频信息
+      this.depotCuration = {
+        warehouseName,
+        warehouseDistrict,
+        videoUrl
+      }
+      // 仓名称
+
+      // 获取标签信息
+      const object = {
+        isHot,
+        isPanacea,
+        labelType,
+        // 处理字符串为空
+        sellPoint: sellPoint === '' ? [] : sellPoint.split(',')
+      }
+      object.sellPoint = object.sellPoint.map((item:string) => Number(item))
+      this.form = object
       // 页面滚动到具体的位置
+      this.$emit('getnum')
       this.scrollTo()
+    } catch (error) {
+      return error
+    }
+  }
+  // 获取卖点字典
+  async getDictData(dictType: any) {
+    try {
+      let params = {
+        dictType
+      }
+      let { data: res } = await GetDictionary(params)
+      if (res.success && res.data) {
+        return res.data.map((item: any) => ({
+          label: item.dictLabel,
+          value: +item.dictValue
+        }))
+      } else {
+        // this.$fail(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get dict data fail:${err}`)
+    }
+  }
+  async initSource() {
+    let requestArr = [
+      this.getDictData('selling_points_project'),
+      this.getDictData('line_label')
+    ]
+    this.getLineDetail()
+    let res = await Promise.all(requestArr)
+    if (res && res.length === requestArr.length) {
+      this.sellPointColumns = res[0]
+      this.labelTypeArr = res[1]
+    }
+  }
+  // 检查新线维护代办
+  async checkNewlineSure(checkType: string, callBack:Function) {
+    try {
+      const params: any = Object.assign({ checkType }, this.queryId, this.form)
+      // const { isHot, labelType, isPanacea, sellPoint } = this.form
+      // isHot && (params.isHot = isHot)
+      // labelType && (params.labelType = labelType)
+      // isPanacea && (params.isPanacea = isPanacea)
+      // sellPoint && (params.sellPoint = sellPoint)
+      // 检查不通过
+      if (checkType === '3') {
+        const rejectionReasons = this.dialogForm.type
+        params.rejectionReasons = this.dialogForm.rejectionReasons// beiz
+        params.rejectionReasonsType =
+          rejectionReasons.length === 2 ? 3 : rejectionReasons.join(',')
+      }
+
+      const { data } = await checkNewlineTodo(params)
+      if (data.success) {
+        callBack()
+      } else {
+        this.$message({ type: 'error', message: data.errorMsg })
+      }
     } catch (error) {
       return error
     }
@@ -639,10 +824,10 @@ export default class extends Vue {
 }
 ::v-deep .el-checkbox-button__inner {
   border: none;
-  border: 1px solid #649CEE !important;
+  border: 1px solid #649cee !important;
   border-radius: 4px !important;
   box-sizing: border-box;
-  color: #649CEE;
+  color: #649cee;
 }
 ::v-deep .is-checked {
   .el-checkbox-button__inner {
@@ -650,10 +835,25 @@ export default class extends Vue {
     box-shadow: none !important;
   }
 }
-.new-line-btn{
+.new-line-btn {
   display: flex;
   justify-content: flex-end;
   padding: 40px 60px;
+}
+.no-source {
+  display: flex;
+  justify-content: center;
+  padding: 60px;
+  flex-wrap: wrap;
+  img {
+    margin: 0 auto;
+  }
+  div {
+    width: 100%;
+    text-align: center;
+    margin-top: 22px;
+    color: #999;
+  }
 }
 </style>
 
@@ -679,14 +879,14 @@ export default class extends Vue {
   }
   .el-icon-question {
     font-size: 18px;
-    vertical-align: middle;
+    vertical-align: text-top;
     margin-right: 6px;
     color: #656565;
   }
   ::v-deep .el-form-item {
     margin-bottom: 12px !important;
   }
-  .lable-form{
+  .lable-form {
     ::v-deep .el-form-item__label {
       color: #333 !important;
     }
@@ -694,7 +894,6 @@ export default class extends Vue {
   .question-item {
     ::v-deep .el-form-item__label {
       padding: 0 !important;
-      margin-right: 6px;
     }
   }
   .checkbox-all {
@@ -709,8 +908,8 @@ export default class extends Vue {
   }
 }
 .group-check {
- margin-top: 20px;
- margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
 <style lang="scss">

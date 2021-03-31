@@ -12,7 +12,7 @@
         <div style="float: right">
           <el-button
             type="primary"
-            @click="getList"
+            @click="getList(true)"
           >
             查询
           </el-button>
@@ -62,7 +62,7 @@
           </el-button>
           <el-button
             type="text"
-            @click="openSelectIgnore(scope.row.agentID,true)"
+            @click="openSelectIgnore(scope.row.agentId,true)"
           >
             忽略
           </el-button>
@@ -78,7 +78,15 @@
       @closed="handleClosed"
     >
       <div style="margin: 20px 0">
-        已选择{{ dialogLineNum }}条线路
+        已选择
+        <el-link
+          :underline="false"
+          type="primary"
+        >
+          {{ dialogLineNum }}
+        </el-link>
+
+        条线路
       </div>
       <el-form
         ref="ignoreFormRef"
@@ -88,11 +96,11 @@
         class="demo-ruleForm"
       >
         <el-form-item
-          label="活动名称"
-          prop="desc"
+          label="原因"
+          prop="shelvesReasons"
         >
           <el-input
-            v-model="dialogForm.desc"
+            v-model="dialogForm.shelvesReasons"
             type="textarea"
             placeholder="如：客户无用车需求"
           />
@@ -135,7 +143,7 @@ export default class extends Vue {
     },
     {
       type: 1,
-      key: 'lindName',
+      key: 'key',
       label: '线路名称：',
       tagAttrs: {
         placeholder: '请输入名称/编号'
@@ -154,7 +162,7 @@ export default class extends Vue {
   ]
   formData = {
     agentId: '',
-    lindName: '',
+    key: '',
     time: []
   }
   columns = [
@@ -173,22 +181,22 @@ export default class extends Vue {
       width: '140px'
     },
     {
-      key: 'lineStatus',
+      key: 'lineStatusName',
       label: '线路状态',
       width: '140px'
     },
     {
-      key: 'yunyin',
+      key: 'shelvesReasons',
       label: '原因',
       width: '240px'
     },
     {
-      key: 'createTime',
+      key: 'lineCreateDate',
       label: '线路创建时间',
       width: '140px'
     },
     {
-      key: 'argentTime',
+      key: 'createDate',
       label: '代办生成时间',
       width: '140px'
     },
@@ -207,11 +215,11 @@ export default class extends Vue {
   }
   showDialog:boolean= false
   dialogForm ={
-    desc: ''
+    shelvesReasons: ''
   }
   rules= {
-    desc: [
-      { required: true, message: '请填写活动形式', trigger: 'blur' }
+    shelvesReasons: [
+      { required: true, message: '请填写下架原因', trigger: 'blur' }
     ]
   }
   multipleSelection= []
@@ -222,7 +230,7 @@ export default class extends Vue {
     this.getList()
   }
   handleClosed() {
-    this.dialogForm.desc = ''
+    this.dialogForm.shelvesReasons = ''
   }
   resetFrom(this:any) {
     this.$refs['fromRef'].resetForm()
@@ -231,41 +239,44 @@ export default class extends Vue {
   private handleSelectionChange(val: any) {
     this.multipleSelection = val
   }
-  private offLine:Array<any> = []
+  private agentIds:Array<any> = []
   // 批量下架
   batchOffShelfHandler() {
-    this.offLine = [...this.multipleSelection]
+    this.agentIds = [...this.multipleSelection]
     this.showDialog = true
     this.dialogTitle = '批量下架线路'
   }
   // 下架
   offShelfHandler(row:any) {
-    this.offLine = [row]
+    this.agentIds = [row]
     this.showDialog = true
   }
   // 下架线路
   async confirm(this:any, callBack:Function) {
     try {
       await this.$refs['ignoreFormRef'].validate()
-      const lineNo = this.offLine.map((item:any) => item.lineId).join(',')
-      const { data } = await offShelf({ lineNo })
+      const agentIds = this.agentIds.map((item:any) => item.agentId)
+      const { data } = await offShelf(agentIds, {
+        logoType: 1,
+        shelvesReasons: this.dialogForm.shelvesReasons
+      })
       if (data.success) {
         this.$message({
           type: 'success',
           message: '下架成功'
         })
-        this.lineNo = []
+        this.agentIds = []
         setTimeout(() => {
           this.getList()
         }, 1500)
-        callBack()
+        callBack();
+        (this.$refs.agentRef as any).toggleRowSelection()
       } else {
         this.$message({
           type: 'error',
           message: data.errorMsg
         })
       }
-      (this.$refs.agentRef as any).toggleRowSelection()
       // if (!isSelect) {
       //   (this.$refs.agentRef as any).toggleRowSelection()
       // }
@@ -275,26 +286,27 @@ export default class extends Vue {
   }
   // 忽略线路
   async openSelectIgnore(row:any, isSelect:boolean = false) {
-    console.log(row, isSelect)
     let str = '已选择1条线路'
     let title = '是否忽略线路'
-    let arr = row
+    let arr = [row]
+
     if (!isSelect) {
       const num = this.multipleSelection.length
       str = `已选择${num}条线路`
       title = '批量忽略线路'
-      arr = this.multipleSelection.map((item:any) => item.lineId).join(',')
+      arr = this.multipleSelection.map((item:any) => item.agentId)
+      debugger
     }
     const err = await this.$confirm(str, title, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'info'
     }).then(async() => {
-      const { data } = await passLine({ arr })
+      const { data } = await passLine(arr, { logoType: 1 })
       if (data.success) {
         this.$message({
           type: 'success',
-          message: '取消成功'
+          message: '操作成功'
         })
         setTimeout(() => {
           this.getList()
@@ -312,18 +324,31 @@ export default class extends Vue {
     })
   }
   // 获取列表
-  async getList() {
+  async getList(isReset:boolean = false) {
     try {
       const params:any = {}
       params.page = this.page.page
       params.limit = this.page.limit
+      if (isReset) {
+        params.page = 0
+      }
+      params.agentStatus = 0
+      const { key, agentId } = this.formData
+      key && (params.key = key)
+      agentId && (params.agentId = agentId)
       const timeArr = this.formData.time
       if (timeArr && timeArr.length === 2) {
-        params.startDate = timeArr[0]
-        params.endDate = timeArr[1]
+        let createDateStart = new Date(timeArr[0])
+        let createDateEnd = new Date(timeArr[1])
+        params.startCreateDate = createDateStart.setHours(0, 0, 0) || undefined
+        params.endCreateDate = createDateEnd.setHours(23, 59, 59, 999) || undefined
       }
       const { data } = await getReaundanLineList(params)
-      this.tableData = data.data
+      if (data.success) {
+        this.tableData = data.data
+        this.page.total = data.page.total
+      }
+      this.$emit('getnum')
     } catch (error) {
       return error
     }
@@ -332,7 +357,7 @@ export default class extends Vue {
     return this.multipleSelection.length === 0
   }
   get dialogLineNum() {
-    return this.offLine.length
+    return this.agentIds.length
   }
 }
 </script>

@@ -2,15 +2,16 @@
   <div>
     <section-container title="仓策展信息">
       <self-form
+        label-position="top"
         :form-item="curationItem"
-        :list-query="baseInfo"
+        :list-query="depotCuration"
       />
       <el-row
         :gutter="10"
         class="curation-row"
       >
         <el-col
-          v-for="(item,index) in ImgArr"
+          v-for="(item,index) in imgArr"
           :key="index"
           :span="6"
           class="curation-col"
@@ -20,7 +21,7 @@
             <div class="img-container">
               <template v-if="item.imgArr[0]">
                 <img
-                  :src="item.imgArr[1]"
+                  :src="item.imgArr[0]"
                   alt=""
                   @click="showImghandel(index)"
                 >
@@ -42,7 +43,7 @@
           class="curation-col"
         >
           <div class="curation-title">
-            <span>讲解视频(1)</span>
+            <span>讲解视频</span>
             <div :class="{'video-box': true ,'no-video-box': !hasvideo}">
               <div
                 v-if="hasvideo"
@@ -63,14 +64,15 @@
       :url-list="imgPreviewList"
     />
     <VideoWeb
+      v-if="hasvideo"
       :show.sync="hasShowVideo"
-      :video-src="videoSrc"
+      :video-src="hasvideo"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import SelfImageViewer from '@/views/line-shelf/components/SelfImageViewer.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -85,6 +87,8 @@ import VideoWeb from '../components/VideoWeb.vue'
   }
 })
 export default class extends Vue {
+  @Prop({ default: () => [] }) imgArr!:Array<any>
+  @Prop({ default: () => {} })depotCuration!:any
   showImgViewer = false
   private hasShowVideo = false
   imgPreviewList = [
@@ -97,40 +101,25 @@ export default class extends Vue {
   private curationItem = [
     {
       type: 7,
-      label: '仓名称:',
+      label: '仓名称',
       key: 'warehouseName',
-      col: 4,
       tagAttrs: {
         class: 'active'
       }
     },
     {
       type: 7,
-      label: '仓位置:',
-      key: 'warehouseAreaName',
-      col: 4,
+      label: '仓位置',
+      key: 'warehouseDistrict',
+
       tagAttrs: {
         class: 'active'
       }
     }
   ]
-  private ImgArr = [
-    {
-      imgArr: ['https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-        'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
-      ],
-      tiele: '仓库图片'
-    },
-    {
-      imgArr: [],
-      tiele: '货物图片'
-    }, {
-      imgArr: [],
-      tiele: '装货图片'
-    }
-  ]
+
   showImghandel(index:number) {
-    this.imgPreviewList = this.ImgArr[index].imgArr
+    this.imgPreviewList = this.imgArr[index].imgArr
     this.showImgViewer = true
   }
   private baseInfo = {
@@ -140,9 +129,8 @@ export default class extends Vue {
   showVideo() {
     this.hasShowVideo = true
   }
-  videoSrc= 'https://vd4.bdstatic-0-576e575c3a53ac79f45327bf8965761a&bcevod_channel=searchbox_feed&pd=1&pt=3&abtest=3000159_2'
   get hasvideo() {
-    return this.videoSrc
+    return this.depotCuration.videoUrl
   }
 }
 </script>

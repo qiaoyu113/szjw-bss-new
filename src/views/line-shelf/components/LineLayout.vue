@@ -4,11 +4,25 @@
       <el-tab-pane
         label="新线维护"
         name="0"
-      />
+      >
+        <span slot="label">
+          <el-badge
+            :value="dnamicLable.lineShelfNewNum"
+            class="item"
+          > 新线维护 </el-badge>
+        </span>
+      </el-tab-pane>
       <el-tab-pane
         label="冗余线路盘点"
         name="1"
-      />
+      >
+        <span slot="label">
+          <el-badge
+            :value="dnamicLable.redundantNewNum"
+            class="item"
+          > 冗余线路盘点 </el-badge>
+        </span>
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -19,7 +33,8 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
   name: 'LineLayout'
 })
 export default class extends Vue {
-  @Prop({ default: '0' }) active!:string
+  @Prop({ default: '0' }) active!: string
+  @Prop({ default: () => { return { lineShelfNewNum: 0, redundantNewNum: 0 } } }) dnamicLable!:object
   get activeName() {
     return this.active
   }
@@ -53,6 +68,12 @@ export default class extends Vue {
     &::after {
       border: none;
       height: 0;
+    }
+  }
+  .item {
+    ::v-deep .is-fixed {
+      right: 0;
+      top: 8px;
     }
   }
 }
