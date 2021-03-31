@@ -98,9 +98,9 @@
                   >
                     <div slot="content">
                       说明：<br>
-                      北京市<br>
-                      专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
-                      共享司机：次肥、中瘦、极瘦
+                      {{ lineLabelVo.cityName }}<br>
+                      专车司机： {{ lineLabelVo.sepcialName.join('、') }}<br>
+                      共享司机：{{ lineLabelVo.shareName.join('、') }}
                     </div>
                     <i class="el-icon-question" />
                   </el-tooltip>
@@ -322,6 +322,9 @@ import {
 import { GetDictionary } from '@/api/common'
 import { detailByUserId } from '@/api/driver-account'
 import { lock } from '@/utils'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -335,6 +338,7 @@ import { lock } from '@/utils'
 export default class extends Vue {
   @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
+  private lineLabelVo:IState = {}
   private baseItem = [
     {
       type: 7,
@@ -732,6 +736,7 @@ export default class extends Vue {
       }
       object.sellPoint = object.sellPoint.map((item:string) => Number(item))
       this.form = object
+      this.lineLabelVo = data.data.lineLabelVO
       // 页面滚动到具体的位置
       this.$emit('getnum')
       this.scrollTo()
