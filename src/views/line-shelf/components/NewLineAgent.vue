@@ -39,7 +39,16 @@
           label-position="top"
           :form-item="baseItem"
           :list-query="baseInfo"
-        />
+        >
+          <template #lineId="scope">
+            <el-link
+              type="primary"
+              @click="goDetails(scope.row.lineId)"
+            >
+              {{ scope.row.lineId }}
+            </el-link>
+          </template>
+        </self-form>
       </section-container>
       <CuratorialInformation
         :img-arr="imgArr"
@@ -312,6 +321,7 @@ import {
 } from '@/api/line-shelf'
 import { GetDictionary } from '@/api/common'
 import { detailByUserId } from '@/api/driver-account'
+import { lock } from '@/utils'
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -335,12 +345,10 @@ export default class extends Vue {
       }
     },
     {
-      type: 7,
+      type: 'lineId',
       label: '线路编号',
       key: 'lineId',
-      tagAttrs: {
-        class: 'active'
-      }
+      slot: true
     },
     {
       type: 7,
@@ -586,6 +594,12 @@ export default class extends Vue {
     this.initSource()
     // this.sellPointColumns = await this.getDictData('selling_points_project')
   }
+  goDetails(id:any) {
+    this.$router.push({
+      path: '/lineshelf/linedetail',
+      query: { id }
+    })
+  }
   async checkError(this:any) {
     try {
       await this.$refs['lineFormRef'].validate()
@@ -757,6 +771,7 @@ export default class extends Vue {
     }
   }
   // 检查新线维护代办
+  @lock
   async checkNewlineSure(checkType: string, callBack:Function) {
     try {
       const params: any = Object.assign({ checkType }, this.queryId, this.form)
