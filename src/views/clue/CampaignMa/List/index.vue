@@ -104,6 +104,9 @@
           <template v-if="scope.row.regionName">
             {{ scope.row.regionName }}
           </template>
+          <template v-else-if="[0,'0'].includes(scope.row.region)">
+            全部
+          </template>
           <template v-else>
             暂无数据
           </template>
@@ -111,6 +114,9 @@
         <template v-slot:cityName="scope">
           <template v-if="scope.row.cityName">
             {{ scope.row.cityName }}
+          </template>
+          <template v-else-if="[0,'0'].includes(scope.row.city)">
+            全部
           </template>
           <template v-else>
             暂无数据
@@ -522,8 +528,8 @@ export default class extends Vue {
     }
     this.listQuery.clueType !== '' && (obj.clueType = +this.listQuery.clueType)
     this.listQuery.userGroupId && (obj.userGroupId = String(this.listQuery.userGroupId))
-    this.listQuery.areCity && (obj.areCity = +this.listQuery.areCity)
-    this.listQuery.cityCode && (obj.cityCode = +this.listQuery.cityCode)
+    this.listQuery.areCity !== '' && (obj.areCity = +this.listQuery.areCity)
+    this.listQuery.cityCode !== '' && (obj.cityCode = +this.listQuery.cityCode)
     this.listQuery.launchPlatform !== '' && (obj.launchPlatform = this.listQuery.launchPlatform)
     if (this.listQuery.dropTime && this.listQuery.dropTime.length > 0) {
       obj.dropStarTime = new Date(this.listQuery.dropTime[0]).setHours(0, 0, 0)
@@ -660,6 +666,7 @@ export default class extends Vue {
             label: item.dictLabel
           }
         })
+        debugger
         this.regionList.push(...nodes)
       }
     } catch (err) {
@@ -668,6 +675,10 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
+    this.cityList.push({
+      value: 0,
+      label: '全部城市'
+    })
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
