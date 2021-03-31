@@ -42,7 +42,7 @@
         class="curation-col"
       >
         <div class="curation-title">
-          <span>讲解视频(1)</span>
+          <span>讲解视频({{ hasvideo?1:0 }})</span>
           <div :class="{'video-box': true ,'no-video-box': !hasvideo}">
             <div
               v-if="hasvideo"
@@ -110,21 +110,6 @@ export default class extends Vue {
       }
     }
   ]
-  // private ImgArr = [
-  //   {
-  //     imgArr: ['https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-  //       'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
-  //     ],
-  //     tiele: '仓库图片'
-  //   },
-  //   {
-  //     imgArr: [],
-  //     tiele: '货物图片'
-  //   }, {
-  //     imgArr: [],
-  //     tiele: '装货图片'
-  //   }
-  // ]
   showImghandel(index:number) {
     this.imgPreviewList = this.ImgArr[index].imgArr
     this.showImgViewer = true
