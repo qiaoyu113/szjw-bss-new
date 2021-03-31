@@ -30,7 +30,7 @@
           {{ row.areCityName }}
         </template>
         <template v-else-if="[0,'0'].includes(row.areCity)">
-          全部
+          全国
         </template>
         <template v-else>
           暂无数据
@@ -41,7 +41,7 @@
           {{ row.cityName }}
         </template>
         <template v-else-if="[0,'0'].includes(row.city)">
-          全部
+          全部城市
         </template>
         <template v-else>
           暂无数据
