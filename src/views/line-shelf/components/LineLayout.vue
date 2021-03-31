@@ -7,7 +7,7 @@
       >
         <span slot="label">
           <el-badge
-            :value="dnamicLable.newLine"
+            :value="dnamicLable.lineShelfNewNum"
             class="item"
           > 新线维护 </el-badge>
         </span>
@@ -18,7 +18,7 @@
       >
         <span slot="label">
           <el-badge
-            :value="dnamicLable.oldLine"
+            :value="dnamicLable.redundantNewNum"
             class="item"
           > 冗余线路盘点 </el-badge>
         </span>
@@ -34,7 +34,7 @@ import { Component, Vue, Prop } from 'vue-property-decorator'
 })
 export default class extends Vue {
   @Prop({ default: '0' }) active!: string
-  @Prop({ default: () => { return { newLine: 0, oldLine: 0 } } }) dnamicLable!:object
+  @Prop({ default: () => { return { lineShelfNewNum: 0, redundantNewNum: 0 } } }) dnamicLable!:object
   get activeName() {
     return this.active
   }

@@ -1,8 +1,19 @@
 <template>
   <div class="cpmplate-container">
-    <line-layout :active.sync="active" />
-    <new-line-agent v-if="active==='0'" />
-    <RedundantLine v-else />
+    <line-layout
+      :num-agent="numImg"
+      :active.sync="active"
+      :dnamic-lable="numImg"
+    />
+    <new-line-agent
+      v-if="active === '0'"
+      :dnamic-lable="numImg"
+      @getnum="getLineShelfNumSure"
+    />
+    <RedundantLine
+      v-else
+      @getnum="getLineShelfNumSure"
+    />
   </div>
 </template>
 
@@ -10,6 +21,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineAgent } from '../components'
 import RedundantLine from './RedundantLine.vue'
+import { getLineShelfNum } from '@/api/line-shelf'
 @Component({
   name: 'Agent',
   components: {
@@ -20,7 +32,28 @@ import RedundantLine from './RedundantLine.vue'
 })
 export default class extends Vue {
   private active: string = '0'
-  mounted() {}
+  private numImg = {
+    toBeCheckedNum: 0,
+    checkedTodayNum: 0,
+    lineShelfNewNum: 0,
+    redundantNewNum: 0,
+    checkedNum: 0
+  }
+  mounted() {
+    this.getLineShelfNumSure()
+  }
+
+  private async getLineShelfNumSure() {
+    try {
+      const { data } = await getLineShelfNum()
+      console.log(data)
+      if (data.success) {
+        this.numImg = data.data
+      }
+    } catch (error) {
+      return error
+    }
+  }
 }
 </script>
 

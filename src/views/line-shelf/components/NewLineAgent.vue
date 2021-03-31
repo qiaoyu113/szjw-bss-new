@@ -5,21 +5,21 @@
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.toBeCheckedNum }}</span>
         <span class="title">待维护（条）</span>
       </el-col>
       <el-col
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.checkedNum }}</span>
         <span class="title">已维护（条）</span>
       </el-col>
       <el-col
         :span="8"
         class="col-status"
       >
-        <span class="number">100</span>
+        <span class="number">{{ dnamicLable.checkedTodayNum }}</span>
         <span class="title">今日完成（条）</span>
       </el-col>
     </el-row>
@@ -299,7 +299,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import pagination from '@/components/Pagination/index.vue'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
@@ -323,6 +323,7 @@ import { detailByUserId } from '@/api/driver-account'
   }
 })
 export default class extends Vue {
+  @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
   private baseItem = [
     {
@@ -718,6 +719,7 @@ export default class extends Vue {
       object.sellPoint = object.sellPoint.map((item:string) => Number(item))
       this.form = object
       // 页面滚动到具体的位置
+      this.$emit('getnum')
       this.scrollTo()
     } catch (error) {
       return error

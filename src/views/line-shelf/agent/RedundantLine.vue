@@ -256,7 +256,10 @@ export default class extends Vue {
     try {
       await this.$refs['ignoreFormRef'].validate()
       const agentIds = this.agentIds.map((item:any) => item.agentId)
-      const { data } = await offShelf(Object.assign({ agentIds }, this.dialogForm))
+      const { data } = await offShelf(agentIds, {
+        logoType: 1,
+        shelvesReasons: this.dialogForm.shelvesReasons
+      })
       if (data.success) {
         this.$message({
           type: 'success',
@@ -285,23 +288,25 @@ export default class extends Vue {
   async openSelectIgnore(row:any, isSelect:boolean = false) {
     let str = '已选择1条线路'
     let title = '是否忽略线路'
-    let arr = row
+    let arr = [row]
+
     if (!isSelect) {
       const num = this.multipleSelection.length
       str = `已选择${num}条线路`
       title = '批量忽略线路'
-      arr = this.multipleSelection.map((item:any) => item.lineId).join(',')
+      arr = this.multipleSelection.map((item:any) => item.agentId)
+      debugger
     }
     const err = await this.$confirm(str, title, {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'info'
     }).then(async() => {
-      const { data } = await passLine({ arr })
+      const { data } = await passLine(arr, { logoType: 1 })
       if (data.success) {
         this.$message({
           type: 'success',
-          message: '取消成功'
+          message: '操作成功'
         })
         setTimeout(() => {
           this.getList()
@@ -328,8 +333,6 @@ export default class extends Vue {
         params.page = 0
       }
       params.agentStatus = 0
-      // params.agentStatus = 1 del
-      // params.processingStatus = 1
       const { key, agentId } = this.formData
       key && (params.key = key)
       agentId && (params.agentId = agentId)
@@ -345,6 +348,7 @@ export default class extends Vue {
         this.tableData = data.data
         this.page.total = data.page.total
       }
+      this.$emit('getnum')
     } catch (error) {
       return error
     }

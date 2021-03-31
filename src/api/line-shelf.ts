@@ -1,7 +1,9 @@
 import request from '@/utils/request'
+import qs from 'qs'
 let prefix2 = '/mock/237'
 let prefix3 = '/mock/153'
 const produce = '/line_center'
+
 // 基础
 export const awitDetail = (params: any) =>
   request({
@@ -62,24 +64,26 @@ export const getReaundanLineList = (data:any) =>
     data
   })
 // 忽略 批量忽略线路
-export const passLine = (data:any) =>
+export const passLine = (data:any, params:any) =>
   request({
     url: `${produce}/v3/line/shelf/maintenance/batchIgnoreToDo`,
     method: 'post',
     data,
-    params: {
-      logoType: 1
+    params,
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
     }
   })
   // 批量下架代办
-export const offShelf = (data:any) =>
+export const offShelf = (data:any, params:any) =>
   request({
-    url: `${produce}/v3/line/shelf/maintenance/batchShelfToDo?logoType=1`,
+    url: `${produce}/v3/line/shelf/maintenance/batchShelfToDo`,
     method: 'POST',
-    data
-    // params: {
-    //   logoType: 1
-    // }
+    data,
+    params,
+    paramsSerializer: params => {
+      return qs.stringify(params, { indices: false })
+    }
   })
 // 检查新线维护待办
 
@@ -94,3 +98,9 @@ export const checkNewlineTodo = (data:any) =>
 export const nextNewLineTodo = () => request({
   url: `${produce}/v3/line/shelf/maintenance/nextNewLineMaintenance`
 })
+
+export const getLineShelfNum = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
+  })
+}
