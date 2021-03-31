@@ -322,6 +322,9 @@ import {
 import { GetDictionary } from '@/api/common'
 import { detailByUserId } from '@/api/driver-account'
 import { lock } from '@/utils'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   name: 'NewLineAgent',
   components: {
@@ -335,6 +338,7 @@ import { lock } from '@/utils'
 export default class extends Vue {
   @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
+  private lineLabelVo:IState = {}
   private baseItem = [
     {
       type: 7,
@@ -744,6 +748,7 @@ export default class extends Vue {
       }
       object.sellPoint = object.sellPoint.map((item:string) => Number(item))
       this.form = object
+      this.lineLabelVo = data.data.lineLabelVO
       // 页面滚动到具体的位置
       this.$emit('getnum')
       this.scrollTo()

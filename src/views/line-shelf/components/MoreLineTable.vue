@@ -58,7 +58,7 @@
           <span
             style="color:#649CEE"
             @click="goLineDteails(scope.row.lineId)"
-          >线路名称{{ scope.row.lineId }}</span>
+          >{{ scope.row.lineName }}</span>
         </template>
 
         <template v-slot:agentStatus="scope">

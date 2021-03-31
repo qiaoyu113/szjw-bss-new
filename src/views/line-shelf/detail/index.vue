@@ -600,7 +600,7 @@ export default class extends Vue {
           this.listQuery.lineStateName = res.data.lineStateName
           this.listQuery.runTestStateName = res.data.runTestStateName
           this.listQuery.waitDirveValidity = res.data.waitDirveValidity
-          this.listQuery.recruitWindowPeriod = res.data.recruitWindowPeriod
+          this.listQuery.recruitWindowPeriod = res.data.recruitWindowPeriod + '天'
           this.listQuery.stabilityRateName = res.data.stabilityRateName
           this.listQuery.lineSaleName = res.data.lineSaleName
           this.listQuery.dutyManagerIdName = res.data.dutyManagerIdName
@@ -613,16 +613,16 @@ export default class extends Vue {
           this.listQuery.oilElectricityRequirementName = res.data.oilElectricityRequirementName
           this.listQuery.handlingDifficultyName = res.data.handlingDifficultyName
           this.listQuery.runSpeed = res.data.runSpeed === 1 ? '是' : '否'
-          this.listQuery.returnBill = res.data.returnBill
+          this.listQuery.returnBill = res.data.returnBill === 1 ? '是' : '否'
           this.listQuery.returnWarehouseName = res.data.returnWarehouseName
           this.listQuery.serviceRequirementName = res.data.serviceRequirementName
           this.listQuery.warehouseCountyName = res.data.warehouseCountyName
-          this.listQuery.distributionWay = res.data.distributionWay
-          this.listQuery.deliveryNum = res.data.deliveryNum
-          this.listQuery.distance = res.data.distance
+          this.listQuery.distributionWay = res.data.distributionWay === 1 ? '整车' : '多点配'
+          this.listQuery.deliveryNum = res.data.deliveryNum + '个'
+          this.listQuery.distance = res.data.distance + '公里'
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
-          this.listQuery.dayNum = res.data.dayNum
+          this.listQuery.dayNum = res.data.dayNum + '趟'
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
@@ -633,9 +633,9 @@ export default class extends Vue {
           this.listQuery.settlementDays = res.data.settlementDays
           // 货物信息
           this.listQuery.cargoTypeName = res.data.cargoTypeName
-          this.listQuery.carry = res.data.carry
+          this.listQuery.carry = res.data.carry === 1 ? '是' : '否'
           // 标签信息
-          this.listQuery.isHot = res.data.isHot
+          this.listQuery.isHot = res.data.isHot === 1 ? '是' : '否'
           this.listQuery.labelTypeName = res.data.labelTypeName
           this.listQuery.lineAdapterName = res.data.lineAdapterName
           this.listQuery.lineUrgentName = res.data.lineUrgentName

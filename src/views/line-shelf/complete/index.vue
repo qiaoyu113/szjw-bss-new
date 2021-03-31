@@ -2,12 +2,16 @@
   <div
     class="cpmplate-container"
   >
-    <line-layout :active.sync="active" />
+    <line-layout
+      :active.sync="active"
+      :dnamic-lable="numImg"
+    />
     <div v-show="active-0===0">
       <newLine-table
         :form-item="formItem"
         :columns="columns"
         :page="page"
+        @getnum="getLineShelfNumSure"
       />
     </div>
 
@@ -16,6 +20,7 @@
         :form-item="formItem1"
         :columns="columns1"
         :page="page"
+        @getnum="getLineShelfNumSure"
       />
     </div>
   </div>
@@ -24,7 +29,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineTable, MoreLineTable } from '../components'
-import { getFinishedLine } from '@/api/line-shelf'
+import { getFinishedLine, getLineShelfNum } from '@/api/line-shelf'
 import SelfTable from '@/components/Base/SelfTable.vue'
   interface IState {
   [key: string]: any;
@@ -51,7 +56,27 @@ export default class extends Vue {
     limit: 10,
     total: 120
   };
-
+  mounted() {
+    this.getLineShelfNumSure()
+  }
+private numImg = {
+  toBeCheckedNum: 0,
+  checkedTodayNum: 0,
+  lineShelfNewNum: 0,
+  redundantNewNum: 0,
+  checkedNum: 0
+}
+private async getLineShelfNumSure() {
+  try {
+    const { data } = await getLineShelfNum()
+    // console.log(data)
+    if (data.success) {
+      this.numImg = data.data
+    }
+  } catch (error) {
+    return error
+  }
+}
   //  新线维护
   private formItem:any[]=[
     {
