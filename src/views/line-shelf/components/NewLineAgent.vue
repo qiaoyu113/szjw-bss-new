@@ -98,9 +98,9 @@
                   >
                     <div slot="content">
                       说明：<br>
-                      北京市<br>
-                      专车司机： 超肥、单肥、次肥、中肥、极瘦<br>
-                      共享司机：次肥、中瘦、极瘦
+                      {{ lableData.cityName }}<br>
+                      专车司机： {{ lableData.sepcialName }}<br>
+                      共享司机：{{ lableData.shareName }}
                     </div>
                     <i class="el-icon-question" />
                   </el-tooltip>
@@ -353,7 +353,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '窗口期',
-      key: 'recruitWindowPeriod',
+      key: 'waitDirveValidity',
       tagAttrs: {
         class: 'error'
       }
@@ -674,6 +674,11 @@ export default class extends Vue {
     videoUrl: ''
   } // 视频地址
   // 获取详情数据
+  private lableData = {
+    cityName: '',
+    sepcialName: '',
+    shareName: ''
+  }
   async getLineDetail() {
     try {
       const { data } = await nextNewLineTodo()
@@ -700,6 +705,13 @@ export default class extends Vue {
         }
       )
       this.baseInfo = data.data.lineDetailVO
+      const { cityName, sepcialName, shareName } = data.data.lineLabelVO
+      this.lableData = {
+        cityName,
+        sepcialName: sepcialName.join('、'),
+        shareName: shareName.join('、')
+
+      }
       this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
       const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict } = data.data.lineDetailVO
       // 获取图片信息
@@ -869,6 +881,9 @@ export default class extends Vue {
     margin-top: 22px;
     color: #999;
   }
+}
+::v-deep .active{
+  color: #649cee;
 }
 </style>
 
