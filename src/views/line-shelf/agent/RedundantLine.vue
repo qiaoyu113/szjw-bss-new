@@ -53,6 +53,14 @@
         @onPageSize="getList"
         @selection-change="handleSelectionChange"
       >
+        <template #lineId="scope">
+          <el-link
+            type="primary"
+            @click="goDetails(scope.row.lineId)"
+          >
+            {{ scope.row.lineId }}
+          </el-link>
+        </template>
         <template #btn="scope">
           <el-button
             type="text"
@@ -102,6 +110,7 @@
           <el-input
             v-model="dialogForm.shelvesReasons"
             type="textarea"
+            maxlength="150"
             placeholder="如：客户无用车需求"
           />
         </el-form-item>
@@ -172,18 +181,17 @@ export default class extends Vue {
     },
     {
       key: 'lineName',
-      label: '线路名称',
-      width: '140px'
+      label: '线路名称'
     },
     {
       key: 'lineId',
       label: '线路编号',
-      width: '140px'
+      slot: true
     },
     {
       key: 'lineStatusName',
       label: '线路状态',
-      width: '140px'
+      width: '100px'
     },
     {
       key: 'shelvesReasons',
@@ -323,6 +331,12 @@ export default class extends Vue {
     }).catch(() => {
     })
   }
+  goDetails(id:any) {
+    this.$router.push({
+      path: '/lineshelf/linedetail',
+      query: { id }
+    })
+  }
   // 获取列表
   async getList(isReset:boolean = false) {
     try {
@@ -330,9 +344,11 @@ export default class extends Vue {
       params.page = this.page.page
       params.limit = this.page.limit
       if (isReset) {
-        params.page = 0
+        params.page = 0;
+        (this.$refs.agentRef as any).toggleRowSelection()
       }
-      params.agentStatus = 0
+      params.processingStatus = 1
+
       const { key, agentId } = this.formData
       key && (params.key = key)
       agentId && (params.agentId = agentId)
