@@ -57,14 +57,14 @@
         <template v-slot:lineName="scope">
           <span
             style="color:#649CEE"
-            @click="goLineDteails(scope.row.id)"
-          >线路名称{{ scope.row.id }}</span>
+            @click="goLineDteails(scope.row.projectId)"
+          >{{ scope.row.lineName }}</span>
         </template>
         <template v-slot:lineSnapshotFlag="scope">
           <span
             style="color:#649CEE"
-            @click="goLineSnapshot(scope.row.id)"
-          >线路名称</span>
+            @click="goLineSnapshot(scope.row.lineSnapshotId)"
+          >{{ scope.row.lineName }}</span>
         </template>
 
         <template v-slot:inspectionStatus="scope">
