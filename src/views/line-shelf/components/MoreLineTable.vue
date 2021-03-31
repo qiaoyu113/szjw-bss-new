@@ -148,7 +148,7 @@ export default class extends Vue {
       let params: any = {
         limit: this.page.limit,
         page: this.page.page,
-        processingStatus: 0
+        processingStatus: 2
       }
       if (this.listQuery.agencyTime && this.listQuery.agencyTime.length > 1) {
         params.startUpdateDate = new Date(this.listQuery.agencyTime[0]).setHours(0, 0, 0)
@@ -158,8 +158,6 @@ export default class extends Vue {
       this.listQuery.lineName !== '' && (params.key = this.listQuery.lineName)
       this.listQuery.checkStatus !== '' && (params.agentStatus = this.listQuery.checkStatus)
       let { data: res } = await getFinishedMoreLine(params)
-      console.log(params)
-
       if (res.success) {
         this.listLoading = false
         this.tableData = res.data
