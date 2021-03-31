@@ -120,7 +120,7 @@ export default class extends Vue {
   private tableData: any[] = [];
   // 检查状态按钮
   private status: any[] = [
-    { label: '全部', value: '', num: '' },
+    { label: '全部', value: '4', num: '' },
     { label: '检查通过', value: 2, num: '' },
     { label: '检查不通过', value: 3, num: '' }
   ];
@@ -176,9 +176,9 @@ export default class extends Vue {
         if (res.success) {
           this.listLoading = false
           this.tableData = res.data
-          this.status[0].num = res.title.all
-          this.status[1].num = res.title.passedNum
-          this.status[2].num = res.title.failedNum
+          this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all
+          this.status[1].num = res.title.passedNum >= 999 ? '999+' : res.title.all
+          this.status[2].num = res.title.failedNum >= 999 ? '999+' : res.title.all
         } else {
           this.$message.error('出错逻辑  tab详情页接口问题')
         }
