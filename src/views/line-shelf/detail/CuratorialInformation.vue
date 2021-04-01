@@ -20,7 +20,7 @@
           <div class="img-container">
             <template v-if="item.imgArr[0]">
               <img
-                :src="item.imgArr[1]"
+                :src="item.imgArr[0]"
                 alt=""
                 @click="showImghandel(index)"
               >
