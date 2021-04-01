@@ -57,7 +57,7 @@
         <template v-slot:lineName="scope">
           <span
             style="color:#649CEE"
-            @click="goLineDteails(scope.row.projectId)"
+            @click="goLineDteails(scope.row.lineId)"
           >{{ scope.row.lineName }}</span>
         </template>
         <template v-slot:lineSnapshotFlag="scope">
