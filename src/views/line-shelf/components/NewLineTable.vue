@@ -169,7 +169,7 @@ export default class extends Vue {
         }
 
         this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
-        this.listQuery.lineId !== '' && (params.key = this.listQuery.lineId)
+        this.listQuery.lineName !== '' && (params.key = this.listQuery.lineName)
         this.listQuery.checkStatus !== '' && (params.inspectionStatus = this.listQuery.checkStatus)
         this.listQuery.result !== '' && (params.rejectionReasons = this.listQuery.result)
         let { data: res } = await getFinishedLine(params)
