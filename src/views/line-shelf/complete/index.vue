@@ -69,7 +69,7 @@ private numImg = {
 private async getLineShelfNumSure() {
   try {
     const { data } = await getLineShelfCompletedNum()
-    console.log(data)
+
     if (data.success) {
       this.numImg = data.data
     }
