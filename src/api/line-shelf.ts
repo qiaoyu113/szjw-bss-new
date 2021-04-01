@@ -124,3 +124,10 @@ export const getLineShelfNum = () => {
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
   })
 }
+
+// 获取已完成新的数量
+export const getLineShelfCompletedNum = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewCompletedNum`
+  })
+}
