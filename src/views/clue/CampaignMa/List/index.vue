@@ -105,7 +105,7 @@
             {{ scope.row.regionName }}
           </template>
           <template v-else-if="[0,'0'].includes(scope.row.region)">
-            全部
+            全国
           </template>
           <template v-else>
             暂无数据
@@ -116,7 +116,7 @@
             {{ scope.row.cityName }}
           </template>
           <template v-else-if="[0,'0'].includes(scope.row.city)">
-            全部
+            全部城市
           </template>
           <template v-else>
             暂无数据
