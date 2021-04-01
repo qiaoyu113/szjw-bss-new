@@ -29,7 +29,7 @@
           src="../../../assets/image/no-source.png"
           alt=""
         >
-        <div>暂无需要处理的代办，休息一下吧！</div>
+        <div>暂无需要处理的待办，休息一下吧！</div>
       </div>
     </template>
     <template v-else>
@@ -53,7 +53,7 @@
               :class="{error: timeError(scope.row.waitDirveValidity)}"
               @click="goDetails(scope.row.lineId)"
             >
-              {{ scope.row.waitDirveValidity }}
+              {{ scope.row.waitDirveValidity| parseTime('{y}-{m}-{d}') }}
             </span>
           </template>
         </self-form>
@@ -69,7 +69,7 @@
           :rules="rules"
           class="lable-form"
           label-width="80px"
-          @validate="dfasdsad"
+          @validate="toUp"
         >
           <el-row>
             <el-col :span="6">
@@ -282,6 +282,7 @@
           <el-form-item
             label="原因（多选）"
             prop="type"
+            label-width="120px"
           >
             <el-checkbox-group v-model="dialogForm.type">
               <el-checkbox
@@ -300,6 +301,7 @@
           </el-form-item>
           <el-form-item
             label="备注"
+            label-width="120px"
             prop="rejectionReasons"
             style="margin-top:30px"
           >
@@ -608,8 +610,8 @@ export default class extends Vue {
     isHot: [{ required: true, message: '请选择是否爆款', trigger: 'blur' }],
     labelType: [{ required: true, message: '请选择线路标签', trigger: 'blur' }],
     isPanacea: [{ required: true, message: '请选择是否万金油', trigger: 'blur' }],
-    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }]
-    // rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
+    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }],
+    rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
   }
   page = {
     limit: 1,
@@ -648,15 +650,10 @@ export default class extends Vue {
         })
       })
     } catch (error) {
-      debugger
-      // this.scrollTo()
-      // console.log('fdsafdasd')
       console.log(error)
-    } finally {
-      console.log('fsdf')
     }
   }
-  dfasdsad(e:string, s:boolean) {
+  toUp(e:string, s:boolean) {
     if (!s) {
       this.scrollTo(300)
     }
@@ -672,7 +669,9 @@ export default class extends Vue {
   // 检查通过
   async checkSuccess(this: any, checkType:string) {
     try {
-      await this.$refs['lineFormRef'].validate()
+      if (checkType === '2') {
+        await this.$refs['lineFormRef'].validate()
+      }
       await this.checkNewlineSure(checkType, () => {
         this.$message({
           type: 'success',
@@ -730,7 +729,7 @@ export default class extends Vue {
   private isSkip = false
   private labelTypeArr = [] // 线路标签
   private queryId = {} // ID
-  private hasAgent = true // 是否有代办
+  private hasAgent = true // 是否有待办
   private depotCuration = { // 仓策展信息
     warehouseName: '',
     warehouseDistrict: '',
@@ -752,7 +751,7 @@ export default class extends Vue {
         })
       }
       const { agentId, lineId, projectId } = data.data
-      // 是否有代办
+      // 是否有待办
       if (agentId === null) {
         this.hasAgent = true
         return
@@ -846,7 +845,7 @@ export default class extends Vue {
       this.labelTypeArr = res[1]
     }
   }
-  // 检查新线维护代办
+  // 检查新线维护待办
   @lock
   async checkNewlineSure(checkType: string, callBack:Function) {
     try {
@@ -857,6 +856,9 @@ export default class extends Vue {
       // isPanacea && (params.isPanacea = isPanacea)
       // sellPoint && (params.sellPoint = sellPoint)
       // 检查不通过
+      if (checkType === '4') {
+        params.sellPoint.push(0) // 不检查传0
+      }
       if (checkType === '3') {
         const rejectionReasons = this.dialogForm.type
         params.rejectionReasons = this.dialogForm.rejectionReasons// beiz
