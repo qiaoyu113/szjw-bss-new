@@ -655,7 +655,8 @@ export default class extends Vue {
   }
   toUp(e:string, s:boolean) {
     if (!s) {
-      this.scrollTo(300)
+      this.$message({ type: 'info', message: '请检查线路标签信息' })
+      this.scrollTo(500)
     }
   }
   handleClosed(this:any) {
