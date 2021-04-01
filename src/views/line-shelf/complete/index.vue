@@ -6,7 +6,7 @@
       :active.sync="active"
       :dnamic-lable="numImg"
     />
-    <div v-show="active-0===0">
+    <div v-if="active-0===0">
       <newLine-table
         :form-item="formItem"
         :columns="columns"
@@ -15,7 +15,7 @@
       />
     </div>
 
-    <div v-show="active-0===1">
+    <div v-if="active-0===1">
       <MoreLineTable
         :form-item="formItem1"
         :columns="columns1"
@@ -104,7 +104,6 @@ private async getLineShelfNumSure() {
       label: '原因',
       tagAttrs: {
         placeholder: '请选择原因'
-
       },
       options: [
         {

@@ -16,7 +16,7 @@
     >
       <el-col
         v-for="item in formItem"
-        :key="item.label || item.key"
+        :key=" item.key||item.label"
         :span="isPC ? item.col || pcCol : 24"
         :offset="item.offset|| 0"
       >

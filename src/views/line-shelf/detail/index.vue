@@ -37,6 +37,7 @@
       :md="true"
     >
       <self-form
+        ref="opopopop"
         label-position="top"
         :list-query="listQuery"
         :form-item="formItem2"
@@ -46,7 +47,9 @@
       >
         <template slot="time">
           <div>
-            {{ (listQuery.deliveryStartDate).split(' ')[0] }}-{{ (listQuery.deliveryStartDate).split(' ')[0] }}
+            {{ listQuery.deliveryStartDate.split(" ")[0] }}-{{
+              listQuery.deliveryStartDate.split(" ")[0]
+            }}
           </div>
         </template>
       </self-form>
@@ -134,59 +137,60 @@ export default class extends Vue {
     private isShowTitle = false
     private projectStrategyInfoVO : IState={}
     private AllImg : IState[]=[]
-   private listQuery:IState = {
-     lineName: '',
-     lineId: '',
-     projectName: '',
-     projectId: '',
-     deliveryStartDate: '',
-     deliveryEndDate: '',
-     warehouseName: '',
-     lineCategoryName: '',
-     lineTypeName: '',
-     lineBalanceName: '',
-     lineStateName: '',
-     runTestStateName: '',
-     waitDirveValidity: '',
-     recruitWindowPeriod: '',
-     stabilityRateName: '',
-     lineSaleName: '',
-     dutyManagerIdName: '',
-     busiTypeName: '', // 车型
-     lineArea: '', // 配送区域
-     warehouseDistrict: '', // 详细地址
-     isBehavior: '', // 是否走禁行
-     isRestriction: '', // 是否走现行
-     oilElectricityRequirementName: '', // 油电要求
-     handlingDifficultyName: '', // 装卸要求
-     runSpeed: '', // 是否走高速
-     returnBill: '', // 是否返仓
-     serviceRequirementName: '', // 服务要求和备注
-     warehouseCountyName: '', // 仓库位置
-     distributionWay: '', // 配送方式
-     deliveryNum: '', // 配送点数量
-     distance: '', // 配送总里程
+    private listQuery:IState = {
+      lineName: '',
+      lineId: '',
+      projectName: '',
+      projectId: '',
+      deliveryStartDate: '',
+      deliveryEndDate: '',
+      warehouseName: '',
+      lineCategoryName: '',
+      lineTypeName: '',
+      lineBalanceName: '',
+      lineStateName: '',
+      runTestStateName: '',
+      waitDirveValidity: '',
+      recruitWindowPeriod: '',
+      stabilityRateName: '',
+      lineSaleName: '',
+      dutyManagerIdName: '',
+      busiTypeName: '', // 车型
+      lineArea: '', // 配送区域
+      warehouseDistrict: '', // 详细地址
+      isBehavior: '', // 是否走禁行
+      isRestriction: '', // 是否走现行
+      oilElectricityRequirementName: '', // 油电要求
+      handlingDifficultyName: '', // 装卸要求
+      runSpeed: '', // 是否走高速
+      returnBill: '', // 是否返仓
+      serviceRequirementName: '', // 服务要求和备注
+      warehouseCountyName: '', // 仓库位置
+      distributionWay: '', // 配送方式
+      deliveryNum: '', // 配送点数量
+      distance: '', // 配送总里程
 
-     time: '', // 配送时间
-     monthNum: '', // 预计月出车天数
-     dayNum: '', // 每日配送趟数
+      time: '', // 配送时间
+      monthNum: '', // 预计月出车天数
+      dayNum: '', // 每日配送趟数
+      lineDeliveryInfoFORMS: [], // 预计工作时间段
 
-     everyTripGuaranteed: '', // 每趟保底（元）
-     everyUnitPrice: '', // 每趟提成（元）
-     shipperOffer: '', // 预计月报价（元）
-     incomeSettlementMethodName: '', // 计价方式
-     settlementCycleName: '', // 结算周期
-     settlementDays: '', // 结算天数
+      everyTripGuaranteed: '', // 每趟保底（元）
+      everyUnitPrice: '', // 每趟提成（元）
+      shipperOffer: '', // 预计月报价（元）
+      incomeSettlementMethodName: '', // 计价方式
+      settlementCycleName: '', // 结算周期
+      settlementDays: '', // 结算天数
 
-     cargoTypeName: '', // 货物类型
-     carry: '', // 是否需要搬运
+      cargoTypeName: '', // 货物类型
+      carry: '', // 是否需要搬运
 
-     isHot: '', // 是否爆款
-     labelTypeName: '', // 线路肥瘦标签
-     lineAdapterName: '', // 适配性
-     lineUrgentName: '' // 线路紧急程度
+      isHot: '', // 是否爆款
+      labelTypeName: '', // 线路肥瘦标签
+      lineAdapterName: '', // 适配性
+      lineUrgentName: '' // 线路紧急程度
 
-   }
+    }
    // 基础信息
    private formItem : IState[] = [
      {
@@ -361,6 +365,23 @@ export default class extends Vue {
       label: '每日配送趟数',
       key: 'dayNum'
     }
+    // }, {
+    //   type: 'lineDeliveryInfoFORMS0',
+    //   label: '预计工作时间段',
+    //   key: 'lineDeliveryInfoFORMS0',
+    //   slot: true
+    // }, {
+    //   type: 'lineDeliveryInfoFORMS1',
+    //   label: '预计工作时间段',
+    //   key: 'lineDeliveryInfoFORMS1',
+    //   slot: true
+    // },
+    // {
+    //   type: 'lineDeliveryInfoFORMS2',
+    //   label: '预计工作时间段',
+    //   key: 'lineDeliveryInfoFORMS2',
+    //   slot: true
+    // }
   ]
   // 结算信息
   private formItem3 : IState[] = [
@@ -510,6 +531,7 @@ export default class extends Vue {
         }
         const { data: res } = await getLineDetail(params)
         if (res.success) {
+          // this.listQuery = { ...res.data }
           this.listQuery.lineName = res.data.lineName
           this.listQuery.lineId = res.data.lineId
           this.listQuery.projectName = res.data.projectName
@@ -546,6 +568,20 @@ export default class extends Vue {
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
           this.listQuery.dayNum = res.data.dayNum + '趟'
+          this.listQuery.lineDeliveryInfoFORMS = res.data.lineDeliveryInfoFORMS
+          const object:{[key:string]:any} = {}
+          const activeFron:Array<any> = []
+          this.listQuery.lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
+            object['lineDeliveryInfoFORMS' + index] = item.workingTimeStart + '-' + item.workingTimeEnd
+            activeFron.push({ type: 7,
+              label: '预计工作时间段',
+              key: 'lineDeliveryInfoFORMS' + index
+            })
+          })
+          this.formItem2.push(...activeFron)
+
+          // this.listQuery = Object.assign({}, this.listQuery, object)
+          this.listQuery = { ...this.listQuery, ...object }
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
@@ -678,18 +714,14 @@ export default class extends Vue {
     }
 }
 </script>
-<style lang='scss' >
+<style lang="scss">
 .Detail {
-   .el-table
-   {
-     .warning-row {
-      td{
-          color: #ff455b;
+  .el-table {
+    .warning-row {
+      td {
+        color: #ff455b;
       }
-
+    }
   }
-   }
-
 }
-
 </style>
