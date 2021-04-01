@@ -234,21 +234,14 @@ export const asyncRoutes: RouteConfig[] = [
   // deliveryRouter,
   // transportRouter,
   lineShelf, // 线路货架维护
-  // 司机运费账户
-  driverFreight,
-  // 客户运费账户
-  customerFreight,
-  // 运费管理
-  freightRouter,
-  // 线索管理
-  clueRouter,
-  driverAccountRouter,
-  // 司机云
-  driverCloudRouter,
-  // 系统管理
-  systemRouter,
-  // 权限管理
-  presetRouter,
+  driverCloudRouter, // 司机云
+  freightRouter, // 司机运费账户
+  driverFreight, // 试跑在跑生命周期
+  customerFreight, // 客户运费账户
+  driverAccountRouter, // 司机梧桐账户
+  clueRouter, // 线索管理
+  systemRouter, // 系统管理
+  presetRouter, // 权限管理
   {
     path: '*',
     redirect: '/401',
