@@ -170,6 +170,7 @@ export default class extends Vue {
      time: '', // 配送时间
      monthNum: '', // 预计月出车天数
      dayNum: '', // 每日配送趟数
+     lineDeliveryInfoFORMS: [], // 预计工作时间段
 
      everyTripGuaranteed: '', // 每趟保底（元）
      everyUnitPrice: '', // 每趟提成（元）
@@ -361,6 +362,12 @@ export default class extends Vue {
       label: '每日配送趟数',
       key: 'dayNum'
     }
+    // , {
+    //   type: 'lineDeliveryInfoFORMS',
+    //   label: '预计工作时间段',
+    //   key: 'lineDeliveryInfoFORMS',
+    //   slot: true
+    // }
   ]
   // 结算信息
   private formItem3 : IState[] = [
@@ -546,6 +553,7 @@ export default class extends Vue {
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
           this.listQuery.dayNum = res.data.dayNum + '趟'
+          this.listQuery.lineDeliveryInfoFORMS = res.data.lineDeliveryInfoFORMS
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
