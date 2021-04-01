@@ -208,7 +208,9 @@
           :list-query="baseInfo"
         >
           <template #deliveryWeekCycle="scope">
-            {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate }}
+            <!-- {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate||parseTime('{y}-{m}-{d}') }} -->
+            <!-- {{ scope.row.deliveryWeekCycle.split(',').map(item => '周'+item).join(',') }} -->
+            {{ formatWeek(scope.row.deliveryWeekCycle) }}
           </template>
         </self-form>
       </section-container>
@@ -687,6 +689,43 @@ export default class extends Vue {
   scrollTo(num:number = 0) {
     const ele: any = document.querySelector('.app-main')
     ele.scrollTo({ top: num, behavior: 'smooth' })
+  }
+  formatWeek(time:string) {
+    const arr = [
+      {
+        label: '周一',
+        value: 1
+      },
+      {
+        label: '周二',
+        value: 2
+      },
+      {
+        label: '周三',
+        value: 3
+      },
+      {
+        label: '周四',
+        value: 4
+      },
+      {
+        label: '周五',
+        value: 5
+      },
+      {
+        label: '周六',
+        value: 6
+      },
+      {
+        label: '周日',
+        value: 7
+      }
+    ]
+
+    const str = time.split(',').map((item:any) => {
+      return arr[Number(item) + -1].label
+    })
+    return str.join(',')
   }
   private isSkip = false
   private labelTypeArr = [] // 线路标签
