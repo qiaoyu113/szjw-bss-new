@@ -489,7 +489,7 @@ export default class extends Vue {
       type: 7,
       label: '每日出车趟数',
       key: 'dayNum',
-      unit: '天'
+      unit: '趟'
     },
     {
       type: 7,
@@ -776,7 +776,7 @@ export default class extends Vue {
 
       }
       this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
-      const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict } = data.data.lineDetailVO
+      const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict, lineDeliveryInfoFORMS } = data.data.lineDetailVO
       // 获取图片信息
       const {
         sellPoint,
@@ -795,8 +795,6 @@ export default class extends Vue {
         warehouseDistrict,
         videoUrl
       }
-      // 仓名称
-
       // 获取标签信息
       const object = {
         isHot,
@@ -808,6 +806,20 @@ export default class extends Vue {
       object.sellPoint = object.sellPoint.map((item:string) => Number(item))
       this.form = object
       this.lineLabelVo = data.data.lineLabelVO
+      const lineTiem:{[key:string]:any} = {}
+      const activeFron:Array<any> = []
+      // 获取预计工作时间段
+      lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
+        lineTiem['lineDeliveryInfoFORMS' + index] = item.workingTimeStart + '-' + item.workingTimeEnd
+        activeFron.push({ type: 7,
+          label: '预计工作时间段',
+          key: 'lineDeliveryInfoFORMS' + index
+        })
+      })
+      this.deliveryDemandItme.splice(4, 0, ...activeFron)
+
+      // this.listQuery = Object.assign({}, this.listQuery, object)
+      this.baseInfo = { ...this.baseInfo, ...lineTiem }
       // 页面滚动到具体的位置
       this.$emit('getnum')
       this.scrollTo()
