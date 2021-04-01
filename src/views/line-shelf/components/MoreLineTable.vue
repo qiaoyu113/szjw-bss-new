@@ -159,6 +159,7 @@ export default class extends Vue {
       this.listQuery.checkStatus !== '' && (params.agentStatus = this.listQuery.checkStatus)
       let { data: res } = await getFinishedMoreLine(params)
       if (res.success) {
+        this.page.total = res.page.total
         this.listLoading = false
         this.tableData = res.data
         this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all

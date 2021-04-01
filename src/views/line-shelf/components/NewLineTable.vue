@@ -167,6 +167,7 @@ export default class extends Vue {
           params.startDate = new Date(this.listQuery.agencyTime[0]).setHours(0, 0, 0)
           params.endDate = new Date(this.listQuery.agencyTime[1]).setHours(23, 59, 59)
         }
+
         this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
         this.listQuery.lineId !== '' && (params.key = this.listQuery.lineId)
         this.listQuery.checkStatus !== '' && (params.inspectionStatus = this.listQuery.checkStatus)
@@ -176,6 +177,7 @@ export default class extends Vue {
         if (res.success) {
           this.listLoading = false
           this.tableData = res.data
+          this.page.total = res.page.total
           this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all
           this.status[1].num = res.title.passedNum >= 999 ? '999+' : res.title.all
           this.status[2].num = res.title.failedNum >= 999 ? '999+' : res.title.all
