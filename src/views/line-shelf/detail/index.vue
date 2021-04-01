@@ -452,7 +452,15 @@ export default class extends Vue {
       key: 'lineUrgentName'// 1
     }
   ]
-
+  activated() {
+    if (this.$route.path.split('/')[2] === 'lineSnapshot') {
+      this.isShowTitle = !this.isShowTitle
+      this.getAllLineSnapshot()
+    } else {
+      this.isShowTitle = false
+      this.getAllLineDetail()
+    }
+  }
   // 操作日志
   private columns : IState = [
     {
