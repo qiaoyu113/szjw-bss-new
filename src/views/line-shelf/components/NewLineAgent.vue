@@ -48,6 +48,14 @@
               {{ scope.row.lineId }}
             </el-link>
           </template>
+          <template #waitDirveValidity="scope">
+            <span
+              :class="{error: timeError(scope.row.waitDirveValidity)}"
+              @click="goDetails(scope.row.lineId)"
+            >
+              {{ scope.row.waitDirveValidity }}
+            </span>
+          </template>
         </self-form>
       </section-container>
       <CuratorialInformation
@@ -355,9 +363,10 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 7,
+      type: 'waitDirveValidity',
       label: '窗口期',
       key: 'waitDirveValidity',
+      slot: true,
       tagAttrs: {
         class: 'error'
       }
@@ -469,12 +478,14 @@ export default class extends Vue {
     {
       type: 7,
       label: '预计月出车天数',
-      key: 'monthNum'
+      key: 'monthNum',
+      unit: '天'
     },
     {
       type: 7,
       label: '每日出车趟数',
-      key: 'dayNum'
+      key: 'dayNum',
+      unit: '天'
     },
     {
       type: 7,
@@ -484,7 +495,9 @@ export default class extends Vue {
     {
       type: 7,
       label: '配送数量',
-      key: 'deliveryNum'
+      key: 'deliveryNum',
+      unit: '天'
+
     },
     {
       type: 7,
@@ -502,7 +515,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '货物件数',
-      key: 'cargoNum'
+      key: 'cargoNum',
+      unit: '件'
     },
     {
       type: 7,
@@ -513,12 +527,14 @@ export default class extends Vue {
     {
       type: 7,
       label: '货物体积',
-      key: 'volume'
+      key: 'volume',
+      unit: '立方米'
     },
     {
       type: 7,
       label: '货物重量',
-      key: 'goodsWeight'
+      key: 'goodsWeight',
+      unit: '吨'
     },
     {
       type: 7,
@@ -531,17 +547,20 @@ export default class extends Vue {
     {
       type: 7,
       label: '单趟报价',
-      key: 'everyTripGuaranteed'
+      key: 'everyTripGuaranteed',
+      unit: '元'
     },
     {
       type: 7,
       label: '单趟提成报价',
-      key: 'everyUnitPrice'
+      key: 'everyUnitPrice',
+      unit: '元'
     },
     {
       type: 7,
       label: '预计月报价',
-      key: 'shipperOffer'
+      key: 'shipperOffer',
+      unit: '元'
     },
     {
       type: 7,
@@ -556,7 +575,8 @@ export default class extends Vue {
     {
       type: 7,
       label: '结算天数',
-      key: 'settlementDays'
+      key: 'settlementDays',
+      unit: '天'
     }
   ]
   private imgArr = [
@@ -586,8 +606,8 @@ export default class extends Vue {
     isHot: [{ required: true, message: '请选择是否爆款', trigger: 'blur' }],
     labelType: [{ required: true, message: '请选择线路标签', trigger: 'blur' }],
     isPanacea: [{ required: true, message: '请选择是否万金油', trigger: 'blur' }],
-    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }],
-    rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
+    sellPoint: [{ required: true, message: '请选择线路卖点', trigger: 'blur' }]
+    // rejectionReasons: [{ required: true, message: '请填写备注', trigger: 'blur' }]
   }
   page = {
     limit: 1,
@@ -815,6 +835,14 @@ export default class extends Vue {
       return error
     }
   }
+  // 时间
+  timeError(time:number) {
+    if (!time) return false
+    let currentTime = new Date(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000 - 1).getTime()
+    let oldTime = new Date(time).getTime()
+    let num = (currentTime - oldTime) / 86400000
+    return (num <= 3) && (num > 0)
+  }
 }
 </script>
 
@@ -889,6 +917,9 @@ export default class extends Vue {
 }
 ::v-deep .active{
   color: #649cee;
+}
+::v-deep .error{
+  color: #ff5256;
 }
 </style>
 
