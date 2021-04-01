@@ -29,7 +29,7 @@
           src="../../../assets/image/no-source.png"
           alt=""
         >
-        <div>暂无需要处理的代办，休息一下吧！</div>
+        <div>暂无需要处理的待办，休息一下吧！</div>
       </div>
     </template>
     <template v-else>
@@ -729,7 +729,7 @@ export default class extends Vue {
   private isSkip = false
   private labelTypeArr = [] // 线路标签
   private queryId = {} // ID
-  private hasAgent = true // 是否有代办
+  private hasAgent = true // 是否有待办
   private depotCuration = { // 仓策展信息
     warehouseName: '',
     warehouseDistrict: '',
@@ -751,7 +751,7 @@ export default class extends Vue {
         })
       }
       const { agentId, lineId, projectId } = data.data
-      // 是否有代办
+      // 是否有待办
       if (agentId === null) {
         this.hasAgent = true
         return
@@ -845,7 +845,7 @@ export default class extends Vue {
       this.labelTypeArr = res[1]
     }
   }
-  // 检查新线维护代办
+  // 检查新线维护待办
   @lock
   async checkNewlineSure(checkType: string, callBack:Function) {
     try {

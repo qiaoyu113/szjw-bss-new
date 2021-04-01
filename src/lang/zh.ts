@@ -194,7 +194,7 @@ export default {
     marketClue: '待市场分配线索',
     lineShelf: '线路货架维护',
     complete: '已完成',
-    agent: '代办',
+    agent: '待办',
     detail: '详情',
     lineSnapshot: '线路快照',
     RandomlyAssigned: '随机分配policy设置',

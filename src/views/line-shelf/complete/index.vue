@@ -83,7 +83,7 @@ private async getLineShelfNumSure() {
       type: 1,
       key: 'agentId',
       col: 8,
-      label: '代办编号',
+      label: '待办编号',
       tagAttrs: {
         placeholder: '请输入'
       }
@@ -124,7 +124,7 @@ private async getLineShelfNumSure() {
     {
       type: 3,
       key: 'agencyTime',
-      label: '代办完成时间',
+      label: '待办完成时间',
       col: 12,
       tagAttrs: {
         clearable: true,
@@ -188,7 +188,7 @@ private async getLineShelfNumSure() {
   private columns: any[] = [
     {
       key: 'agentId',
-      label: '代办编号'
+      label: '待办编号'
     },
     {
       key: 'lineName',
@@ -230,7 +230,7 @@ private async getLineShelfNumSure() {
     },
     {
       key: 'createDate',
-      label: '代办生成时间'
+      label: '待办生成时间'
     }
 
   ]
@@ -241,7 +241,7 @@ private async getLineShelfNumSure() {
       type: 1,
       key: 'agentId',
       col: 8,
-      label: '代办编号',
+      label: '待办编号',
       tagAttrs: {
         placeholder: '请输入'
       }
@@ -258,7 +258,7 @@ private async getLineShelfNumSure() {
     {
       type: 3,
       key: 'agencyTime',
-      label: '代办完成时间',
+      label: '待办完成时间',
       col: 12,
       tagAttrs: {
         clearable: true,
@@ -322,7 +322,7 @@ private async getLineShelfNumSure() {
    private columns1: any[] = [
      {
        key: 'agentId',
-       label: '代办编号'
+       label: '待办编号'
      },
      {
        key: 'lineName',
@@ -360,7 +360,7 @@ private async getLineShelfNumSure() {
      },
      {
        key: 'createDate',
-       label: '代办生成时间'
+       label: '待办生成时间'
      }
 
    ]

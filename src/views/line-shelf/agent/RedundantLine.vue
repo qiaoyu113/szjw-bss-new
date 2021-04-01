@@ -144,7 +144,7 @@ export default class extends Vue {
     {
       type: 1,
       key: 'agentId',
-      label: '代办编号：',
+      label: '待办编号：',
       tagAttrs: {
         placeholder: '请输入'
       },
@@ -162,7 +162,7 @@ export default class extends Vue {
     {
       type: 3,
       key: 'time',
-      label: '代办生成时间：',
+      label: '待办生成时间：',
       tagAttrs: {
         placeholder: '请选择'
       },
@@ -177,7 +177,7 @@ export default class extends Vue {
   columns = [
     {
       key: 'agentId',
-      label: '代办编号'
+      label: '待办编号'
     },
     {
       key: 'lineName',
@@ -205,7 +205,7 @@ export default class extends Vue {
     },
     {
       key: 'createDate',
-      label: '代办生成时间',
+      label: '待办生成时间',
       width: '140px'
     },
     {

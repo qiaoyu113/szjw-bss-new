@@ -417,7 +417,7 @@ export default class extends Vue {
     notFollowDay: '', // 未跟进天数
     onlyMe: false, // 只看自己
     status: '', // 状态
-    toDo: false, // 代办事项
+    toDo: false, // 待办事项
     sort: '', // 排序方式
     clueType: 0,
     createTime: '',
