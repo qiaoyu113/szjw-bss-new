@@ -179,8 +179,8 @@ export default class extends Vue {
           this.tableData = res.data
           this.page.total = res.page.total
           this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all
-          this.status[1].num = res.title.passedNum >= 999 ? '999+' : res.title.all
-          this.status[2].num = res.title.failedNum >= 999 ? '999+' : res.title.all
+          this.status[1].num = res.title.passedNum >= 999 ? '999+' : res.title.passedNum
+          this.status[2].num = res.title.failedNum >= 999 ? '999+' : res.title.failedNum
         } else {
           this.$message.error('出错逻辑  tab详情页接口问题')
         }
