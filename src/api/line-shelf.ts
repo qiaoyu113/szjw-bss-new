@@ -62,7 +62,7 @@ export const getFinishedMoreLine = (data :any) => {
 // 获取线路详情信息
 export const getLineDetail = (params :any) => {
   return request({
-    url: `${prefix4}/v2/line/lineInfo/detail`,
+    url: `${prefix4}/v3/line/shelf/maintenance/getLineShelfDetail`,
     method: 'get',
     params
   })
@@ -123,5 +123,12 @@ export const getLineShelfNum = () => {
   return request({
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
     // url: `${produce}/v3/line/shelf/maintenance/lineShelfNumPublic`
+  })
+}
+
+// 获取已完成新的数量
+export const getLineShelfCompletedNum = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewCompletedNum`
   })
 }

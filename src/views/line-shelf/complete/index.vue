@@ -29,7 +29,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineTable, MoreLineTable } from '../components'
-import { getFinishedLine, getLineShelfNum } from '@/api/line-shelf'
+import { getFinishedLine, getLineShelfNum, getLineShelfCompletedNum } from '@/api/line-shelf'
 import SelfTable from '@/components/Base/SelfTable.vue'
   interface IState {
   [key: string]: any;
@@ -68,8 +68,8 @@ private numImg = {
 }
 private async getLineShelfNumSure() {
   try {
-    const { data } = await getLineShelfNum()
-    // console.log(data)
+    const { data } = await getLineShelfCompletedNum()
+
     if (data.success) {
       this.numImg = data.data
     }
