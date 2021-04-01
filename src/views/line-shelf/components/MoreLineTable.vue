@@ -163,8 +163,8 @@ export default class extends Vue {
         this.listLoading = false
         this.tableData = res.data
         this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all
-        this.status[1].num = res.title.removeShelvesNum >= 999 ? '999+' : res.title.all
-        this.status[2].num = res.title.ignoreNum >= 999 ? '999+' : res.title.all
+        this.status[1].num = res.title.removeShelvesNum >= 999 ? '999+' : res.title.removeShelvesNum
+        this.status[2].num = res.title.ignoreNum >= 999 ? '999+' : res.title.ignoreNum
       } else {
         this.$message.error('数据无法访问')
       }
