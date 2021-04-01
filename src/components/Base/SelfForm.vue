@@ -123,7 +123,7 @@
           <span
             v-else-if="item.type ===7"
             v-bind="item.tagAttrs || {}"
-            v-text="canNull(listQuery[item.key],item.isNull,item.filterText)"
+            v-text="canNull(listQuery[item.key],item.isNull,item.filterText,item.unit)"
           />
           <el-cascader
             v-else-if="item.type ===8"
@@ -228,10 +228,10 @@ export default class extends Vue {
     }
 
     // 没有数据的情况下，是否展示暂无数据，默认展示否则为空
-    canNull(val:any, isNull:any, filterText:string) {
+    canNull(val:any, isNull:any, filterText:string, unit:string = '') {
       if (isNull) {
         if (val || val === 0) {
-          return val
+          return val + unit
         } else {
           return ''
         }
@@ -242,7 +242,7 @@ export default class extends Vue {
         }
         return ''
       } else {
-        return DataIsNull(val)
+        return DataIsNull(val) !== '暂无数据' ? DataIsNull(val + unit) : '暂无数据'
       }
     }
     // 提交表单

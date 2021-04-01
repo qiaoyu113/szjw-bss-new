@@ -121,7 +121,7 @@ export const nextNewLineTodo = () => request({
 // 获取新的数量
 export const getLineShelfNum = () => {
   return request({
-    // url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
-    url: `${produce}/v3/line/shelf/maintenance/lineShelfNumPublic`
+    url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
+    // url: `${produce}/v3/line/shelf/maintenance/lineShelfNumPublic`
   })
 }
