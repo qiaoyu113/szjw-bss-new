@@ -7,7 +7,7 @@
       >
         <span slot="label">
           <el-badge
-            :value="dnamicLable.lineShelfNewNum"
+            :value="dnamicLable.lineShelfNewNum>999?'999+':dnamicLable.lineShelfNewNum"
             class="item"
           > 新线维护 </el-badge>
         </span>
@@ -18,7 +18,7 @@
       >
         <span slot="label">
           <el-badge
-            :value="dnamicLable.redundantNewNum"
+            :value="dnamicLable.redundantNewNum>999?'999+':dnamicLable.redundantNewNum"
             class="item"
           > 冗余线路盘点 </el-badge>
         </span>

@@ -102,19 +102,12 @@ export default class extends Vue {
     {
       type: 7,
       label: '仓名称',
-      key: 'warehouseName',
-      tagAttrs: {
-        class: 'active'
-      }
+      key: 'warehouseName'
     },
     {
       type: 7,
       label: '仓位置',
-      key: 'warehouseDistrict',
-
-      tagAttrs: {
-        class: 'active'
-      }
+      key: 'warehouseDistrict'
     }
   ]
 
