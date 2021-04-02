@@ -36,6 +36,19 @@
             {{ listQuery.provinceAreaName }}/{{ listQuery.cityAreaName }}/{{ listQuery.countyAreaName }}
           </div>
         </template>
+        <template slot="serviceRequirementName">
+          <!-- {{ listQuery.serviceRequirementName }}{{ listQuery.remark }} -->
+          <el-tooltip
+            placement="right"
+          >
+            <div slot="content">
+              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+            </div>
+            <div class="ellipsis">
+              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+            </div>
+          </el-tooltip>
+        </template>
       </self-form>
     </SectionContainer>
     <SectionContainer
@@ -295,6 +308,7 @@ export default class extends Vue {
       label: '主要配送区域',
       key: 'lineArea',
       slot: true
+
     },
     {
       type: 7,
@@ -337,9 +351,10 @@ export default class extends Vue {
       key: 'returnWarehouseName'
     },
     {
-      type: 7,
+      type: 'serviceRequirementName',
       label: '服务要求和备注',
-      key: 'serviceRequirementName'
+      key: 'serviceRequirementName',
+      slot: true
     },
     {
       type: 7,
@@ -574,6 +589,7 @@ export default class extends Vue {
         this.listQuery.returnBill = res.data.returnBill === 1 ? '是' : '否'
         this.listQuery.returnWarehouseName = res.data.returnWarehouseName
         this.listQuery.serviceRequirementName = res.data.serviceRequirementName
+        this.listQuery.remark = res.data.remark
         this.listQuery.districtArea = res.data.districtArea
         this.listQuery.distributionWay =
           res.data.distributionWay === 1 ? '整车' : '多点配'
@@ -692,6 +708,7 @@ export default class extends Vue {
         this.listQuery.returnBill = res.data.returnBill === 1 ? '是' : '否'
         this.listQuery.returnWarehouseName = res.data.returnWarehouseName
         this.listQuery.serviceRequirementName = res.data.serviceRequirementName
+        this.listQuery.remark = res.data.remark
         this.listQuery.districtArea = res.data.districtArea
         this.listQuery.distributionWay =
           res.data.distributionWay === 1 ? '整车' : '多点配'
@@ -831,6 +848,14 @@ export default class extends Vue {
         color: #ff455b;
       }
     }
+  }
+    .ellipsis {
+    height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 }
 </style>
