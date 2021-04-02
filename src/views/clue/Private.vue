@@ -107,6 +107,7 @@
     <div class="table_box">
       <div class="table_top">
         <el-badge
+          v-permission="['/v2/market-clue/todoList']"
           :value="toDoValue"
           :max="99999"
         >
