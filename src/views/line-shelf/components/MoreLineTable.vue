@@ -111,7 +111,7 @@ export default class extends Vue {
   private tableData: any[] = [];
   private active: number = 0;
    private status: any[] = [
-     { label: '全部', value: 3, num: '' },
+     { label: '全部', value: '', num: '' },
      { label: '下架', value: 1, num: '' },
      { label: '忽略', value: 2, num: '' }
    ];
