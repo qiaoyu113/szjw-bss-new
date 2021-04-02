@@ -85,7 +85,7 @@
       />
     </SectionContainer>
     <SectionContainer
-      title="现场信息"
+      title="策展信息"
       :md="true"
     >
       <CuratorialInformation
@@ -155,9 +155,9 @@ export default class extends Vue {
       stabilityRateName: '',
       lineSaleName: '',
       dutyManagerIdName: '',
-      busiTypeName: '', // 车型
+      carTypeName: '', // 车型
       lineArea: '', // 配送区域
-      warehouseDistrict: '', // 详细地址
+      warehouseCountyName: '', // 详细地址
       isBehavior: '', // 是否走禁行
       isRestriction: '', // 是否走现行
       oilElectricityRequirementName: '', // 油电要求
@@ -165,7 +165,7 @@ export default class extends Vue {
       runSpeed: '', // 是否走高速
       returnBill: '', // 是否返仓
       serviceRequirementName: '', // 服务要求和备注
-      warehouseCountyName: '', // 仓库位置
+      warehouseDistrict: '', // 仓库位置
       distributionWay: '', // 配送方式
       deliveryNum: '', // 配送点数量
       distance: '', // 配送总里程
@@ -275,7 +275,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '配送车型',
-      key: 'busiTypeName'
+      key: 'carTypeName'
     },
     {
       type: 7,
@@ -285,7 +285,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '详细地址',
-      key: 'warehouseDistrict'
+      key: 'warehouseCountyName'
     },
     {
       type: 7,
@@ -330,7 +330,7 @@ export default class extends Vue {
     {
       type: 7,
       label: '仓库位置',
-      key: 'warehouseCountyName' // 1
+      key: 'warehouseDistrict' //
     },
     {
       type: 7,
@@ -558,7 +558,7 @@ export default class extends Vue {
           this.listQuery.lineSaleName = res.data.lineSaleName
           this.listQuery.dutyManagerIdName = res.data.dutyManagerIdName
 
-          this.listQuery.busiTypeName = res.data.busiTypeName
+          this.listQuery.carTypeName = res.data.carTypeName
           this.listQuery.lineArea = res.data.lineArea
           this.listQuery.warehouseDistrict = res.data.warehouseDistrict
           this.listQuery.isBehavior = res.data.isBehavior === 1 ? '是' : '否'
@@ -667,6 +667,20 @@ export default class extends Vue {
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
           this.listQuery.dayNum = res.data.dayNum + '趟'
+          this.listQuery.lineDeliveryInfoFORMS = res.data.lineDeliveryInfoFORMS
+          const object:{[key:string]:any} = {}
+          const activeFron:Array<any> = []
+          this.listQuery.lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
+            object['lineDeliveryInfoFORMS' + index] = item.workingTimeStart + '-' + item.workingTimeEnd
+            activeFron.push({ type: 7,
+              label: '预计工作时间段',
+              key: 'lineDeliveryInfoFORMS' + index
+            })
+          })
+          this.formItem2.push(...activeFron)
+
+          // this.listQuery = Object.assign({}, this.listQuery, object)
+          this.listQuery = { ...this.listQuery, ...object }
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
