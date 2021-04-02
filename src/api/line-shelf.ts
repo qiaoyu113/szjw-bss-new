@@ -43,7 +43,7 @@ export const getFinishedLine = (data :any) => {
     data
   })
 }
-// 获取代办维护数据
+// 获取待办维护数据
 export const getNewLineDetail = (data:any) => {
   return request({
     url: '/mock/153/get/newLIne/agent',
@@ -94,7 +94,7 @@ export const passLine = (data:any, params:any) =>
       return qs.stringify(params, { indices: false })
     }
   })
-  // 批量下架代办
+  // 批量下架待办
 export const offShelf = (data:any, params:any) =>
   request({
     url: `${produce}/v3/line/shelf/maintenance/batchShelfToDo`,
@@ -114,7 +114,7 @@ export const checkNewlineTodo = (data:any) =>
     data
   })
 
-// 下一个代办维护
+// 下一个待办维护
 export const nextNewLineTodo = () => request({
   url: `${produce}/v3/line/shelf/maintenance/nextNewLineMaintenance`
 })
@@ -122,6 +122,7 @@ export const nextNewLineTodo = () => request({
 export const getLineShelfNum = () => {
   return request({
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewStatusNum`
+    // url: `${produce}/v3/line/shelf/maintenance/lineShelfNumPublic`
   })
 }
 
