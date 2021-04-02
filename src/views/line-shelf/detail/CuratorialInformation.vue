@@ -102,9 +102,9 @@ export default class extends Vue {
   private curationItem = [
     {
       type: 7,
-      label: '亮点:',
+      label: '卖点:',
       key: 'sellPointName',
-      col: 4,
+      col: 24,
       tagAttrs: {
         class: 'active'
       }
