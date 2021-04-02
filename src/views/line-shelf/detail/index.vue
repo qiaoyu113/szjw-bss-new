@@ -48,10 +48,13 @@
         :pc-col="6"
       >
         <template slot="time">
-          <div>
+          <div v-show="Number(listQuery.lineCategory) ===2">
             {{ listQuery.deliveryStartDate.split(" ")[0] }}-{{
               listQuery.deliveryStartDate.split(" ")[0]
             }}
+          </div>
+          <div v-show="Number(listQuery.lineCategory)===1">
+            {{ listQuery.deliveryWeekCycle }}
           </div>
         </template>
       </self-form>
@@ -173,6 +176,8 @@ export default class extends Vue {
       distance: '', // 配送总里程
 
       time: '', // 配送时间
+      lineCategory: '', // 是否稳定
+      deliveryWeekCycle: '', // 稳定线路配送时间
       monthNum: '', // 预计月出车天数
       dayNum: '', // 每日配送趟数
       lineDeliveryInfoFORMS: [], // 预计工作时间段
@@ -560,6 +565,7 @@ export default class extends Vue {
           this.listQuery.distance = res.data.distance + '公里'
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
+          this.listQuery.lineCategory = res.data.lineCategory
           this.listQuery.dayNum = res.data.dayNum + '趟'
           this.listQuery.lineDeliveryInfoFORMS = res.data.lineDeliveryInfoFORMS
           const object:{[key:string]:any} = {}
@@ -575,6 +581,11 @@ export default class extends Vue {
 
           // this.listQuery = Object.assign({}, this.listQuery, object)
           this.listQuery = { ...this.listQuery, ...object }
+
+          let dayWork = res.data.deliveryWeekCycle.split(',').map((item:any) => {
+            return '周' + item
+          })
+          this.listQuery.deliveryWeekCycle = dayWork.toString()
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
@@ -653,6 +664,7 @@ export default class extends Vue {
           this.listQuery.distance = res.data.distance + '公里'
           // 配送时间信息
           this.listQuery.monthNum = res.data.monthNum
+          this.listQuery.lineCategory = res.data.lineCategory
           this.listQuery.dayNum = res.data.dayNum + '趟'
           this.listQuery.lineDeliveryInfoFORMS = res.data.lineDeliveryInfoFORMS
           const object:{[key:string]:any} = {}
@@ -668,6 +680,11 @@ export default class extends Vue {
 
           // this.listQuery = Object.assign({}, this.listQuery, object)
           this.listQuery = { ...this.listQuery, ...object }
+
+          let dayWork = res.data.deliveryWeekCycle.split(',').map((item:any) => {
+            return '周' + item
+          })
+          this.listQuery.deliveryWeekCycle = dayWork.toString()
 
           // 结算信息
           this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
@@ -690,7 +707,7 @@ export default class extends Vue {
           this.projectStrategyInfoVO.sellPointName = this.projectStrategyInfoVO.sellPointName.toString()
           let { cargoUrl, loadingPictureUrl, warehousePictureUrl } = res.data.projectStrategyInfoVO
 
-          this.AllImg = [cargoUrl, loadingPictureUrl, warehousePictureUrl]
+          this.AllImg = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
           this.ImgArr.map((item:any, index:any) => {
             item.imgArr = this.AllImg[index]
           })
