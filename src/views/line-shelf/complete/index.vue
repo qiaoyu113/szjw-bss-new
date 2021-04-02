@@ -161,7 +161,7 @@ private async getLineShelfNumSure() {
                 const end = new Date()
                 const start = new Date()
                 start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-                picker.$emit('pick', [start, start])
+                picker.$emit('pick', [start, end])
               }
             }
           ]
@@ -295,7 +295,7 @@ private async getLineShelfNumSure() {
                 const end = new Date()
                 const start = new Date()
                 start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-                picker.$emit('pick', [start, start])
+                picker.$emit('pick', [start, end])
               }
             }
           ]
@@ -355,7 +355,7 @@ private async getLineShelfNumSure() {
      },
      {
        key: 'lineCreateDate',
-       label: '线路创造时间'
+       label: '线路创建/激活时间'
      },
      {
        key: 'createDate',
