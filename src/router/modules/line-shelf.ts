@@ -40,7 +40,7 @@ const lineShelfRouter: RouteConfig = {
         apiUrl: 'root',
         hidden: true,
         title: 'lineDetail',
-        noCache: false
+        noCache: true
       }
     },
     {

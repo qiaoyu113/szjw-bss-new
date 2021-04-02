@@ -111,7 +111,7 @@ export default class extends Vue {
   private tableData: any[] = [];
   private active: number = 0;
    private status: any[] = [
-     { label: '全部', value: '', num: '' },
+     { label: '全部', value: 3, num: '' },
      { label: '下架', value: 1, num: '' },
      { label: '忽略', value: 2, num: '' }
    ];
@@ -162,9 +162,9 @@ export default class extends Vue {
         this.page.total = res.page.total
         this.listLoading = false
         this.tableData = res.data
-        this.status[0].num = res.title.all >= 999 ? '999+' : res.title.all
-        this.status[1].num = res.title.removeShelvesNum >= 999 ? '999+' : res.title.removeShelvesNum
-        this.status[2].num = res.title.ignoreNum >= 999 ? '999+' : res.title.ignoreNum
+        this.status[0].num = res.page.total >= 999 ? '999+' : res.page.total
+        this.status[1].num = res.page.total >= 999 ? '999+' : res.page.total
+        this.status[2].num = res.page.total >= 999 ? '999+' : res.page.total
       } else {
         this.$message.error('数据无法访问')
       }

@@ -1,5 +1,7 @@
 <template>
-  <div class="p15 Detail">
+  <div
+    class="p15 Detail"
+  >
     <h2
       v-show="isShowTitle"
       style="color:#ff455b"
@@ -365,23 +367,6 @@ export default class extends Vue {
       label: '每日配送趟数',
       key: 'dayNum'
     }
-    // }, {
-    //   type: 'lineDeliveryInfoFORMS0',
-    //   label: '预计工作时间段',
-    //   key: 'lineDeliveryInfoFORMS0',
-    //   slot: true
-    // }, {
-    //   type: 'lineDeliveryInfoFORMS1',
-    //   label: '预计工作时间段',
-    //   key: 'lineDeliveryInfoFORMS1',
-    //   slot: true
-    // },
-    // {
-    //   type: 'lineDeliveryInfoFORMS2',
-    //   label: '预计工作时间段',
-    //   key: 'lineDeliveryInfoFORMS2',
-    //   slot: true
-    // }
   ]
   // 结算信息
   private formItem3 : IState[] = [
@@ -623,7 +608,9 @@ export default class extends Vue {
         console.log(err)
       }
     }
-
+    get routerKey() {
+      return this.$route.query.id
+    }
     private async getAllLineSnapshot() {
       try {
         let params = {
@@ -720,7 +707,6 @@ export default class extends Vue {
         return 'warning-row'
       }
     }
-
     // mounted() {
     //   this.getAllLineDetail()
     // }
