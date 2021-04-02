@@ -27,7 +27,7 @@ const matchCenterRouter: RouteConfig = {
     },
     {
       path: 'customerInvite',
-      component: () => import( '@/views/set-center/CustomerInvite.vue'),
+      component: () => import('@/views/set-center/CustomerInvite.vue'),
       name: 'customerInvite',
       meta: {
         apiUrl: 'root',
