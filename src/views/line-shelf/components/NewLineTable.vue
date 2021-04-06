@@ -81,7 +81,6 @@
           <el-tooltip
             v-else
             placement="top"
-            effect="light"
           >
             <div
               slot="content"

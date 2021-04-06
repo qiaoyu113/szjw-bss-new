@@ -48,7 +48,6 @@
               {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
             <div
-
               class="ellipsis"
             >
               {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
@@ -76,7 +75,7 @@
         <template slot="time">
           <div v-show="Number(listQuery.lineCategory) === 2">
             {{ listQuery.deliveryStartDate.split(" ")[0] }}-{{
-              listQuery.deliveryStartDate.split(" ")[0]
+              listQuery.deliveryEndDate.split(" ")[0]
             }}
           </div>
           <div v-show="Number(listQuery.lineCategory) === 1">
@@ -615,7 +614,6 @@ export default class extends Vue {
         const activeFron: Array<any> = []
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
-            console.log(item.workingTimeStart)
             let abc = this.workTimeText(item, index)
 
             object['lineDeliveryInfoFORMS' + index] = abc
@@ -645,10 +643,12 @@ export default class extends Vue {
         this.listQuery.incomeSettlementMethod = res.data.incomeSettlementMethod
         this.listQuery.everyUnitPrice = res.data.everyUnitPrice
         this.listQuery.shipperOffer = res.data.shipperOffer
-        this.listQuery.incomeSettlementMethodName =
-          res.data.incomeSettlementMethodName
+        this.listQuery.incomeSettlementMethodName = res.data.incomeSettlementMethodName
         this.listQuery.settlementCycleName = res.data.settlementCycleName
         this.listQuery.settlementDays = res.data.settlementDays
+        if (Number(res.data.incomeSettlementMethod) === 1) {
+          this.formItem3.splice(0, 1)
+        }
         // 货物信息
         this.listQuery.cargoTypeName = res.data.cargoTypeName
         this.listQuery.carry = res.data.carry === 1 ? '是' : '否'
@@ -768,6 +768,9 @@ export default class extends Vue {
           res.data.incomeSettlementMethodName
         this.listQuery.settlementCycleName = res.data.settlementCycleName
         this.listQuery.settlementDays = res.data.settlementDays
+        if (Number(res.data.incomeSettlementMethod) === 1) {
+          this.formItem3.splice(0, 1)
+        }
         // 货物信息
         this.listQuery.cargoTypeName = res.data.cargoTypeName
         this.listQuery.carry = res.data.carry === 1 ? '是' : '否'
@@ -877,13 +880,10 @@ export default class extends Vue {
       }
     }
   }
-    .ellipsis {
-    height: 40px;
+  .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    white-space:word-break
   }
 }
 </style>
