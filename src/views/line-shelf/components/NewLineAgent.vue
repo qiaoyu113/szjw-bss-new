@@ -198,7 +198,11 @@
           label-position="top"
           :form-item="deliveryItem"
           :list-query="baseInfo"
-        />
+        >
+          <template #transArea="scope">
+            {{ scope.row.transArea }}
+          </template>
+        </self-form>
       </section-container>
       <section-container title="配送要求">
         <self-form
@@ -393,7 +397,8 @@ export default class extends Vue {
   ]
   private baseInfo = {
     checkbox: 'fadfas',
-    distance: ''
+    distance: '',
+    transArea: ''
   }
   private listQuery = {}
   private hasOption = [
@@ -421,9 +426,10 @@ export default class extends Vue {
       key: 'carTypeName'
     },
     {
-      type: 7,
+      type: 'transArea',
       label: '配送区域',
-      key: 'lineArea'
+      key: 'transArea',
+      slot: true
     },
     {
       type: 7,
@@ -775,6 +781,7 @@ export default class extends Vue {
           shareName: shareName.join('、')
         }
       }
+      this.baseInfo.transArea = data.data.lineDetailVO.provinceAreaName + data.data.lineDetailVO.cityAreaName + data.data.lineDetailVO.countyAreaName
       this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
       const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict, lineDeliveryInfoFORMS } = data.data.lineDetailVO
       // 获取图片信息
