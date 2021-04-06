@@ -145,7 +145,8 @@ export default class extends Vue {
       key: 'agentId',
       label: '待办编号：',
       tagAttrs: {
-        placeholder: '请输入'
+        placeholder: '请输入',
+        clearable: true
       },
       col: 6
     },
@@ -154,7 +155,8 @@ export default class extends Vue {
       key: 'key',
       label: '线路名称：',
       tagAttrs: {
-        placeholder: '请输入名称/编号'
+        placeholder: '请输入名称/编号',
+        clearable: true
       },
       col: 6
     },
