@@ -202,6 +202,9 @@
           <template #transArea="scope">
             {{ scope.row.transArea }}
           </template>
+          <template #serviceRemark="scope">
+            {{ scope.row.serviceRequirementName }}、 {{ scope.row.remark }}
+          </template>
         </self-form>
       </section-container>
       <section-container title="配送要求">
@@ -232,7 +235,7 @@
       <section-container title="结算信息">
         <self-form
           label-position="top"
-          :form-item="SettlementItem"
+          :form-item="baseInfo.incomeSettlementMethod === 2 ? SettlementItem : SettlementItem2"
           :list-query="baseInfo"
         />
       </section-container>
@@ -359,6 +362,7 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
+  private dayIndex = 1000
   private lineLabelVo:IState = {}
   private baseItem = [
     {
@@ -476,9 +480,10 @@ export default class extends Vue {
       filterText: '是:否'
     },
     {
-      type: 7,
+      type: 'serviceRemark',
       label: '服务要求和备注',
-      key: 'serviceRequirementName'
+      key: 'serviceRemark',
+      slot: true
     }
   ]
   private deliveryInfo = {}
@@ -546,6 +551,36 @@ export default class extends Vue {
       type: 7,
       label: '单趟提成报价',
       key: 'everyUnitPrice',
+      unit: '元'
+    },
+    {
+      type: 7,
+      label: '预计月报价',
+      key: 'shipperOffer',
+      unit: '元'
+    },
+    {
+      type: 7,
+      label: '计价方式',
+      key: 'incomeSettlementMethodName'
+    },
+    {
+      type: 7,
+      label: '结算周期',
+      key: 'settlementCycleName'
+    },
+    {
+      type: 7,
+      label: '结算天数',
+      key: 'settlementDays',
+      unit: '天'
+    }
+  ]
+  private SettlementItem2 = [
+    {
+      type: 7,
+      label: '单趟报价',
+      key: 'everyTripGuaranteed',
       unit: '元'
     },
     {
@@ -676,6 +711,20 @@ export default class extends Vue {
     const ele: any = document.querySelector('.app-main')
     ele.scrollTo({ top: num, behavior: 'smooth' })
   }
+
+  private workTimeText(item:any, idx:any) {
+    const [start, end] = [item.workingTimeStart, item.workingTimeEnd]
+    if (start && end) {
+      if (idx > this.dayIndex) {
+        return `次日${start}-次日${end}`
+      } else if (Number(start.substring(0, 2)) > Number(end.substring(0, 2))) {
+        this.dayIndex = idx
+        return `${start}-次日${end}`
+      }
+    }
+    return `${start}-${end}`
+  }
+
   formatWeek(time:string) {
     const arr = [
       {
@@ -799,7 +848,8 @@ export default class extends Vue {
       const activeFron:Array<any> = []
       // 获取预计工作时间段
       lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
-        lineTiem['lineDeliveryInfoFORMS' + index] = item.workingTimeStart + '-' + item.workingTimeEnd
+        let abc = this.workTimeText(item, index)
+        lineTiem['lineDeliveryInfoFORMS' + index] = abc
         activeFron.push({ type: 7,
           label: '预计工作时间段',
           key: 'lineDeliveryInfoFORMS' + index
