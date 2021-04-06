@@ -45,13 +45,13 @@
               slot="content"
               style="max-width:300px"
             >
-              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+              {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
             <div
 
               class="ellipsis"
             >
-              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+              {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
           </el-tooltip>
           <div v-else>
