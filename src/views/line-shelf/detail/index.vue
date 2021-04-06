@@ -45,13 +45,13 @@
               slot="content"
               style="max-width:300px"
             >
-              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+              {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
             <div
 
               class="ellipsis"
             >
-              {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
+              {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
           </el-tooltip>
           <div v-else>
@@ -166,6 +166,7 @@ interface IState {
 })
 export default class extends Vue {
   private isShowTitle = false;
+  private dayIndex = 1000;
   private projectStrategyInfoVO: IState = {};
   private AllImg: Array<any> = [];
   private listQuery: IState = {
@@ -614,9 +615,10 @@ export default class extends Vue {
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
             console.log(item.workingTimeStart)
+            let abc = this.workTimeText(item, index)
 
-            object['lineDeliveryInfoFORMS' + index] =
-              item.workingTimeStart + '-' + item.workingTimeEnd
+            object['lineDeliveryInfoFORMS' + index] = abc
+            // item.workingTimeStart + '-' + item.workingTimeEnd
 
             activeFron.push({
               type: 7,
@@ -735,8 +737,9 @@ export default class extends Vue {
         const activeFron: Array<any> = []
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
-            object['lineDeliveryInfoFORMS' + index] =
-              item.workingTimeStart + '-' + item.workingTimeEnd
+            let abc = this.workTimeText(item, index)
+
+            object['lineDeliveryInfoFORMS' + index] = abc
             activeFron.push({
               type: 7,
               label: '预计工作时间段',
@@ -798,7 +801,18 @@ export default class extends Vue {
       return 'warning-row'
     }
   }
-
+  private workTimeText(item:any, idx:any) {
+    const [start, end] = [item.workingTimeStart, item.workingTimeEnd]
+    if (start && end) {
+      if (idx > this.dayIndex) {
+        return `次日${start}-次日${end}`
+      } else if (Number(start.substring(0, 2)) > Number(end.substring(0, 2))) {
+        this.dayIndex = idx
+        return `${start}-次日${end}`
+      }
+    }
+    return `${start}-${end}`
+  }
   // mounted() {
   //   this.getAllLineDetail()
   // }
