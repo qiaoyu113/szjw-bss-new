@@ -81,8 +81,11 @@
           <el-tooltip
             v-else
             placement="top"
+            effect="light"
           >
-            <div slot="content">
+            <div
+              slot="content"
+            >
               {{ scope.row.rejectionReasons }}
             </div>
             <div class="remarks">
