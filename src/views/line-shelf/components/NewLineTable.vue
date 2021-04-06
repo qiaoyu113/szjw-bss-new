@@ -82,7 +82,9 @@
             v-else
             placement="top"
           >
-            <div slot="content">
+            <div
+              slot="content"
+            >
               {{ scope.row.rejectionReasons }}
             </div>
             <div class="remarks">
