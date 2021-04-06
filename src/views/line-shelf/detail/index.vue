@@ -37,17 +37,26 @@
           </div>
         </template>
         <template slot="serviceRequirementName">
-          <!-- {{ listQuery.serviceRequirementName }}{{ listQuery.remark }} -->
           <el-tooltip
+            v-if="listQuery.serviceRequirementName||listQuery.remark"
             placement="right"
           >
-            <div slot="content">
+            <div
+              slot="content"
+              style="max-width:300px"
+            >
               {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
             </div>
-            <div class="ellipsis">
+            <div
+
+              class="ellipsis"
+            >
               {{ listQuery.serviceRequirementName }}{{ listQuery.remark }}
             </div>
           </el-tooltip>
+          <div v-else>
+            暂无数据
+          </div>
         </template>
       </self-form>
     </SectionContainer>
@@ -604,8 +613,11 @@ export default class extends Vue {
         const activeFron: Array<any> = []
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
+            console.log(item.workingTimeStart)
+
             object['lineDeliveryInfoFORMS' + index] =
               item.workingTimeStart + '-' + item.workingTimeEnd
+
             activeFron.push({
               type: 7,
               label: '预计工作时间段',
@@ -786,6 +798,7 @@ export default class extends Vue {
       return 'warning-row'
     }
   }
+
   // mounted() {
   //   this.getAllLineDetail()
   // }
