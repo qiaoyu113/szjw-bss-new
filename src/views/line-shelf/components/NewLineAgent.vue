@@ -210,10 +210,15 @@
           :form-item="deliveryDemandItme"
           :list-query="baseInfo"
         >
-          <template #deliveryWeekCycle="scope">
-            <!-- {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate||parseTime('{y}-{m}-{d}') }} -->
-            <!-- {{ scope.row.deliveryWeekCycle.split(',').map(item => '周'+item).join(',') }} -->
-            {{ formatWeek(scope.row.deliveryWeekCycle) }}
+          <template #time="scope">
+            <div v-if="scope.row.lineCategory === 1">
+              {{ formatWeek(scope.row.deliveryWeekCycle) }}
+            </div>
+            <div v-else>
+              {{ scope.row.deliveryStartDate.split(" ")[0] }}-{{
+                scope.row.deliveryEndDate.split(" ")[0]
+              }}
+            </div>
           </template>
         </self-form>
       </section-container>
@@ -479,9 +484,9 @@ export default class extends Vue {
   private deliveryInfo = {}
   private deliveryDemandItme = [
     {
-      type: 'deliveryWeekCycle',
+      type: 'time',
       label: '配送时间',
-      key: 'deliveryWeekCycle',
+      key: 'time',
       slot: true
       // slot deliveryStartDate deliveryEndDate
     },
