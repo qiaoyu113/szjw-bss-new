@@ -529,32 +529,9 @@ export default class extends Vue {
     },
     {
       type: 7,
-      label: '货物件数',
-      key: 'cargoNum',
-      unit: '件'
-    },
-    {
-      type: 7,
       label: '是否需要搬运',
       key: 'carry',
       filterText: '是:否'
-    },
-    {
-      type: 7,
-      label: '货物体积',
-      key: 'volume',
-      unit: '立方米'
-    },
-    {
-      type: 7,
-      label: '货物重量',
-      key: 'goodsWeight',
-      unit: '吨'
-    },
-    {
-      type: 7,
-      label: '其他上岗要求',
-      key: 'dutyRemark'
     }
   ]
   private goodsInfo = {}
