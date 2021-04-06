@@ -391,7 +391,10 @@ export default class extends Vue {
       key: 'dutyManagerIdName'
     }
   ]
-  private baseInfo = {}
+  private baseInfo = {
+    checkbox: 'fadfas',
+    distance: ''
+  }
   private listQuery = {}
   private hasOption = [
     {
