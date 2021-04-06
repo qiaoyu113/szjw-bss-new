@@ -51,7 +51,6 @@
           <template #waitDirveValidity="scope">
             <span
               :class="{error: timeError(scope.row.waitDirveValidity)}"
-              @click="goDetails(scope.row.lineId)"
             >
               {{ scope.row.waitDirveValidity| parseTime('{y}-{m}-{d}') }}
             </span>
@@ -236,6 +235,7 @@
           type="info"
           plain
           :loading="isSkip"
+          :disabled="processingPriority === 1"
           @click="checkSuccess('4')"
         >
           跳过暂不检查
@@ -500,7 +500,7 @@ export default class extends Vue {
       type: 7,
       label: '配送数量',
       key: 'deliveryNum',
-      unit: '天'
+      unit: '个'
 
     },
     {
@@ -585,10 +585,7 @@ export default class extends Vue {
   ]
   private imgArr = [
     {
-      imgArr: [
-        'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-        'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
-      ],
+      imgArr: [],
       tiele: '仓库图片'
     },
     {
@@ -600,6 +597,7 @@ export default class extends Vue {
       tiele: '装货图片'
     }
   ]
+  private processingPriority: string = ''
   showDialog: boolean = false
   private dialogForm = {
     type: [],
@@ -751,7 +749,7 @@ export default class extends Vue {
           message: data.errorMsg
         })
       }
-      const { agentId, lineId, projectId } = data.data
+      const { agentId, lineId, projectId, processingPriority } = data.data
       // 是否有待办
       if (agentId === null) {
         this.hasAgent = true
@@ -767,13 +765,15 @@ export default class extends Vue {
           projectId
         }
       )
+      this.processingPriority = processingPriority
       this.baseInfo = data.data.lineDetailVO
-      const { cityName, sepcialName, shareName } = data.data.lineLabelVO
-      this.lableData = {
-        cityName,
-        sepcialName: sepcialName.join('、'),
-        shareName: shareName.join('、')
-
+      if (data.data.lineLabelVO) {
+        const { cityName, sepcialName, shareName } = data.data.lineLabelVO
+        this.lableData = {
+          cityName,
+          sepcialName: sepcialName.join('、'),
+          shareName: shareName.join('、')
+        }
       }
       this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
       const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict, lineDeliveryInfoFORMS } = data.data.lineDetailVO
@@ -821,9 +821,12 @@ export default class extends Vue {
       // this.listQuery = Object.assign({}, this.listQuery, object)
       this.baseInfo = { ...this.baseInfo, ...lineTiem }
       // 页面滚动到具体的位置
-      this.$emit('getnum')
+      setTimeout(() => {
+        this.$emit('getnum')
+      }, 1500)
       this.scrollTo()
     } catch (error) {
+      console.log('nextNewLineTodo', error)
       return error
     }
   }
@@ -895,7 +898,7 @@ export default class extends Vue {
     let currentTime = new Date(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000 - 1).getTime()
     let oldTime = new Date(time).getTime()
     let num = (currentTime - oldTime) / 86400000
-    return (num <= 3) && (num > 0)
+    return Math.abs(num) <= 3
   }
 }
 </script>
