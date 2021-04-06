@@ -738,7 +738,6 @@ export default class extends Vue {
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
             let abc = this.workTimeText(item, index)
-
             object['lineDeliveryInfoFORMS' + index] = abc
             activeFron.push({
               type: 7,
@@ -784,7 +783,7 @@ export default class extends Vue {
           cargoUrl,
           loadingPictureUrl
         } = res.data.projectStrategyInfoVO
-        const AllImg = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
+        this.AllImg = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
         this.ImgArr.map((item: any, index: any) => {
           item.imgArr = this.AllImg[index]
         })
