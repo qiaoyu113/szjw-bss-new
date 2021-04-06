@@ -218,6 +218,7 @@ export default class extends Vue {
     incomeSettlementMethodName: '', // 计价方式
     settlementCycleName: '', // 结算周期
     settlementDays: '', // 结算天数
+    incomeSettlementMethod: '', // 按趟计费
 
     cargoTypeName: '', // 货物类型
     carry: '', // 是否需要搬运
@@ -641,6 +642,7 @@ export default class extends Vue {
 
         // 结算信息
         this.listQuery.everyTripGuaranteed = res.data.everyTripGuaranteed
+        this.listQuery.incomeSettlementMethod = res.data.incomeSettlementMethod
         this.listQuery.everyUnitPrice = res.data.everyUnitPrice
         this.listQuery.shipperOffer = res.data.shipperOffer
         this.listQuery.incomeSettlementMethodName =
