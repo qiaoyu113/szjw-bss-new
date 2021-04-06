@@ -737,8 +737,9 @@ export default class extends Vue {
         const activeFron: Array<any> = []
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
-            object['lineDeliveryInfoFORMS' + index] =
-              item.workingTimeStart + '-' + item.workingTimeEnd
+            let abc = this.workTimeText(item, index)
+
+            object['lineDeliveryInfoFORMS' + index] = abc
             activeFron.push({
               type: 7,
               label: '预计工作时间段',
