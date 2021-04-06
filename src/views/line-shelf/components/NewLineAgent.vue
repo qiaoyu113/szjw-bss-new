@@ -203,7 +203,7 @@
             {{ scope.row.transArea }}
           </template>
           <template #serviceRemark="scope">
-            {{ scope.row.serviceRequirementName }}、 {{ scope.row.remark }}
+            {{ scope.row.serviceRequirementName }}{{ scope.row.serviceRequirementName && scope.row.remark ? '、' : '暂无数据' }}{{ scope.row.remark }}
           </template>
         </self-form>
       </section-container>
