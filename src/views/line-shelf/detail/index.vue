@@ -365,6 +365,7 @@ export default class extends Vue {
       label: '服务要求和备注',
       key: 'serviceRequirementName',
       slot: true
+
     },
     {
       type: 7,
