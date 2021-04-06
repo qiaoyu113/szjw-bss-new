@@ -614,7 +614,6 @@ export default class extends Vue {
         const activeFron: Array<any> = []
         this.listQuery.lineDeliveryInfoFORMS.forEach(
           (item: any, index: number) => {
-            console.log(item.workingTimeStart)
             let abc = this.workTimeText(item, index)
 
             object['lineDeliveryInfoFORMS' + index] = abc
