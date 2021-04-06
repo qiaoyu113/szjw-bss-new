@@ -846,6 +846,44 @@ export default class extends Vue {
       this.lineLabelVo = data.data.lineLabelVO
       const lineTiem:{[key:string]:any} = {}
       const activeFron:Array<any> = []
+      this.deliveryDemandItme = [
+        {
+          type: 'time',
+          label: '配送时间',
+          key: 'time',
+          slot: true
+          // slot deliveryStartDate deliveryEndDate
+        },
+        {
+          type: 7,
+          label: '预计月出车天数',
+          key: 'monthNum',
+          unit: '天'
+        },
+        {
+          type: 7,
+          label: '每日出车趟数',
+          key: 'dayNum',
+          unit: '趟'
+        },
+        {
+          type: 7,
+          label: '预计工作时间',
+          key: 'timeDiff'
+        },
+        {
+          type: 7,
+          label: '配送数量',
+          key: 'deliveryNum',
+          unit: '个'
+
+        },
+        {
+          type: 7,
+          label: '配送里程',
+          key: 'distance'
+        }
+      ]
       // 获取预计工作时间段
       lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
         let abc = this.workTimeText(item, index)
