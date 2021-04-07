@@ -33,12 +33,14 @@
       >
         <template slot="lineArea">
           <div>
-            {{ listQuery.provinceAreaName }}/{{ listQuery.cityAreaName }}/{{ listQuery.countyAreaName }}
+            {{ listQuery.provinceAreaName }}/{{ listQuery.cityAreaName }}/{{
+              listQuery.countyAreaName
+            }}
           </div>
         </template>
         <template slot="serviceRequirementName">
           <el-tooltip
-            v-if="listQuery.serviceRequirementName||listQuery.remark"
+            v-if="listQuery.serviceRequirementName || listQuery.remark"
             placement="right"
           >
             <div
@@ -47,9 +49,7 @@
             >
               {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
-            <div
-              class="ellipsis"
-            >
+            <div class="ellipsis">
               {{ listQuery.serviceRequirementName }} {{ listQuery.remark }}
             </div>
           </el-tooltip>
@@ -318,7 +318,6 @@ export default class extends Vue {
       label: '主要配送区域',
       key: 'lineArea',
       slot: true
-
     },
     {
       type: 7,
@@ -365,7 +364,6 @@ export default class extends Vue {
       label: '服务要求和备注',
       key: 'serviceRequirementName',
       slot: true
-
     },
     {
       type: 7,
@@ -644,12 +642,13 @@ export default class extends Vue {
         this.listQuery.incomeSettlementMethod = res.data.incomeSettlementMethod
         this.listQuery.everyUnitPrice = res.data.everyUnitPrice
         this.listQuery.shipperOffer = res.data.shipperOffer
-        this.listQuery.incomeSettlementMethodName = res.data.incomeSettlementMethodName
+        this.listQuery.incomeSettlementMethodName =
+          res.data.incomeSettlementMethodName
         this.listQuery.settlementCycleName = res.data.settlementCycleName
         this.listQuery.settlementDays = res.data.settlementDays
         if (Number(res.data.incomeSettlementMethod) === 1) {
           this.formItem3.splice(0, 1)
-          this.formItem3.map((item:any) => {
+          this.formItem3.map((item: any) => {
             if (item.label === '每趟保底（元）') {
               item.label = '单趟报价（元）'
             }
@@ -776,7 +775,7 @@ export default class extends Vue {
         this.listQuery.settlementDays = res.data.settlementDays
         if (Number(res.data.incomeSettlementMethod) === 1) {
           this.formItem3.splice(0, 1)
-          this.formItem3.map((item:any) => {
+          this.formItem3.map((item: any) => {
             if (item.label === '每趟保底（元）') {
               item.label = '单趟报价（元）'
             }
@@ -816,7 +815,7 @@ export default class extends Vue {
       return 'warning-row'
     }
   }
-  private workTimeText(item:any, idx:any) {
+  private workTimeText(item: any, idx: any) {
     const [start, end] = [item.workingTimeStart, item.workingTimeEnd]
     if (start && end) {
       if (idx > this.dayIndex) {
@@ -875,9 +874,12 @@ export default class extends Vue {
         value: 7
       }
     ]
-    const str = time.split(',').sort().map((item: any) => {
-      return arr[Number(item) + -1].label
-    })
+    const str = time
+      .split(',')
+      .sort()
+      .map((item: any) => {
+        return arr[Number(item) + -1].label
+      })
     return str.join(',')
   }
 }
@@ -892,9 +894,11 @@ export default class extends Vue {
     }
   }
   .ellipsis {
+    display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space:word-break
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 </style>
