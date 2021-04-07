@@ -51,7 +51,6 @@
           <template #waitDirveValidity="scope">
             <span
               :class="{error: timeError(scope.row.waitDirveValidity)}"
-              @click="goDetails(scope.row.lineId)"
             >
               {{ scope.row.waitDirveValidity| parseTime('{y}-{m}-{d}') }}
             </span>
@@ -199,7 +198,14 @@
           label-position="top"
           :form-item="deliveryItem"
           :list-query="baseInfo"
-        />
+        >
+          <template #transArea="scope">
+            {{ scope.row.transArea }}
+          </template>
+          <template #serviceRemark="scope">
+            {{ scope.row.serviceRequirementName }}{{ scope.row.serviceRequirementName && scope.row.remark ? '、' : '暂无数据' }}{{ scope.row.remark }}
+          </template>
+        </self-form>
       </section-container>
       <section-container title="配送要求">
         <self-form
@@ -207,10 +213,15 @@
           :form-item="deliveryDemandItme"
           :list-query="baseInfo"
         >
-          <template #deliveryWeekCycle="scope">
-            <!-- {{ scope.row.deliveryStartDate|parseTime('{y}-{m}-{d}') }}-{{ scope.row.scopedeliveryEndDate||parseTime('{y}-{m}-{d}') }} -->
-            <!-- {{ scope.row.deliveryWeekCycle.split(',').map(item => '周'+item).join(',') }} -->
-            {{ formatWeek(scope.row.deliveryWeekCycle) }}
+          <template #time="scope">
+            <div v-if="scope.row.lineCategory === 1">
+              {{ formatWeek(scope.row.deliveryWeekCycle) }}
+            </div>
+            <div v-else>
+              {{ scope.row.deliveryStartDate.split(" ")[0] }}-{{
+                scope.row.deliveryEndDate.split(" ")[0]
+              }}
+            </div>
           </template>
         </self-form>
       </section-container>
@@ -224,7 +235,7 @@
       <section-container title="结算信息">
         <self-form
           label-position="top"
-          :form-item="SettlementItem"
+          :form-item="baseInfo.incomeSettlementMethod === 2 ? SettlementItem : SettlementItem2"
           :list-query="baseInfo"
         />
       </section-container>
@@ -236,6 +247,7 @@
           type="info"
           plain
           :loading="isSkip"
+          :disabled="processingPriority === 1"
           @click="checkSuccess('4')"
         >
           跳过暂不检查
@@ -350,6 +362,7 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
+  private dayIndex = 1000
   private lineLabelVo:IState = {}
   private baseItem = [
     {
@@ -393,7 +406,8 @@ export default class extends Vue {
   ]
   private baseInfo = {
     checkbox: 'fadfas',
-    distance: ''
+    distance: '',
+    transArea: ''
   }
   private listQuery = {}
   private hasOption = [
@@ -421,9 +435,10 @@ export default class extends Vue {
       key: 'carTypeName'
     },
     {
-      type: 7,
+      type: 'transArea',
       label: '配送区域',
-      key: 'lineArea'
+      key: 'transArea',
+      slot: true
     },
     {
       type: 7,
@@ -465,17 +480,18 @@ export default class extends Vue {
       filterText: '是:否'
     },
     {
-      type: 7,
+      type: 'serviceRemark',
       label: '服务要求和备注',
-      key: 'serviceRequirementName'
+      key: 'serviceRemark',
+      slot: true
     }
   ]
   private deliveryInfo = {}
   private deliveryDemandItme = [
     {
-      type: 'deliveryWeekCycle',
+      type: 'time',
       label: '配送时间',
-      key: 'deliveryWeekCycle',
+      key: 'time',
       slot: true
       // slot deliveryStartDate deliveryEndDate
     },
@@ -500,7 +516,7 @@ export default class extends Vue {
       type: 7,
       label: '配送数量',
       key: 'deliveryNum',
-      unit: '天'
+      unit: '个'
 
     },
     {
@@ -518,32 +534,9 @@ export default class extends Vue {
     },
     {
       type: 7,
-      label: '货物件数',
-      key: 'cargoNum',
-      unit: '件'
-    },
-    {
-      type: 7,
       label: '是否需要搬运',
       key: 'carry',
       filterText: '是:否'
-    },
-    {
-      type: 7,
-      label: '货物体积',
-      key: 'volume',
-      unit: '立方米'
-    },
-    {
-      type: 7,
-      label: '货物重量',
-      key: 'goodsWeight',
-      unit: '吨'
-    },
-    {
-      type: 7,
-      label: '其他上岗要求',
-      key: 'dutyRemark'
     }
   ]
   private goodsInfo = {}
@@ -583,12 +576,39 @@ export default class extends Vue {
       unit: '天'
     }
   ]
+  private SettlementItem2 = [
+    {
+      type: 7,
+      label: '单趟报价',
+      key: 'everyTripGuaranteed',
+      unit: '元'
+    },
+    {
+      type: 7,
+      label: '预计月报价',
+      key: 'shipperOffer',
+      unit: '元'
+    },
+    {
+      type: 7,
+      label: '计价方式',
+      key: 'incomeSettlementMethodName'
+    },
+    {
+      type: 7,
+      label: '结算周期',
+      key: 'settlementCycleName'
+    },
+    {
+      type: 7,
+      label: '结算天数',
+      key: 'settlementDays',
+      unit: '天'
+    }
+  ]
   private imgArr = [
     {
-      imgArr: [
-        'https://t7.baidu.com/it/u=825057118,3516313570&fm=193&f=GIF',
-        'https://5b0988e595225.cdn.sohucs.com/images/20180706/762c46951d624675ab88874a61a11eb5.jpeg'
-      ],
+      imgArr: [],
       tiele: '仓库图片'
     },
     {
@@ -600,6 +620,7 @@ export default class extends Vue {
       tiele: '装货图片'
     }
   ]
+  private processingPriority: string = ''
   showDialog: boolean = false
   private dialogForm = {
     type: [],
@@ -690,6 +711,20 @@ export default class extends Vue {
     const ele: any = document.querySelector('.app-main')
     ele.scrollTo({ top: num, behavior: 'smooth' })
   }
+
+  private workTimeText(item:any, idx:any) {
+    const [start, end] = [item.workingTimeStart, item.workingTimeEnd]
+    if (start && end) {
+      if (idx > this.dayIndex) {
+        return `次日${start}-次日${end}`
+      } else if (Number(start.substring(0, 2)) > Number(end.substring(0, 2))) {
+        this.dayIndex = idx
+        return `${start}-次日${end}`
+      }
+    }
+    return `${start}-${end}`
+  }
+
   formatWeek(time:string) {
     const arr = [
       {
@@ -751,7 +786,7 @@ export default class extends Vue {
           message: data.errorMsg
         })
       }
-      const { agentId, lineId, projectId } = data.data
+      const { agentId, lineId, projectId, processingPriority } = data.data
       // 是否有待办
       if (agentId === null) {
         this.hasAgent = true
@@ -767,14 +802,17 @@ export default class extends Vue {
           projectId
         }
       )
+      this.processingPriority = processingPriority
       this.baseInfo = data.data.lineDetailVO
-      const { cityName, sepcialName, shareName } = data.data.lineLabelVO
-      this.lableData = {
-        cityName,
-        sepcialName: sepcialName.join('、'),
-        shareName: shareName.join('、')
-
+      if (data.data.lineLabelVO) {
+        const { cityName, sepcialName, shareName } = data.data.lineLabelVO
+        this.lableData = {
+          cityName,
+          sepcialName: sepcialName.join('、'),
+          shareName: shareName.join('、')
+        }
       }
+      this.baseInfo.transArea = data.data.lineDetailVO.provinceAreaName + data.data.lineDetailVO.cityAreaName + data.data.lineDetailVO.countyAreaName
       this.baseInfo.distance = data.data.lineDetailVO.distance + '公里'
       const { isHot, isPanacea, labelType, warehouseName, warehouseDistrict, lineDeliveryInfoFORMS } = data.data.lineDetailVO
       // 获取图片信息
@@ -808,9 +846,48 @@ export default class extends Vue {
       this.lineLabelVo = data.data.lineLabelVO
       const lineTiem:{[key:string]:any} = {}
       const activeFron:Array<any> = []
+      this.deliveryDemandItme = [
+        {
+          type: 'time',
+          label: '配送时间',
+          key: 'time',
+          slot: true
+          // slot deliveryStartDate deliveryEndDate
+        },
+        {
+          type: 7,
+          label: '预计月出车天数',
+          key: 'monthNum',
+          unit: '天'
+        },
+        {
+          type: 7,
+          label: '每日出车趟数',
+          key: 'dayNum',
+          unit: '趟'
+        },
+        {
+          type: 7,
+          label: '预计工作时间',
+          key: 'timeDiff'
+        },
+        {
+          type: 7,
+          label: '配送数量',
+          key: 'deliveryNum',
+          unit: '个'
+
+        },
+        {
+          type: 7,
+          label: '配送里程',
+          key: 'distance'
+        }
+      ]
       // 获取预计工作时间段
       lineDeliveryInfoFORMS.forEach((item:any, index:number) => {
-        lineTiem['lineDeliveryInfoFORMS' + index] = item.workingTimeStart + '-' + item.workingTimeEnd
+        let abc = this.workTimeText(item, index)
+        lineTiem['lineDeliveryInfoFORMS' + index] = abc
         activeFron.push({ type: 7,
           label: '预计工作时间段',
           key: 'lineDeliveryInfoFORMS' + index
@@ -821,9 +898,12 @@ export default class extends Vue {
       // this.listQuery = Object.assign({}, this.listQuery, object)
       this.baseInfo = { ...this.baseInfo, ...lineTiem }
       // 页面滚动到具体的位置
-      this.$emit('getnum')
+      setTimeout(() => {
+        this.$emit('getnum')
+      }, 1500)
       this.scrollTo()
     } catch (error) {
+      console.log('nextNewLineTodo', error)
       return error
     }
   }
@@ -895,7 +975,7 @@ export default class extends Vue {
     let currentTime = new Date(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000 - 1).getTime()
     let oldTime = new Date(time).getTime()
     let num = (currentTime - oldTime) / 86400000
-    return (num <= 3) && (num > 0)
+    return Math.abs(num) <= 3
   }
 }
 </script>

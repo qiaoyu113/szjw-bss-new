@@ -53,12 +53,12 @@
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
-        <template #lineId="scope">
+        <template #lineName="scope">
           <el-link
             type="primary"
             @click="goDetails(scope.row.lineId)"
           >
-            {{ scope.row.lineId }}
+            {{ scope.row.lineName }}
           </el-link>
         </template>
         <template #btn="scope">
@@ -93,7 +93,6 @@
         >
           {{ dialogLineNum }}
         </el-link>
-
         条线路
       </div>
       <el-form
@@ -146,7 +145,8 @@ export default class extends Vue {
       key: 'agentId',
       label: '待办编号：',
       tagAttrs: {
-        placeholder: '请输入'
+        placeholder: '请输入',
+        clearable: true
       },
       col: 6
     },
@@ -155,7 +155,8 @@ export default class extends Vue {
       key: 'key',
       label: '线路名称：',
       tagAttrs: {
-        placeholder: '请输入名称/编号'
+        placeholder: '请输入名称/编号',
+        clearable: true
       },
       col: 6
     },
@@ -164,7 +165,42 @@ export default class extends Vue {
       key: 'time',
       label: '待办生成时间：',
       tagAttrs: {
-        placeholder: '请选择'
+        placeholder: '请选择',
+        pickerOptions: {
+          shortcuts: [{
+            text: '今天',
+            onClick(picker: any) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 0)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '近一周',
+            onClick(picker: any) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '近一月',
+            onClick(picker: any) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+              picker.$emit('pick', [start, end])
+            }
+          }, {
+            text: '近三月',
+            onClick(picker: any) {
+              const end = new Date()
+              const start = new Date()
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+              picker.$emit('pick', [start, end])
+            }
+          }]
+        }
       },
       col: 12
     }
@@ -181,12 +217,12 @@ export default class extends Vue {
     },
     {
       key: 'lineName',
-      label: '线路名称'
+      label: '线路名称',
+      slot: true
     },
     {
       key: 'lineId',
-      label: '线路编号',
-      slot: true
+      label: '线路编号'
     },
     {
       key: 'lineStatusName',
@@ -305,7 +341,7 @@ export default class extends Vue {
 
     if (!isSelect) {
       const num = this.multipleSelection.length
-      str = `已选择${num}条线路`
+      str = `已选择${num}条线路，确定忽略`
       title = '批量忽略线路'
       arr = this.multipleSelection.map((item:any) => item.agentId)
     }

@@ -85,7 +85,8 @@ private async getLineShelfNumSure() {
       col: 8,
       label: '待办编号',
       tagAttrs: {
-        placeholder: '请输入'
+        placeholder: '请输入',
+        clearable: true
       }
     },
     {
@@ -94,7 +95,8 @@ private async getLineShelfNumSure() {
       col: 8,
       label: '线路名称',
       tagAttrs: {
-        placeholder: '请输入名称/编号'
+        placeholder: '请输入名称/编号',
+        clearable: true
       }
     },
     {
@@ -103,7 +105,8 @@ private async getLineShelfNumSure() {
       col: 8,
       label: '原因',
       tagAttrs: {
-        placeholder: '请选择原因'
+        placeholder: '请选择原因',
+        clearable: true
       },
       options: [
         {
@@ -161,7 +164,7 @@ private async getLineShelfNumSure() {
                 const end = new Date()
                 const start = new Date()
                 start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-                picker.$emit('pick', [start, start])
+                picker.$emit('pick', [start, end])
               }
             }
           ]
@@ -242,7 +245,8 @@ private async getLineShelfNumSure() {
       col: 8,
       label: '待办编号',
       tagAttrs: {
-        placeholder: '请输入'
+        placeholder: '请输入',
+        clearable: true
       }
     },
     {
@@ -251,7 +255,8 @@ private async getLineShelfNumSure() {
       col: 8,
       label: '线路名称',
       tagAttrs: {
-        placeholder: '请输入名称/编号'
+        placeholder: '请输入名称/编号',
+        clearable: true
       }
     },
     {
@@ -295,7 +300,7 @@ private async getLineShelfNumSure() {
                 const end = new Date()
                 const start = new Date()
                 start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-                picker.$emit('pick', [start, start])
+                picker.$emit('pick', [start, end])
               }
             }
           ]
@@ -355,7 +360,7 @@ private async getLineShelfNumSure() {
      },
      {
        key: 'lineCreateDate',
-       label: '线路创造时间'
+       label: '线路创建/激活时间'
      },
      {
        key: 'createDate',
