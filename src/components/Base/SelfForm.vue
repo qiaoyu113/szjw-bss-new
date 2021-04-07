@@ -16,7 +16,7 @@
     >
       <el-col
         v-for="item in formItem"
-        :key="item.label || item.key"
+        :key=" item.key||item.label"
         :span="isPC ? item.col || pcCol : 24"
         :offset="item.offset|| 0"
       >
@@ -123,7 +123,7 @@
           <span
             v-else-if="item.type ===7"
             v-bind="item.tagAttrs || {}"
-            v-text="canNull(listQuery[item.key],item.isNull)"
+            v-text="canNull(listQuery[item.key],item.isNull,item.filterText,item.unit)"
           />
           <el-cascader
             v-else-if="item.type ===8"
@@ -204,6 +204,7 @@ import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { DataIsNull } from '@/utils/index'
 import '@/styles/common.scss'
+import { stream } from 'xlsx/types'
 
   interface IState {
     [key: string]: any;
@@ -227,15 +228,21 @@ export default class extends Vue {
     }
 
     // 没有数据的情况下，是否展示暂无数据，默认展示否则为空
-    canNull(val:any, isNull:any) {
+    canNull(val:any, isNull:any, filterText:string, unit:string = '') {
       if (isNull) {
         if (val || val === 0) {
-          return val
+          return val + unit
         } else {
           return ''
         }
+      } else if (filterText) {
+        if (typeof filterText === 'string') {
+          const arr = filterText.split(':')
+          return val === 1 ? arr[0] : arr[1]
+        }
+        return ''
       } else {
-        return DataIsNull(val)
+        return DataIsNull(val) !== '暂无数据' ? DataIsNull(val + unit) : '暂无数据'
       }
     }
     // 提交表单
