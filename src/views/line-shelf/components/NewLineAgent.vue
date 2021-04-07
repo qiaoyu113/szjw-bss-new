@@ -212,7 +212,8 @@
           </template>
           <template #serviceRemark="scope">
             <div class="serviceRemark">
-              {{ scope.row.serviceRequirementName }}{{ scope.row.serviceRequirementName && scope.row.remark ? '、' : '暂无数据' }}{{ scope.row.remark }}
+              {{ ceshi }}{{ !ceshi && !ceshi2 ? '暂无数据' : ceshi && ceshi2 ? '、' : '' }}{{ ceshi2 }}
+              {{ scope.row.serviceRequirementName }}{{ !scope.row.serviceRequirementName && !scope.row.remark ? '暂无数据' : scope.row.serviceRequirementName && !scope.row.remark ? '、' : '' }}{{ scope.row.remark }}
             </div>
           </template>
         </self-form>
