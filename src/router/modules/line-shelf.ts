@@ -29,7 +29,7 @@ const lineShelfRouter: RouteConfig = {
       meta: {
         apiUrl: 'root',
         title: 'complete',
-        noCache: true
+        noCache: false
       }
     },
     {
