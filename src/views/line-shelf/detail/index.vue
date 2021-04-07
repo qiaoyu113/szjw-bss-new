@@ -881,9 +881,14 @@ export default class extends Vue {
     }
   }
   .ellipsis {
+    text-overflow: -o-ellipsis-lastline;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space:word-break
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 24px;
   }
 }
 </style>

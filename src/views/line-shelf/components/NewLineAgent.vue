@@ -203,7 +203,9 @@
             {{ scope.row.transArea }}
           </template>
           <template #serviceRemark="scope">
-            {{ scope.row.serviceRequirementName }}{{ scope.row.serviceRequirementName && scope.row.remark ? '、' : '暂无数据' }}{{ scope.row.remark }}
+            <div class="serviceRemark">
+              {{ scope.row.serviceRequirementName }}{{ scope.row.serviceRequirementName && scope.row.remark ? '、' : '暂无数据' }}{{ scope.row.remark }}
+            </div>
           </template>
         </self-form>
       </section-container>
@@ -1105,6 +1107,16 @@ export default class extends Vue {
     ::v-deep .el-form-item__content {
       margin: 0 !important;
     }
+  }
+  .serviceRemark {
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 24px;
   }
 }
 .group-check {
