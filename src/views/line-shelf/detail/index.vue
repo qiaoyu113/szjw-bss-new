@@ -649,6 +649,11 @@ export default class extends Vue {
         this.listQuery.settlementDays = res.data.settlementDays
         if (Number(res.data.incomeSettlementMethod) === 1) {
           this.formItem3.splice(0, 1)
+          this.formItem3.map((item:any) => {
+            if (item.label === '每趟保底（元）') {
+              item.label = '单趟报价（元）'
+            }
+          })
         }
         // 货物信息
         this.listQuery.cargoTypeName = res.data.cargoTypeName
@@ -668,7 +673,7 @@ export default class extends Vue {
           warehousePictureUrl
         } = res.data.projectStrategyInfoVO
 
-        this.AllImg = [warehousePictureUrl, loadingPictureUrl, cargoUrl]
+        this.AllImg = [warehousePictureUrl, cargoUrl, loadingPictureUrl]
         this.ImgArr.map((item: any, index: any) => {
           item.imgArr = this.AllImg[index]
         })
@@ -771,6 +776,11 @@ export default class extends Vue {
         this.listQuery.settlementDays = res.data.settlementDays
         if (Number(res.data.incomeSettlementMethod) === 1) {
           this.formItem3.splice(0, 1)
+          this.formItem3.map((item:any) => {
+            if (item.label === '每趟保底（元）') {
+              item.label = '单趟报价（元）'
+            }
+          })
         }
         // 货物信息
         this.listQuery.cargoTypeName = res.data.cargoTypeName
