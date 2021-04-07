@@ -40,6 +40,14 @@
           :form-item="baseItem"
           :list-query="baseInfo"
         >
+          <template #lineName="scope">
+            <el-link
+              type="primary"
+              @click="goDetails(scope.row.lineId)"
+            >
+              {{ scope.row.lineName }}
+            </el-link>
+          </template>
           <template #lineId="scope">
             <el-link
               type="primary"
@@ -368,12 +376,13 @@ export default class extends Vue {
   private lineLabelVo:IState = {}
   private baseItem = [
     {
-      type: 7,
+      type: 'lineName',
       label: '线路名称',
       key: 'lineName',
       tagAttrs: {
         class: 'active'
-      }
+      },
+      slot: true
     },
     {
       type: 'lineId',
