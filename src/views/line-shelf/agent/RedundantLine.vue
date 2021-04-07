@@ -402,6 +402,10 @@ export default class extends Vue {
       const { data } = await getReaundanLineList(params)
       if (data.success) {
         this.tableData = data.data
+        console.log(this.tableData)
+        this.tableData.map((item:any) => {
+          item.shelvesReasons = '线路创建后的15天，未有试跑意向/待确认/待到场/跟车中/已试跑/稳定在跑,18天内外线BD没有操作下架'
+        })
         this.page.total = data.page.total
       }
       this.$emit('getnum')
