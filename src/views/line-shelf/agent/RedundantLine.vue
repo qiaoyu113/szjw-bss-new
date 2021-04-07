@@ -12,7 +12,7 @@
         <div style="float: right">
           <el-button
             type="primary"
-            @click="getList(true)"
+            @click="getList()"
           >
             查询
           </el-button>
@@ -285,6 +285,7 @@ export default class extends Vue {
     this.multipleSelection = val
   }
   handlePageSize(page:any) {
+    console.log('page===', page)
     this.page.page = page.page
     this.page.limit = page.limit
     this.getList()
