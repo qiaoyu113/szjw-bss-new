@@ -41,15 +41,16 @@
       </template>
     </self-form>
     <div class="table-container">
-      <SelfTable
+      <self-table
         ref="agentRef"
+        :index="true"
         style="padding: 30px 10px"
         :is-p30="false"
         :columns="columns"
         :table-data="tableData"
         :page="page"
         :operation-list="[]"
-        row-key="a"
+        row-key="agentId"
         @onPageSize="handlePageSize"
         @selection-change="handleSelectionChange"
       >
@@ -75,7 +76,7 @@
             忽略
           </el-button>
         </template>
-      </SelfTable>
+      </self-table>
     </div>
     <SelfDialog
       :visible.sync="showDialog"
@@ -317,7 +318,7 @@ export default class extends Vue {
         this.agentIds = []
         setTimeout(() => {
           this.getList()
-        }, 1500)
+        }, 2000)
         callBack();
         (this.$refs.agentRef as any).toggleRowSelection()
       } else {
@@ -358,7 +359,7 @@ export default class extends Vue {
         })
         setTimeout(() => {
           this.getList()
-        }, 1500)
+        }, 2000)
       } else {
         this.$message({
           type: 'error',
