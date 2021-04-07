@@ -9,7 +9,7 @@ const lineShelfRouter: RouteConfig = {
   meta: {
     title: 'lineShelf',
     icon: 'chart',
-    apiUrl: 'root'
+    apiUrl: ['/v3/line/shelf/menu']
   },
   children: [
     {
