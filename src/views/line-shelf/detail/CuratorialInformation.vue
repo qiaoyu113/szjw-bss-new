@@ -43,7 +43,7 @@
       >
         <div class="curation-title">
           <span>讲解视频({{ hasvideo?1:0 }})</span>
-          <div :class="{'video-box': true ,'no-video-box': !hasvideo}">
+          <div :class="{'video-box': true}">
             <div
               v-if="hasvideo"
               class="video-mask"
@@ -52,6 +52,11 @@
               <i class="el-icon-video-play" />
               <span>点击播放</span>
             </div>
+            <img
+              v-else
+              src="../../../assets/image/no-video.png"
+              alt=""
+            >
           </div>
         </div>
       </el-col>
