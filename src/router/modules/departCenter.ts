@@ -1,0 +1,29 @@
+import { RouteConfig } from 'vue-router'
+import Layout from '@/layout/index.vue'
+
+const departCenterRouter: RouteConfig = {
+  path: '/depart',
+  component: Layout,
+  redirect: '/depart/guestList',
+  name: 'Depart',
+  meta: {
+    title: 'depart',
+    icon: 'delivery',
+    apiUrl: 'root',
+    alwaysShow: true
+  },
+  children: [
+    {
+      path: 'guestList', /* 客邀列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/guestList/index.vue'),
+      name: 'GuestList',
+      meta: {
+        apiUrl: 'root',
+        title: 'guestList',
+        noCache: false
+      }
+    }
+  ]
+}
+
+export default departCenterRouter
