@@ -25,6 +25,7 @@ import presetRouter from './modules/preset'
 // import customerRouter from './modules/customer'
 import lineShelf from './modules/line-shelf'
 import clueRouter from './modules/clue'
+import departCenterRouter from './modules/departCenter'
 
 Vue.use(Router)
 
@@ -233,6 +234,7 @@ export const asyncRoutes: RouteConfig[] = [
   // 运力中心
   // deliveryRouter,
   // transportRouter,
+  // -------------上线打开下面的注释------------
   lineShelf, // 线路货架维护
   driverCloudRouter, // 司机云
   freightRouter, // 司机运费账户
@@ -242,6 +244,7 @@ export const asyncRoutes: RouteConfig[] = [
   clueRouter, // 线索管理
   systemRouter, // 系统管理
   presetRouter, // 权限管理
+  departCenterRouter, // 撮合中心
   {
     path: '*',
     redirect: '/401',
