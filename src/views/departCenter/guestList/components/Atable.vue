@@ -25,7 +25,7 @@
               线
             </div>
             <div
-              v-if="isMore"
+              v-if="isShowPercent"
               class="percent"
             >
               匹配度{{ row.percent }}%
@@ -288,6 +288,7 @@ interface IState {
 @Component
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
+  @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
   private tableData:IState[] = [
     {
