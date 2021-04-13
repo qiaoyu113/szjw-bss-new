@@ -44,7 +44,7 @@
             <el-popover
               placement="right"
               width="200"
-              trigger="click"
+              trigger="hover"
             >
               <div class="text1">
                 这条线路是异常<el-button
@@ -194,11 +194,27 @@
           <template slot-scope="{row}">
             <p class="text">
               <el-button
-                v-if="row.a"
+                v-if="isMore&&row.a"
                 type="text"
                 size="small"
               >
                 匹配撮合
+              </el-button>
+            </p>
+            <p class="text">
+              <el-button
+                type="text"
+                size="small"
+              >
+                创建意向
+              </el-button>
+            </p>
+            <p class="text">
+              <el-button
+                type="text"
+                size="small"
+              >
+                取消意向
               </el-button>
             </p>
             <p class="text">
