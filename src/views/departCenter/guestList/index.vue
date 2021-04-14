@@ -78,7 +78,7 @@
     <div
       class="table_box"
     >
-      <Atable :table-data="tableData" />
+      <Atable :list-query="listQuery" />
       <pagination
         :operation-list="[]"
         :total="page.total"
@@ -119,7 +119,6 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private lineTypes:IState[] = [] // 线路肥瘦
   private timeLists:IState[] = []
-  private tableData:IState[]= [{}, {}]
   private listQuery:IState = {
     status: '',
     start: '',

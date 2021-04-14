@@ -236,6 +236,7 @@ export const asyncRoutes: RouteConfig[] = [
   // transportRouter,
   // -------------上线打开下面的注释------------
   lineShelf, // 线路货架维护
+  departCenterRouter, // 撮合中心
   driverCloudRouter, // 司机云
   freightRouter, // 司机运费账户
   driverFreight, // 试跑在跑生命周期
@@ -244,7 +245,6 @@ export const asyncRoutes: RouteConfig[] = [
   clueRouter, // 线索管理
   systemRouter, // 系统管理
   presetRouter, // 权限管理
-  departCenterRouter, // 撮合中心
   {
     path: '*',
     redirect: '/401',
