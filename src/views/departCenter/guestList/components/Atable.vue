@@ -1,299 +1,299 @@
 <template>
   <div class="lineTableContainer">
-    <template>
-      <el-table
-        ref="lineTable"
-        :data="tableData"
-        style="width: 100%"
-        border
-        stripe
-        highlight-current-row
-        size="mini"
-        row-key="id"
-        :row-style="{height: '20px'}"
-        fit
-        :cell-style="{padding: '5px 0'}"
+    <el-table
+      ref="lineTable"
+      :data="tableData"
+      style="width: 100%"
+      border
+      stripe
+      highlight-current-row
+      size="mini"
+      row-key="id"
+      :row-style="{height: '20px'}"
+      fit
+      :cell-style="{padding: '5px 0'}"
+    >
+      <el-table-column
+        label=""
+        width="50"
+        class-name="noP"
       >
-        <el-table-column
-          label=""
-          width="50"
-          class-name="noP"
-        >
-          <template slot-scope="{row}">
-            <div class="arrow" />
-            <div class="name">
-              线
+        <template slot-scope="{row}">
+          <div class="arrow" />
+          <div class="name">
+            线
+          </div>
+          <div
+            v-if="isShowPercent"
+            class="percent"
+          >
+            匹配度{{ row.percent }}%
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="基础信息"
+        width="180"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <router-link to="#">
+            {{ row.a }}
+          </router-link>
+          <el-popover
+            placement="right"
+            width="200"
+            trigger="hover"
+          >
+            <div class="text1">
+              这条线路是异常<el-button
+                type="text"
+                size="small"
+              >
+                火爆
+              </el-button>,4.2厢货,场景简单,菜鸟也能干...
             </div>
-            <div
-              v-if="isShowPercent"
-              class="percent"
+            <i
+              slot="reference"
+              class="el-icon-chat-dot-round"
+            />
+          </el-popover>
+          <p class="text">
+            ({{ row.b }})
+          </p>
+          <p class="text">
+            {{ row.lineId }}
+          </p>
+          <p class="text">
+            窗口期:剩余{{ row.c }}天
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="车辆"
+        width="180"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            {{ row.d }}/{{ row.e }}
+          </p>
+          <p class="text">
+            {{ row.f }}/{{ row.g }}/{{ row.h }}
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="配送信息"
+        width="180"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+          </p>
+          <p class="text">
+            配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="结算"
+        width="180"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            趟运费:{{ row.m1 }}元
+          </p>
+          <p class="text">
+            预计月运费:{{ row.m1 }}元
+          </p>
+          <p class="text">
+            结算周期:周结
+          </p>
+          <p class="text">
+            结算天数:7天
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="线路特点"
+        width="180"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            货品:食品/团购
+          </p>
+          <p class="text">
+            装卸难度:只装不卸
+          </p>
+          <p class="text">
+            配送类型:整车
+          </p>
+          <p class="text">
+            工作时间段:{{ row.time }}
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="标签"
+        width="120"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p
+            v-if="row.a"
+            class="text"
+          >
+            爆款
+          </p>
+          <p class="text">
+            客急
+          </p>
+          <p class="text">
+            客邀线
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="状态"
+        width="120"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            <i
+              class="el-icon-s-custom"
+            /> 老张
+          </p>
+          <p
+            v-if="row.a"
+            class="text"
+          >
+            已上架
+          </p>
+          <p class="text">
+            已发起客邀
+          </p>
+          <p class="text">
+            待确认意向
+          </p>
+          <p class="text">
+            客邀成功
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="操作"
+        width="120"
+        class-name="center"
+      >
+        <template slot-scope="{row}">
+          <p class="text">
+            <el-button
+              v-if="isMore&&row.a"
+              type="text"
+              size="small"
             >
-              匹配度{{ row.percent }}%
+              匹配撮合
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleCreateTruRun"
+            >
+              创建意向
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleCancelTruRun"
+            >
+              取消意向
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              type="text"
+              size="small"
+            >
+              查看详情
+            </el-button>
+          </p>
+          <p
+            v-if="isMore"
+            class="text"
+          >
+            <el-button
+              size="mini"
+              @click.stop="toogleExpand(row)"
+            >
+              {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+            </el-button>
+          </p>
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="isMore"
+        type="expand"
+        width="1"
+        class-name="expand"
+      >
+        <template slot-scope="{row}">
+          <div class="item">
+            <div class="title">
+              项目信息:
             </div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="基础信息"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <router-link to="#">
-              {{ row.a }}
-            </router-link>
-            <el-popover
-              placement="right"
-              width="200"
-              trigger="hover"
-            >
-              <div class="text1">
-                这条线路是异常<el-button
-                  type="text"
-                  size="small"
-                >
-                  火爆
-                </el-button>,4.2厢货,场景简单,菜鸟也能干...
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
-            <p class="text">
-              ({{ row.b }})
-            </p>
-            <p class="text">
-              {{ row.lineId }}
-            </p>
-            <p class="text">
-              窗口期:剩余{{ row.c }}天
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="车辆"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
-              {{ row.d }}/{{ row.e }}
-            </p>
-            <p class="text">
-              {{ row.f }}/{{ row.g }}/{{ row.h }}
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="配送信息"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
-              仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
-            </p>
-            <p class="text">
-              配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="结算"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
-              趟运费:{{ row.m1 }}元
-            </p>
-            <p class="text">
-              预计月运费:{{ row.m1 }}元
-            </p>
-            <p class="text">
-              结算周期:周结
-            </p>
-            <p class="text">
-              结算天数:7天
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="线路特点"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
-              货品:食品/团购
-            </p>
-            <p class="text">
-              装卸难度:只装不卸
-            </p>
-            <p class="text">
-              配送类型:整车
-            </p>
-            <p class="text">
-              工作时间段:{{ row.time }}
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="标签"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p
-              v-if="row.a"
-              class="text"
-            >
-              爆款
-            </p>
-            <p class="text">
-              客急
-            </p>
-            <p class="text">
-              客邀线
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="状态"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
-              <i
-                class="el-icon-s-custom"
-              /> 老张
-            </p>
-            <p
-              v-if="row.a"
-              class="text"
-            >
-              已上架
-            </p>
-            <p class="text">
-              已发起客邀
-            </p>
-            <p class="text">
-              待确认意向
-            </p>
-            <p class="text">
-              客邀成功
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          width="180"
-          class-name="center"
-        >
-          <template slot-scope="{row}">
-            <p class="text">
+            <div class="content">
               <el-button
-                v-if="isMore&&row.a"
-                type="text"
-                size="small"
-              >
-                匹配撮合
-              </el-button>
-            </p>
-            <p class="text">
-              <el-button
-                type="text"
-                size="small"
-              >
-                创建意向
-              </el-button>
-            </p>
-            <p class="text">
-              <el-button
-                type="text"
-                size="small"
-              >
-                取消意向
-              </el-button>
-            </p>
-            <p class="text">
-              <el-button
-                type="text"
-                size="small"
-              >
-                查看详情
-              </el-button>
-            </p>
-            <p
-              v-if="isMore"
-              class="text"
-            >
-              <el-button
+                v-for="item in row.arr"
+                :key="item"
                 size="mini"
-                @click.stop="toogleExpand(row)"
+                class="btn"
               >
-                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+                {{ item }}
               </el-button>
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          v-if="isMore"
-          type="expand"
-          width="1"
-          class-name="expand"
-        >
-          <template slot-scope="{row}">
-            <div class="item">
-              <div class="title">
-                项目信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.arr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
             </div>
-            <div class="item">
-              <div class="title">
-                配送信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.brr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
+          </div>
+          <div class="item">
+            <div class="title">
+              配送信息:
             </div>
-            <div class="item">
-              <div class="title">
-                撮合信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.crr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
+            <div class="content">
+              <el-button
+                v-for="item in row.brr"
+                :key="item"
+                size="mini"
+                class="btn"
+              >
+                {{ item }}
+              </el-button>
             </div>
-          </template>
-        </el-table-column>
-      </el-table>
-    </template>
+          </div>
+          <div class="item">
+            <div class="title">
+              撮合信息:
+            </div>
+            <div class="content">
+              <el-button
+                v-for="item in row.crr"
+                :key="item"
+                size="mini"
+                class="btn"
+              >
+                {{ item }}
+              </el-button>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 <script lang="ts">
@@ -301,7 +301,9 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
-@Component
+@Component({
+  name: 'lineTable'
+})
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
@@ -346,6 +348,14 @@ export default class extends Vue {
       row.isOpen = true
       $table.toggleRowExpansion(row)
     }
+  }
+  // 创建意向
+  handleCreateTruRun() {
+    this.$emit('tryRun')
+  }
+  // 取消意向
+  handleCancelTruRun() {
+    this.$emit('cancelTryRun')
   }
 }
 </script>

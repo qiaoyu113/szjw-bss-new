@@ -82,6 +82,8 @@
       <Atable
         :list-query="listQuery"
         :is-more="true"
+        @tryRun="handleCreateTryRun"
+        @cancelTryRun="handleCancelTryRun"
       />
       <pagination
         :operation-list="[]"
@@ -93,6 +95,12 @@
       />
     </div>
     <GuestDrawer v-model="showDrawer" />
+
+    <create-tryRun
+      ref="createTryRun"
+      :obj="obj"
+    />
+    <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
 <script lang="ts">
@@ -101,7 +109,12 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
+
 import GuestDrawer from '../guestDrawer/index.vue'
+import CreateTryRun from './components/CreateTryRun.vue'
+import CancelTryRun from './components/CancelTryRun.vue'
+import { GetDictionaryList } from '@/api/common'
+import { mapDictData, getProviceCityCountryData } from '../js/index'
 interface PageObj {
   page:number,
   limit:number,
@@ -117,17 +130,29 @@ interface IState {
     SelfForm,
     Atable,
     Pagination,
-    GuestDrawer
+    GuestDrawer,
+    CreateTryRun,
+    CancelTryRun
   }
 })
 export default class extends Vue {
+  private obj:IState = {
+    driverName: 'tom',
+    driverId: 'SJ20210121212',
+    lineName: '天猫配送',
+    lineId: 'XL20210121212',
+    workingTimeStart: '06:10'
+  }
   private listLoading:boolean = false
   private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
-  private lineTypes:IState[] = [] // 线路肥瘦
+  private labelTypeArr:IState[] = [] // 线路肥瘦
   private timeLists:IState[] = []
   private listQuery:IState = {
+    labelType: '',
+    isBehavior: '',
+    isRestriction: '',
     status: '',
     start: '',
     end: '',
@@ -165,8 +190,8 @@ export default class extends Vue {
         filterable: true
       },
       label: '线路肥瘦',
-      key: 'c',
-      options: this.lineTypes
+      key: 'labelType',
+      options: this.labelTypeArr
     },
     {
       type: 2,
@@ -176,7 +201,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '是否闯禁行',
-      key: 'd',
+      key: 'isBehavior',
       options: [
         {
           label: '全部',
@@ -200,7 +225,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '是否闯限行',
-      key: 'e',
+      key: 'isRestriction',
       options: [
         {
           label: '全部',
@@ -263,21 +288,27 @@ export default class extends Vue {
       type: 8,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       },
       label: '仓库位置',
-      key: 'g',
-      options: []
+      key: 'g'
     },
     {
       type: 8,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       },
       label: '配送区域',
-      key: 'i',
-      options: []
+      key: 'i'
     },
     {
       type: 'key',
@@ -399,8 +430,33 @@ export default class extends Vue {
     }
     this.getLists()
   }
-
+  // 创建试跑意向
+  handleCreateTryRun() {
+    (this.$refs.createTryRun as any).showDialog = true
+  }
+  // 取消创建试跑意向
+  handleCancelTryRun() {
+    (this.$refs.cancelTryRun as any).showDialog = true
+  }
+  // 获取字典列表
+  async getDictList() {
+    try {
+      let params:string[] = ['Intentional_compartment', 'line_label']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get dict list fail:${err}`)
+    } finally {
+      //
+    }
+  }
   init() {
+    this.getDictList()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({
