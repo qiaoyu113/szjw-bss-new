@@ -67,7 +67,8 @@
       </self-form>
       <div class="table_box">
         <div class="middle" />
-        <self-table
+        <span>{{ 111 }}</span>
+        <!-- <self-table
           ref="RefundForm"
           :index="listQuery.status === '3'"
           :is-p30="false"
@@ -100,7 +101,16 @@
               查看详情
             </el-button>
           </template>
-        </self-table>
+        </self-table> -->
+        <Btable :list-query="listQuery" />
+        <pagination
+          :operation-list="[]"
+          :total="page.total"
+          :page.sync="page.page"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :limit.sync="page.limit"
+          @pagination="handlePageSizeChange"
+        />
       </div>
     </div>
   </div>
@@ -111,6 +121,8 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
+import Btable from './components/Btable.vue'
+import Pagination from '@/components/Pagination/index.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -123,13 +135,16 @@ interface IState {
   name: 'LineList',
   components: {
     SelfTable,
-    SelfForm
+    SelfForm,
+    Btable,
+    Pagination
   }
 })
 export default class extends Vue {
-  private listLoading:boolean = false;
+  private listLoading:boolean = false
   private multipleSelection: any[] = []
-  private tableData:any[] = [];
+  private modelIdOptions: any[] = []
+  private tableData:any[] = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -160,7 +175,8 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true
-      }
+      },
+      options: this.modelIdOptions
     },
     {
       type: 2,
@@ -276,47 +292,47 @@ export default class extends Vue {
     },
     {
       name: '4',
-      text: '客邀成功'
+      text: '客邀撮合成功'
     },
     {
       name: '2',
-      text: '司推成功'
+      text: '司推撮合成功'
     }
   ]
-  private columns:any[] = [
-    {
-      key: 'basicsMessage',
-      label: '基础信息'
-    },
-    {
-      key: 'car',
-      label: '车辆'
-    },
-    {
-      key: 'deliveryMessage',
-      label: '配送信息'
-    },
-    {
-      key: 'settlement',
-      label: '结算'
-    },
-    {
-      key: 'lineCharacteristic',
-      label: '线路特点'
-    },
-    {
-      key: 'label',
-      label: '标签'
-    },
-    {
-      key: 'status',
-      label: '状态'
-    },
-    {
-      key: 'op',
-      label: '操作'
-    }
-  ]
+  // private columns:any[] = [
+  //   {
+  //     key: 'basicsMessage',
+  //     label: '基础信息'
+  //   },
+  //   {
+  //     key: 'car',
+  //     label: '车辆'
+  //   },
+  //   {
+  //     key: 'deliveryMessage',
+  //     label: '配送信息'
+  //   },
+  //   {
+  //     key: 'settlement',
+  //     label: '结算'
+  //   },
+  //   {
+  //     key: 'lineCharacteristic',
+  //     label: '线路特点'
+  //   },
+  //   {
+  //     key: 'label',
+  //     label: '标签'
+  //   },
+  //   {
+  //     key: 'status',
+  //     label: '状态'
+  //   },
+  //   {
+  //     key: 'op',
+  //     label: '操作'
+  //   }
+  // ]
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -327,9 +343,19 @@ export default class extends Vue {
     total: 0
   }
   // 分页
-  handlePageSize(page:PageObj) {
-    this.page.page = page.page
-    this.page.limit = page.limit
+  // handlePageSize(page:PageObj) {
+  //   this.page.page = page.page
+  //   this.page.limit = page.limit
+  // }
+  // 分页
+  handlePageSizeChange(page:number, limit:number) {
+    if (page) {
+      this.page.page = page
+    }
+    if (limit) {
+      this.page.limit = limit
+    }
+    this.getList()
   }
   handleSelectionChange(val:any) {
     // console.log(val)
@@ -352,6 +378,17 @@ export default class extends Vue {
       stabilityTemporary: '',
       lineName: '',
       status: ''
+    }
+  }
+  // 获取列表
+  async getList() {
+    try {
+      this.listLoading = true
+    } catch (err) {
+      console.log(`getlist fail:${err}`)
+    } finally {
+      this.listLoading = false
+      //
     }
   }
   // 发起客邀
