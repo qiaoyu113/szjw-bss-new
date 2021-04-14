@@ -145,7 +145,7 @@ export default class extends Vue {
   }
   private formItem:any[] = [
     {
-      type: 8,
+      type: 2,
       key: 'workCity',
       label: '城市',
       tagAttrs: {
@@ -154,7 +154,7 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'carType',
       label: '车型',
       tagAttrs: {
@@ -163,7 +163,7 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'lineFineness',
       label: '线路肥瘦',
       tagAttrs: {
@@ -172,7 +172,7 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'handlingDifficulty',
       label: '装卸难度',
       tagAttrs: {
@@ -181,7 +181,7 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'freightSection',
       label: '单趟运费区间',
       tagAttrs: {
@@ -190,7 +190,7 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'workTime',
       label: '工作时间段',
       tagAttrs: {
@@ -217,16 +217,30 @@ export default class extends Vue {
       }
     },
     {
-      type: 8,
+      type: 2,
       key: 'stabilityTemporary',
       label: '稳定/临时',
       tagAttrs: {
         placeholder: '请选择',
         clearable: true
-      }
+      },
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '稳定',
+          value: 1
+        },
+        {
+          label: '临时',
+          value: 2
+        }
+      ]
     },
     {
-      type: 8,
+      type: 1,
       key: 'lineName',
       label: '线路名称/编号',
       tagAttrs: {
@@ -267,10 +281,6 @@ export default class extends Vue {
     {
       name: '2',
       text: '司推成功'
-    },
-    {
-      name: '5',
-      text: '无法发起客邀'
     }
   ]
   private columns:any[] = [
