@@ -2,6 +2,7 @@
   <div
     v-loading="listLoading"
     class="GuestListContainer"
+    :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
       p15: isPC
     }"
@@ -78,7 +79,10 @@
     <div
       class="table_box"
     >
-      <Atable :list-query="listQuery" />
+      <Atable
+        :list-query="listQuery"
+        :is-more="true"
+      />
       <pagination
         :operation-list="[]"
         :total="page.total"
@@ -88,6 +92,7 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <GuestDrawer v-model="showDrawer" />
   </div>
 </template>
 <script lang="ts">
@@ -96,6 +101,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
+import GuestDrawer from '../guestDrawer/index.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -110,11 +116,13 @@ interface IState {
   components: {
     SelfForm,
     Atable,
-    Pagination
+    Pagination,
+    GuestDrawer
   }
 })
 export default class extends Vue {
   private listLoading:boolean = false
+  private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
   private lineTypes:IState[] = [] // 线路肥瘦
@@ -346,6 +354,9 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
+    alert(1)
+    this.showDrawer = true
+
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
       return this.$message.warning('单趟运费起始金额不能大于终止金额')
     }
@@ -405,6 +416,8 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
+    height: 100%;
+    transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;
