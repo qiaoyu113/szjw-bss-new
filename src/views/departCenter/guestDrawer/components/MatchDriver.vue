@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:38:14
- * @LastEditTime: 2021-04-13 18:16:19
+ * @LastEditTime: 2021-04-14 16:10:14
  * @LastEditors: D.C.base
 -->
 <template>
@@ -64,6 +64,9 @@
 <script lang="ts">
 import SearchKeyWords from './SearchKeyWords.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   components: {
     SearchKeyWords

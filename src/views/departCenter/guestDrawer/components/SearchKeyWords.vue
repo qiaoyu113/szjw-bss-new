@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-14 15:54:04
+ * @LastEditTime: 2021-04-14 16:46:51
  * @LastEditors: D.C.base
 -->
 <template>
@@ -16,7 +16,7 @@
             :key="index"
             trigger="hover"
             placement="bottom-start"
-            @visible-change="handleChange(item.title)"
+            @visible-change="handleChange(item.title,item.multiple)"
             @command="handleCommand"
           >
             <span class="el-dropdown-link">
@@ -33,19 +33,50 @@
             </el-dropdown-menu>
           </el-dropdown>
         </template>
+        <div class="formbox">
+          <el-input
+            v-model="keyWords"
+            placeholder="请输入司机姓名/编号"
+            suffix-icon="el-icon-search"
+          />
+          <el-button
+            type="primary"
+            size="small"
+          >
+            查询
+          </el-button>
+        </div>
       </div>
-      <div class="formbox">
-        <el-input
-          v-model="keyWords"
-          placeholder="请输入司机姓名/编号"
-          suffix-icon="el-icon-search"
-        />
-        <el-button
-          type="primary"
-          size="small"
-        >
-          查询
-        </el-button>
+      <div class="formList">
+        <div class="formItem">
+          <el-col :span="11">
+            <el-input
+              v-model="input"
+              placeholder="请输入起始金额"
+            />
+          </el-col>
+          <el-col
+            class="line"
+            :span="2"
+          >
+            -
+          </el-col>
+          <el-col :span="11">
+            <el-input
+              v-model="input"
+              placeholder="请输入终止金额"
+            />
+          </el-col>
+        </div>
+        <div class="formItem">
+          <el-time-picker
+            is-range
+            range-separator="至"
+            start-placeholder="开始时间"
+            end-placeholder="结束时间"
+            placeholder="选择时间范围"
+          />
+        </div>
       </div>
     </div>
     <div
@@ -74,6 +105,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   components: {
 
@@ -81,10 +115,11 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
+  private multiple: boolean = true
   private curSelected: object = {}
   private selectTitle: string = ''
   private selectedData: any[] = [];
-  private selectList:IState[] = [
+  private selectList: IState[] = [
     {
       options: [{
         value: '全部',
@@ -97,7 +132,6 @@ export default class SearchKeyWords extends Vue {
         label: '专车'
       }],
       multiple: true,
-      type: 'select',
       title: '业务线'
     },
     {
@@ -105,7 +139,7 @@ export default class SearchKeyWords extends Vue {
         value: '全部',
         label: '全部'
       }],
-      type: 'select',
+      multiple: true,
       title: '司机车型'
     },
     {
@@ -122,6 +156,7 @@ export default class SearchKeyWords extends Vue {
         value: '重装卸',
         label: '重装卸'
       }],
+      multiple: true,
       title: '期望装卸难度'
     },
     {
@@ -135,6 +170,7 @@ export default class SearchKeyWords extends Vue {
         value: '临时',
         label: '临时'
       }],
+      multiple: false,
       title: '期望稳定/临时'
     },
     {
@@ -157,6 +193,7 @@ export default class SearchKeyWords extends Vue {
         value: '季度结',
         label: '季度结'
       }],
+      multiple: true,
       title: '期望结算周期'
     },
     {
@@ -170,6 +207,7 @@ export default class SearchKeyWords extends Vue {
         value: '选项3',
         label: '蚵仔煎'
       }],
+      multiple: true,
       title: '期望货品类型'
     },
     {
@@ -183,6 +221,7 @@ export default class SearchKeyWords extends Vue {
         value: '多点配',
         label: '多点配'
       }],
+      multiple: false,
       title: '期望配送难度'
     }
   ]
@@ -190,10 +229,11 @@ export default class SearchKeyWords extends Vue {
     this.selectedData = []
     this.$emit('on-clear')
   }
-  handleChange(title) {
+  handleChange(title:string, multiple:boolean) {
     this.selectTitle = title
+    this.multiple = multiple
   }
-  handleCommand(command) {
+  handleCommand(command:string) {
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
         return item.type === this.selectTitle
@@ -201,6 +241,7 @@ export default class SearchKeyWords extends Vue {
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
         if (selecteds.indexOf(command) === -1) {
+          this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
           this.selectedData[index].selected.push(command)
         }
       } else {
@@ -218,7 +259,7 @@ export default class SearchKeyWords extends Vue {
       this.selectedData.push(obj)
     }
   }
-  clearSelect(i) {
+  clearSelect(i: number) {
     this.selectedData.splice(i, 1)
   }
   mounted() {
@@ -253,6 +294,8 @@ export default class SearchKeyWords extends Vue {
   .topSelect{
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
     padding:15px 30px 15px 30px;
     border-bottom:2px solid #f3f3f5;
     .selectedform{
@@ -264,11 +307,26 @@ export default class SearchKeyWords extends Vue {
       display: flex;
       justify-content: center;
       align-items: center;
+      width: 300px;
       .el-input{
         margin-right: 10px;
       }
       .el-button{
         height: 36px;
+      }
+    }
+    .formList{
+      display: flex;
+      align-items: center;
+      .formItem{
+        display: inline-block;
+        margin-right: 10px;
+        margin-top: 10px;
+        .line{
+          text-align: center;
+          height: 36px;
+          line-height: 36px;
+        }
       }
     }
   }
