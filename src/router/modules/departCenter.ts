@@ -14,6 +14,16 @@ const departCenterRouter: RouteConfig = {
   },
   children: [
     {
+      path: 'lineList', /* 线路列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/lineList/index.vue'),
+      name: 'LineList',
+      meta: {
+        apiUrl: 'root',
+        title: 'lineList',
+        noCache: false
+      }
+    },
+    {
       path: 'guestList', /* 客邀列表 */
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/guestList/index.vue'),
       name: 'GuestList',
