@@ -21,12 +21,12 @@
       >
         <template slot-scope="{row}">
           <div class="arrow" />
-          <div
+          <!-- <div
             v-if="isShowPercent"
             class="percent"
           >
             匹配度{{ row.percent }}%
-          </div>
+          </div> -->
           <div style="textAlign:center">
             <p class="text">
               <span class="cycleTag" />
@@ -149,7 +149,7 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        width="120"
+        width="150"
         class-name="center"
         fixed="right"
       >
@@ -165,6 +165,9 @@
             >
               呼叫
             </el-button>
+            <section class="phone">
+              18848885135
+            </section>
           </p>
           <p class="text">
             <el-button
@@ -173,6 +176,22 @@
               @click.stop="handleTag"
             >
               打标签
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              type="text"
+              size="small"
+            >
+              创建试跑意向
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              type="text"
+              size="small"
+            >
+              推线
             </el-button>
           </p>
           <p class="text">
@@ -191,6 +210,17 @@
               查看详情
             </el-button>
           </p>
+          <p
+            v-if="isMore"
+            class="text"
+          >
+            <el-button
+              size="mini"
+              @click.stop="toogleExpand(row)"
+            >
+              {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+            </el-button>
+          </p>
         </template>
       </el-table-column>
       <el-table-column
@@ -200,49 +230,44 @@
         class-name="expand"
       >
         <template slot-scope="{row}">
+          <div
+            class="item"
+            :a="row"
+          >
+            <div class="title">
+              基础信息:
+            </div>
+            <div class="content">
+              40岁/A1本/5年货运经验/58同城/成交：2020-01-01
+            </div>
+          </div>
           <div class="item">
             <div class="title">
-              项目信息:
+              试跑信息:
             </div>
             <div class="content">
               <el-button
-                v-for="item in row.arr"
-                :key="item"
                 size="mini"
-                class="btn"
+                type="text"
               >
-                {{ item }}
+                立即查看
               </el-button>
             </div>
           </div>
           <div class="item">
             <div class="title">
-              配送信息:
+              司机状态:
             </div>
             <div class="content">
-              <el-button
-                v-for="item in row.brr"
-                :key="item"
-                size="mini"
-                class="btn"
-              >
-                {{ item }}
-              </el-button>
+              着急试跑
             </div>
           </div>
           <div class="item">
             <div class="title">
-              撮合信息:
+              备注信息:
             </div>
             <div class="content">
-              <el-button
-                v-for="item in row.crr"
-                :key="item"
-                size="mini"
-                class="btn"
-              >
-                {{ item }}
-              </el-button>
+              司机有贷款压力，不怕累活，不是稳定活不接受
             </div>
           </div>
         </template>
@@ -369,7 +394,8 @@ export default class extends Vue {
   }
   .percent {
     position: absolute;
-    top: 50px;
+    top: 50%;
+    bottom: 50%;
     left: 7px;
     font-size: 12px;
     color: #f5a821;
@@ -382,6 +408,9 @@ export default class extends Vue {
     color: #444444;
     font-size: 12px;
     line-height: 20px;
+  }
+  .phone{
+    color:#888585 ;
   }
   .tip {
     margin: 0px;

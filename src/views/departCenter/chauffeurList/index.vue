@@ -105,6 +105,7 @@
       <Atable
         :table-data="tableData"
         :is-show-percent="true"
+        :is-more="true"
       />
       <pagination
         :operation-list="[]"
