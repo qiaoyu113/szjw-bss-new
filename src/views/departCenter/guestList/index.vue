@@ -72,12 +72,13 @@
     <div
       class="table_box"
     >
-      <!-- <Atable
+      <Atable
         :list-query="listQuery"
         :is-show-percent="true"
+        :obj="{}"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
-      /> -->
+      />
       <pagination
         :operation-list="[]"
         :total="page.total"

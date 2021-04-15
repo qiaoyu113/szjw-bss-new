@@ -11,69 +11,62 @@
       row-key="id"
       :row-style="{height: '20px'}"
       fit
+      :header-cell-style="{padding: '6px 20px'}"
       :cell-style="{padding: '5px 0'}"
     >
       <el-table-column
         label="基础信息"
-        width="180"
-        class-name="center noP"
+        min-width="120"
+        align="center"
       >
         <template slot-scope="{row}">
-          <div class="left">
-            <div class="arrow" />
-            <div class="name">
-              线
-            </div>
-            <div
-              v-if="isShowPercent"
-              class="percent"
-            >
-              匹配度{{ row.percent }}%
-            </div>
+          <div class="arrow" />
+          <div
+            v-if="isShowPercent"
+            class="percent"
+          >
+            匹配度{{ row.percent }}%
           </div>
-          <div class="right">
-            <router-link to="#">
-              {{ row.a }}
-            </router-link>
-            <el-popover
-              placement="right"
-              width="200"
-              trigger="hover"
-            >
-              <div class="text1">
-                这条线路是异常<el-button
-                  type="text"
-                  size="small"
-                >
-                  火爆
-                </el-button>,4.2厢货,场景简单,菜鸟也能干...
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
-            <p :class="obj.b === row.b ? 'blue text' : 'text'">
-              ({{ row.b }})
-            </p>
-            <p
-              :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
-            >
-              {{ row.lineId }}
-            </p>
-            <p
-              class="text"
-              :class="obj.c === row.c ? 'blue text' : 'text'"
-            >
-              窗口期:剩余{{ row.c }}天
-            </p>
-          </div>
+
+          <router-link to="#">
+            {{ row.a }}
+          </router-link>
+          <el-popover
+            placement="right"
+            width="200"
+            trigger="hover"
+          >
+            <div class="text1">
+              这条线路是异常<el-button
+                type="text"
+                size="small"
+              >
+                火爆
+              </el-button>,4.2厢货,场景简单,菜鸟也能干...
+            </div>
+            <i
+              slot="reference"
+              class="el-icon-chat-dot-round"
+            />
+          </el-popover>
+          <p :class="obj.b === row.b ? 'blue text' : 'text'">
+            ({{ row.b }})
+          </p>
+          <p
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
+            {{ row.lineId }}
+          </p>
+          <p
+            class="text"
+            :class="obj.c === row.c ? 'blue text' : 'text'"
+          >
+            窗口期:剩余{{ row.c }}天
+          </p>
         </template>
       </el-table-column>
       <el-table-column
         label="车辆"
-        width="180"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -92,8 +85,6 @@
       </el-table-column>
       <el-table-column
         label="配送信息"
-        width="200"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -112,8 +103,6 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        width="180"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -138,8 +127,6 @@
       </el-table-column>
       <el-table-column
         label="线路特点"
-        width="180"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -167,8 +154,6 @@
       </el-table-column>
       <el-table-column
         label="标签"
-        width="120"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -187,8 +172,6 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        width="120"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -215,8 +198,6 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        width="120"
-        class-name="center"
         fixed="right"
       >
         <template slot-scope="{row}">
@@ -337,32 +318,32 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
-  @Prop({ default: () => [] }) tableData!:IState[]
+  // @Prop({ default: () => [] }) tableData!:IState[]
   @Prop({ default: () => {} }) obj!:IState
-  // private tableData:IState[] = [
-  //   {
-  //     a: '京东传站',
-  //     b: '李外线经理',
-  //     lineId: 'XL202012300377',
-  //     c: '3',
-  //     d: '4.2米厢货',
-  //     e: '油车',
-  //     f: '能闯禁行',
-  //     g: '能闯限行行',
-  //     h: '共享',
-  //     p1: '湖南省',
-  //     c1: '长沙市',
-  //     c2: '短沙县',
-  //     m1: 500,
-  //     time: '9:00~18:00',
-  //     percent: 80,
-  //     id: 1,
-  //     arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-  //     brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-  //     crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-  //     isOpen: false
-  //   }
-  // ]
+  private tableData:IState[] = [
+    {
+      a: '京东传站',
+      b: '李外线经理',
+      lineId: 'XL202012300377',
+      c: '3',
+      d: '4.2米厢货',
+      e: '油车',
+      f: '能闯禁行',
+      g: '能闯限行行',
+      h: '共享',
+      p1: '湖南省',
+      c1: '长沙市',
+      c2: '短沙县',
+      m1: 500,
+      time: '9:00~18:00',
+      percent: 80,
+      id: 1,
+      arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
+      brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
+      crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+      isOpen: false
+    }
+  ]
   // 展开
   toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
@@ -392,25 +373,24 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .lineTableContainer {
-    .left {
-      width: 50px;
-      .arrow {
-        height: 0;
-        border-top: 30px solid #639DEC;
-        border-right: 30px solid transparent;
-        border-left:30px solid transparent;
-        transform: rotate(135deg);
-        position: absolute;
-        top: -5px;
-        left: -20px;
-      }
-      .name {
-        font-size: 12px;
-        color: #fff;
-        position: relative;
-        top: -40px;
-        left: -16px;
-      }
+    .arrow {
+      height: 0;
+      border-top: 30px solid #639DEC;
+      border-right: 30px solid transparent;
+      border-left:30px solid transparent;
+      transform: rotate(135deg);
+      position: absolute;
+      top: -8px;
+      left: -21px;
+    }
+    .arrow::after {
+      content: "线";
+      display: inline-block;
+      position: relative;
+      bottom: 35px;
+      left: 5px;
+      transform: rotate(-135deg);
+      color: white;
     }
     .percent {
       position: absolute;
@@ -467,27 +447,11 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-.lineTableContainer >>> .center {
-  text-align: center;
-}
-.lineTableContainer >>> .noP {
-  padding: 0px!important;
-  position: relative;
-}
+
 .lineTableContainer >>> .expand .cell{
   padding: 0px!important;
 }
-.lineTableContainer >>> .noP .cell {
-  display: flex;
-  align-items: center;
-  padding: 0px!important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  text-align: center;
-  width: 100%;
-}
+
 </style>
 
 <style>
