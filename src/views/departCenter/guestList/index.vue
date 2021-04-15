@@ -8,8 +8,10 @@
   >
     <!-- 查询表单 -->
     <self-form
+      ref="selectForm"
       :list-query="listQuery"
       :form-item="formItem"
+      :load-by-keyword="loadLineByKeyword"
       size="small"
       label-width="100px"
       class="p15 SuggestForm"
@@ -53,27 +55,6 @@
           重置
         </el-button>
       </div>
-      <template slot="lineId">
-        <el-select
-          v-model.trim="listQuery.key"
-          v-loadmore="loadQueryLineByKeyword"
-          placeholder="请选择"
-          reserve-keyword
-          :default-first-option="true"
-          clearable
-          filterable
-          remote
-          :remote-method="queryLineByKeyword"
-          @clear="handleClearQueryLine"
-        >
-          <el-option
-            v-for="item in lineOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
-        </el-select>
-      </template>
       <template slot="start">
         <el-input
           v-model="listQuery.start"
@@ -93,6 +74,7 @@
     >
       <Atable
         :list-query="listQuery"
+        :is-show-percent="true"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
@@ -155,13 +137,6 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [] // 线路肥瘦
   private timeLists:IState[] = []
-  private lineKeyword = '' // 线路关键字
-  private queryLineLoading:boolean = false
-  private lineOptions:IState = []
-  private linePage:PageObj ={
-    page: 0,
-    limit: 10
-  }
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
@@ -325,11 +300,15 @@ export default class extends Vue {
       key: 'i'
     },
     {
-      type: 'lineId',
+      type: 15,
       label: '线路名称/编号',
       key: 'key',
       slot: true,
-      w: '110px'
+      w: '110px',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      }
     },
     {
       type: 2,
@@ -397,6 +376,20 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 根据关键字查线路id
+  async loadLineByKeyword(params:IState) {
+    try {
+      let { data: res } = await getLineSearch(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item.lineName,
+        value: item.lineId
+      }))
+      return result
+    } catch (err) {
+      console.log(`get driver list fail:${err}`)
+      return []
+    }
+  }
   // 查询
   handleFilterClick() {
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
@@ -461,60 +454,9 @@ export default class extends Vue {
       //
     }
   }
-  // 根据关键字查司机id
-  async loadLineByKeyword(params:IState) {
-    try {
-      let { data: res } = await getLineSearch(params)
-      let result:any[] = res.data.map((item:any) => ({
-        label: item.lineName,
-        value: item.lineId
-      }))
-      return result
-    } catch (err) {
-      console.log(`get driver list fail:${err}`)
-      return []
-    }
-  }
-  // 顶部查询线路列表
-  async loadQueryLineByKeyword(val?:string) {
-    this.linePage.page++
-    val = this.lineKeyword
-    let params:IState = {
-      page: this.linePage.page,
-      limit: this.linePage.limit
-    }
-    val !== '' && (params.key = val)
-    this.queryLineLoading = true
-    try {
-      let result:IState[] = await this.loadLineByKeyword(params)
-      this.lineOptions.push(...result)
-    } finally {
-      this.queryLineLoading = false
-    }
-  }
-  // 顶部线路关键字搜索
-  queryLineByKeyword(val:string) {
-    this.linePage.page = 0
-    this.lineKeyword = val
-    this.resetLineOptions()
-    this.loadQueryLineByKeyword(val)
-  }
-  // 删除查询区选中的线路
-  handleClearQueryLine() {
-    this.lineKeyword = ''
-    this.resetLineOptions()
-    this.loadQueryLineByKeyword()
-  }
-  // 清空线路列表
-  resetLineOptions() {
-    let len:number = this.lineOptions.length
-    if (len > 0) {
-      this.lineOptions.splice(0, len)
-    }
-  }
   init() {
-    this.getDictList()
-    this.loadQueryLineByKeyword()
+    this.getDictList();
+    (this.$refs.selectForm as any).loadQueryLineByKeyword()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({
