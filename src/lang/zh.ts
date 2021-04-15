@@ -210,6 +210,7 @@ export default {
     showUser: '查看用户列表',
     addUserNew: '创建用户',
     depart: '撮合中心',
+    lineList: '线路列表',
     guestList: '客邀'
   },
   navbar: {
