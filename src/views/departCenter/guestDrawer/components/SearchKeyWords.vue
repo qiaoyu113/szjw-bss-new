@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-14 16:46:51
+ * @LastEditTime: 2021-04-15 09:11:16
  * @LastEditors: D.C.base
 -->
 <template>
@@ -26,7 +26,7 @@
               <el-dropdown-item
                 v-for="(obj,index2) in item.options"
                 :key="index2"
-                :command="obj.value"
+                :command="obj.label"
               >
                 {{ obj.label }}
               </el-dropdown-item>
@@ -48,10 +48,9 @@
         </div>
       </div>
       <div class="formList">
-        <div class="formItem">
+        <!-- <div class="formItem">
           <el-col :span="11">
             <el-input
-              v-model="input"
               placeholder="请输入起始金额"
             />
           </el-col>
@@ -63,7 +62,6 @@
           </el-col>
           <el-col :span="11">
             <el-input
-              v-model="input"
               placeholder="请输入终止金额"
             />
           </el-col>
@@ -77,6 +75,33 @@
             placeholder="选择时间范围"
           />
         </div>
+        <div class="formItem">
+          <el-cascader
+            ref="cascader"
+            v-bind="item.tagAttrs || {}"
+            :options="item.options"
+          />
+        </div> -->
+        <self-form
+          :list-query="listQuery"
+          :form-item="formItem"
+          size="small"
+          class="SuggestForm"
+          :pc-col="8"
+        >
+          <template slot="start">
+            <el-input
+              v-model="listQuery.start"
+              v-only-number="{min: 0, max: 20000, precision: 0}"
+            />
+          </template>
+          <template slot="end">
+            <el-input
+              v-model="listQuery.end"
+              v-only-number="{min: 0, max: 20000, precision: 0}"
+            />
+          </template>
+        </self-form>
       </div>
     </div>
     <div
@@ -104,21 +129,101 @@
 </template>
 
 <script lang="ts">
+import { GetDictionaryList } from '@/api/common'
+import SelfForm from '@/components/Base/SelfForm.vue'
+import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
 @Component({
   components: {
-
+    SelfForm
   }
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
-  private multiple: boolean = true
+  private carLists:IState[] = [] // 车型列表
+  private multiple: boolean = true // 当前选项是否是多选
   private curSelected: object = {}
   private selectTitle: string = ''
   private selectedData: any[] = [];
+  private timeLists:IState[] = []
+  private listQuery:IState = {
+    labelType: '',
+    isBehavior: '',
+    isRestriction: '',
+    status: '',
+    start: '',
+    end: '',
+    f1: '',
+    f2: ''
+  }
+  private formItem:any[] = [
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        style: {
+          width: '100px'
+        }
+      },
+      label: '工作时间段',
+      col: 5,
+      key: 'f1',
+      options: this.timeLists
+    },
+    {
+      type: 2,
+      col: 4,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        style: {
+          width: '100px'
+        }
+      },
+      label: ' ',
+      w: '20px',
+      key: 'f2',
+      class: 'end',
+      options: this.timeLists
+    },
+    {
+      type: 'start',
+      label: '单趟运费区间',
+      key: 'start',
+      w: '110px',
+      col: 5,
+      slot: true
+    },
+    {
+      type: 'end',
+      label: ' ',
+      w: '20px',
+      key: 'end',
+      col: 3,
+      class: 'end',
+      slot: true
+    },
+    {
+      type: 8,
+      col: 7,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
+      },
+      label: '现居住地址',
+      key: 'i'
+    }
+  ]
   private selectList: IState[] = [
     {
       options: [{
@@ -225,6 +330,24 @@ export default class SearchKeyWords extends Vue {
       title: '期望配送难度'
     }
   ]
+  // 获取字典列表
+  async getDictList() {
+    try {
+      let params:string[] = ['Intentional_compartment']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.selectList[1].options = [...this.selectList[1].options, ...this.carLists]
+        console.log(this.carLists)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get dict list fail:${err}`)
+    } finally {
+      //
+    }
+  }
   handleClearAll() {
     this.selectedData = []
     this.$emit('on-clear')
@@ -263,10 +386,23 @@ export default class SearchKeyWords extends Vue {
     this.selectedData.splice(i, 1)
   }
   mounted() {
-
+    this.getDictList()
+    for (let i = 0; i < 24; i++) {
+      let count = i < 9 ? `0${i}:00` : `${i}:00`
+      this.timeLists.push({
+        label: count,
+        value: count
+      })
+    }
   }
 }
 </script>
+<style>
+  .el-dropdown-menu{
+      max-height: 300px;
+      overflow: auto;
+  }
+</style>
 <style lang="scss" scoped>
 .searchBox{
   background: #fff;
@@ -276,6 +412,9 @@ export default class SearchKeyWords extends Vue {
     i{
       color: #606060 !important;
     }
+  }
+  ::v-deep  .el-form-item__label{
+   color: #4b4b4b !important;
   }
   ::v-deep .el-dropdown{
     display: flex;
@@ -287,17 +426,23 @@ export default class SearchKeyWords extends Vue {
       background: #f4f4f6;
       margin: 0 10px;
     }
-    &:last-child::after{
+  }
+  .el-dropdown:nth-last-of-type(2):after{
       display: none;
-    }
   }
   .topSelect{
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
-    padding:15px 30px 15px 30px;
+    padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
+    ::v-deep .el-form-item--small.el-form-item{
+      margin-bottom: 0;
+    }
+    ::v-deep .selfForm{
+      padding-left: 0;
+    }
     .selectedform{
       display: flex;
       flex-wrap: wrap;
@@ -307,7 +452,8 @@ export default class SearchKeyWords extends Vue {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 300px;
+      width: 250px;
+      margin-left: 20px;
       .el-input{
         margin-right: 10px;
       }

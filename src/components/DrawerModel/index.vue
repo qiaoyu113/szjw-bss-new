@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-14 11:09:24
+ * @LastEditTime: 2021-04-15 08:52:08
  * @LastEditors: D.C.base
 -->
 <template>
@@ -32,6 +32,9 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 @Component({
   name: 'DrawerModel'
 })
+/**
+   * @property  {boolean}    value           true:显示  false:隐藏
+   */
 export default class DrawerModel extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
@@ -39,6 +42,7 @@ export default class DrawerModel extends Vue {
   onValueChanged(val: boolean, oldVal: boolean) {
     this.visible = val
   }
+  // 关闭回调事件
   closeHandle() {
     this.visible = false
     this.$emit('input', false)

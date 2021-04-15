@@ -385,7 +385,7 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    alert('测试抽屉显示使用')
+    alert(1)
     this.showDrawer = true
 
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {

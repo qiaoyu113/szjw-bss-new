@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-14 10:34:48
+ * @LastEditTime: 2021-04-15 08:43:44
  * @LastEditors: D.C.base
 -->
 <template>
@@ -49,6 +49,7 @@ export default class GuestDrawer extends Vue {
 .drawerBox {
   width: 100%;
   height: 100%;
+  overflow: auto;
   ::v-deep .el-drawer{
     overflow: initial;
     background: #e6e9f0;
