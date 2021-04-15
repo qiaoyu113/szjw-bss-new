@@ -102,7 +102,10 @@
     </self-form>
     <!-- 表格 -->
     <div class="table_box">
-      <!-- <Atable :table-data="tableData" /> -->
+      <Atable
+        :table-data="tableData"
+        :is-show-percent="true"
+      />
       <pagination
         :operation-list="[]"
         :total="page.total"
@@ -118,7 +121,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
-// import Atable from './components/Atable.vue'
+import Atable from './components/Atable.vue'
 import {
   today,
   yesterday,
@@ -142,29 +145,40 @@ interface IState {
   name: 'ChauffeurList',
   components: {
     SelfForm,
-    // Atable,
+    Atable,
     doubleInput,
     Pagination
   }
 })
 export default class extends Vue {
   private listLoading: boolean = false;
-  private busiOptions: IState[] = [];
+  private busiOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
+  private carKindOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
+  private hardOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
+  private cycleOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
   private driverOptions: IState[] = [];
-  private carKindOptions: IState[] = [];
-  private hardOptions: IState[] = [];
-  private cycleOptions: IState[] = [];
   private timeLists: IState[] = [];
   private tableData: IState[] = [{}, {}];
   private listQuery: IState = {
+    busiType: '',
+    carType: '',
+    carKind: '',
     driverId: '',
+    address: '',
+    hard: '',
+    hope: '',
+    cycle: '',
     time: [],
     rents: [],
-    status: '',
-    start: '',
-    end: '',
-    f1: '',
-    f2: ''
+    status: ''
   };
   private driverLoading: Boolean = false;
   private driverOver: Boolean = false;
@@ -183,7 +197,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '所属业务线',
-      key: 'a',
+      key: 'busiType',
       options: this.busiOptions
     },
     {
@@ -194,7 +208,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '司机车型',
-      key: 'b',
+      key: 'carType',
       options: this.driverOptions
     },
     {
@@ -205,7 +219,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '电油分类',
-      key: 'c',
+      key: 'carKind',
       options: this.carKindOptions
     },
     {
@@ -216,7 +230,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '居住地址',
-      key: 'd'
+      key: 'address'
     },
     // {
     //   type: 8,
@@ -243,7 +257,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '装卸接受度',
-      key: 'e',
+      key: 'hard',
       options: this.hardOptions
     },
     {
@@ -254,7 +268,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '期望稳定/临时',
-      key: 'e1',
+      key: 'hope',
       options: [
         { label: '全部', value: '' },
         { label: '稳定', value: 1 },
@@ -269,7 +283,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '期望结算周期',
-      key: 'e2',
+      key: 'cycle',
       options: this.cycleOptions
     },
     {
