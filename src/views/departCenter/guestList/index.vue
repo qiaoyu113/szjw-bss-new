@@ -75,6 +75,7 @@
       <Atable
         :list-query="listQuery"
         :is-show-percent="true"
+        :obj="{}"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
