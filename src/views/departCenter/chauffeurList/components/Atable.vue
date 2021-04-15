@@ -16,7 +16,6 @@
     >
       <el-table-column
         label="基础信息"
-        class-name="center"
         align="center"
       >
         <template slot-scope="{row}">
@@ -47,7 +46,6 @@
       </el-table-column>
       <el-table-column
         label="车辆"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -60,7 +58,6 @@
       </el-table-column>
       <el-table-column
         label="地址信息"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -76,7 +73,6 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -92,7 +88,6 @@
       </el-table-column>
       <el-table-column
         label="线路忍耐度"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -111,7 +106,6 @@
       </el-table-column>
       <el-table-column
         label="标签"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -130,7 +124,6 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        class-name="center"
       >
         <template slot-scope="{row}">
           <p
@@ -150,7 +143,6 @@
       <el-table-column
         label="操作"
         width="150"
-        class-name="center"
         fixed="right"
       >
         <template
@@ -448,9 +440,6 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-.chauffeurTableContainer >>> .center {
-  /* text-align: center; */
-}
 </style>
 
 <style>
