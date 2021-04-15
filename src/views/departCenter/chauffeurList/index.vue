@@ -16,12 +16,10 @@
       :pc-col="6"
     >
       <template slot="rents">
-        <div>
-          <doubleInput v-model="listQuery.rents" />
-        </div>
+        <doubleInput v-model="listQuery.rents" />
       </template>
       <template slot="driverId">
-        <div>
+        <div style="width:100%">
           <el-select
             v-model="listQuery.driverId"
             v-loadmore="loadmore"
@@ -283,7 +281,7 @@ export default class extends Vue {
     },
     {
       type: 3,
-      col: 10,
+      col: 12,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -299,7 +297,7 @@ export default class extends Vue {
       type: 'driverId',
       label: '司机姓名/编号',
       key: 'driverId',
-      col: 8,
+      col: 6,
       slot: true
     },
     {

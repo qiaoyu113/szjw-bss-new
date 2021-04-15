@@ -1,7 +1,6 @@
 <template>
   <div class="inputRange">
     <el-input
-      :key="modelArr[0]"
       v-model.number="modelArr[0]"
       class="input"
       placeholder="最低"
@@ -9,7 +8,6 @@
     />
     <span class="icon">~</span>
     <el-input
-      :key="modelArr[1]"
       v-model.number="modelArr[1]"
       class="input"
       placeholder="最高"
@@ -18,7 +16,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Watch, Prop, Model, Emit } from 'vue-property-decorator'
+import { Vue, Component, Model, Emit } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
@@ -51,11 +49,13 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
 .inputRange {
+  width: 100%;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: center;
   flex: 1;
+  overflow: hidden;
   .icon {
     width: 24px;
     text-align: center;

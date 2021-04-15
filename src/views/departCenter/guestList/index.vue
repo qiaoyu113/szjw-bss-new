@@ -53,13 +53,26 @@
           重置
         </el-button>
       </div>
-      <template slot="key">
-        <el-autocomplete
-          v-model="listQuery.key"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入"
-        />
+      <template slot="lineId">
+        <el-select
+          v-model.trim="listQuery.key"
+          v-loadmore="loadQueryLineByKeyword"
+          placeholder="请选择"
+          reserve-keyword
+          :default-first-option="true"
+          clearable
+          filterable
+          remote
+          :remote-method="queryLineByKeyword"
+          @clear="handleClearQueryLine"
+        >
+          <el-option
+            v-for="item in lineOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </template>
       <template slot="start">
         <el-input
@@ -78,7 +91,11 @@
     <div
       class="table_box"
     >
-      <Atable :table-data="tableData" />
+      <Atable
+        :list-query="listQuery"
+        @tryRun="handleCreateTryRun"
+        @cancelTryRun="handleCancelTryRun"
+      />
       <pagination
         :operation-list="[]"
         :total="page.total"
@@ -88,6 +105,11 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <create-tryRun
+      ref="createTryRun"
+      :obj="obj"
+    />
+    <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
 <script lang="ts">
@@ -96,6 +118,11 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
+import CreateTryRun from './components/CreateTryRun.vue'
+import CancelTryRun from './components/CancelTryRun.vue'
+import { GetDictionaryList } from '@/api/common'
+import { mapDictData, getProviceCityCountryData } from '../js/index'
+import { getLineSearch } from '@/api/departCenter'
 interface PageObj {
   page:number,
   limit:number,
@@ -110,22 +137,41 @@ interface IState {
   components: {
     SelfForm,
     Atable,
-    Pagination
+    Pagination,
+    CreateTryRun,
+    CancelTryRun
   }
 })
 export default class extends Vue {
+  private obj:IState = {
+    driverName: 'tom',
+    driverId: 'SJ20210121212',
+    lineName: '天猫配送',
+    lineId: 'XL20210121212',
+    workingTimeStart: '06:10'
+  }
   private listLoading:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
-  private lineTypes:IState[] = [] // 线路肥瘦
+  private labelTypeArr:IState[] = [] // 线路肥瘦
   private timeLists:IState[] = []
-  private tableData:IState[]= [{}, {}]
+  private lineKeyword = '' // 线路关键字
+  private queryLineLoading:boolean = false
+  private lineOptions:IState = []
+  private linePage:PageObj ={
+    page: 0,
+    limit: 10
+  }
   private listQuery:IState = {
+    labelType: '',
+    isBehavior: '',
+    isRestriction: '',
     status: '',
     start: '',
     end: '',
     f1: '',
-    f2: ''
+    f2: '',
+    key: ''
   }
   private formItem:any[] = [
     {
@@ -158,8 +204,8 @@ export default class extends Vue {
         filterable: true
       },
       label: '线路肥瘦',
-      key: 'c',
-      options: this.lineTypes
+      key: 'labelType',
+      options: this.labelTypeArr
     },
     {
       type: 2,
@@ -169,7 +215,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '是否闯禁行',
-      key: 'd',
+      key: 'isBehavior',
       options: [
         {
           label: '全部',
@@ -193,7 +239,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '是否闯限行',
-      key: 'e',
+      key: 'isRestriction',
       options: [
         {
           label: '全部',
@@ -256,24 +302,30 @@ export default class extends Vue {
       type: 8,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       },
       label: '仓库位置',
-      key: 'g',
-      options: []
+      key: 'g'
     },
     {
       type: 8,
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       },
       label: '配送区域',
-      key: 'i',
-      options: []
+      key: 'i'
     },
     {
-      type: 'key',
+      type: 'lineId',
       label: '线路名称/编号',
       key: 'key',
       slot: true,
@@ -374,11 +426,6 @@ export default class extends Vue {
   handleStatusChange(val:string|number) {
     console.log('xxx:', val)
   }
-  // 线路名称/编号 模糊搜索
-  querySearch(queryString:string, cb:Function) {
-    // eslint-disable-next-line standard/no-callback-literal
-    cb([])
-  }
   // 分页
   handlePageSizeChange(page:number, limit:number) {
     if (page) {
@@ -389,8 +436,85 @@ export default class extends Vue {
     }
     this.getLists()
   }
-
+  // 创建试跑意向
+  handleCreateTryRun() {
+    (this.$refs.createTryRun as any).showDialog = true
+  }
+  // 取消创建试跑意向
+  handleCancelTryRun() {
+    (this.$refs.cancelTryRun as any).showDialog = true
+  }
+  // 获取字典列表
+  async getDictList() {
+    try {
+      let params:string[] = ['Intentional_compartment', 'line_label']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get dict list fail:${err}`)
+    } finally {
+      //
+    }
+  }
+  // 根据关键字查司机id
+  async loadLineByKeyword(params:IState) {
+    try {
+      let { data: res } = await getLineSearch(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item.lineName,
+        value: item.lineId
+      }))
+      return result
+    } catch (err) {
+      console.log(`get driver list fail:${err}`)
+      return []
+    }
+  }
+  // 顶部查询线路列表
+  async loadQueryLineByKeyword(val?:string) {
+    this.linePage.page++
+    val = this.lineKeyword
+    let params:IState = {
+      page: this.linePage.page,
+      limit: this.linePage.limit
+    }
+    val !== '' && (params.key = val)
+    this.queryLineLoading = true
+    try {
+      let result:IState[] = await this.loadLineByKeyword(params)
+      this.lineOptions.push(...result)
+    } finally {
+      this.queryLineLoading = false
+    }
+  }
+  // 顶部线路关键字搜索
+  queryLineByKeyword(val:string) {
+    this.linePage.page = 0
+    this.lineKeyword = val
+    this.resetLineOptions()
+    this.loadQueryLineByKeyword(val)
+  }
+  // 删除查询区选中的线路
+  handleClearQueryLine() {
+    this.lineKeyword = ''
+    this.resetLineOptions()
+    this.loadQueryLineByKeyword()
+  }
+  // 清空线路列表
+  resetLineOptions() {
+    let len:number = this.lineOptions.length
+    if (len > 0) {
+      this.lineOptions.splice(0, len)
+    }
+  }
   init() {
+    this.getDictList()
+    this.loadQueryLineByKeyword()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({
