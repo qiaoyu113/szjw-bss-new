@@ -14,59 +14,55 @@
       :cell-style="{padding: '5px 0'}"
     >
       <el-table-column
-        label=""
-        width="50"
-        class-name="noP"
-      >
-        <template slot-scope="{row}">
-          <div class="arrow" />
-          <div class="name">
-            线
-          </div>
-          <div
-            v-if="isShowPercent"
-            class="percent"
-          >
-            匹配度{{ row.percent }}%
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column
         label="基础信息"
         width="180"
-        class-name="center"
+        class-name="center noP"
       >
         <template slot-scope="{row}">
-          <router-link to="#">
-            {{ row.a }}
-          </router-link>
-          <el-popover
-            placement="right"
-            width="200"
-            trigger="hover"
-          >
-            <div class="text1">
-              这条线路是异常<el-button
-                type="text"
-                size="small"
-              >
-                火爆
-              </el-button>,4.2厢货,场景简单,菜鸟也能干...
+          <div class="left">
+            <div class="arrow" />
+            <div class="name">
+              线
             </div>
-            <i
-              slot="reference"
-              class="el-icon-chat-dot-round"
-            />
-          </el-popover>
-          <p class="text">
-            ({{ row.b }})
-          </p>
-          <p class="text">
-            {{ row.lineId }}
-          </p>
-          <p class="text">
-            窗口期:剩余{{ row.c }}天
-          </p>
+            <div
+              v-if="isShowPercent"
+              class="percent"
+            >
+              匹配度{{ row.percent }}%
+            </div>
+          </div>
+          <div class="right">
+            <router-link to="#">
+              {{ row.a }}
+            </router-link>
+            <el-popover
+              placement="right"
+              width="200"
+              trigger="hover"
+            >
+              <div class="text1">
+                这条线路是异常<el-button
+                  type="text"
+                  size="small"
+                >
+                  火爆
+                </el-button>,4.2厢货,场景简单,菜鸟也能干...
+              </div>
+              <i
+                slot="reference"
+                class="el-icon-chat-dot-round"
+              />
+            </el-popover>
+            <p class="text">
+              ({{ row.b }})
+            </p>
+            <p class="text">
+              {{ row.lineId }}
+            </p>
+            <p class="text">
+              窗口期:剩余{{ row.c }}天
+            </p>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -85,7 +81,7 @@
       </el-table-column>
       <el-table-column
         label="配送信息"
-        width="180"
+        width="200"
         class-name="center"
       >
         <template slot-scope="{row}">
@@ -189,6 +185,7 @@
         label="操作"
         width="120"
         class-name="center"
+        fixed="right"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -361,22 +358,25 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .lineTableContainer {
-    .arrow {
-      height: 0;
-      border-top: 30px solid #639DEC;
-      border-right: 30px solid transparent;
-      border-left:30px solid transparent;
-      transform: rotate(135deg);
-      position: absolute;
-      top: -5px;
-      left: -20px;
-    }
-    .name {
-      font-size: 12px;
-      color: #fff;
-      position: relative;
-      top: 4px;
-      left: -33px;
+    .left {
+      width: 50px;
+      .arrow {
+        height: 0;
+        border-top: 30px solid #639DEC;
+        border-right: 30px solid transparent;
+        border-left:30px solid transparent;
+        transform: rotate(135deg);
+        position: absolute;
+        top: -5px;
+        left: -20px;
+      }
+      .name {
+        font-size: 12px;
+        color: #fff;
+        position: relative;
+        top: -40px;
+        left: -16px;
+      }
     }
     .percent {
       position: absolute;
@@ -440,15 +440,16 @@ export default class extends Vue {
 .lineTableContainer >>> .expand .cell{
   padding: 0px!important;
 }
-/* .lineTableContainer >>> .expand .cell */
 .lineTableContainer >>> .noP .cell {
+  display: flex;
+  align-items: center;
   padding: 0px!important;
   position: absolute;
   top: 0;
   left: 0;
-  width: 50px;
   height: 100%;
-  text-align: right;
+  text-align: center;
+  width: 100%;
 }
 </style>
 

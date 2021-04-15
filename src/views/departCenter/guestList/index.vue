@@ -9,8 +9,10 @@
   >
     <!-- 查询表单 -->
     <self-form
+      ref="selectForm"
       :list-query="listQuery"
       :form-item="formItem"
+      :load-by-keyword="loadLineByKeyword"
       size="small"
       label-width="100px"
       class="p15 SuggestForm"
@@ -82,6 +84,7 @@
       <Atable
         :list-query="listQuery"
         :is-more="true"
+        :is-show-percent="true"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
@@ -115,6 +118,7 @@ import CreateTryRun from './components/CreateTryRun.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
+import { getLineSearch } from '@/api/departCenter'
 interface PageObj {
   page:number,
   limit:number,
@@ -157,7 +161,8 @@ export default class extends Vue {
     start: '',
     end: '',
     f1: '',
-    f2: ''
+    f2: '',
+    key: ''
   }
   private formItem:any[] = [
     {
@@ -311,11 +316,15 @@ export default class extends Vue {
       key: 'i'
     },
     {
-      type: 'key',
+      type: 15,
       label: '线路名称/编号',
       key: 'key',
       slot: true,
-      w: '110px'
+      w: '110px',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true
+      }
     },
     {
       type: 2,
@@ -383,6 +392,20 @@ export default class extends Vue {
   get isPC() {
     return SettingsModule.isPC
   }
+  // 根据关键字查线路id
+  async loadLineByKeyword(params:IState) {
+    try {
+      let { data: res } = await getLineSearch(params)
+      let result:any[] = res.data.map((item:any) => ({
+        label: item.lineName,
+        value: item.lineId
+      }))
+      return result
+    } catch (err) {
+      console.log(`get driver list fail:${err}`)
+      return []
+    }
+  }
   // 查询
   handleFilterClick() {
     alert(1)
@@ -414,11 +437,6 @@ export default class extends Vue {
   // 客邀状态变化
   handleStatusChange(val:string|number) {
     console.log('xxx:', val)
-  }
-  // 线路名称/编号 模糊搜索
-  querySearch(queryString:string, cb:Function) {
-    // eslint-disable-next-line standard/no-callback-literal
-    cb([])
   }
   // 分页
   handlePageSizeChange(page:number, limit:number) {
@@ -456,7 +474,8 @@ export default class extends Vue {
     }
   }
   init() {
-    this.getDictList()
+    this.getDictList();
+    (this.$refs.selectForm as any).loadQueryLineByKeyword()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({
