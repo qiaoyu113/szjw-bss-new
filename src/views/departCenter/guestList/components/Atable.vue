@@ -53,13 +53,18 @@
                 class="el-icon-chat-dot-round"
               />
             </el-popover>
-            <p class="text">
+            <p :class="obj.b === row.b ? 'blue text' : 'text'">
               ({{ row.b }})
             </p>
-            <p class="text">
+            <p
+              :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+            >
               {{ row.lineId }}
             </p>
-            <p class="text">
+            <p
+              class="text"
+              :class="obj.c === row.c ? 'blue text' : 'text'"
+            >
               窗口期:剩余{{ row.c }}天
             </p>
           </div>
@@ -71,10 +76,16 @@
         class-name="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.d === row.d ? 'blue text' : 'text'"
+          >
             {{ row.d }}/{{ row.e }}
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.f === row.f ? 'blue text' : 'text'"
+          >
             {{ row.f }}/{{ row.g }}/{{ row.h }}
           </p>
         </template>
@@ -85,10 +96,16 @@
         class-name="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.p1 === row.p1 ? 'blue text' : 'text'"
+          >
             仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.c1 === row.c1 ? 'blue text' : 'text'"
+          >
             配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
         </template>
@@ -99,10 +116,16 @@
         class-name="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
             趟运费:{{ row.m1 }}元
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
             预计月运费:{{ row.m1 }}元
           </p>
           <p class="text">
@@ -119,16 +142,25 @@
         class-name="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
             货品:食品/团购
           </p>
           <p class="text">
             装卸难度:只装不卸
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
             配送类型:整车
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.time === row.time ? 'blue text' : 'text'"
+          >
             工作时间段:{{ row.time }}
           </p>
         </template>
@@ -305,30 +337,32 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
-  private tableData:IState[] = [
-    {
-      a: '京东传站',
-      b: '李外线经理',
-      lineId: 'XL202012300377',
-      c: '3',
-      d: '4.2米厢货',
-      e: '油车',
-      f: '能闯禁行',
-      g: '能闯限行行',
-      h: '共享',
-      p1: '湖南省',
-      c1: '长沙市',
-      c2: '短沙县',
-      m1: 500,
-      time: '9:00~18:00',
-      percent: 80,
-      id: 1,
-      arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-      brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-      crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-      isOpen: false
-    }
-  ]
+  @Prop({ default: () => [] }) tableData!:IState[]
+  @Prop({ default: () => {} }) obj!:IState
+  // private tableData:IState[] = [
+  //   {
+  //     a: '京东传站',
+  //     b: '李外线经理',
+  //     lineId: 'XL202012300377',
+  //     c: '3',
+  //     d: '4.2米厢货',
+  //     e: '油车',
+  //     f: '能闯禁行',
+  //     g: '能闯限行行',
+  //     h: '共享',
+  //     p1: '湖南省',
+  //     c1: '长沙市',
+  //     c2: '短沙县',
+  //     m1: 500,
+  //     time: '9:00~18:00',
+  //     percent: 80,
+  //     id: 1,
+  //     arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
+  //     brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
+  //     crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+  //     isOpen: false
+  //   }
+  // ]
   // 展开
   toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
@@ -425,6 +459,9 @@ export default class extends Vue {
         background: #F7F7F7;
         border-radius:6px;
       }
+    }
+    .blue {
+      color:#639DEC
     }
   }
 </style>
