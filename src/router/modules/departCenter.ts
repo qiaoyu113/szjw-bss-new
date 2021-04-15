@@ -40,7 +40,8 @@ const departCenterRouter: RouteConfig = {
       meta: {
         apiUrl: 'root',
         title: 'guestList',
-        noCache: false
+        noCache: false,
+        hidden: true
       }
     },
     {

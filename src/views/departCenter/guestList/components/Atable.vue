@@ -12,21 +12,21 @@
       :row-style="{height: '20px'}"
       fit
       :header-cell-style="{padding: '6px 20px'}"
-      :cell-style="{padding: '5px 0'}"
+      :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
         label="基础信息"
-        min-width="120"
+        min-width="220"
         align="center"
       >
         <template slot-scope="{row}">
           <div class="arrow" />
-          <div
+          <!-- <div
             v-if="isShowPercent"
             class="percent"
           >
             匹配度{{ row.percent }}%
-          </div>
+          </div> -->
 
           <router-link to="#">
             {{ row.a }}
@@ -67,6 +67,7 @@
       </el-table-column>
       <el-table-column
         label="车辆"
+        min-width="150"
       >
         <template slot-scope="{row}">
           <p
@@ -85,6 +86,7 @@
       </el-table-column>
       <el-table-column
         label="配送信息"
+        min-width="240"
       >
         <template slot-scope="{row}">
           <p
@@ -103,6 +105,7 @@
       </el-table-column>
       <el-table-column
         label="结算"
+        min-width="160"
       >
         <template slot-scope="{row}">
           <p
@@ -127,6 +130,7 @@
       </el-table-column>
       <el-table-column
         label="线路特点"
+        min-width="200"
       >
         <template slot-scope="{row}">
           <p
@@ -154,6 +158,7 @@
       </el-table-column>
       <el-table-column
         label="标签"
+        min-width="100"
       >
         <template slot-scope="{row}">
           <p
@@ -172,6 +177,7 @@
       </el-table-column>
       <el-table-column
         label="状态"
+        min-width="160"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -199,6 +205,7 @@
       <el-table-column
         label="操作"
         fixed="right"
+        min-width="120"
       >
         <template slot-scope="{row}">
           <p class="text">

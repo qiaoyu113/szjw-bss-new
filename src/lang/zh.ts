@@ -211,7 +211,7 @@ export default {
     addUserNew: '创建用户',
     depart: '撮合中心',
     lineList: '线路列表',
-    guestList: '客邀',
+    guestList: '客邀列表',
     chauffeurList: '司推列表'
   },
   navbar: {
