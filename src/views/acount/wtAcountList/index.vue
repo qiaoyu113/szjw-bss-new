@@ -14,9 +14,7 @@
       size="small"
       class="p15"
     >
-      <template
-        slot="driverId"
-      >
+      <template slot="driverId">
         <div>
           <el-select
             v-model="listQuery.driverId"
@@ -84,7 +82,6 @@
       </div>
       <self-table
         ref="driverListTable"
-
         :height="tableHeight"
         :is-p30="false"
         :index="false"
@@ -177,12 +174,28 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { getLabel, lock } from '@/utils/index.ts'
-import { getAcountList, accountFreeze, accountUnfreeze, managementExport, orderList, orderDetail, countConfirmByDriver, orderMoney, orderCanExtractMoney } from '@/api/driver-account'
+import {
+  getAcountList,
+  accountFreeze,
+  accountUnfreeze,
+  managementExport,
+  orderList,
+  orderDetail,
+  countConfirmByDriver,
+  orderMoney,
+  orderCanExtractMoney
+} from '@/api/driver-account'
 import { getDriverNoAndNameList } from '@/api/driver'
 import { delayTime } from '@/settings.ts'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { HandlePages, phoneReg } from '@/utils/index'
-import { GetOpenCityData, getOfficeByType, getOfficeByTypeAndOfficeId, GetDutyListByLevel, GetSpecifiedRoleList } from '@/api/common'
+import {
+  GetOpenCityData,
+  getOfficeByType,
+  getOfficeByTypeAndOfficeId,
+  GetDutyListByLevel,
+  GetSpecifiedRoleList
+} from '@/api/common'
 import { exportFileTip } from '@/utils/exportTip'
 interface IState {
   [key: string]: any;
@@ -202,12 +215,12 @@ interface PageObj {
   }
 })
 export default class extends Vue {
-  times:number = 10;
-  private keyWord:String = ''
-  private sumbitAgain:Boolean = false
-  private fullscreenLoading:Boolean = false
-  private driverLoading:Boolean = false
-  private driverOver:Boolean = false
+  times: number = 10;
+  private keyWord: String = '';
+  private sumbitAgain: Boolean = false;
+  private fullscreenLoading: Boolean = false;
+  private driverLoading: Boolean = false;
+  private driverOver: Boolean = false;
   private showDialog: any = {
     visible: false,
     title: '提示',
@@ -224,16 +237,16 @@ export default class extends Vue {
     { label: '否', value: 2 },
     { label: '是', value: 1 }
   ];
-  private busiTypeOptions:any[] = []
-  private keyOptions:any[] = []
-  private driverOtions:any[] = []
-  private orderOptions:any[] = []
-  private getGmStatus:Boolean = true
-  private getDriverStatus:Boolean = true
-  private driverPage:any = {
+  private busiTypeOptions: any[] = [];
+  private keyOptions: any[] = [];
+  private driverOtions: any[] = [];
+  private orderOptions: any[] = [];
+  private getGmStatus: Boolean = true;
+  private getDriverStatus: Boolean = true;
+  private driverPage: any = {
     page: 1,
     limit: 20
-  }
+  };
   // 表单对象
   private listQuery: IState = {
     workCity: [],
@@ -430,8 +443,8 @@ export default class extends Vue {
     }
   ];
   // columnData
-  private columnData:any = {}
-  private freezeForm:any = {
+  private columnData: any = {};
+  private freezeForm: any = {
     driverId: '',
     name: '',
     orderId: '',
@@ -443,8 +456,8 @@ export default class extends Vue {
     reason: '',
     applyForAccountUnfrozen: '',
     isconfirmOrder: ''
-  }
-  private freezeItem:any[] = [
+  };
+  private freezeItem: any[] = [
     {
       type: 7,
       key: 'driverId',
@@ -506,8 +519,8 @@ export default class extends Vue {
         rows: '4'
       }
     }
-  ]
-  private unfreezeItem:any[] = [
+  ];
+  private unfreezeItem: any[] = [
     {
       type: 7,
       key: 'driverId',
@@ -575,21 +588,29 @@ export default class extends Vue {
         rows: '4'
       }
     }
-  ]
-  private freezesRules:any = {
+  ];
+  private freezesRules: any = {
     orderId: [
       { required: true, message: '请选择订单', trigger: ['blur', 'change'] }
     ],
     applyForAccountFrozen: [
-      { required: true, message: '请填写申请冻结金额', trigger: ['blur', 'change'] },
+      {
+        required: true,
+        message: '请填写申请冻结金额',
+        trigger: ['blur', 'change']
+      },
       { validator: this.checkFrozen(1), trigger: ['blur', 'change'] }
     ],
     applyForAccountUnfrozen: [
-      { required: true, message: '请填写申请解冻金额', trigger: ['blur', 'change'] },
+      {
+        required: true,
+        message: '请填写申请解冻金额',
+        trigger: ['blur', 'change']
+      },
       { validator: this.checkFrozen(2), trigger: ['blur', 'change'] }
     ]
-  }
-  private isPass:Boolean = false
+  };
+  private isPass: Boolean = false;
   /**
    *分页对象
    */
@@ -631,12 +652,14 @@ export default class extends Vue {
       }
       let { data: res } = await GetDutyListByLevel(params)
       if (res.success) {
-        let options = res.data.map((item:any) => ({
-          label: item.dutyName,
-          value: item.id
-        })).filter((ele:any) => {
-          return (ele.label === '共享' || ele.label === '专车')
-        })
+        let options = res.data
+          .map((item: any) => ({
+            label: item.dutyName,
+            value: item.id
+          }))
+          .filter((ele: any) => {
+            return ele.label === '共享' || ele.label === '专车'
+          })
         this.busiTypeOptions.push({ label: '全部', value: '' }, ...options)
       } else {
         this.$message.error(res.errorMsg)
@@ -646,7 +669,7 @@ export default class extends Vue {
     }
   }
 
-  private async showWork(node:any, resolve:any) {
+  private async showWork(node: any, resolve: any) {
     let query: any = {
       parentId: ''
     }
@@ -725,7 +748,7 @@ export default class extends Vue {
   }
 
   // 查询订单列表
-  private async getOrderList(id:string, type:number) {
+  private async getOrderList(id: string, type: number) {
     try {
       let params = {
         driverId: id,
@@ -738,13 +761,13 @@ export default class extends Vue {
       }
       let { data: res } = await orderList(params)
       if (res.success) {
-        let orderOptions = res.data.map((ele:any) => {
+        let orderOptions = res.data.map((ele: any) => {
           return { label: ele.orderId, value: ele.orderId, state: ele.status }
         })
         if (type === 2) {
           this.orderOptions.push(...orderOptions)
         } else {
-          orderOptions = orderOptions.filter((ele:any) => {
+          orderOptions = orderOptions.filter((ele: any) => {
             return ele.state === 30
           })
           this.orderOptions.push(...orderOptions)
@@ -761,7 +784,7 @@ export default class extends Vue {
   }
 
   // 查询对应订单的冻结金额
-  private async getMoney(orderId:string) {
+  private async getMoney(orderId: string) {
     try {
       let params = { orderId: orderId }
       let { data: res } = await orderMoney(params)
@@ -776,7 +799,7 @@ export default class extends Vue {
   }
 
   // 查询对应订单的可提现金额
-  private async getCanExtractMoney(driverId:string) {
+  private async getCanExtractMoney(driverId: string) {
     try {
       let params = { driverId: driverId }
       let { data: res } = await orderCanExtractMoney(params)
@@ -791,7 +814,7 @@ export default class extends Vue {
   }
 
   // 查询对应订单详情
-  private async getOrderDetail(orderId:string) {
+  private async getOrderDetail(orderId: string) {
     try {
       let params = {
         driverId: this.columnData.driverId,
@@ -812,9 +835,9 @@ export default class extends Vue {
   }
 
   // 开启弹窗 type === 1为冻结，2为解冻
-  private async isFreeze(item:any, type:number) {
-    let title:string = ''
-    let name:number = 0
+  private async isFreeze(item: any, type: number) {
+    let title: string = ''
+    let name: number = 0
     this.columnData = item
     this.freezeForm = { ...this.freezeForm, ...this.columnData }
     this.freezeForm.freezingMoney = null
@@ -834,10 +857,10 @@ export default class extends Vue {
     await this.getCanExtractMoney(item.driverId)
   }
 
-  private async isSureCheck(id:string) {
+  private async isSureCheck(id: string) {
     let { data: res } = await countConfirmByDriver({ orderId: id })
     if (res.success) {
-      this.freezeForm.isconfirmOrder = (res.data ? '是' : '否')
+      this.freezeForm.isconfirmOrder = res.data ? '是' : '否'
     } else {
       this.$message.error(res.errorMsg)
     }
@@ -846,14 +869,14 @@ export default class extends Vue {
   private closed() {
     this.sumbitAgain = false
     this.columnData = {};
-    ((this.$refs.SelfForm) as any).resetForm()
-    let len:number = this.orderOptions.length
+    (this.$refs.SelfForm as any).resetForm()
+    let len: number = this.orderOptions.length
     if (len > 0) {
       this.orderOptions.splice(0, len)
     }
   }
   // 确认弹窗
-  private async confirm(done:any) {
+  private async confirm(done: any) {
     try {
       this.handleValidateForm()
       if (this.isPass) {
@@ -914,7 +937,7 @@ export default class extends Vue {
       this.$message.error(res.errorMsg)
     }
   }
-  private goRouter(id:string) {
+  private goRouter(id: string) {
     let routeUrl = this.$router.resolve({
       path: '/driveraccount/financialFlow',
       query: { id: id }
@@ -922,14 +945,14 @@ export default class extends Vue {
     window.open(routeUrl.href, '_blank')
   }
 
-  private onPass(val:Boolean) {
+  private onPass(val: Boolean) {
     this.isPass = val
   }
   /**
    *校验表单
    */
   private handleValidateForm() {
-    ((this.$refs.SelfForm) as any).submitForm()
+    (this.$refs.SelfForm as any).submitForm()
   }
   /**
    * 查询
@@ -982,7 +1005,7 @@ export default class extends Vue {
    * 导出
    */
   @lock
-  private async handleExportClick(sucFun:Function) {
+  private async handleExportClick(sucFun: Function) {
     if (this.listQuery.time && this.listQuery.time.length === 2) {
       let params: any = {}
       this.setData(params)
@@ -1002,15 +1025,17 @@ export default class extends Vue {
   }
 
   // params处理
-  private setData(params:any) {
+  private setData(params: any) {
     params.balance = this.listQuery.balance
     if (this.listQuery.workCity.length > 0) {
-      this.listQuery.workCity && (params.workCity = Number(this.listQuery.workCity[1]))
+      this.listQuery.workCity &&
+        (params.workCity = Number(this.listQuery.workCity[1]))
     }
     this.listQuery.driverId && (params.driverCode = this.listQuery.driverId)
     this.listQuery.busiType !== '' &&
-        (params.busiType = this.listQuery.busiType)
-    this.listQuery.joinManagerId !== '' && (params.joinManagerId = this.listQuery.joinManagerId)
+      (params.busiType = this.listQuery.busiType)
+    this.listQuery.joinManagerId !== '' &&
+      (params.joinManagerId = this.listQuery.joinManagerId)
 
     if (this.listQuery.time.length > 1) {
       params.startDate = new Date(this.listQuery.time[0]).setHours(0, 0, 0)
@@ -1029,9 +1054,9 @@ export default class extends Vue {
   }
 
   // 冻结金额,解冻金额效验 输入效验
-  private checkFrozen(type:any) {
+  private checkFrozen(type: any) {
     let that = this
-    return function(rule:any, value:any, callback:any) {
+    return function(rule: any, value: any, callback: any) {
       if (type === 1) {
         if (Number(value) === 0) {
           return callback(new Error('申请冻结金额不能为0'))
@@ -1056,12 +1081,14 @@ export default class extends Vue {
 
   async getGmOptions() {
     try {
-      let params:any = {
+      let params: any = {
         roleTypes: [1],
         uri: '/v2/wt-driver-account/management/queryGM'
       }
-      this.listQuery.workCity[1] !== '' && (params.cityCode = this.listQuery.workCity[1])
-      this.listQuery.busiType !== '' && (params.productLine = this.listQuery.busiType)
+      this.listQuery.workCity[1] !== '' &&
+        (params.cityCode = this.listQuery.workCity[1])
+      this.listQuery.busiType !== '' &&
+        (params.productLine = this.listQuery.busiType)
       let { data: res } = await GetSpecifiedRoleList(params)
       if (res.success) {
         this.gmOptions.splice(0, this.gmOptions.length)
@@ -1080,7 +1107,7 @@ export default class extends Vue {
     }
   }
 
-  async getDriverInfo(keyWord:any = '') {
+  async getDriverInfo(keyWord: any = '') {
     try {
       this.keyWord = keyWord
       let params = {
@@ -1098,7 +1125,11 @@ export default class extends Vue {
         url: '/v2/wt-driver-account/management/queryDriverList'
       })
       if (res.success) {
-        if (res.data.length && res.data.length > 0 && res.data.length === this.driverPage.limit) {
+        if (
+          res.data.length &&
+          res.data.length > 0 &&
+          res.data.length === this.driverPage.limit
+        ) {
           this.driverPage.page++
         } else {
           this.driverOver = true
@@ -1122,7 +1153,7 @@ export default class extends Vue {
     this.getDriverInfo(this.keyWord)
   }
 
-  private async remoteMethod(query:any) {
+  private async remoteMethod(query: any) {
     this.keyWord = query
     this.driverLoading = true
     this.driverPage.page = 1
@@ -1141,7 +1172,7 @@ export default class extends Vue {
   }
 
   @Watch('freezeForm.orderId', { deep: true })
-  private changeOrderId(val:any) {
+  private changeOrderId(val: any) {
     if (val) {
       this.getOrderDetail(val)
       this.getMoney(val)
@@ -1151,7 +1182,7 @@ export default class extends Vue {
     }
   }
   @Watch('listQuery.workCity', { deep: true })
-  private changeWorkCity(val:any, oldVal:any) {
+  private changeWorkCity(val: any, oldVal: any) {
     if (val !== oldVal) {
       this.getGmOptions()
       this.driverPage.page = 1
@@ -1163,7 +1194,7 @@ export default class extends Vue {
     }
   }
   @Watch('listQuery.busiType', { deep: true })
-  private changeBusiType(val:any, oldVal:any) {
+  private changeBusiType(val: any, oldVal: any) {
     if (val !== oldVal) {
       this.getGmOptions()
       this.driverPage.page = 1
@@ -1175,7 +1206,7 @@ export default class extends Vue {
     }
   }
   @Watch('listQuery.joinManagerId', { deep: true })
-  private changeJoinManagerId(val:any, oldVal:any) {
+  private changeJoinManagerId(val: any, oldVal: any) {
     if (val !== oldVal) {
       this.driverPage.page = 1
       this.driverOver = false
@@ -1187,7 +1218,10 @@ export default class extends Vue {
 
   get tableHeight() {
     let otherHeight = 440
-    return document.body.offsetHeight - otherHeight || document.documentElement.offsetHeight - otherHeight
+    return (
+      document.body.offsetHeight - otherHeight ||
+      document.documentElement.offsetHeight - otherHeight
+    )
   }
 
   // 判断是否是PC
@@ -1219,10 +1253,10 @@ export default class extends Vue {
     justify-content: flex-end;
     align-items: center;
   }
-  .active{
-    color: #649CEE;
+  .active {
+    color: #649cee;
     cursor: pointer;
-    text-decoration:underline;
+    text-decoration: underline;
   }
   .mobile {
     width: 100%;
@@ -1233,31 +1267,31 @@ export default class extends Vue {
     margin-top: 10px;
     width: 80%;
   }
-  .doItem{
-    color: #649CEE;
+  .doItem {
+    color: #649cee;
     margin: 0 5px;
     cursor: pointer;
   }
   .table_box {
-      padding: 0px 30px;
-      background: #ffffff;
-      -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-      box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-      overflow: hidden;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      .middle {
-        margin: 10px 0px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        .count {
-          font-size:14px;
-          color:#666;
-        }
+    padding: 0px 30px;
+    background: #ffffff;
+    -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+    box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    .middle {
+      margin: 10px 0px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      .count {
+        font-size: 14px;
+        color: #666;
       }
     }
+  }
 }
 </style>
 
@@ -1265,15 +1299,15 @@ export default class extends Vue {
 .wtAcountList >>> .el-form-item__label {
   color: #999;
 }
-.wtAcountList >>> .selfForm{
-    width: 100%;
-    background: #fff;
-    margin-bottom: 10px;
-    margin-left: 0px !important;
-    margin-right: 0px !important;
-    /* box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5); */
+.wtAcountList >>> .selfForm {
+  width: 100%;
+  background: #fff;
+  margin-bottom: 10px;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  /* box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5); */
 }
-.wtAcountList >>> .el-form-item__content div{
+.wtAcountList >>> .el-form-item__content div {
   width: 100%;
 }
 @media screen and (min-width: 700px) {
