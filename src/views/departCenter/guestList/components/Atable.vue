@@ -11,32 +11,23 @@
       row-key="id"
       :row-style="{height: '20px'}"
       fit
-      :cell-style="{padding: '5px 0'}"
+      :header-cell-style="{padding: '6px 20px'}"
+      :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
-        label=""
-        width="50"
-        class-name="noP"
+        label="基础信息"
+        min-width="220"
+        align="center"
       >
         <template slot-scope="{row}">
           <div class="arrow" />
-          <div class="name">
-            线
-          </div>
-          <div
+          <!-- <div
             v-if="isShowPercent"
             class="percent"
           >
             匹配度{{ row.percent }}%
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="基础信息"
-        width="180"
-        class-name="center"
-      >
-        <template slot-scope="{row}">
+          </div> -->
+
           <router-link to="#">
             {{ row.a }}
           </router-link>
@@ -58,55 +49,75 @@
               class="el-icon-chat-dot-round"
             />
           </el-popover>
-          <p class="text">
+          <p :class="obj.b === row.b ? 'blue text' : 'text'">
             ({{ row.b }})
           </p>
-          <p class="text">
+          <p
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
             {{ row.lineId }}
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.c === row.c ? 'blue text' : 'text'"
+          >
             窗口期:剩余{{ row.c }}天
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="车辆"
-        width="180"
-        class-name="center"
+        min-width="150"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.d === row.d ? 'blue text' : 'text'"
+          >
             {{ row.d }}/{{ row.e }}
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.f === row.f ? 'blue text' : 'text'"
+          >
             {{ row.f }}/{{ row.g }}/{{ row.h }}
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="配送信息"
-        width="180"
-        class-name="center"
+        min-width="240"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.p1 === row.p1 ? 'blue text' : 'text'"
+          >
             仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.c1 === row.c1 ? 'blue text' : 'text'"
+          >
             配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="结算"
-        width="180"
-        class-name="center"
+        min-width="160"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
             趟运费:{{ row.m1 }}元
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
             预计月运费:{{ row.m1 }}元
           </p>
           <p class="text">
@@ -119,28 +130,35 @@
       </el-table-column>
       <el-table-column
         label="线路特点"
-        width="180"
-        class-name="center"
+        min-width="200"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
             货品:食品/团购
           </p>
           <p class="text">
             装卸难度:只装不卸
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+          >
             配送类型:整车
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="obj.time === row.time ? 'blue text' : 'text'"
+          >
             工作时间段:{{ row.time }}
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="标签"
-        width="120"
-        class-name="center"
+        min-width="100"
       >
         <template slot-scope="{row}">
           <p
@@ -159,8 +177,7 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        width="120"
-        class-name="center"
+        min-width="160"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -187,8 +204,8 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        width="120"
-        class-name="center"
+        fixed="right"
+        min-width="120"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -308,6 +325,8 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
+  // @Prop({ default: () => [] }) tableData!:IState[]
+  @Prop({ default: () => {} }) obj!:IState
   private tableData:IState[] = [
     {
       a: '京东传站',
@@ -368,15 +387,17 @@ export default class extends Vue {
       border-left:30px solid transparent;
       transform: rotate(135deg);
       position: absolute;
-      top: -5px;
-      left: -20px;
+      top: -8px;
+      left: -21px;
     }
-    .name {
-      font-size: 12px;
-      color: #fff;
+    .arrow::after {
+      content: "线";
+      display: inline-block;
       position: relative;
-      top: 4px;
-      left: -33px;
+      bottom: 35px;
+      left: 5px;
+      transform: rotate(-135deg);
+      color: white;
     }
     .percent {
       position: absolute;
@@ -426,30 +447,18 @@ export default class extends Vue {
         border-radius:6px;
       }
     }
+    .blue {
+      color:#639DEC
+    }
   }
 </style>
 
 <style scoped>
-.lineTableContainer >>> .center {
-  text-align: center;
-}
-.lineTableContainer >>> .noP {
-  padding: 0px!important;
-  position: relative;
-}
+
 .lineTableContainer >>> .expand .cell{
   padding: 0px!important;
 }
-/* .lineTableContainer >>> .expand .cell */
-.lineTableContainer >>> .noP .cell {
-  padding: 0px!important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50px;
-  height: 100%;
-  text-align: right;
-}
+
 </style>
 
 <style>
