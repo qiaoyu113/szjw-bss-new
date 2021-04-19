@@ -146,17 +146,23 @@
     <!-- 按钮 -->
     <el-row :gutter="10">
       <div class="btns">
-        <el-button type="primary">
+        <el-button
+          type="primary"
+          @click="resetHandle"
+        >
           重置
         </el-button>
-        <el-button type="primary">
+        <el-button
+          type="primary"
+          @click="saveHandle"
+        >
           保存
         </el-button>
         <el-button
           type="primary"
-          @click="markVisible = true"
+          @click="scoreHandle"
         >
-          开始打分
+          {{ scoreword }}
         </el-button>
       </div>
     </el-row>
@@ -185,9 +191,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Watch } from 'vue-property-decorator'
+import { saveOrEditRuleData } from '@/api/score'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
+import { RouteRecord, Route } from 'vue-router'
 @Component({
   name: 'Set',
   components: {
@@ -257,8 +265,124 @@ export default class extends Vue {
     '城市公共：',
     '城市公共抽取比例：'
   ]
+  // 开始打分弹框参数
+  private submitLoading: boolean = false;
+  // 开始打分按钮文字
+  private scoreword: string = '开始打分'
+
+  @Watch('$route')
+  private onRouteChange(route: Route) {
+    // if you go to the redirect page, do not update the breadcrumbs
+    // if (route.path.startsWith('/redirect/')) {
+    //   return
+    // }
+    // this.getBreadcrumb()
+    console.log(route)
+    if (route.path === '/energizeMark/set') {
+      this.$refs.roleRef.resetFields()
+      if (localStorage.getItem('roleForm')) {
+        let roleFormData = JSON.parse(localStorage.getItem('roleForm'))
+        this.roleForm = roleFormData
+      } else {
+        this.roleForm.cityGMC = ''
+        this.roleForm.areaGMR = ''
+        this.roleForm.cityPublic = ''
+      }
+    }
+  }
+
   private getMarkArr() {
     return [...this.roleForm, ...this.proportionForm]
+  }
+  private resetHandle() {
+    console.log('重置', this.$refs)
+    this.roleForm.cityGMC = ''
+    this.roleForm.areaGMR = ''
+    this.roleForm.cityPublic = ''
+    this.proportionForm.proportion = ''
+    this.$refs.roleRef.resetFields()
+    localStorage.setItem('roleForm', '')
+  }
+
+  private saveHandle() {
+    console.log('保存')
+    let { cityGMC, areaGMR, cityPublic } = this.roleForm
+    let sum = cityGMC + areaGMR + cityPublic
+    console.log(cityGMC, areaGMR, cityPublic)
+    if (sum !== 100) {
+      this.$message.error('权重之和必须等于100')
+    } else {
+      this.$message({
+        message: '保存成功',
+        type: 'success'
+      })
+      localStorage.setItem('roleForm', JSON.stringify(this.roleForm))
+    }
+  }
+  private beforeClose() {
+
+  }
+  private handleClosed() {
+    this.markVisible = false
+  }
+  // 打分
+  private scoreHandle() {
+    let { cityGMC, areaGMR, cityPublic } = this.roleForm
+    let { proportion } = this.proportionForm
+    let sum = cityGMC + areaGMR + cityPublic
+    // if (this.scoreword === '开始打分') {
+    //   this.markVisible = true
+    // }
+
+    if (sum === 100 && proportion && this.scoreword === '开始打分') {
+      this.markVisible = true
+    } else {
+      this.$message.error('请将信息填写正确')
+    }
+  }
+
+  private handleConfirmClick() {
+    this.markVisible = false
+    localStorage.setItem('roleForm', JSON.stringify(this.roleForm))
+    this.saveOrEditRuleData()
+    // this.scoreword
+  }
+  // 倒计时
+  private countdown() {
+    let that = this
+    let time = 10// 30分钟换算成1800秒
+    let intervalFunc = window.setInterval(function() {
+      time = time - 1
+      let minute = parseInt(time / 60)
+      let second = parseInt(time % 60)
+      that.scoreword = minute + '分' + second + '秒'
+      if (minute === 0 && second === 0) {
+        that.scoreword = '开始打分'
+        window.clearInterval(intervalFunc)
+      }
+    }, 1000)
+  }
+
+  // 提交打分接口
+  private async saveOrEditRuleData() {
+    console.log('调用打分接口')
+    let obj = {
+      cityPublicWeight: this.roleForm.cityPublic,
+      gmcWeight: this.roleForm.cityGMC,
+      gmrWeight: this.roleForm.areaGMR,
+      cityPublicProportion: this.proportionForm.proportion
+    }
+    const { data } = await saveOrEditRuleData(obj)
+    if (data) {
+      this.$message({
+        message: '设置打分规则成功',
+        type: 'success'
+      })
+      this.countdown()
+    } else {
+      this.$message.error('设置打分规则失败')
+    }
+    console.log(data)
   }
 }
 </script>

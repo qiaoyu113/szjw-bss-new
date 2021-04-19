@@ -3,7 +3,7 @@
     <!-- 提示tips -->
     <div class="tips">
       <p>
-        场次：FN2021041500001
+        场次：{{ scoreInfo.sessionId }}
       </p>
       <p>
         本场时间：2021-04-15 10:03:55-2021-04-15 10:03:55
@@ -110,10 +110,16 @@ export default class extends Vue {
       label: '提交时间'
     },
     {
-      key: 'createDate',
+      key: 'bdProcessingStatusName',
       label: '提交状态'
     }
   ]
+
+  private scoreInfo:any={
+    sessionId: '',
+    startDate: '',
+    endDate: ''
+  }
   mounted() {
     this.getList()
   }
