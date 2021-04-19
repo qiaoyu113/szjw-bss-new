@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2021-04-13 14:28:38
- * @LastEditTime: 2021-04-13 15:04:16
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \szjw_bss_web\src\router\modules\departCenter.ts
- */
 import { RouteConfig } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
@@ -22,6 +14,16 @@ const departCenterRouter: RouteConfig = {
   },
   children: [
     {
+      path: 'lineList', /* 线路列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/lineList/index.vue'),
+      name: 'LineList',
+      meta: {
+        apiUrl: 'root',
+        title: 'lineList',
+        noCache: false
+      }
+    },
+    {
       path: 'guestList', /* 客邀列表 */
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/guestList/index.vue'),
       name: 'GuestList',
@@ -29,6 +31,17 @@ const departCenterRouter: RouteConfig = {
         apiUrl: 'root',
         title: 'guestList',
         noCache: false
+      }
+    },
+    {
+      path: 'demo', /* 客邀列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/demo/index.vue'),
+      name: 'GuestList',
+      meta: {
+        apiUrl: 'root',
+        title: 'guestList',
+        noCache: false,
+        hidden: true
       }
     },
     {
