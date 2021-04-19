@@ -179,7 +179,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleTag"
+              @click.stop="handleDepart"
             >
               匹配撮合
             </el-button>
@@ -192,7 +192,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleTag"
+              @click.stop="handleDetail"
             >
               查看详情
             </el-button>
@@ -205,6 +205,7 @@
             <el-button
               type="text"
               size="small"
+              @click.stop="handleCreatRun"
             >
               创建试跑意向
             </el-button>
@@ -217,6 +218,7 @@
             <el-button
               type="text"
               size="small"
+              @click.stop="handlePutLine"
             >
               推线
             </el-button>
@@ -365,13 +367,29 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
-  // 创建意向
+  // 外呼
   handleCall() {
     this.$emit('call')
   }
   // 打标签
   handleTag() {
     this.$emit('tag')
+  }
+  // 撮合
+  handleDepart() {
+    this.$emit('depart')
+  }
+  // 查看详情
+  handleDetail() {
+    this.$emit('detail')
+  }
+  // 创建试跑
+  handleCreatRun() {
+    this.$emit('creatRun')
+  }
+  // 推线
+  handlePutLine() {
+    this.$emit('line')
   }
 }
 </script>

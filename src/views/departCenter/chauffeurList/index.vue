@@ -8,6 +8,7 @@
   >
     <!-- 查询表单 -->
     <self-form
+      ref="searchForm"
       :list-query="listQuery"
       :form-item="formItem"
       size="small"
@@ -79,26 +80,6 @@
           重置
         </el-button>
       </div>
-      <template slot="key">
-        <el-autocomplete
-          v-model="listQuery.key"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入"
-        />
-      </template>
-      <template slot="start">
-        <el-input
-          v-model="listQuery.start"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
-      <template slot="end">
-        <el-input
-          v-model="listQuery.end"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
     </self-form>
     <!-- 表格 -->
     <div class="table_box">
@@ -107,6 +88,10 @@
         :is-show-percent="false"
         :is-more="false"
         :op-type="[2,1]"
+        @call="call"
+        @tag="tag"
+        @detail="detail"
+        @depart="depart"
       />
       <pagination
         :operation-list="[]"
@@ -117,6 +102,13 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <CallPhone
+      :show-dialog.sync="callObj.callPhoneDio"
+      :clue-status="callObj.clueType"
+      :phone="callObj.phone"
+      :clue-id="callObj.clueId"
+      @success="getLists"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -125,7 +117,8 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import { GetDictionaryList } from '@/api/common'
-import { showWork } from '@/utils'
+import { mapDictData, getProviceCityCountryData } from '../js/index'
+import CallPhone from '@/views/clue/components/CallPhone/index.vue'
 import {
   today,
   yesterday,
@@ -136,6 +129,7 @@ import {
 import { getDriverNoAndNameList } from '@/api/driver'
 import Pagination from '@/components/Pagination/index.vue'
 import doubleInput from './components/doubleInput.vue'
+import creatTryRun from '../guestList/components/CreateTryRun.vue'
 interface PageObj {
   page: number;
   limit: number;
@@ -151,11 +145,22 @@ interface IState {
     SelfForm,
     Atable,
     doubleInput,
-    Pagination
+    Pagination,
+    CallPhone
   }
 })
 export default class extends Vue {
   private listLoading: boolean = false;
+  private callPhoneDio:boolean = false
+  private clueType:number = 0
+  private clueId:string = ''
+  private phone:string = ''
+  private callObj:IState = {
+    callPhoneDio: false,
+    clueType: 0,
+    clueId: '',
+    phone: ''
+  }
   private busiOptions: IState[] = [
     { label: '全部', value: '' },
     { label: '专车', value: 0 },
@@ -238,12 +243,9 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        'default-expanded-keys': true,
-        'default-checked-keys': true,
-        'node-key': 'address',
         props: {
           lazy: true,
-          lazyLoad: showWork
+          lazyLoad: getProviceCityCountryData
         }
       }
     },
@@ -424,7 +426,33 @@ export default class extends Vue {
   }
   // 重置
   handleResetClick() {
-    this.listQuery = {}
+    (this.$refs['searchForm'] as any).resetForm()
+  }
+  call() {
+    let phone = '18848885135'
+    let repStr = phone.substr(3)
+    let newStr = phone.replace(repStr, '********')
+    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      console.log(123)
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消拨打'
+      })
+    })
+  }
+  tag() {
+    console.log('tag')
+  }
+  depart() {
+    console.log('depart')
+  }
+  detail() {
+    console.log('detail')
   }
   // 获取列表
   async getLists() {
@@ -476,13 +504,12 @@ export default class extends Vue {
       // if (contactsLen > 0) {
       //   this.contactsOption.splice(0, contactsLen)
       // }
-      let params = ['Intentional_compartment']
+      let params = ['Intentional_compartment', 'handling_difficulty', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        let cars = res.data.Intentional_compartment.map(function(item:any) {
-          return { label: item.dictLabel, value: item.dictValue }
-        })
-        this.driverOptions.push(...cars)
+        this.driverOptions.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.hardOptions.push(...mapDictData(res.data.handling_difficulty || []))
+        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
       } else {
         this.$message.error(res.errorMsg)
       }
