@@ -153,6 +153,7 @@
             <el-button
               type="text"
               size="small"
+              style="paddingBottom:0"
               @click.stop="handleCall"
             >
               呼叫
@@ -170,7 +171,37 @@
               打标签
             </el-button>
           </p>
-          <p class="text">
+          <!-- type="1" -->
+          <p
+            v-if="opType.includes(1)"
+            class="text"
+          >
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleTag"
+            >
+              匹配撮合
+            </el-button>
+          </p>
+          <!-- type="2" -->
+          <p
+            v-if="opType.includes(2)"
+            class="text"
+          >
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleTag"
+            >
+              查看详情
+            </el-button>
+          </p>
+          <!-- type="3" -->
+          <p
+            v-if="opType.includes(3)"
+            class="text"
+          >
             <el-button
               type="text"
               size="small"
@@ -178,28 +209,16 @@
               创建试跑意向
             </el-button>
           </p>
-          <p class="text">
+          <!-- type="4" -->
+          <p
+            v-if="opType.includes(4)"
+            class="text"
+          >
             <el-button
               type="text"
               size="small"
             >
               推线
-            </el-button>
-          </p>
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
-            >
-              匹配撮合
-            </el-button>
-          </p>
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
-            >
-              查看详情
             </el-button>
           </p>
           <p
@@ -279,6 +298,7 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
+  @Prop({ default: [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',
@@ -402,7 +422,8 @@ export default class extends Vue {
     line-height: 20px;
   }
   .phone{
-    color:#888585 ;
+    color:#888585;
+    line-height: 12px;
   }
   .tip {
     margin: 0px;

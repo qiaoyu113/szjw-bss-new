@@ -104,8 +104,9 @@
     <div class="table_box">
       <Atable
         :table-data="tableData"
-        :is-show-percent="true"
-        :is-more="true"
+        :is-show-percent="false"
+        :is-more="false"
+        :op-type="[2,1]"
       />
       <pagination
         :operation-list="[]"
@@ -123,6 +124,8 @@ import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
+import { GetDictionaryList } from '@/api/common'
+import { showWork } from '@/utils'
 import {
   today,
   yesterday,
@@ -154,10 +157,14 @@ interface IState {
 export default class extends Vue {
   private listLoading: boolean = false;
   private busiOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: '' },
+    { label: '专车', value: 0 },
+    { label: '共享', value: 1 }
   ];
   private carKindOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: '' },
+    { label: '油车', value: 1 },
+    { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
     { label: '全部', value: '' }
@@ -169,16 +176,16 @@ export default class extends Vue {
   private timeLists: IState[] = [];
   private tableData: IState[] = [{}, {}];
   private listQuery: IState = {
-    busiType: '',
+    busiType: null,
     carType: '',
-    carKind: '',
+    carKind: null,
     driverId: '',
     address: '',
-    hard: '',
-    hope: '',
-    cycle: '',
-    time: [],
+    hard: null,
+    hope: null,
+    cycle: null,
     rents: [],
+    time: [],
     status: ''
   };
   private driverLoading: Boolean = false;
@@ -225,31 +232,21 @@ export default class extends Vue {
     },
     {
       type: 8,
+      key: 'address',
+      col: 6,
+      label: '居住地址',
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        filterable: true
-      },
-      label: '居住地址',
-      key: 'address'
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'address',
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
+      }
     },
-    // {
-    //   type: 8,
-    //   key: "workCity",
-    //   col: 8,
-    //   label: "所属城市",
-    //   tagAttrs: {
-    //     placeholder: "请选择所属城市",
-    //     clearable: true,
-    //     "default-expanded-keys": true,
-    //     "default-checked-keys": true,
-    //     "node-key": "workCity",
-    //     props: {
-    //       lazy: true,
-    //       lazyLoad: showWork,
-    //     },
-    //   },
-    // },
     {
       type: 2,
       tagAttrs: {
@@ -469,8 +466,33 @@ export default class extends Vue {
       })
     }
   }
+  async getOptions() {
+    try {
+      // let carLen:number = this.carOptions.length
+      // if (carLen > 0) {
+      //   this.carOptions.splice(0, carLen)
+      // }
+      // let contactsLen:number = this.contactsOption.length
+      // if (contactsLen > 0) {
+      //   this.contactsOption.splice(0, contactsLen)
+      // }
+      let params = ['Intentional_compartment']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        let cars = res.data.Intentional_compartment.map(function(item:any) {
+          return { label: item.dictLabel, value: item.dictValue }
+        })
+        this.driverOptions.push(...cars)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
   mounted() {
     this.init()
+    this.getOptions()
   }
 }
 </script>
