@@ -6,19 +6,19 @@
         场次：{{ scoreInfo.sessionId }}
       </p>
       <p>
-        本场时间：2021-04-15 10:03:55-2021-04-15 10:03:55
+        本场时间：{{ scoreInfo.startDate }}-{{ scoreInfo.endDate }}
       </p>
       <p>
-        预计打分人数一共170人，已提交<span>20</span>人，未提交<span>150</span>人，其中：
+        预计打分人数一共{{ scoreInfo.estimateAllScorer }}人，已提交<span>{{ scoreInfo.allSubmitted }}</span>人，未提交<span>{{ scoreInfo.allUnsubmitted }}</span>人，其中：
       </p>
       <p>
-        GMR(80%)预计打分6人，实际<span>6</span>人
+        GMR({{ scoreInfo.gmrWeight }})预计打分{{ scoreInfo.estimateScorerGmr }}人，实际<span>{{ scoreInfo.submittedScorerGmr }}</span>人
       </p>
       <p>
-        GMC(10%)预计打分50人，实际打分<span>49</span>人
+        GMC({{ scoreInfo.gmcWeight }})预计打分{{ scoreInfo.estimateScorerGmc }}人，实际打分<span>{{ scoreInfo.submittedScorerGmc }}</span>人
       </p>
       <p>
-        城市公共(10%)预计打分114人，实际打分<span>109</span>人
+        城市公共({{ scoreInfo.cityWeight }})预计打分{{ scoreInfo.estimateScorerCity }}人，实际打分<span>{{ scoreInfo.submittedScorerCity }}</span>人
       </p>
     </div>
     <div class="table_box">
@@ -66,7 +66,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import { getFinishedLine } from '@/api/line-shelf'
+import { getScorerNum, getScoreStatusList } from '@/api/score'
 
 interface PageObj {
   page: Number;
@@ -118,10 +118,19 @@ export default class extends Vue {
   private scoreInfo:any={
     sessionId: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    estimateAllScorer: '',
+    allUnsubmitted: '',
+    submittedScorerGmr: '',
+    estimateScorerGmr: '',
+    estimateScorerGmc: '',
+    submittedScorerGmc: '',
+    estimateScorerCity: '',
+    submittedScorerCity: ''
   }
   mounted() {
     this.getList()
+    this.getScorerNum()
   }
   // 页数更改
   handlePageSize(page: any) {
@@ -134,12 +143,12 @@ export default class extends Vue {
     this.listLoading = true
     try {
       let params: any = {
-        limit: this.page.limit,
-        page: this.page.page,
-        inspectionStatus: 4
+        pageSize: this.page.limit,
+        pageNum: this.page.page,
+        sessionId: ''
       }
 
-      let { data: res } = await getFinishedLine(params)
+      let { data: res } = await getScoreStatusList(params)
 
       if (res.success) {
         this.listLoading = false
@@ -150,6 +159,14 @@ export default class extends Vue {
       }
     } catch (err) {
       console.log(`get lists fail:`, err)
+    }
+  }
+
+  async getScorerNum() {
+    let sessionId:string = ''
+    let { data: res } = await getScorerNum(sessionId)
+    if (res.success) {
+      this.scoreInfo = res.data
     }
   }
 }

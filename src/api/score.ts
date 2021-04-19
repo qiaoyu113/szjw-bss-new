@@ -14,3 +14,18 @@ export const saveOrEditRuleData = (data: any) =>
     method: 'post',
     data
   })
+// 实时获取打分人数量
+export const getScorerNum = (data: any) =>
+  request({
+    url: `${baseUrl}/api/score/v1/score/monitor/web/getScorerNum`,
+    method: 'get',
+    data
+  })
+
+// 实时获取打分人数量
+export const getScoreStatusList = (data: any) =>
+  request({
+    url: `${baseUrl}/api/score/v1/score/monitor/web/getScoreStatusList`,
+    method: 'post',
+    data
+  })
