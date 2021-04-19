@@ -30,6 +30,7 @@
           <el-input
             v-if="item.type === 1"
             v-model.trim="listQuery[item.key]"
+            :style="item.style"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
           >

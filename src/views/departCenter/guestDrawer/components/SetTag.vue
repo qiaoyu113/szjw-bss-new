@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-19 09:09:31
+ * @LastEditTime: 2021-04-19 19:19:13
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,7 +11,7 @@
       :visible.sync="showDialog"
       title="给司机打标签"
       :confirm="confirm"
-      width="770px"
+      width="800px"
       :destroy-on-close="false"
       @closed="handleDialogClosed"
     >
@@ -21,28 +21,82 @@
         :form-item="formItem"
         :rules="rules"
         size="small"
-        label-width="200px"
+        label-width="120px"
         class="p15 SuggestForm"
         :pc-col="24"
         @onPass="handlePassChange"
       >
+        <template slot="startTime">
+          <el-time-select
+            v-model="listQuery['startTime'].jobStartDate"
+            class="timeSelect"
+            placeholder="起始时间"
+            :picker-options="{
+              start: '00:00',
+              step: '01:00',
+              end: '23:00'
+            }"
+          />
+          <span style="padding:0 3px">-</span>
+          <el-time-select
+            v-model="listQuery['startTime'].jobEndDate"
+            class="timeSelect"
+            placeholder="结束时间"
+            :picker-options="{
+              start: '00:00',
+              step: '01:00',
+              end: '23:00',
+              minTime: listQuery['startTime'].jobStartDate
+            }"
+          />
+        </template>
+        <template slot="endTime">
+          <el-time-select
+            v-model="listQuery['endTime'].jobStartDate"
+            class="timeSelect"
+            placeholder="起始时间"
+            :picker-options="{
+              start: '00:00',
+              step: '01:00',
+              end: '23:00'
+            }"
+          />
+          <span style="padding:0 3px">-</span>
+          <el-time-select
+            v-model="listQuery['endTime'].jobEndDate"
+            class="timeSelect"
+            placeholder="结束时间"
+            :picker-options="{
+              start: '00:00',
+              step: '01:00',
+              end: '23:00',
+              minTime: listQuery['endTime'].jobStartDate
+            }"
+          />
+        </template>
         <template slot="remark">
           <el-input
             v-model="listQuery.remark"
             class="remark"
             type="textarea"
-            :rows="1"
+            :rows="2"
+            clearable
             placeholder="请输入内容"
           />
           <div class="tags">
-            <el-radio
-              v-for="(item,index) in reasonLists"
-              :key="index"
-              border
-              :label="item.value"
+            <el-radio-group
+              v-model="listQuery.remark"
+              size="small"
             >
-              {{ item.label }}
-            </el-radio>
+              <el-radio
+                v-for="(item,index) in reasonLists"
+                :key="index"
+                border
+                :label="item.value"
+              >
+                {{ item.label }}
+              </el-radio>
+            </el-radio-group>
           </div>
         </template>
       </self-form>
@@ -72,30 +126,39 @@ export default class extends Vue {
   private reasonLists:IState[] = [
     {
       label: '电话停机',
-      value: '1'
+      value: '电话停机'
     },
     {
       label: '电话长期打不通',
-      value: 2
+      value: '电话长期打不通'
     },
     {
       label: '电话空号',
-      value: 3
+      value: '电话空号'
     },
     {
       label: '电话号码错误',
-      value: 4
+      value: '电话号码错误'
     },
     {
       label: '态度恶劣，无法沟通',
-      value: 5
+      value: '态度恶劣，无法沟通'
     }
   ]
   private timeLists:IState[] = []
   private listQuery:IState = {
     prohibitionAddress: '',
     complexity: [],
+    chargingCode: 0,
     stable: [],
+    startTime: {
+      jobStartDate: '',
+      jobEndDate: ''
+    },
+    endTime: {
+      jobStartDate: '',
+      jobEndDate: ''
+    },
     remark: ''
   }
   private formItem:any[] = [
@@ -129,7 +192,6 @@ export default class extends Vue {
         if (!visible) {
           _this.getData()
         }
-        // this.$refs['cascader2'].$children.toggleDropDownVisible(false)
       }
     },
     {
@@ -207,7 +269,10 @@ export default class extends Vue {
         placeholder: '请输入',
         clearable: true
       },
-      col: 4,
+      style: {
+        flex: 'none',
+        width: '100px'
+      },
       label: '期望运费（趟）',
       key: 'chargingCode'
     },
@@ -235,7 +300,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      col: 12,
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -255,21 +320,22 @@ export default class extends Vue {
         clearable: true
       },
       col: 6,
-      key: 'chargingCode1'
+      key: ''
     },
     {
-      type: 10,
+      slot: true,
+      type: 'startTime',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 6,
-      key: 'chargingCode3'
+      col: 8,
+      key: 'startTime'
     },
     {
       type: 8,
-      col: 12,
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -292,14 +358,15 @@ export default class extends Vue {
       key: 'chargingCode4'
     },
     {
-      type: 10,
+      slot: true,
+      type: 'endTime',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 6,
-      key: 'chargingCode5'
+      col: 8,
+      key: 'endTime'
     },
     {
       type: 4,
@@ -374,7 +441,15 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
 ::v-deep .el-dialog__wrapper{
-    //background:rgba(0,0,0,0.5);
+    background:rgba(0,0,0,0.5);
+}
+::v-deep .el-form-item__label{
+  width:100px;
+}
+::v-deep .el-date-editor{
+  .el-input__inner{
+    padding-right: 5px;
+  }
 }
 .tags{
   display: flex;
