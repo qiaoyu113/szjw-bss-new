@@ -56,14 +56,7 @@
           重置
         </el-button>
       </div>
-      <template slot="key">
-        <el-autocomplete
-          v-model="listQuery.key"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入"
-        />
-      </template>
+
       <template slot="start">
         <el-input
           v-model="listQuery.start"
