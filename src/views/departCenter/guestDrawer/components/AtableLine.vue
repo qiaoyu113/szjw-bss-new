@@ -276,7 +276,10 @@
               </el-button>
             </div>
           </div>
-          <div class="item">
+          <div
+            v-if="row.crr"
+            class="item"
+          >
             <div class="title">
               撮合信息:
             </div>
@@ -328,7 +331,6 @@ export default class extends Vue {
       id: 1,
       arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
       brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-      crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
       isOpen: false
     }
   ]
