@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-18 18:29:35
+ * @LastEditTime: 2021-04-20 18:25:09
  * @LastEditors: D.C.base
 -->
 <template>
@@ -48,40 +48,6 @@
         </div>
       </div>
       <div class="formList">
-        <!-- <div class="formItem">
-          <el-col :span="11">
-            <el-input
-              placeholder="请输入起始金额"
-            />
-          </el-col>
-          <el-col
-            class="line"
-            :span="2"
-          >
-            -
-          </el-col>
-          <el-col :span="11">
-            <el-input
-              placeholder="请输入终止金额"
-            />
-          </el-col>
-        </div>
-        <div class="formItem">
-          <el-time-picker
-            is-range
-            range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            placeholder="选择时间范围"
-          />
-        </div>
-        <div class="formItem">
-          <el-cascader
-            ref="cascader"
-            v-bind="item.tagAttrs || {}"
-            :options="item.options"
-          />
-        </div> -->
         <self-form
           :list-query="listQuery"
           :form-item="formItem"
@@ -143,11 +109,22 @@ interface IState {
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
-  private carLists:IState[] = [] // 车型列表
+  private carLists:IState[] = [
+    {
+      value: '全部',
+      label: '全部'
+    }
+  ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
   private curSelected: object = {}
   private selectTitle: string = ''
   private selectedData: any[] = [];
+  private hardOptions: IState[] = [ // 装卸接受度
+    { label: '全部', value: '' }
+  ];
+  private cycleOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
   private timeLists:IState[] = []
   private listQuery:IState = {
     labelType: '',
@@ -240,64 +217,31 @@ export default class SearchKeyWords extends Vue {
       title: '业务线'
     },
     {
-      options: [{
-        value: '全部',
-        label: '全部'
-      }],
+      options: this.carLists,
       multiple: true,
       title: '司机车型'
     },
     {
-      options: [{
-        value: '全部',
-        label: '全部'
-      }, {
-        value: '不需要装卸',
-        label: '不需要装卸'
-      }, {
-        value: '轻装卸',
-        label: '轻装卸'
-      }, {
-        value: '重装卸',
-        label: '重装卸'
-      }],
+      options: this.hardOptions,
       multiple: true,
       title: '期望装卸难度'
     },
     {
       options: [{
-        value: '全部',
+        value: '',
         label: '全部'
       }, {
-        value: '稳定',
+        value: 1,
         label: '稳定'
       }, {
-        value: '临时',
+        value: 2,
         label: '临时'
       }],
       multiple: false,
       title: '期望稳定/临时'
     },
     {
-      options: [{
-        value: '全部',
-        label: '全部'
-      }, {
-        value: '现结',
-        label: '现结'
-      }, {
-        value: '周结',
-        label: '周结'
-      }, {
-        value: '半月结',
-        label: '半月结'
-      }, {
-        value: '月结',
-        label: '月结'
-      }, {
-        value: '季度结',
-        label: '季度结'
-      }],
+      options: this.cycleOptions,
       multiple: true,
       title: '期望结算周期'
     },
@@ -330,24 +274,6 @@ export default class SearchKeyWords extends Vue {
       title: '期望配送难度'
     }
   ]
-  // 获取字典列表
-  async getDictList() {
-    try {
-      let params:string[] = ['Intentional_compartment']
-      let { data: res } = await GetDictionaryList(params)
-      if (res.success) {
-        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.selectList[1].options = [...this.selectList[1].options, ...this.carLists]
-        console.log(this.carLists)
-      } else {
-        this.$message.error(res.errorMsg)
-      }
-    } catch (err) {
-      console.log(`get dict list fail:${err}`)
-    } finally {
-      //
-    }
-  }
   handleClearAll() {
     this.selectedData = []
     this.$emit('on-clear')
@@ -385,8 +311,23 @@ export default class SearchKeyWords extends Vue {
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
   }
+  async getOptions() {
+    try {
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
   mounted() {
-    this.getDictList()
+    this.getOptions()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({

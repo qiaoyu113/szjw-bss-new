@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-20 17:32:25
+ * @LastEditTime: 2021-04-20 17:58:36
  * @LastEditors: D.C.base
 -->
 <template>
@@ -120,7 +120,7 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = false
+  private showDialog:boolean = true
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
