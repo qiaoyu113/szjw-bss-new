@@ -84,6 +84,7 @@
     <!-- 表格 -->
     <div class="table_box">
       <Atable
+        key="chauffeurTable"
         :table-data="tableData"
         :is-show-percent="false"
         :is-more="false"
@@ -504,11 +505,11 @@ export default class extends Vue {
       // if (contactsLen > 0) {
       //   this.contactsOption.splice(0, contactsLen)
       // }
-      let params = ['Intentional_compartment', 'handling_difficulty', 'settlement_cycle']
+      let params = ['Intentional_compartment', 'line_handling_difficulty', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.driverOptions.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.hardOptions.push(...mapDictData(res.data.handling_difficulty || []))
+        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
       } else {
         this.$message.error(res.errorMsg)
