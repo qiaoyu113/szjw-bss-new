@@ -56,7 +56,6 @@
           重置
         </el-button>
       </div>
-
       <template slot="start">
         <el-input
           v-model="listQuery.start"
@@ -78,6 +77,7 @@
         :list-query="listQuery"
         :is-more="true"
         :is-show-percent="true"
+        :obj="{}"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />

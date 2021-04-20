@@ -30,6 +30,7 @@
           <el-input
             v-if="item.type === 1"
             v-model.trim="listQuery[item.key]"
+            :style="item.style"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
           >
@@ -206,6 +207,31 @@
                 :value="sub.value"
               />
             </el-select>
+          </template>
+          <template v-else-if="item.type === 16">
+            <el-col :span="8">
+              <el-cascader
+                ref="cascader2"
+                v-model="listQuery[item.key]"
+                v-bind="item.tagAttrs || {}"
+                :options="item.options"
+                @visible-change="item.listeners"
+              />
+            </el-col>
+            <el-col :span="16">
+              <el-select
+                v-model="item.value"
+                multiple
+                placeholder="请选择"
+              >
+                <el-option
+                  v-for="obj in item.countyOptions"
+                  :key="obj.value"
+                  :label="obj.label"
+                  :value="obj.value"
+                />
+              </el-select>
+            </el-col>
           </template>
           <slot
             v-else-if="item.slot"

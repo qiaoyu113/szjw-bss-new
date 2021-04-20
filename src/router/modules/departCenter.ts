@@ -32,6 +32,27 @@ const departCenterRouter: RouteConfig = {
         title: 'guestList',
         noCache: false
       }
+    },
+    {
+      path: 'demo', /* 客邀列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/demo/index.vue'),
+      name: 'GuestList',
+      meta: {
+        apiUrl: 'root',
+        title: 'guestList',
+        noCache: false,
+        hidden: true
+      }
+    },
+    {
+      path: 'chauffeurList', /* 司推列表 */
+      component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/chauffeurList/index.vue'),
+      name: 'ChauffeurList',
+      meta: {
+        apiUrl: 'root',
+        title: 'chauffeurList',
+        noCache: false
+      }
     }
   ]
 }

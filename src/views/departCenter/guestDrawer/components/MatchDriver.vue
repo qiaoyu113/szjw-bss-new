@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:38:14
- * @LastEditTime: 2021-04-15 08:46:12
+ * @LastEditTime: 2021-04-17 10:19:53
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,31 +11,35 @@
     <SearchKeyWords />
     <h3>司机匹配线路</h3>
     <div class="lineTable">
-      <Atable
+      <AtableDriver
         :list-query="listQuery"
         :is-more="true"
         @tryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
     </div>
+    <SetTag v-if="showTag" />
   </section>
 </template>
 
 <script lang="ts">
 import SearchKeyWords from './SearchKeyWords.vue'
-import Atable from './Atable.vue'
+import AtableDriver from './AtableDriver.vue'
+import SetTag from './SetTag.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
 @Component({
   components: {
-    Atable,
-    SearchKeyWords
+    AtableDriver,
+    SearchKeyWords,
+    SetTag
   }
 })
 export default class DepartLine extends Vue {
   private listLoading:boolean = false
+  private showTag:boolean = true
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',

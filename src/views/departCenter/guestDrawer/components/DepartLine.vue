@@ -2,12 +2,13 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:36:20
- * @LastEditTime: 2021-04-15 08:45:19
+ * @LastEditTime: 2021-04-17 10:08:26
  * @LastEditors: D.C.base
 -->
 <template>
   <section class="departLine">
-    <Atable
+    <h3>待撮合线路</h3>
+    <AtableLine
       :list-query="listQuery"
       :is-more="true"
       @tryRun="handleCreateTryRun"
@@ -18,10 +19,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import Atable from './Atable.vue'
+import AtableLine from './AtableLine.vue'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   components: {
-    Atable
+    AtableLine
   }
 })
 export default class DepartLine extends Vue {
