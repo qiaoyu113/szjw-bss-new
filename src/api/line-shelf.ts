@@ -132,3 +132,10 @@ export const getLineShelfCompletedNum = () => {
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewCompletedNum`
   })
 }
+
+export const getCityList = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity`,
+    method: 'get'
+  })
+}
