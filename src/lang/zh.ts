@@ -208,7 +208,11 @@ export default {
     authoritySystem: '权限管理',
     roleSystem: '权限管理系统',
     showUser: '查看用户列表',
-    addUserNew: '创建用户'
+    addUserNew: '创建用户',
+    depart: '撮合中心',
+    lineList: '线路列表',
+    guestList: '客邀列表',
+    chauffeurList: '司推列表'
   },
   navbar: {
     setPassword: '修改密码',
