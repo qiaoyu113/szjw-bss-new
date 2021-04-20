@@ -59,3 +59,22 @@ export async function getProvinceList(params:string[], level?:number) {
     //
   }
 }
+// 获取省、市 二级联动，县单独放到数组中
+export async function getProviceCityAndCountryData(node: any, resolve: any) {
+  if (node.level === 0) {
+    let params = ['100000']
+    let citys = await getProvinceList(params)
+    resolve(citys)
+  } else if (node.level === 1) {
+    let params = ['100000']
+    params.push(node.value)
+    let groups = await getProvinceList(params)
+    let newData = groups.map(item => ({
+      value: item.value,
+      label: item.label,
+      leaf: true
+    }))
+    console.log(newData)
+    resolve(newData)
+  }
+}
