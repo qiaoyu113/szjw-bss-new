@@ -133,6 +133,13 @@ export const getLineShelfCompletedNum = () => {
   })
 }
 
+export const getCityList = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity`,
+    method: 'get'
+  })
+}
+
 // 获取外线销售
 export const getLineSale = (data:any) => {
   return request({

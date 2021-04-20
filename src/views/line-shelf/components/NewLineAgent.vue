@@ -1,5 +1,104 @@
 <template>
   <div class="new-line-container">
+    <SelfDialog
+      :visible.sync="cityShow"
+      width="50%"
+      title=""
+      :show-cancel-button="false"
+      :show-confirm-button="false"
+      append-to-body
+    >
+      <el-table
+        :data="cityArr"
+        height="450"
+        border
+        style="width: 82%"
+      >
+        <el-table-column
+          prop="cityName"
+          label="线路城市"
+          width="290"
+        />
+        <el-table-column
+          label="待办条数"
+          width="290"
+        >
+          <template slot-scope="scope">
+            {{ scope.row.num }}条
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- <div
+        class="bigTable"
+        style="height: 405px; overflow: auto; margin-left: 30px"
+      >
+        <table
+          border="2"
+          cellspacing="0"
+          cellpadding="1"
+          width="500px"
+          style="border-collapse: collapse; border: 2px solid #ccc; position: absolute; background-color: rgb(230, 229, 229);"
+        >
+          <tr>
+            <th
+              width="50px"
+              height="45px"
+            >
+              线路城市
+            </th>
+            <th
+              width="50px"
+              height="45px"
+            >
+              代办条数
+            </th>
+          </tr>
+        </table>
+        <table
+          border="2"
+          cellspacing="0"
+          cellpadding="1"
+          width="500px"
+          style="border-collapse: collapse; text-align: center; border: 2px solid #ccc;"
+        >
+          <tr>
+            <th
+              width="100px"
+              height="45px"
+            >
+              线路城市
+            </th>
+            <th
+              width="100px"
+              height="45px"
+            >
+              代办条数
+            </th>
+          </tr>
+          <tr
+            v-for="(item, index) in cityArr"
+            :key="index"
+          >
+            <td
+              width="100px"
+              height="45px"
+            >
+              {{ item.cityName }}
+            </td>
+            <td
+              width="100px"
+              height="45px"
+            >
+              {{ item.num }}条
+            </td>
+          </tr>
+        </table>
+      </div>
+      <i
+        class="el-icon-circle-close"
+        @click="cityShow = false"
+      /> -->
+    </SelfDialog>
     <el-row class="row-status">
       <el-col
         :span="8"
@@ -7,6 +106,11 @@
       >
         <span class="number">{{ dnamicLable.toBeCheckedNum }}</span>
         <span class="title">待维护（条）</span>
+        <i
+          v-permission="['/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity']"
+          class="el-icon-arrow-right"
+          @click="cityClick"
+        />
       </el-col>
       <el-col
         :span="8"
@@ -349,11 +453,12 @@ import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import CuratorialInformation from '../agent/CuratorialInformation.vue'
-import {
+import { getCityList,
   getNewLineDetail,
   checkNewlineTodo,
   nextNewLineTodo
 } from '@/api/line-shelf'
+
 import { GetDictionary } from '@/api/common'
 import { detailByUserId } from '@/api/driver-account'
 import { lock } from '@/utils'
@@ -373,8 +478,10 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => { return { checkedNum: 0, checkedTodayNum: 0, toBeCheckedNum: 0 } } }) dnamicLable!:object
   showImgDialog = true
+  cityShow = false
   private dayIndex = 1000
   private lineLabelVo:IState = {}
+  private cityArr = []
   private baseItem = [
     {
       type: 'lineName',
@@ -655,11 +762,30 @@ export default class extends Vue {
     this.initSource()
     // this.sellPointColumns = await this.getDictData('selling_points_project')
   }
+  cityClick() {
+    this.cityShow = true
+    this.getCitys()
+  }
   goDetails(id:any) {
     this.$router.push({
       path: '/lineshelf/linedetail',
       query: { id }
     })
+  }
+  // 待审核城市列表
+  async getCitys() {
+    try {
+      let { data: res } = await getCityList()
+      console.log(res)
+
+      if (res.success) {
+        this.cityArr = res.data
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      //
+    }
   }
   async checkError(this:any) {
     try {
@@ -999,6 +1125,7 @@ export default class extends Vue {
   padding: 18px 0;
 }
 .col-status {
+  position: relative;
   border-right: 1px solid #eff5fe;
   padding: 4px 0;
   color: #fff;
@@ -1016,6 +1143,11 @@ export default class extends Vue {
   }
   .title {
     font-size: 14px;
+  }
+  .el-icon-arrow-right {
+    position: absolute;
+    top: 20px;
+    left: 65%;
   }
 }
 .agent-button {
@@ -1072,7 +1204,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .new-line-container {
   overflow: hidden;
-  // padding: 0 12px;
+}
   ::v-deep .SectionContainer {
     margin-top: 8px;
     box-shadow: none;
@@ -1128,7 +1260,6 @@ export default class extends Vue {
     -webkit-box-orient: vertical;
     line-height: 24px;
   }
-}
 .group-check {
   margin-top: 20px;
   margin-bottom: 20px;
