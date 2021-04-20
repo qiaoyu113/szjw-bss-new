@@ -125,8 +125,11 @@ import { LineLayout, NewLineAgent } from '../components'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { getReaundanLineList, passLine, offShelf } from '@/api/line-shelf'
+import { getReaundanLineList, passLine, offShelf, getLineSale, getLineCity } from '@/api/line-shelf'
 import { times } from 'lodash'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   name: 'Agent',
   components: {
@@ -137,9 +140,12 @@ import { times } from 'lodash'
     SelfDialog
   }
 })
+
 export default class extends Vue {
   showVideo = false
   private active: string = '0'
+  private lineSale:IState = [];
+  private lineCity:IState = [];
   formItem = [
     {
       type: 1,
@@ -204,11 +210,37 @@ export default class extends Vue {
         }
       },
       col: 12
+    },
+    {
+      type: 2,
+      label: '外线销售：',
+      key: 'lineSale',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 6,
+      options: this.lineSale
+    },
+    {
+      type: 2,
+      label: '线路城市：',
+      key: 'lineCity',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 6,
+      options: this.lineCity
     }
   ]
   formData = {
     agentId: '',
     key: '',
+    lineSale: '',
+    lineCity: '',
     time: []
   }
   columns = [
@@ -236,6 +268,17 @@ export default class extends Vue {
       width: '240px'
     },
     {
+      key: 'lineSaleName',
+      label: '外线销售'
+
+    },
+    {
+      key: 'cityName',
+      label: '线路城市'
+
+    },
+    {
+
       key: 'lineCreateDate',
       label: '线路创建时间',
       width: '140px'
@@ -270,9 +313,10 @@ export default class extends Vue {
   multipleSelection= []
   private selectRow = []
   private dialogTitle = '下架线路'
-
   mounted() {
     this.getList()
+    this.getLinesales()
+    this.getLineCitys()
   }
   handleClosed() {
     this.dialogForm.shelvesReasons = ''
@@ -285,7 +329,7 @@ export default class extends Vue {
     this.multipleSelection = val
   }
   handlePageSize(page:any) {
-    console.log('page===', page)
+    // console.log('page===', page)
     this.page.page = page.page
     this.page.limit = page.limit
     this.getList()
@@ -391,9 +435,11 @@ export default class extends Vue {
       }
       params.processingStatus = 1
 
-      const { key, agentId } = this.formData
+      const { key, agentId, lineCity, lineSale } = this.formData
       key && (params.key = key)
       agentId && (params.agentId = agentId)
+      lineCity && (params.city = lineCity)
+      lineSale && (params.lineSaleId = lineSale)
       const timeArr = this.formData.time
       if (timeArr && timeArr.length === 2) {
         let createDateStart = new Date(timeArr[0])
@@ -404,7 +450,7 @@ export default class extends Vue {
       const { data } = await getReaundanLineList(params)
       if (data.success) {
         this.tableData = data.data
-        console.log(this.tableData)
+        // console.log(this.tableData)
         this.tableData.map((item:any) => {
           item.shelvesReasons = '线路创建后的15天，未有试跑意向/待确认/待到场/跟车中/已试跑/稳定在跑,18天内外线BD没有操作下架'
         })
@@ -420,6 +466,42 @@ export default class extends Vue {
   }
   get dialogLineNum() {
     return this.agentIds.length
+  }
+  async getLinesales() {
+    let params = {
+      roleTypes: [2],
+      uri: '/v2/line/lineInfo/lineSaleList'
+    }
+    let { data: res } = await getLineSale(params)
+    if (res.success) {
+      let gms = res.data.map(function(item: any) {
+        return {
+          label: item.name,
+          value: item.id
+        }
+      })
+      let lenGm:number = this.lineSale.length
+      if (lenGm > 0) {
+        this.lineSale.splice(0, lenGm)
+      }
+      this.lineSale.push(...gms)
+    }
+  }
+  async getLineCitys() {
+    let { data: res } = await getLineCity()
+    if (res.success) {
+      let city = res.data.map(function(item: any) {
+        return {
+          label: item.name,
+          value: item.code
+        }
+      })
+      let lenGm:number = this.lineCity.length
+      if (lenGm > 0) {
+        this.lineCity.splice(0, lenGm)
+      }
+      this.lineCity.push(...city)
+    }
   }
 }
 </script>
