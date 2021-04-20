@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="guestListContainer"
     v-loading="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
@@ -485,7 +486,8 @@ export default class extends Vue {
 <style lang="scss" scoped>
   .GuestListContainer {
     height: 100%;
-    transform: translate(0,0);
+    overflow: hidden;
+    //transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;

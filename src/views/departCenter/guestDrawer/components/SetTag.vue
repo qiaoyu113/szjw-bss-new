@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-19 19:19:13
+ * @LastEditTime: 2021-04-20 17:32:25
  * @LastEditors: D.C.base
 -->
 <template>
@@ -120,7 +120,7 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = true
+  private showDialog:boolean = false
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
@@ -177,7 +177,6 @@ export default class extends Vue {
       key: 'prohibitionAddress',
       label: '可闯禁行区域',
       col: 24,
-      value: [],
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -196,7 +195,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition4',
+      key: 'prohibition2',
       label: '能否闯限行',
       col: 24,
       options: [
@@ -229,7 +228,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition3',
+      key: 'a',
       label: '装卸接受度',
       col: 24,
       options: [
@@ -274,7 +273,7 @@ export default class extends Vue {
         width: '100px'
       },
       label: '期望运费（趟）',
-      key: 'chargingCode'
+      key: 'expected'
     },
     {
       type: 5,
@@ -290,7 +289,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition6',
+      key: 'b',
       label: '外边是否有活',
       col: 24,
       options: [
@@ -310,13 +309,13 @@ export default class extends Vue {
         }
       },
       label: '起始点',
-      key: 'i'
+      key: 'starting'
     },
     {
       type: 1,
       w: '0px',
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入详细地址',
         clearable: true
       },
       col: 6,
@@ -351,7 +350,7 @@ export default class extends Vue {
       type: 1,
       w: '0px',
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入详细地址',
         clearable: true
       },
       col: 6,
@@ -370,7 +369,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition7',
+      key: 'd',
       label: '司机情况',
       col: 24,
       options: [
@@ -399,8 +398,32 @@ export default class extends Vue {
     }
   ]
   private rules:IState = {
+    prohibition: [
+      { required: true, message: '请选择是否闯禁行', trigger: 'change' }
+    ],
+    prohibition2: [
+      { required: true, message: '请选择是否闯限行', trigger: 'change' }
+    ],
     a: [
-      { required: true, message: '请选择取消创建试跑意向的原因', trigger: 'blur' }
+      { required: true, message: '请选择装卸接受度', trigger: 'change' }
+    ],
+    complexity: [
+      { required: true, message: '请选择配送复杂度', trigger: 'change' }
+    ],
+    expected: [
+      { required: true, message: '请输入期望的运费', trigger: 'blur' }
+    ],
+    b: [
+      { required: true, message: '请选择外边是否有值', trigger: 'change' }
+    ],
+    starting: [
+      { required: true, message: '请选择起始点', trigger: 'change' }
+    ],
+    distribution: [
+      { required: true, message: '请选择配送点', trigger: 'change' }
+    ],
+    d: [
+      { required: true, message: '请选择司机情况', trigger: 'change' }
     ]
   }
   // 确定按钮

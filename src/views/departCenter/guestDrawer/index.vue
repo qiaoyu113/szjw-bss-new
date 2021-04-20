@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-15 08:43:44
+ * @LastEditTime: 2021-04-19 20:55:47
  * @LastEditors: D.C.base
 -->
 <template>
@@ -18,6 +18,7 @@
 </template>
 
 <script lang="ts">
+import { on } from '@/utils/dom'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import DrawerModel from '@/components/DrawerModel/index.vue'
 import DepartLine from './components/DepartLine.vue'
