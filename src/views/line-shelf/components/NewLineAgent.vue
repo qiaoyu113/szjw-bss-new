@@ -362,7 +362,6 @@
           type="info"
           plain
           :loading="isSkip"
-          :disabled="processingPriority === 1"
           @click="checkSuccess('4')"
         >
           跳过暂不检查
