@@ -107,6 +107,7 @@
         <span class="number">{{ dnamicLable.toBeCheckedNum }}</span>
         <span class="title">待维护（条）</span>
         <i
+          v-permission="['/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity']"
           class="el-icon-arrow-right"
           @click="cityClick"
         />
