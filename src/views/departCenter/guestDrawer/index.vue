@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-20 18:16:04
+ * @LastEditTime: 2021-04-20 19:28:50
  * @LastEditors: D.C.base
 -->
 <template>
@@ -27,6 +27,7 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
+          @tag="setTagHandle"
         />
       </div>
     </section>
@@ -40,11 +41,13 @@ import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
 import AtableLine from './components/AtableLine.vue'
 import AtableDriver from './components/AtableDriver.vue'
+import SetTag from './components/SetTag.vue'
 interface IState {
   [key: string]: any;
 }
 @Component({
   components: {
+    SetTag,
     DrawerModel,
     SearchKeyWords,
     AtableLine,
@@ -82,6 +85,9 @@ export default class GuestDrawer extends Vue {
   closeHandle() {
     this.visible = false
     this.$emit('input', false)
+  }
+  setTagHandle() {
+    this.showTag = true
   }
   mounted() {
 

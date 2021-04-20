@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-20 18:25:09
+ * @LastEditTime: 2021-04-20 19:20:18
  * @LastEditors: D.C.base
 -->
 <template>
@@ -16,7 +16,7 @@
             :key="index"
             trigger="hover"
             placement="bottom-start"
-            @visible-change="handleChange(item.title,item.multiple)"
+            @visible-change="handleChange(item.title,item.multiple,item.options)"
             @command="handleCommand"
           >
             <span class="el-dropdown-link">
@@ -42,6 +42,7 @@
           <el-button
             type="primary"
             size="small"
+            @click="searchHandle"
           >
             查询
           </el-button>
@@ -111,12 +112,12 @@ export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
   private carLists:IState[] = [
     {
-      value: '全部',
+      value: '',
       label: '全部'
     }
   ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
-  private curSelected: object = {}
+  private curSelecteds: array = []
   private selectTitle: string = ''
   private selectedData: any[] = [];
   private hardOptions: IState[] = [ // 装卸接受度
@@ -127,14 +128,11 @@ export default class SearchKeyWords extends Vue {
   ];
   private timeLists:IState[] = []
   private listQuery:IState = {
-    labelType: '',
-    isBehavior: '',
-    isRestriction: '',
-    status: '',
     start: '',
     end: '',
     f1: '',
-    f2: ''
+    f2: '',
+    address: ''
   }
   private formItem:any[] = [
     {
@@ -198,19 +196,19 @@ export default class SearchKeyWords extends Vue {
         }
       },
       label: '现居住地址',
-      key: 'i'
+      key: 'address'
     }
   ]
   private selectList: IState[] = [
     {
       options: [{
-        value: '全部',
+        value: '',
         label: '全部'
       }, {
-        value: '共享',
+        value: 0,
         label: '共享'
       }, {
-        value: '专车',
+        value: 1,
         label: '专车'
       }],
       multiple: true,
@@ -278,11 +276,16 @@ export default class SearchKeyWords extends Vue {
     this.selectedData = []
     this.$emit('on-clear')
   }
-  handleChange(title:string, multiple:boolean) {
+  handleChange(title:string, multiple:boolean, options:array) {
     this.selectTitle = title
     this.multiple = multiple
+    this.curSelecteds = options
   }
   handleCommand(command:string) {
+    let obj = this.curSelecteds.find((item:any) => {
+      return item.label === command
+    })
+    let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
         return item.type === this.selectTitle
@@ -291,11 +294,15 @@ export default class SearchKeyWords extends Vue {
         let selecteds = this.selectedData[index].selected
         if (selecteds.indexOf(command) === -1) {
           this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
+          this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
           this.selectedData[index].selected.push(command)
+          console.log(this.selectedData[index].optionIds)
+          this.selectedData[index].optionIds.push(id)
         }
       } else {
         let obj = {
           type: this.selectTitle,
+          optionIds: [id],
           selected: [command]
         }
         this.selectedData.push(obj)
@@ -303,10 +310,12 @@ export default class SearchKeyWords extends Vue {
     } else {
       let obj = {
         type: this.selectTitle,
+        optionIds: [id],
         selected: [command]
       }
       this.selectedData.push(obj)
     }
+    console.log(this.selectedData)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
@@ -319,12 +328,16 @@ export default class SearchKeyWords extends Vue {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        console.log(this.cycleOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
     } catch (err) {
       console.log(`get base info fail:${err}`)
     }
+  }
+  searchHandle() {
+    console.log(this.listQuery)
   }
   mounted() {
     this.getOptions()
