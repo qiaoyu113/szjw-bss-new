@@ -470,7 +470,7 @@ export default class extends Vue {
   async getLinesales() {
     let params = {
       roleTypes: [2],
-      uri: '/v2/line/lineInfo/lineSaleList'
+      uri: '/v3/line/shelf/maintenance/lineSaleList'
     }
     let { data: res } = await getLineSale(params)
     if (res.success) {

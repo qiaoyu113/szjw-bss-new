@@ -347,7 +347,7 @@ private async getLineShelfNumSure() {
     },
     {
       type: 2,
-      label: '司机业务线',
+      label: '外线销售',
       key: 'lineSale',
       tagAttrs: {
         placeholder: '请选择',
@@ -443,7 +443,7 @@ private async getLineShelfNumSure() {
    async getLinesales() {
      let params = {
        roleTypes: [2],
-       uri: '/v2/line/lineInfo/lineSaleList'
+       uri: '/v3/line/shelf/maintenance/lineSaleList'
      }
      let { data: res } = await getLineSale(params)
      if (res.success) {
