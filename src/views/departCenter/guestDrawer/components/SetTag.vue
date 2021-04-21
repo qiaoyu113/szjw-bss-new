@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 10:32:10
+ * @LastEditTime: 2021-04-21 10:51:48
  * @LastEditors: D.C.base
 -->
 <template>
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryData } from '../../js/index'
@@ -121,7 +121,7 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = true
+  @Prop({ default: false }) private showDialog !: boolean
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
@@ -495,8 +495,5 @@ export default class extends Vue {
 .remark ::v-deep .el-textarea__inner{
   padding-top: 50px;
   padding-bottom: 10px;
-}
-.setTag {
-
 }
 </style>

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 10:30:31
+ * @LastEditTime: 2021-04-21 10:51:31
  * @LastEditors: D.C.base
 -->
 <template>
@@ -32,7 +32,7 @@
         />
       </div>
     </section>
-    <SetTag v-if="tagShow" />
+    <SetTag :show-dialog.sync="tagShow" />
     <CreateTryRun v-if="tryRunShow" />
   </DrawerModel>
 </template>
