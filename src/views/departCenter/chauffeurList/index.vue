@@ -40,6 +40,7 @@
       :clue-id="callObj.clueId"
       @success="getLists"
     />
+    <SetTag ref="setTag" />
   </div>
 </template>
 <script lang="ts">
@@ -47,8 +48,9 @@ import { Vue, Component } from 'vue-property-decorator'
 import Atable from './components/Atable.vue'
 import CallPhone from '@/views/clue/components/CallPhone/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
-import searchForm from './components/searchForm.vue'
+import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
+import SetTag from '../guestDrawer/components/SetTag.vue'
 interface PageObj {
   page: number;
   limit: number;
@@ -64,7 +66,8 @@ interface IState {
     Atable,
     Pagination,
     CallPhone,
-    searchForm
+    SearchForm,
+    SetTag
   }
 })
 export default class extends Vue {
@@ -93,6 +96,7 @@ export default class extends Vue {
     clueId: '',
     phone: ''
   };
+  private showTag:Boolean = false
   // 表格分页
   private page: PageObj = {
     page: 1,
@@ -103,8 +107,8 @@ export default class extends Vue {
     return SettingsModule.isPC
   }
 
-  call(val: any) {
-    console.log(val)
+  call(row:IState) {
+    console.log(row)
     let phone = '18848885135'
     let repStr = phone.substr(3)
     let newStr = phone.replace(repStr, '********')
@@ -123,8 +127,9 @@ export default class extends Vue {
         })
       })
   }
-  tag() {
-    console.log('tag')
+  tag(row:IState) {
+    console.log('tag');
+    (this.$refs['setTag'] as any).showDialog = true
   }
   depart() {
     console.log('depart')
