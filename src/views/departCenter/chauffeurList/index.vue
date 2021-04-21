@@ -41,12 +41,16 @@
       @success="getLists"
     />
     <SetTag ref="setTag" />
+    <DetailDialog
+      :driver-id="id"
+    />
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import Atable from './components/Atable.vue'
 import CallPhone from '@/views/clue/components/CallPhone/index.vue'
+import DetailDialog from './components/DetailDialog.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
@@ -67,7 +71,8 @@ interface IState {
     Pagination,
     CallPhone,
     SearchForm,
-    SetTag
+    SetTag,
+    DetailDialog
   }
 })
 export default class extends Vue {
@@ -169,6 +174,7 @@ export default class extends Vue {
     this.getLists()
   }
 }
+
 </script>
 <style lang="scss" scoped>
 .chauffeurListContainer {
