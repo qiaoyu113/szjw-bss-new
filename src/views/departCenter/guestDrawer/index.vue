@@ -15,7 +15,9 @@
       <h3>待撮合线路</h3>
       <AtableLine
         :list-query="listQueryLine"
+        obj="{}"
         :is-more="true"
+        @cancelTryRun="handleCancelTryRun1"
       />
     </section>
     <!-- 撮合匹配的司机列表 -->
@@ -34,6 +36,7 @@
     </section>
     <SetTag v-if="tagShow" />
     <CreateTryRun v-if="tryRunShow" />
+    <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
 
@@ -45,6 +48,7 @@ import CreateTryRun from '../guestList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
+import CancelTryRun from '../guestList/components/CancelTryRun.vue'
 
 interface IState {
   [key: string]: any;
@@ -56,7 +60,8 @@ interface IState {
     AtableLine,
     AtableDriver,
     CreateTryRun,
-    SetTag
+    SetTag,
+    CancelTryRun
   }
 })
 export default class GuestDrawer extends Vue {
@@ -115,6 +120,10 @@ export default class GuestDrawer extends Vue {
     } else if (val === 'tryRun') {
       this.tryRunShow = true
     }
+  }
+  // 取消创建试跑意向
+  handleCancelTryRun1() {
+    (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
     this.tagShow = true

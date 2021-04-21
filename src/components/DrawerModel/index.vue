@@ -55,6 +55,7 @@ export default class DrawerModel extends Vue {
 </script>
 <style lang="scss" scoped>
 .drawerBox {
+  // margin-top:84px;
   width: 100%;
   height: 100%;
   ::v-deep .el-drawer{

@@ -4,8 +4,7 @@
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC,
-      isDrawer: showDrawer
+      p15: isPC
     }"
   >
     <!-- 查询表单 -->
@@ -92,7 +91,9 @@
         @pagination="handlePageSizeChange"
       />
     </div>
-    <GuestDrawer v-model="showDrawer" />
+    <GuestDrawer
+      v-model="showDrawer"
+    />
 
     <cancel-tryRun ref="cancelTryRun" />
   </div>
@@ -507,7 +508,7 @@ export default class extends Vue {
       transform: translateZ(0);
     }
     &.isDrawer {
-      // transform: translate(0,0);
+      transform: translate(0,0);
     }
   }
 </style>
