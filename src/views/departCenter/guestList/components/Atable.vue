@@ -206,7 +206,7 @@
       <el-table-column
         label="操作"
         fixed="right"
-        min-width="120"
+        min-width="150"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -353,7 +353,11 @@ export default class extends Vue {
   // 获取列表数据
   async getLists() {
     try {
-      for (let i = 0; i < 5; i++) {
+      let num:number = 5
+      if (this.isMore) {
+        num = 1
+      }
+      for (let i = 0; i < num; i++) {
         let obj:IState = {
           a: '京东传站',
           b: '李外线经理',
@@ -386,7 +390,9 @@ export default class extends Vue {
     }
   }
   mounted() {
-    this.getLists()
+    setTimeout(() => {
+      this.getLists()
+    }, 500)
   }
 }
 </script>

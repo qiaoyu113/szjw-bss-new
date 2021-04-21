@@ -2,8 +2,10 @@
   <SelfDialog
     :visible.sync="showDialog"
     title="取消试跑意向"
+    append-to-body
     :confirm="confirm"
     width="500px"
+    custom-class="a1111"
     :destroy-on-close="false"
     @closed="handleDialogClosed"
   >
@@ -72,3 +74,18 @@ export default class extends Vue {
   }
 }
 </script>
+
+<style>
+.a1111 .el-dialog__header{
+  padding: 0;
+  height: 40px;
+  line-height: 40px;
+  padding-left: 20px;
+  background: #2f448a;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: left;
+}
+</style>

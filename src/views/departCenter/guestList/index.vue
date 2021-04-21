@@ -92,7 +92,9 @@
         @pagination="handlePageSizeChange"
       />
     </div>
-    <GuestDrawer v-model="showDrawer" />
+    <GuestDrawer
+      v-model="showDrawer"
+    />
 
     <cancel-tryRun ref="cancelTryRun" />
   </div>
@@ -506,9 +508,6 @@ export default class extends Vue {
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
     }
-    &.isDrawer {
-      // transform: translate(0,0);
-    }
   }
 </style>
 
@@ -516,5 +515,14 @@ export default class extends Vue {
   .GuestListContainer >>> .end .el-form-item__label::before {
     content:'~';
     color: #9e9e9e;
+  }
+  .isDrawer >>> .el-drawer__wrapper {
+    top:84px;
+  }
+  .isDrawer >>> .v-modal {
+    top:84px;
+  }
+  .isDrawer >>> .el-drawer__body {
+    padding-bottom: 84px;
   }
 </style>
