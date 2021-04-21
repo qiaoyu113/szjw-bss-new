@@ -17,7 +17,6 @@
       <el-table-column
         label="基础信息"
         align="center"
-        min-width="220"
       >
         <template slot-scope="{row}">
           <div class="arrow" />
@@ -47,7 +46,6 @@
       </el-table-column>
       <el-table-column
         label="车辆"
-        min-width="150"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -60,7 +58,6 @@
       </el-table-column>
       <el-table-column
         label="地址信息"
-        min-width="240"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -76,7 +73,6 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="160"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -92,7 +88,6 @@
       </el-table-column>
       <el-table-column
         label="线路忍耐度"
-        min-width="200"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -111,7 +106,6 @@
       </el-table-column>
       <el-table-column
         label="标签"
-        min-width="100"
       >
         <template slot-scope="{row}">
           <p
@@ -130,7 +124,6 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        min-width="160"
       >
         <template slot-scope="{row}">
           <p
@@ -149,18 +142,19 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        min-width="150"
+        width="150"
         fixed="right"
       >
         <template
           slot-scope="{row}"
+          :a="row"
         >
           <p class="text">
             <el-button
               type="text"
               size="small"
               style="paddingBottom:0"
-              @click.stop="handleCall(row)"
+              @click.stop="handleCall"
             >
               呼叫
             </el-button>
@@ -306,7 +300,7 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
-  @Prop({ default: [] }) opType!: number[];
+  @Prop({ default: () => [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',
@@ -374,8 +368,8 @@ export default class extends Vue {
     }
   }
   // 外呼
-  handleCall(row:IState) {
-    this.$emit('call', row)
+  handleCall() {
+    this.$emit('call')
   }
   // 打标签
   handleTag() {

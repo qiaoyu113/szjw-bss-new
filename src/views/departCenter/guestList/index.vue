@@ -1,7 +1,9 @@
 <template>
   <div
+    ref="guestListContainer"
     v-loading="listLoading"
     class="GuestListContainer"
+    :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
       p15: isPC
     }"
@@ -74,6 +76,7 @@
     >
       <Atable
         :list-query="listQuery"
+        :is-more="true"
         :is-show-percent="true"
         :obj="{}"
         @tryRun="handleCreateTryRun"
@@ -88,6 +91,8 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <GuestDrawer v-model="showDrawer" />
+
     <create-tryRun
       ref="createTryRun"
       :obj="obj"
@@ -101,6 +106,8 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
+
+import GuestDrawer from '../guestDrawer/index.vue'
 import CreateTryRun from './components/CreateTryRun.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
@@ -121,6 +128,7 @@ interface IState {
     SelfForm,
     Atable,
     Pagination,
+    GuestDrawer,
     CreateTryRun,
     CancelTryRun
   }
@@ -134,6 +142,7 @@ export default class extends Vue {
     workingTimeStart: '06:10'
   }
   private listLoading:boolean = false
+  private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [] // 线路肥瘦
@@ -393,6 +402,9 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
+    alert(1)
+    this.showDrawer = true
+
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
       return this.$message.warning('单趟运费起始金额不能大于终止金额')
     }
@@ -473,6 +485,9 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
+    height: 100%;
+    overflow: hidden;
+    transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;
