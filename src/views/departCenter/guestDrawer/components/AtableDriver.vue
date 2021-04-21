@@ -174,6 +174,7 @@
             <el-button
               type="text"
               size="small"
+              @click.stop="handleTryRun"
             >
               创建试跑意向
             </el-button>
@@ -345,13 +346,17 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
-  // 创建意向
+  // 呼叫
   handleCall() {
-    this.$emit('call')
+    this.$emit('handleCall')
   }
   // 打标签
   handleTag() {
-    this.$emit('tag')
+    this.$emit('handleTag')
+  }
+  // 创建意向
+  handleTryRun() {
+    this.$emit('handleTryRun', 'a')
   }
 }
 </script>

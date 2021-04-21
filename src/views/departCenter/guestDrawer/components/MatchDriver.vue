@@ -14,11 +14,14 @@
       <AtableDriver
         :list-query="listQuery"
         :is-more="true"
-        @tryRun="handleCreateTryRun"
+        @handleCall="handleCall"
+        @handleTag="handleTag"
+        @handleTryRun="handleCreateTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
     </div>
     <SetTag v-if="showTag" />
+    <CreateTryRun v-if="showTryRun" />
   </section>
 </template>
 
@@ -26,6 +29,7 @@
 import SearchKeyWords from './SearchKeyWords.vue'
 import AtableDriver from './AtableDriver.vue'
 import SetTag from './SetTag.vue'
+import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
@@ -34,12 +38,14 @@ interface IState {
   components: {
     AtableDriver,
     SearchKeyWords,
-    SetTag
+    SetTag,
+    CreateTryRun
   }
 })
 export default class DepartLine extends Vue {
   private listLoading:boolean = false
-  private showTag:boolean = true
+  private showTag:boolean = false
+  private showTryRun:boolean = false
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
@@ -50,9 +56,18 @@ export default class DepartLine extends Vue {
     f1: '',
     f2: ''
   }
+  // 呼叫
+  handleCall() {
+    //
+  }
+  // 打标签
+  handleTag() {
+    this.showTag = true
+  }
   // 创建试跑意向
-  handleCreateTryRun() {
-    (this.$refs.createTryRun as any).showDialog = true
+  handleCreateTryRun(val: any) {
+    console.log(val)
+    this.showTryRun = true
   }
   // 取消创建试跑意向
   handleCancelTryRun() {
