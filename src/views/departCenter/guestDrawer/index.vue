@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 10:30:31
+ * @LastEditTime: 2021-04-21 10:55:15
  * @LastEditors: D.C.base
 -->
 <template>
@@ -34,7 +34,7 @@
         />
       </div>
     </section>
-    <SetTag v-if="tagShow" />
+    <SetTag v-model="tagShow" />
     <CreateTryRun v-if="tryRunShow" />
     <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
@@ -126,6 +126,7 @@ export default class GuestDrawer extends Vue {
     (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
+    alert('点击率')
     this.tagShow = true
   }
   mounted() {
