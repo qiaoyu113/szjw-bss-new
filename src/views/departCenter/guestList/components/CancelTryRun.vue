@@ -1,26 +1,24 @@
 <template>
-  <div class="createTryRunContainer">
-    <SelfDialog
-      :visible.sync="showDialog"
-      title="取消试跑意向"
-      :confirm="confirm"
-      width="500px"
-      :destroy-on-close="false"
-      @closed="handleDialogClosed"
-    >
-      <self-form
-        ref="cancelForm"
-        :list-query="listQuery"
-        :form-item="formItem"
-        :rules="rules"
-        size="small"
-        label-width="200px"
-        class="p15 SuggestForm"
-        :pc-col="24"
-        @onPass="handlePassChange"
-      />
-    </SelfDialog>
-  </div>
+  <SelfDialog
+    :visible.sync="showDialog"
+    title="取消试跑意向"
+    :confirm="confirm"
+    width="500px"
+    :destroy-on-close="false"
+    @closed="handleDialogClosed"
+  >
+    <self-form
+      ref="cancelForm"
+      :list-query="listQuery"
+      :form-item="formItem"
+      :rules="rules"
+      size="small"
+      label-width="200px"
+      class="p15 SuggestForm"
+      :pc-col="24"
+      @onPass="handlePassChange"
+    />
+  </SelfDialog>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
@@ -74,8 +72,3 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-  .createTryRunContainer {
-
-  }
-</style>

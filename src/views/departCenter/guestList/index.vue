@@ -2,8 +2,10 @@
   <div
     v-loading="listLoading"
     class="GuestListContainer"
+    :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC
+      p15: isPC,
+      isDrawer: showDrawer
     }"
   >
     <!-- 查询表单 -->
@@ -73,10 +75,12 @@
       class="table_box"
     >
       <Atable
+        ref="lineTable"
         :list-query="listQuery"
-        :is-show-percent="true"
+        :is-more="false"
+        :is-show-percent="false"
         :obj="{}"
-        @tryRun="handleCreateTryRun"
+        @match="handleMatchTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
       <pagination
@@ -88,10 +92,8 @@
         @pagination="handlePageSizeChange"
       />
     </div>
-    <create-tryRun
-      ref="createTryRun"
-      :obj="obj"
-    />
+    <GuestDrawer v-model="showDrawer" />
+
     <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
@@ -101,7 +103,8 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
-import CreateTryRun from './components/CreateTryRun.vue'
+
+import GuestDrawer from '../guestDrawer/index.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
@@ -121,19 +124,13 @@ interface IState {
     SelfForm,
     Atable,
     Pagination,
-    CreateTryRun,
+    GuestDrawer,
     CancelTryRun
   }
 })
 export default class extends Vue {
-  private obj:IState = {
-    driverName: 'tom',
-    driverId: 'SJ20210121212',
-    lineName: '天猫配送',
-    lineId: 'XL20210121212',
-    workingTimeStart: '06:10'
-  }
   private listLoading:boolean = false
+  private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [] // 线路肥瘦
@@ -408,7 +405,8 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true
+      this.listLoading = true;
+      (this.$refs.lineTable as any).getLists()
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
@@ -430,9 +428,9 @@ export default class extends Vue {
     }
     this.getLists()
   }
-  // 创建试跑意向
-  handleCreateTryRun() {
-    (this.$refs.createTryRun as any).showDialog = true
+  // 匹配撮合
+  handleMatchTryRun() {
+    this.showDrawer = true
   }
   // 取消创建试跑意向
   handleCancelTryRun() {
@@ -507,6 +505,9 @@ export default class extends Vue {
       overflow: hidden;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
+    }
+    &.isDrawer {
+      // transform: translate(0,0);
     }
   }
 </style>
