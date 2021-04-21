@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-20 19:28:50
+ * @LastEditTime: 2021-04-21 10:08:01
  * @LastEditors: D.C.base
 -->
 <template>
@@ -40,9 +40,9 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
-import AtableLine from './components/AtableLine.vue'
-import AtableDriver from './components/AtableDriver.vue'
 import CreateTryRun from '../guestList/components/CreateTryRun.vue'
+import AtableLine from '../guestList/components/Atable.vue'
+import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 
 interface IState {
