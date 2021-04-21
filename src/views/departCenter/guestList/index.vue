@@ -1,11 +1,11 @@
 <template>
   <div
-    ref="guestListContainer"
     v-loading="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC
+      p15: isPC,
+      isDrawer: showDrawer
     }"
   >
     <!-- 查询表单 -->
@@ -94,10 +94,6 @@
     </div>
     <GuestDrawer v-model="showDrawer" />
 
-    <create-tryRun
-      ref="createTryRun"
-      :obj="obj"
-    />
     <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
@@ -109,7 +105,6 @@ import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
 import GuestDrawer from '../guestDrawer/index.vue'
-import CreateTryRun from './components/CreateTryRun.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
@@ -130,18 +125,10 @@ interface IState {
     Atable,
     Pagination,
     GuestDrawer,
-    CreateTryRun,
     CancelTryRun
   }
 })
 export default class extends Vue {
-  private obj:IState = {
-    driverName: 'tom',
-    driverId: 'SJ20210121212',
-    lineName: '天猫配送',
-    lineId: 'XL20210121212',
-    workingTimeStart: '06:10'
-  }
   private listLoading:boolean = false
   private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
@@ -484,9 +471,6 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
-    height: 100%;
-    overflow: hidden;
-    transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;
@@ -521,6 +505,9 @@ export default class extends Vue {
       overflow: hidden;
       -webkit-transform: translateZ(0);
       transform: translateZ(0);
+    }
+    &.isDrawer {
+      // transform: translate(0,0);
     }
   }
 </style>
