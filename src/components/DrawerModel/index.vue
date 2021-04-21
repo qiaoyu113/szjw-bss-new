@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-19 20:56:04
+ * @LastEditTime: 2021-04-21 14:11:09
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,7 +11,7 @@
     :visible.sync="visible"
     :with-header="false"
     :modal-append-to-body="false"
-    size="90%"
+    size="80%"
     top="84px"
     @close="closeHandle"
   >
