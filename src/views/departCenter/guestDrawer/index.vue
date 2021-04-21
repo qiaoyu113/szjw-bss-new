@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 10:55:15
+ * @LastEditTime: 2021-04-21 17:10:18
  * @LastEditors: D.C.base
 -->
 <template>
@@ -35,7 +35,7 @@
         />
       </div>
     </section>
-    <SetTag v-model="tagShow" />
+    <SetTag ref="tagShow" />
     <CreateTryRun v-if="tryRunShow" />
     <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
@@ -50,7 +50,6 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
-
 interface IState {
   [key: string]: any;
 }
@@ -90,9 +89,11 @@ export default class GuestDrawer extends Vue {
     f1: '',
     f2: ''
   }
+  $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
     this.visible = val
+    this.$eventBus.$emit('setIndex', val)
   }
   closeHandle() {
     this.visible = false
@@ -117,8 +118,7 @@ export default class GuestDrawer extends Vue {
   }
   // 打标签
   setTagHandle() {
-    alert('点击率')
-    this.tagShow = true
+    (this.$refs.tagShow as any).isShow = true
   }
   handleCreateRun() {
     this.tryRunShow = true
