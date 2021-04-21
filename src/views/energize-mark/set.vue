@@ -428,8 +428,8 @@ export default class extends Vue {
     let time = myTime// 30分钟换算成1800秒
     let intervalFunc = window.setInterval(function() {
       time = time - 1
-      let minute = parseInt(time / 60)
-      let second = parseInt(time % 60)
+      let minute = parseInt(String(time / 60))
+      let second = parseInt(String(time % 60))
       that.scoreword = minute + '分' + second + '秒'
       if (minute === 0 && second === 0) {
         that.scoreword = '开始打分'
