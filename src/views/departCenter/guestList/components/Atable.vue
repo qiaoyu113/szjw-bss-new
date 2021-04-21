@@ -526,7 +526,7 @@ export default class extends Vue {
       content: "线";
       display: inline-block;
       position: relative;
-      bottom: 35px;
+      bottom: 30px;
       left: 5px;
       transform: rotate(-135deg);
       color: white;
