@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="guestListContainer"
     v-loading="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
@@ -74,11 +75,12 @@
       class="table_box"
     >
       <Atable
+        ref="lineTable"
         :list-query="listQuery"
-        :is-more="true"
-        :is-show-percent="true"
+        :is-more="false"
+        :is-show-percent="false"
         :obj="{}"
-        @tryRun="handleCreateTryRun"
+        @match="handleMatchTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
       <pagination
@@ -401,9 +403,6 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    alert(1)
-    this.showDrawer = true
-
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
       return this.$message.warning('单趟运费起始金额不能大于终止金额')
     }
@@ -419,7 +418,8 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true
+      this.listLoading = true;
+      (this.$refs.lineTable as any).getLists()
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
@@ -441,9 +441,9 @@ export default class extends Vue {
     }
     this.getLists()
   }
-  // 创建试跑意向
-  handleCreateTryRun() {
-    (this.$refs.createTryRun as any).showDialog = true
+  // 匹配撮合
+  handleMatchTryRun() {
+    this.showDrawer = true
   }
   // 取消创建试跑意向
   handleCancelTryRun() {
@@ -485,6 +485,7 @@ export default class extends Vue {
 <style lang="scss" scoped>
   .GuestListContainer {
     height: 100%;
+    overflow: hidden;
     transform: translate(0,0);
     .btnPc {
        width: 100%;

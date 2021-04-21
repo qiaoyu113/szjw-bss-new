@@ -792,7 +792,7 @@ export default class extends Vue {
           areaCode: this.dialogForm.areaCode,
           dutyId: ''
         }
-        if (this.addData.type === 4) {
+        if (this.addData.type >= 4) {
           params.dutyId = this.dialogForm.dutyId
         }
         const { data } = await updateOffice(params)

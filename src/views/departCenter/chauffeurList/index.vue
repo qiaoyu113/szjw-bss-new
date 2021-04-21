@@ -8,6 +8,7 @@
   >
     <!-- 查询表单 -->
     <self-form
+      ref="searchForm"
       :list-query="listQuery"
       :form-item="formItem"
       size="small"
@@ -79,33 +80,19 @@
           重置
         </el-button>
       </div>
-      <template slot="key">
-        <el-autocomplete
-          v-model="listQuery.key"
-          class="inline-input"
-          :fetch-suggestions="querySearch"
-          placeholder="请输入"
-        />
-      </template>
-      <template slot="start">
-        <el-input
-          v-model="listQuery.start"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
-      <template slot="end">
-        <el-input
-          v-model="listQuery.end"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
     </self-form>
     <!-- 表格 -->
     <div class="table_box">
       <Atable
+        key="chauffeurTable"
         :table-data="tableData"
-        :is-show-percent="true"
-        :is-more="true"
+        :is-show-percent="false"
+        :is-more="false"
+        :op-type="[2,1]"
+        @call="call"
+        @tag="tag"
+        @detail="detail"
+        @depart="depart"
       />
       <pagination
         :operation-list="[]"
@@ -116,6 +103,13 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <CallPhone
+      :show-dialog.sync="callObj.callPhoneDio"
+      :clue-status="callObj.clueType"
+      :phone="callObj.phone"
+      :clue-id="callObj.clueId"
+      @success="getLists"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -123,6 +117,9 @@ import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
+import { GetDictionaryList } from '@/api/common'
+import { mapDictData, getProviceCityCountryData } from '../js/index'
+import CallPhone from '@/views/clue/components/CallPhone/index.vue'
 import {
   today,
   yesterday,
@@ -133,6 +130,7 @@ import {
 import { getDriverNoAndNameList } from '@/api/driver'
 import Pagination from '@/components/Pagination/index.vue'
 import doubleInput from './components/doubleInput.vue'
+import creatTryRun from '../guestList/components/CreateTryRun.vue'
 interface PageObj {
   page: number;
   limit: number;
@@ -148,16 +146,31 @@ interface IState {
     SelfForm,
     Atable,
     doubleInput,
-    Pagination
+    Pagination,
+    CallPhone
   }
 })
 export default class extends Vue {
   private listLoading: boolean = false;
+  private callPhoneDio:boolean = false
+  private clueType:number = 0
+  private clueId:string = ''
+  private phone:string = ''
+  private callObj:IState = {
+    callPhoneDio: false,
+    clueType: 0,
+    clueId: '',
+    phone: ''
+  }
   private busiOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: '' },
+    { label: '专车', value: 0 },
+    { label: '共享', value: 1 }
   ];
   private carKindOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: '' },
+    { label: '油车', value: 1 },
+    { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
     { label: '全部', value: '' }
@@ -169,16 +182,16 @@ export default class extends Vue {
   private timeLists: IState[] = [];
   private tableData: IState[] = [{}, {}];
   private listQuery: IState = {
-    busiType: '',
+    busiType: null,
     carType: '',
-    carKind: '',
+    carKind: null,
     driverId: '',
     address: '',
-    hard: '',
-    hope: '',
-    cycle: '',
-    time: [],
+    hard: null,
+    hope: null,
+    cycle: null,
     rents: [],
+    time: [],
     status: ''
   };
   private driverLoading: Boolean = false;
@@ -225,31 +238,18 @@ export default class extends Vue {
     },
     {
       type: 8,
+      key: 'address',
+      col: 6,
+      label: '居住地址',
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        filterable: true
-      },
-      label: '居住地址',
-      key: 'address'
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
+      }
     },
-    // {
-    //   type: 8,
-    //   key: "workCity",
-    //   col: 8,
-    //   label: "所属城市",
-    //   tagAttrs: {
-    //     placeholder: "请选择所属城市",
-    //     clearable: true,
-    //     "default-expanded-keys": true,
-    //     "default-checked-keys": true,
-    //     "node-key": "workCity",
-    //     props: {
-    //       lazy: true,
-    //       lazyLoad: showWork,
-    //     },
-    //   },
-    // },
     {
       type: 2,
       tagAttrs: {
@@ -427,7 +427,34 @@ export default class extends Vue {
   }
   // 重置
   handleResetClick() {
-    this.listQuery = {}
+    (this.$refs['searchForm'] as any).resetForm()
+  }
+  call(val:any) {
+    console.log(val)
+    let phone = '18848885135'
+    let repStr = phone.substr(3)
+    let newStr = phone.replace(repStr, '********')
+    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      console.log(123)
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消拨打'
+      })
+    })
+  }
+  tag() {
+    console.log('tag')
+  }
+  depart() {
+    console.log('depart')
+  }
+  detail() {
+    console.log('detail')
   }
   // 获取列表
   async getLists() {
@@ -469,8 +496,32 @@ export default class extends Vue {
       })
     }
   }
+  async getOptions() {
+    try {
+      // let carLen:number = this.carOptions.length
+      // if (carLen > 0) {
+      //   this.carOptions.splice(0, carLen)
+      // }
+      // let contactsLen:number = this.contactsOption.length
+      // if (contactsLen > 0) {
+      //   this.contactsOption.splice(0, contactsLen)
+      // }
+      let params = ['Intentional_compartment', 'line_handling_difficulty', 'settlement_cycle']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.driverOptions.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
   mounted() {
     this.init()
+    this.getOptions()
   }
 }
 </script>
