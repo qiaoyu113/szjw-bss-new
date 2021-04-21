@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 17:46:04
+ * @LastEditTime: 2021-04-21 17:56:35
  * @LastEditors: D.C.base
 -->
 <template>
@@ -29,7 +29,7 @@
       >
         <template slot="startTime">
           <el-time-select
-            v-model="listQuery['startTime'].jobStartDate"
+            v-model="listQuery['jobStartDate']"
             class="timeSelect"
             placeholder="起始时间"
             :picker-options="{
@@ -40,20 +40,20 @@
           />
           <span style="padding:0 3px">-</span>
           <el-time-select
-            v-model="listQuery['startTime'].jobEndDate"
+            v-model="listQuery['jobEndDate']"
             class="timeSelect"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['startTime'].jobStartDate
+              minTime: listQuery['jobStartDate']
             }"
           />
         </template>
         <template slot="endTime">
           <el-time-select
-            v-model="listQuery['endTime'].jobStartDate"
+            v-model="listQuery['jobStartDate2']"
             class="timeSelect"
             placeholder="起始时间"
             :picker-options="{
@@ -64,14 +64,14 @@
           />
           <span style="padding:0 3px">-</span>
           <el-time-select
-            v-model="listQuery['endTime'].jobEndDate"
+            v-model="listQuery['jobEndDate2']"
             class="timeSelect"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['endTime'].jobStartDate
+              minTime: listQuery['jobStartDate2']
             }"
           />
         </template>
@@ -161,14 +161,10 @@ export default class extends Vue {
     stable: [],
     starting: '',
     detailed: '',
-    startTime: {
-      jobStartDate: null,
-      jobEndDate: null
-    },
-    endTime: {
-      jobStartDate: null,
-      jobEndDate: null
-    },
+    jobStartDate: null,
+    jobEndDate: null,
+    jobStartDate2: null,
+    jobEndDate2: null,
     distribution: '',
     detailed2: '',
     situation: '',
@@ -417,7 +413,7 @@ export default class extends Vue {
     prohibition2: [
       { required: true, message: '请选择是否闯限行', trigger: 'change' }
     ],
-    a: [
+    hard: [
       { required: true, message: '请选择装卸接受度', trigger: 'change' }
     ],
     complexity: [
@@ -426,8 +422,8 @@ export default class extends Vue {
     expected: [
       { required: true, message: '请输入期望的运费', trigger: 'blur' }
     ],
-    b: [
-      { required: true, message: '请选择外边是否有值', trigger: 'change' }
+    isWork: [
+      { required: true, message: '请选择外边是否有活', trigger: 'change' }
     ],
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
@@ -435,7 +431,7 @@ export default class extends Vue {
     distribution: [
       { required: true, message: '请选择配送点', trigger: 'change' }
     ],
-    d: [
+    situation: [
       { required: true, message: '请选择司机情况', trigger: 'change' }
     ]
   }
