@@ -1,22 +1,26 @@
 <template>
   <div class="inputRange">
     <el-input
-      v-model.number="modelArr[0]"
+      :value="modelArr[0]"
+      v-bind="$attrs"
       class="input"
       placeholder="最低"
-      @blur="changeInput1"
+      @input="changeInput1"
+      @blur="blurChange"
     />
     <span class="icon">~</span>
     <el-input
-      v-model.number="modelArr[1]"
+      :value="modelArr[1]"
+      v-bind="$attrs"
       class="input"
       placeholder="最高"
-      @blur="changeInput2"
+      @input="changeInput2"
+      @blur="blurChange"
     />
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Model, Emit } from 'vue-property-decorator'
+import { Vue, Component, Model, Emit, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
@@ -25,25 +29,43 @@ interface IState {
   components: {}
 })
 export default class extends Vue {
-  @Model('sendMessage', { type: Array }) readonly modelArr!: any[]
-  private type:number = 0
+  @Model('inputChange', { type: Array }) readonly modelArr!: any[]
+  @Prop({ default: () => [] }) range?:number[]
+  private newModelArr:string[] = ['', '']
+  get sortModel() {
+    return (this.range as number[]).sort((a, b) => a - b)
+  }
   private changeInput1(val:number) {
-    this.sendMessage()
+    this.sendMessage(val, 0)
   }
   private changeInput2(val:number) {
-    this.sendMessage()
+    this.sendMessage(val, 1)
   }
-  @Emit()
-  sendMessage() {
-    if (this.modelArr.length > 1) {
-      if (this.modelArr.includes('')) {
-        this.$message.warning('请完善范围。')
-      } else if (+this.modelArr[0] > +this.modelArr[1]) {
+  private blurChange() {
+    if (this.sortModel.length > 0) {
+      let some = this.modelArr.some((item, index) => {
+        if (+item >= this.sortModel[1] || +item <= this.sortModel[0]) {
+          this.$message.warning(`最大范围为${this.sortModel[0]}-${this.sortModel[1]}之间`)
+          this.modelArr.splice(index, 1, '')
+          return true
+        }
+      })
+
+      if (some) return
+    }
+
+    if (this.modelArr.length > 1 && !this.modelArr.includes('')) {
+      if (+this.modelArr[0] >= +this.modelArr[1]) {
         this.$message.warning('后置参数要大于前置参数。')
-        this.modelArr.pop()
+        return this.modelArr.pop()
       }
     }
-    return this.modelArr
+  }
+  @Emit('inputChange')
+  sendMessage(e:any, index:number) {
+    this.newModelArr.splice(index, 1, e)
+    console.log(this.newModelArr, 'this.newModelArr')
+    return this.newModelArr
   }
 }
 </script>
