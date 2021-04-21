@@ -429,7 +429,8 @@ export default class extends Vue {
   handleResetClick() {
     (this.$refs['searchForm'] as any).resetForm()
   }
-  call() {
+  call(val:any) {
+    console.log(val)
     let phone = '18848885135'
     let repStr = phone.substr(3)
     let newStr = phone.replace(repStr, '********')

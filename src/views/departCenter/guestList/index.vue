@@ -487,7 +487,7 @@ export default class extends Vue {
   .GuestListContainer {
     height: 100%;
     overflow: hidden;
-    //transform: translate(0,0);
+    transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;

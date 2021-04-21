@@ -35,6 +35,7 @@
           v-for="item in tableBtn"
           :key="item.text"
           :value="item.num"
+          :hidden="item.name !== listQuery.status"
           :max="9999"
         >
           <el-button
@@ -1290,7 +1291,7 @@ export default class extends Vue {
         res.page = await HandlePages(res.page)
         this.page.total = res.page.total
         this.tableData = res.data || []
-        this.titleChang(res.title)
+        this.titleChang(res.title, res.page.total)
       } else {
         this.tableData = res.data || []
         this.$message.error(res.errorMsg)
@@ -1301,13 +1302,9 @@ export default class extends Vue {
       this.listLoading = false
     }
   }
-  titleChang(title: any) {
+  titleChang(title: any, total:number) {
     this.btns.forEach(item => {
-      if (item.name === '') {
-        item.num = title.all
-      } else {
-        item.num = title[item.name]
-      }
+      item.num = total
     })
     this.toDoValue = title.toDoCount
   }
@@ -1619,7 +1616,7 @@ export default class extends Vue {
           this.$notify({
             title: '',
             message:
-              '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
+              '若导入数量较大时，请多耐心等候。可在右上角「下载工具」内查看导入失败线索，重新导入！',
             duration: 0,
             offset: 70
           })

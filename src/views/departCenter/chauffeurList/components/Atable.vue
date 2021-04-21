@@ -375,8 +375,7 @@ export default class extends Vue {
   }
   // 外呼
   handleCall(row:IState) {
-    console.log(row)
-    this.$emit('call')
+    this.$emit('call', row)
   }
   // 打标签
   handleTag() {
