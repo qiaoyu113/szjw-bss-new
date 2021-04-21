@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-20 17:32:25
+ * @LastEditTime: 2021-04-20 19:34:03
  * @LastEditors: D.C.base
 -->
 <template>
@@ -21,7 +21,7 @@
         :form-item="formItem"
         :rules="rules"
         size="small"
-        label-width="120px"
+        label-width="130px"
         class="p15 SuggestForm"
         :pc-col="24"
         @onPass="handlePassChange"
@@ -120,7 +120,7 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = false
+  private showDialog:boolean = true
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
@@ -251,7 +251,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition2',
+      key: 'period',
       label: '期望账期',
       col: 24,
       options: [
