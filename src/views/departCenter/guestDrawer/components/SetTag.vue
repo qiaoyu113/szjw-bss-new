@@ -2,8 +2,8 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 10:32:10
- * @LastEditors: D.C.base
+ * @LastEditTime: 2021-04-21 16:52:07
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <div class="setTag">
@@ -121,7 +121,7 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = true
+  private showDialog:boolean = false
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [

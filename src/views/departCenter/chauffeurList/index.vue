@@ -42,7 +42,9 @@
     />
     <SetTag ref="setTag" />
     <DetailDialog
-      :driver-id="id"
+      :driver-id="detailId"
+      :dialog-table-visible.sync="detailDio"
+      active-name="third"
     />
   </div>
 </template>
@@ -101,6 +103,8 @@ export default class extends Vue {
     clueId: '',
     phone: ''
   };
+  private detailDio:Boolean = false
+  private detailId:string = ''
   private showTag:Boolean = false
   // 表格分页
   private page: PageObj = {
@@ -141,6 +145,7 @@ export default class extends Vue {
   }
   detail() {
     console.log('detail')
+    this.detailDio = true
   }
   // 获取列表
   async getLists() {
