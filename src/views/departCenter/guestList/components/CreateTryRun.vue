@@ -1,33 +1,31 @@
 <template>
-  <div class="createTryRunContainer">
-    <SelfDialog
-      :visible.sync="showDialog"
-      title="创建试跑意向"
-      :confirm="confirm"
-      width="500px"
-      :destroy-on-close="false"
-      @closed="handleDialogClosed"
+  <SelfDialog
+    :visible.sync="showDialog"
+    title="创建试跑意向"
+    :confirm="confirm"
+    width="500px"
+    :destroy-on-close="false"
+    @closed="handleDialogClosed"
+  >
+    <self-form
+      ref="tryForm"
+      :list-query="listQuery"
+      :form-item="formItem"
+      :rules="rules"
+      size="small"
+      label-width="140px"
+      class="p15 SuggestForm"
+      :pc-col="24"
+      @onPass="handlePassChange"
     >
-      <self-form
-        ref="tryForm"
-        :list-query="listQuery"
-        :form-item="formItem"
-        :rules="rules"
-        size="small"
-        label-width="140px"
-        class="p15 SuggestForm"
-        :pc-col="24"
-        @onPass="handlePassChange"
-      >
-        <template #driverId>
-          {{ obj.driverName }} ({{ obj.driverId }})
-        </template>
-        <template #lineId>
-          {{ obj.lineName }} ({{ obj.lineId }})
-        </template>
-      </self-form>
-    </SelfDialog>
-  </div>
+      <template #driverId>
+        {{ obj.driverName }} ({{ obj.driverId }})
+      </template>
+      <template #lineId>
+        {{ obj.lineName }} ({{ obj.lineId }})
+      </template>
+    </self-form>
+  </SelfDialog>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
