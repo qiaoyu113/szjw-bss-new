@@ -1,26 +1,26 @@
 <template>
-  <div class="createTryRunContainer">
-    <SelfDialog
-      :visible.sync="showDialog"
-      title="取消试跑意向"
-      :confirm="confirm"
-      width="500px"
-      :destroy-on-close="false"
-      @closed="handleDialogClosed"
-    >
-      <self-form
-        ref="cancelForm"
-        :list-query="listQuery"
-        :form-item="formItem"
-        :rules="rules"
-        size="small"
-        label-width="200px"
-        class="p15 SuggestForm"
-        :pc-col="24"
-        @onPass="handlePassChange"
-      />
-    </SelfDialog>
-  </div>
+  <SelfDialog
+    :visible.sync="showDialog"
+    title="取消试跑意向"
+    append-to-body
+    :confirm="confirm"
+    width="500px"
+    custom-class="a1111"
+    :destroy-on-close="false"
+    @closed="handleDialogClosed"
+  >
+    <self-form
+      ref="cancelForm"
+      :list-query="listQuery"
+      :form-item="formItem"
+      :rules="rules"
+      size="small"
+      label-width="200px"
+      class="p15 SuggestForm"
+      :pc-col="24"
+      @onPass="handlePassChange"
+    />
+  </SelfDialog>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
@@ -74,8 +74,18 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-  .createTryRunContainer {
 
-  }
+<style>
+.a1111 .el-dialog__header{
+  padding: 0;
+  height: 40px;
+  line-height: 40px;
+  padding-left: 20px;
+  background: #2f448a;
+  border-radius: 2px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: left;
+}
 </style>

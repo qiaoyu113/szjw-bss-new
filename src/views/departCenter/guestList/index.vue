@@ -1,11 +1,11 @@
 <template>
   <div
-    ref="guestListContainer"
     v-loading="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC
+      p15: isPC,
+      isDrawer: showDrawer
     }"
   >
     <!-- 查询表单 -->
@@ -75,11 +75,12 @@
       class="table_box"
     >
       <Atable
+        ref="lineTable"
         :list-query="listQuery"
-        :is-more="true"
-        :is-show-percent="true"
+        :is-more="false"
+        :is-show-percent="false"
         :obj="{}"
-        @tryRun="handleCreateTryRun"
+        @match="handleMatchTryRun"
         @cancelTryRun="handleCancelTryRun"
       />
       <pagination
@@ -91,12 +92,10 @@
         @pagination="handlePageSizeChange"
       />
     </div>
-    <GuestDrawer v-model="showDrawer" />
-
-    <create-tryRun
-      ref="createTryRun"
-      :obj="obj"
+    <GuestDrawer
+      v-model="showDrawer"
     />
+
     <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
@@ -108,7 +107,6 @@ import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
 import GuestDrawer from '../guestDrawer/index.vue'
-import CreateTryRun from './components/CreateTryRun.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
@@ -129,18 +127,10 @@ interface IState {
     Atable,
     Pagination,
     GuestDrawer,
-    CreateTryRun,
     CancelTryRun
   }
 })
 export default class extends Vue {
-  private obj:IState = {
-    driverName: 'tom',
-    driverId: 'SJ20210121212',
-    lineName: '天猫配送',
-    lineId: 'XL20210121212',
-    workingTimeStart: '06:10'
-  }
   private listLoading:boolean = false
   private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
@@ -402,9 +392,6 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    alert(1)
-    this.showDrawer = true
-
     if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
       return this.$message.warning('单趟运费起始金额不能大于终止金额')
     }
@@ -420,7 +407,8 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true
+      this.listLoading = true;
+      (this.$refs.lineTable as any).getLists()
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
@@ -442,9 +430,9 @@ export default class extends Vue {
     }
     this.getLists()
   }
-  // 创建试跑意向
-  handleCreateTryRun() {
-    (this.$refs.createTryRun as any).showDialog = true
+  // 匹配撮合
+  handleMatchTryRun() {
+    this.showDrawer = true
   }
   // 取消创建试跑意向
   handleCancelTryRun() {
@@ -485,9 +473,6 @@ export default class extends Vue {
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
-    height: 100%;
-    overflow: hidden;
-    //transform: translate(0,0);
     .btnPc {
        width: 100%;
        display: flex;
@@ -530,5 +515,14 @@ export default class extends Vue {
   .GuestListContainer >>> .end .el-form-item__label::before {
     content:'~';
     color: #9e9e9e;
+  }
+  .isDrawer >>> .el-drawer__wrapper {
+    top:84px;
+  }
+  .isDrawer >>> .v-modal {
+    top:84px;
+  }
+  .isDrawer >>> .el-drawer__body {
+    padding-bottom: 84px;
   }
 </style>

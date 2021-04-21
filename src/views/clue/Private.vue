@@ -1616,7 +1616,7 @@ export default class extends Vue {
           this.$notify({
             title: '',
             message:
-              '正在导入，10分钟左右可在右上角「下载工具」 内查看导入失败线索，重新导入！',
+              '若导入数量较大时，请多耐心等候。可在右上角「下载工具」内查看导入失败线索，重新导入！',
             duration: 0,
             offset: 70
           })
