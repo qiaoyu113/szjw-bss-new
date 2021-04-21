@@ -67,7 +67,7 @@
       </self-form>
       <div class="table_box">
         <div class="middle" />
-        <span>{{ 111 }}</span>
+        <span>筛选结果：{{ 111 }}条</span>
         <!-- <self-table
           ref="RefundForm"
           :index="listQuery.status === '3'"
@@ -102,7 +102,12 @@
             </el-button>
           </template>
         </self-table> -->
-        <Btable :list-query="listQuery" />
+        <Btable
+          :list-query="listQuery"
+          :is-show-percent="true"
+          :obj="{}"
+          @guest="handleLaunchGuest"
+        />
         <pagination
           :operation-list="[]"
           :total="page.total"
@@ -112,6 +117,10 @@
           @pagination="handlePageSizeChange"
         />
       </div>
+      <launch-guest
+        ref="launchGuest"
+        :obj="obj"
+      />
     </div>
   </div>
 </template>
@@ -121,8 +130,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
+import SelfDialog from '@/components/SelfDialog/index.vue'
+import { GetDictionaryList } from '@/api/common'
+import { mapDictData, getProviceCityCountryData } from '../js/index'
 import Btable from './components/Btable.vue'
+import LaunchGuest from './components/LaunchGuest.vue'
 import Pagination from '@/components/Pagination/index.vue'
+
 interface PageObj {
   page:number,
   limit:number,
@@ -136,14 +150,19 @@ interface IState {
   components: {
     SelfTable,
     SelfForm,
+    SelfDialog,
     Btable,
-    Pagination
+    Pagination,
+    LaunchGuest
   }
 })
 export default class extends Vue {
+  private obj:IState = {}
   private listLoading:boolean = false
+  private carLists:IState[] = [] // 车型列表
+  private labelTypeArr:IState[] = [] // 线路肥瘦
   private multipleSelection: any[] = []
-  private modelIdOptions: any[] = []
+  private showDialog: boolean = false
   private tableData:any[] = []
   private listQuery:IState = {
     workCity: [],
@@ -176,7 +195,7 @@ export default class extends Vue {
         placeholder: '请选择',
         clearable: true
       },
-      options: this.modelIdOptions
+      options: this.carLists
     },
     {
       type: 2,
@@ -185,7 +204,8 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true
-      }
+      },
+      options: this.labelTypeArr
     },
     {
       type: 2,
@@ -194,7 +214,37 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true
-      }
+      },
+      options: [
+        {
+          label: '全部',
+          value: ''
+        },
+        {
+          label: '不装卸',
+          value: 1
+        },
+        {
+          label: '只装不卸（轻）',
+          value: 2
+        },
+        {
+          label: '只卸不装（轻）',
+          value: 3
+        },
+        {
+          label: '只装不卸（重）',
+          value: 4
+        },
+        {
+          label: '只卸不装（重）',
+          value: 5
+        },
+        {
+          label: '重装卸（重）',
+          value: 6
+        }
+      ]
     },
     {
       type: 2,
@@ -220,7 +270,11 @@ export default class extends Vue {
       label: '仓库位置',
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       }
     },
     {
@@ -229,7 +283,11 @@ export default class extends Vue {
       label: '配送区域',
       tagAttrs: {
         placeholder: '请选择',
-        clearable: true
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
       }
     },
     {
@@ -358,7 +416,6 @@ export default class extends Vue {
     this.getList()
   }
   handleSelectionChange(val:any) {
-    // console.log(val)
     this.multipleSelection = val
   }
   // 查询
@@ -381,9 +438,24 @@ export default class extends Vue {
     }
   }
   // 获取列表
-  async getList() {
+  private async getList() {
     try {
       this.listLoading = true
+      let params: IState = {
+        page: this.page.page,
+        limit: this.page.limit
+      }
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+        params.workCity = this.listQuery.workCity[1]
+      }
+      this.listQuery.carType !== '' && (params.carType = this.listQuery.carTpe)
+      this.listQuery.lineFineness !== '' && (params.lineFineness = this.listQuery.lineFineness)
+      this.listQuery.handlingDifficulty !== '' && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
+      this.listQuery.freightSection !== '' && (params.freightSection = this.listQuery.freightSection)
+      this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
+      this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
+      this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
+      // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
     } finally {
@@ -391,8 +463,36 @@ export default class extends Vue {
       //
     }
   }
+  // 获取字典列表
+  async getDictList() {
+    try {
+      let params:string[] = ['Intentional_compartment', 'line_label']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get dict list fail:${err}`)
+    } finally {
+      //
+    }
+  }
   // 发起客邀
-  private handleClick(row:IState) {
+  handleLaunchGuest() {
+    (this.$refs.launchGuest as any).showDialog = true
+  }
+  // 取消客邀
+  // handleCancelTryRun() {
+  //   (this.$refs.cancelTryRun as any).showDialog = true
+  // }
+  init() {
+    this.getDictList()
+  }
+  mounted() {
+    this.init()
   }
 }
 </script>
