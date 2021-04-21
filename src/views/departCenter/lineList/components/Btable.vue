@@ -12,9 +12,10 @@
         row-key="id"
         :row-style="{height: '20px'}"
         fit
-        :cell-style="{padding: '5px 0'}"
+        :header-cell-style="{padding: '6px 20px'}"
+        :cell-style="{padding: '5px 20px'}"
       >
-        <el-table-column
+        <!-- <el-table-column
           label=""
           width="50"
           class-name="noP"
@@ -31,13 +32,15 @@
               匹配度{{ row.percent }}%
             </div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column
           label="基础信息"
-          width="180"
-          class-name="center"
+          width="220"
+          align="center"
+          class-name="firstColumn"
         >
           <template slot-scope="{row}">
+            <div class="arrow" />
             <router-link to="#">
               {{ row.a }}
             </router-link>
@@ -196,6 +199,7 @@
               <el-button
                 type="text"
                 size="small"
+                @click.stop="handleLaunchGuest"
               >
                 发起客邀
               </el-button>
@@ -204,6 +208,7 @@
               <el-button
                 type="text"
                 size="small"
+                @click.stop="handleCancelGuest"
               >
                 取消客邀
               </el-button>
@@ -338,6 +343,14 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
+  // 取消意向
+  handleCancelGuest() {
+    this.$emit('cancelGuest')
+  }
+  // 发起客邀
+  handleLaunchGuest() {
+    this.$emit('launchGuest')
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -349,15 +362,17 @@ export default class extends Vue {
       border-left:30px solid transparent;
       transform: rotate(135deg);
       position: absolute;
-      top: -5px;
-      left: -20px;
+      top: -8px;
+      left: -21px;
     }
-    .name {
-      font-size: 12px;
-      color: #fff;
+    .arrow::after {
+      content: "线";
+      display: inline-block;
       position: relative;
-      top: 4px;
-      left: -33px;
+      bottom: 30px;
+      left: 5px;
+      transform: rotate(-135deg);
+      color: white;
     }
     .percent {
       position: absolute;
@@ -421,8 +436,11 @@ export default class extends Vue {
 .lineTableContainer >>> .expand .cell{
   padding: 0px!important;
 }
+.lineTableContainer >>> .firstColumn {
+  overflow: hidden;
+}
 /* .lineTableContainer >>> .expand .cell */
-.lineTableContainer >>> .noP .cell {
+/* .lineTableContainer >>> .noP .cell {
   padding: 0px!important;
   position: absolute;
   top: 0;
@@ -430,7 +448,7 @@ export default class extends Vue {
   width: 50px;
   height: 100%;
   text-align: right;
-}
+} */
 </style>
 
 <style>

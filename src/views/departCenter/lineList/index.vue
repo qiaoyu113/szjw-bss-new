@@ -106,7 +106,8 @@
           :list-query="listQuery"
           :is-show-percent="true"
           :obj="{}"
-          @guest="handleLaunchGuest"
+          @launchGuest="handleLaunchGuest"
+          @cancelGuest="handleCancelGuest"
         />
         <pagination
           :operation-list="[]"
@@ -121,6 +122,7 @@
         ref="launchGuest"
         :obj="obj"
       />
+      <cancel-guest ref="cancelGuest" />
     </div>
   </div>
 </template>
@@ -134,7 +136,8 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import Btable from './components/Btable.vue'
-import LaunchGuest from './components/LaunchGuest.vue'
+import LaunchGuest from './components/LaunchGuests.vue'
+import CancelGuest from './components/CancelGuest.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
 interface PageObj {
@@ -153,7 +156,8 @@ interface IState {
     SelfDialog,
     Btable,
     Pagination,
-    LaunchGuest
+    LaunchGuest,
+    CancelGuest
   }
 })
 export default class extends Vue {
@@ -161,7 +165,7 @@ export default class extends Vue {
   private listLoading:boolean = false
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [] // 线路肥瘦
-  private multipleSelection: any[] = []
+  // private multipleSelection: any[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
   private listQuery:IState = {
@@ -415,9 +419,9 @@ export default class extends Vue {
     }
     this.getList()
   }
-  handleSelectionChange(val:any) {
-    this.multipleSelection = val
-  }
+  // handleSelectionChange(val:any) {
+  //   this.multipleSelection = val
+  // }
   // 查询
   handleFilterClick() {
   }
@@ -485,9 +489,9 @@ export default class extends Vue {
     (this.$refs.launchGuest as any).showDialog = true
   }
   // 取消客邀
-  // handleCancelTryRun() {
-  //   (this.$refs.cancelTryRun as any).showDialog = true
-  // }
+  handleCancelGuest() {
+    (this.$refs.cancelGuest as any).showDialog = true
+  }
   init() {
     this.getDictList()
   }
