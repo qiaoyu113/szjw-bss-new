@@ -2,13 +2,13 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 10:51:48
+ * @LastEditTime: 2021-04-21 10:58:07
  * @LastEditors: D.C.base
 -->
 <template>
   <div class="setTag">
     <SelfDialog
-      :visible.sync="showDialog"
+      :visible.sync="visible"
       title="给司机打标签"
       :confirm="confirm"
       :modal="false"
@@ -105,7 +105,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryData } from '../../js/index'
@@ -121,7 +121,8 @@ var _this = {}
   }
 })
 export default class extends Vue {
-  @Prop({ default: false }) private showDialog !: boolean
+   @Prop({ default: false }) private value !: boolean
+  private visible : boolean = false // 抽屉显示隐藏
   private countyOptions:Array = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
@@ -161,6 +162,10 @@ export default class extends Vue {
       jobEndDate: ''
     },
     remark: ''
+  }
+  @Watch('value')
+  onValueChanged(val: boolean, oldVal: boolean) {
+    this.visible = val
   }
   private formItem:any[] = [
     {
@@ -430,10 +435,16 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.cancelForm as any).submitForm()
+    this.closeHandle()
   }
   // 弹框关闭
   private handleDialogClosed() {
     (this.$refs.cancelForm as any).resetForm()
+    this.closeHandle()
+  }
+  closeHandle() {
+    this.visible = false
+    this.$emit('input', false)
   }
   getData() {
     setTimeout(async() => {
