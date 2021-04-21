@@ -12,18 +12,17 @@
         预计打分人数一共{{ scoreInfo.estimateAllScorer }}人，已提交<span>{{ scoreInfo.allSubmitted }}</span>人，未提交<span>{{ scoreInfo.allUnsubmitted }}</span>人，其中：
       </p>
       <p>
-        GMR({{ scoreInfo.gmrWeight }})预计打分{{ scoreInfo.estimateScorerGmr }}人，实际<span>{{ scoreInfo.submittedScorerGmr }}</span>人
+        GMR({{ scoreInfo.gmrWeight }}%)预计打分{{ scoreInfo.estimateScorerGmr }}人，实际<span>{{ scoreInfo.submittedScorerGmr }}</span>人
       </p>
       <p>
-        GMC({{ scoreInfo.gmcWeight }})预计打分{{ scoreInfo.estimateScorerGmc }}人，实际打分<span>{{ scoreInfo.submittedScorerGmc }}</span>人
+        GMC({{ scoreInfo.gmcWeight }}%)预计打分{{ scoreInfo.estimateScorerGmc }}人，实际打分<span>{{ scoreInfo.submittedScorerGmc }}</span>人
       </p>
       <p>
-        城市公共({{ scoreInfo.cityWeight }})预计打分{{ scoreInfo.estimateScorerCity }}人，实际打分<span>{{ scoreInfo.submittedScorerCity }}</span>人
+        城市公共({{ scoreInfo.cityWeight }}%)预计打分{{ scoreInfo.estimateScorerCity }}人，实际打分<span>{{ scoreInfo.submittedScorerCity }}</span>人
       </p>
     </div>
     <div class="table_box">
       <self-table
-        v-loading="listLoading"
         :operation-list="[]"
         :index="false"
         :columns="columns"
@@ -31,32 +30,25 @@
         :page="page"
         @onPageSize="handlePageSize"
       >
-        <template v-slot:lineName="scope">
+        <template v-slot:officeName="scope">
           <span
             style="color:#649CEE"
-            @click="goLineDteails(scope.row.lineId)"
-          >{{ scope.row.lineName }}</span>
+          >{{ scope.row.officeName }}</span>
         </template>
-
-        <template v-slot:agentStatus="scope">
-          <span v-if="scope.row.agentStatus===1"> 已下架</span>
-          <span v-if="scope.row.agentStatus===2"> 忽略</span>
+        <template v-slot:commitDate="scope">
+          <span v-if="scope.row.commitDate">{{ scope.row.commitDate }}</span>
           <span v-else />
         </template>
 
-        <template v-slot:shelvesReasons="scope">
-          <span v-if="scope.row.agentStatus!==1" />
-          <el-tooltip
+        <template v-slot:status="scope">
+          <span
+            v-if="scope.row.status === 1"
+            style="color:green"
+          >已提交</span>
+          <span
             v-else
-            placement="top"
-          >
-            <div slot="content">
-              {{ scope.row.shelvesReasons }}
-            </div>
-            <div class="ellipsis">
-              {{ scope.row.shelvesReasons }}
-            </div>
-          </el-tooltip>
+            style="color:red"
+          >未提交</span>
         </template>
       </self-table>
     </div>
@@ -89,29 +81,31 @@ export default class extends Vue {
   }
   private columns: any[] = [
     {
-      key: 'agentId',
+      key: 'personName',
       label: '姓名'
     },
     {
-      key: 'lineName',
+      key: 'officeName',
       label: '组织架构',
       slot: true
     },
     {
-      key: 'lineId',
+      key: 'roleName',
       label: '职务'
     },
     {
-      key: 'updateName',
+      key: 'mobile',
       label: '手机号'
     },
     {
-      key: 'updateDate',
-      label: '提交时间'
+      key: 'commitDate',
+      label: '提交时间',
+      slot: true
     },
     {
-      key: 'bdProcessingStatusName',
-      label: '提交状态'
+      key: 'status',
+      label: '提交状态',
+      slot: true
     }
   ]
 
@@ -128,9 +122,28 @@ export default class extends Vue {
     estimateScorerCity: '',
     submittedScorerCity: ''
   }
+  private timer: any = ''
+
   mounted() {
-    this.getList()
-    this.getScorerNum()
+    if (this.timer) {
+      clearInterval(this.timer)
+    } else {
+      this.getList()
+      this.getScorerNum()
+      this.timer = setInterval(() => {
+        this.getList()
+        this.getScorerNum()
+        console.log('mounted定时触发了')
+      }, 3000)
+    }
+  }
+  destroyed() {
+    clearInterval(this.timer)
+  }
+  beforeRouteLeave(to:any, from:any, next:Function) {
+    console.log('')
+    clearInterval(this.timer)
+    next()
   }
   // 页数更改
   handlePageSize(page: any) {
@@ -143,28 +156,25 @@ export default class extends Vue {
     this.listLoading = true
     try {
       let params: any = {
-        pageSize: this.page.limit,
         pageNum: this.page.page,
-        sessionId: ''
+        pageSize: this.page.limit
       }
 
       let { data: res } = await getScoreStatusList(params)
-
       if (res.success) {
         this.listLoading = false
         this.tableData = res.data
         this.page.total = res.page.total
       } else {
-        this.$message.error('出错逻辑  tab详情页接口问题')
+        this.$message.error(res.errorMsg)
       }
     } catch (err) {
-      console.log(`get lists fail:`, err)
+      console.log(`getScoreStatusList fail:`, err)
     }
   }
 
   async getScorerNum() {
-    let sessionId:string = ''
-    let { data: res } = await getScorerNum(sessionId)
+    let { data: res } = await getScorerNum()
     if (res.success) {
       this.scoreInfo = res.data
     }

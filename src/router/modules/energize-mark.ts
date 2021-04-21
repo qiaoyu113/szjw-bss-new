@@ -17,7 +17,7 @@ const energizeMarkRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "driver" */ '@/views/energize-mark/statistic.vue'),
       name: 'Statistic',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/score/assess/statistical',
         title: 'statistic',
         noCache: false
       }
@@ -27,9 +27,9 @@ const energizeMarkRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "driver" */ '@/views/energize-mark/monitor.vue'),
       name: 'Monitor',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/score/monitor',
         title: 'monitor',
-        noCache: false
+        noCache: true
       }
     },
     {
@@ -37,7 +37,7 @@ const energizeMarkRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "driver" */ '@/views/energize-mark/set.vue'),
       name: 'Set',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/score/rule/setting',
         title: 'set',
         noCache: false
       }

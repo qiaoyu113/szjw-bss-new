@@ -1,134 +1,124 @@
 <template>
   <div class="statistic-container">
     <div class="left-container">
-      <ul
-        v-infinite-scroll="load"
-        infinite-scroll-disabled="disabled"
-      >
+      <ul>
         <li
-          v-for="i in count"
-          :key="i"
-          :class="itemIsClicked && itemClick === i ? 'item-clicked' : ''"
-          @click="handleItemClick(i)"
+          v-for="(item, index) in listData"
+          :key="index"
+          :class="itemIsClicked && itemClick === index ? 'item-clicked' : ''"
+          @click="handleItemClick(item, index)"
         >
-          FN2021-{{ i }}
+          {{ item.sessionId.slice(0, 8) }}
         </li>
       </ul>
       <p v-if="loading">
         加载中...
       </p>
-      <p v-if="noMore">
+      <!-- <p v-if="noMore">
         没有更多了
-      </p>
+      </p> -->
     </div>
     <div class="right-container">
       <section-container
-        :title="`场次编号：202103020001`"
+        :title="`场次编号：${scorerNumVO.sessionId}`"
         :md="true"
       >
         <!-- 提示tips -->
         <div class="tips">
           <p>
-            本场时间：2021-04-15 10:03:55-2021-04-15 10:03:55
+            本场时间：{{ scorerNumVO.startDate }}-{{ scorerNumVO.endDate }}
           </p>
           <p>
-            预计打分人数一共170人，已提交<span>20</span>人，未提交<span>150</span>人，其中：
+            预计打分人数一共{{ scorerNumVO.estimateAllScorer }}人，已提交<span>{{ scorerNumVO.allSubmitted }}</span>人，未提交<span>{{ scorerNumVO.allUnsubmitted }}</span>人，其中：
           </p>
           <p>
-            GMR（80%）预计打分6人，实际<span>6</span>人
+            GMR（{{ scorerNumVO.gmrWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScorerGmr }}人，实际<span>{{ scorerNumVO.submittedScoreGmr }}</span>人
           </p>
           <p>
-            GMC（10%）预计打分50人，实际打分<span>49</span>人
+            GMC（{{ scorerNumVO.gmcWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreGmc }}人，实际打分<span>{{ scorerNumVO.submittedScorerGmc }}</span>人
           </p>
           <p>
-            城市公共（10%）预计打分114人，实际打分<span>109</span>人
+            城市公共（{{ scorerNumVO.cityPublicWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreCity }}人，实际打分<span>{{ scorerNumVO.submittedScorerCity }}</span>人，抽取人数：<span>{{ scorerNumVO.cityPublicNum || '0' }}</span>人
           </p>
         </div>
       </section-container>
       <!-- table表 -->
       <div class="table_box">
         <div class="head_title">
-          场次：2021030100001
+          场次：{{ scorerNumVO.sessionId }}
         </div>
         <el-table
           v-loading="listLoading"
           border
-          :data="tableData"
+          :data="reportOneLevelScoreVOS"
+          :row-class-name="tableRowClassName"
         >
           <el-table-column
             align="center"
-            prop="agentId"
           >
             <template
-              slot="header"
+              #header
             >
               <p>一级部门</p>
               <p>会计</p>
             </template>
             <template slot-scope="scope">
-              {{ scope.row.agentId }}
+              {{ scope.row.deptName }}
             </template>
           </el-table-column>
           <el-table-column
             align="center"
           >
             <template
-              slot="header"
+              #header
             >
               <p>合计</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
-              {{ scope.row.lineName }}
+              {{ scope.row.totalScore }}
             </template>
           </el-table-column>
           <el-table-column
             align="center"
           >
             <template
-              slot="header"
+              #header
             >
-              <p>GMR（20%）</p>
+              <p>GMR（{{ scorerNumVO.gmrWeight }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
-              {{ scope.row.updateDate }}
+              {{ scope.row.gmrScore }}
             </template>
           </el-table-column>
           <el-table-column
             align="center"
           >
             <template
-              slot="header"
+              #header
             >
-              <p>GMC（70%）</p>
+              <p>GMC（{{ scorerNumVO.gmcWeight }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
-              {{ scope.row.lineId }}
+              {{ scope.row.gmcScore }}
             </template>
           </el-table-column>
           <el-table-column
             align="center"
           >
             <template
-              slot="header"
+              #header
             >
-              <p>GG（10%）</p>
+              <p>GG（{{ scorerNumVO.cityPublicWeight }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
-              {{ scope.row.updateName }}
+              {{ scope.row.cityPublicScore }}
             </template>
           </el-table-column>
         </el-table>
-        <Pagination
-          :total="page.total"
-          :page="page.page"
-          :limit="page.limit"
-          :operation-list="[]"
-          @pagination="handlePageSize"
-        />
       </div>
     </div>
   </div>
@@ -137,88 +127,120 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import SectionContainer from '@/components/SectionContainer/index.vue'
-import { getFinishedLine } from '@/api/line-shelf'
-import Pagination from '@/components/Pagination/index.vue'
+import { getHistorySessionList, getReportInfo } from '@/api/score'
 
-interface PageObj {
-  page: Number;
-  limit: Number;
-  total?: Number;
-}
 @Component({
   name: 'Statistic',
   components: {
-    SectionContainer,
-    Pagination
+    SectionContainer
   }
 })
 export default class extends Vue {
-  private count: number = 10
+  private listData: any[] = []
   private loading: boolean = false
-  private itemIsClicked: boolean = false
-  private itemClick: number = 1
+  private itemIsClicked: boolean = true
+  private itemClick: number = 0
   private listLoading: boolean = false
-  private tableData: any[] = []
-  private page: PageObj = {
-    page: 1,
-    limit: 10,
-    total: 0
+  private scorerNumVO: object = {
+    submittedScorerGmc: '',
+    submittedScorerCity: '',
+    submittedScoreGmr: '',
+    startDate: '',
+    sessionId: '',
+    gmrWeight: '',
+    gmcWeight: '',
+    estimateScorerGmr: '',
+    estimateScoreGmc: '',
+    estimateScoreCity: '',
+    estimateAllScorer: '',
+    endDate: '',
+    cityPublicWeight: '',
+    cityPublicNum: '',
+    allUnsubmitted: '',
+    allSubmitted: ''
   }
+  private reportOneLevelScoreVOS: any[] = []
 
-  get noMore() {
-    return this.count >= 50
-  }
-
-  get disabled() {
-    return this.loading || this.noMore
-  }
-  // 加载左侧列表
-  load() {
+  // 查询历史场次列表
+  async getHistorySessionList() {
     this.loading = true
-    setTimeout(() => {
-      this.count += 10
+    try {
+      let { data: res } = await getHistorySessionList()
       this.loading = false
-    }, 1000)
+      this.listData = res.data
+      this.getReportInfo(res.data[0].sessionId)
+      // if (res.success) {
+      //   this.listData = res.data
+      //   this.getReportInfo(res.data[0].sessionId)
+      // }
+    } catch (error) {
+      this.loading = false
+      console.log(`getHistorySessionList fail:`, error)
+    }
   }
 
   // li点击事件
-  handleItemClick(item: any) {
+  handleItemClick(item: any, index: number) {
     this.itemIsClicked = true
-    this.itemClick = item
+    this.itemClick = index
+    this.getReportInfo(item.sessionId)
   }
 
   mounted() {
-    this.getList()
+    this.getHistorySessionList()
   }
 
-  // 页数更改
-  handlePageSize(page: any) {
-    this.page.page = page.page
-    this.page.limit = page.limit
-    this.getList()
-  }
-  // 获取新线维护列表
-  async getList() {
+  // 查询报表详情
+  async getReportInfo(id: string) {
     this.listLoading = true
     try {
       let params: any = {
-        limit: this.page.limit,
-        page: this.page.page,
-        inspectionStatus: 4
+        sessionId: id
       }
-
-      let { data: res } = await getFinishedLine(params)
-
+      let { data: res } = await getReportInfo(params)
+      this.listLoading = false
       if (res.success) {
-        this.listLoading = false
-        this.tableData = res.data
-        this.page.total = res.page.total
-      } else {
-        this.$message.error('出错逻辑  tab详情页接口问题')
+        this.scorerNumVO = { ...this.scorerNumVO, ...res.data.reportScorerNumVO }
+        // this.reportOneLevelScoreVOS = res.data.reportOneLevelScoreVOS
+        let tableArr:any[] = []
+        for (let i = 0; i < res.data.reportOneLevelScoreVOS.length; i++) {
+          let item:any = res.data.reportOneLevelScoreVOS[i]
+          let arr:any[] = []
+          if (item.reportTwoLevelScoreVOS && item.reportTwoLevelScoreVOS.length > 0) {
+            for (let j = 0; j < item.reportTwoLevelScoreVOS.length; j++) {
+              let sub = item.reportTwoLevelScoreVOS[j]
+              arr.push({
+                deptName: sub.deptName,
+                totalScore: sub.twoLevelTotalScore,
+                gmrScore: sub.gmrScore,
+                gmcScore: sub.gmcScore,
+                cityPublicScore: sub.cityPublicScore
+              })
+            }
+
+            tableArr.push(...arr)
+            tableArr.push({
+              deptName: item.deptName,
+              totalScore: item.columnOneLevelTotalScore || 0,
+              gmrScore: item.gmrOneLevelScore,
+              gmcScore: item.gmcOneLevelScore,
+              cityPublicScore: item.cityPublicOneLevelScore,
+              flag: true
+            })
+          }
+        }
+        this.reportOneLevelScoreVOS = tableArr
       }
     } catch (err) {
-      console.log(`get lists fail:`, err)
+      this.listLoading = false
+      console.log(`getReportInfo fail:`, err)
     }
+  }
+  tableRowClassName({ row }:{row:any}) {
+    if (row.flag) {
+      return 'gray'
+    }
+    return ''
   }
 }
 </script>
@@ -241,6 +263,9 @@ export default class extends Vue {
         margin: 0;
         padding: 0;
         li {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
           height: 65px;
           text-align: center;
           margin: 0;
@@ -281,7 +306,7 @@ export default class extends Vue {
             font-size: 22px;
             font-family: 'PingFangSC-Regular';
             margin: 0 0 10px 45px;
-            padding: 0;
+            padding: 1px;
             line-height: 20px;
           }
         }
@@ -332,5 +357,8 @@ export default class extends Vue {
   }
   .statistic-container .right-container .table_box >>> .el-table--border td {
     border-bottom: 0;
+  }
+  .table_box  >>> .gray {
+    background:#d4dae9;
   }
 </style>

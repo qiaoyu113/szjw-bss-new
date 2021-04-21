@@ -172,7 +172,7 @@
       title="确认"
       width="40%"
       :cancel-button-text="`取消打分`"
-      :confirm-button-text="`确定打分`"
+      :confirm-button-text="`确定开始打分`"
       :before-close="beforeClose"
       :confirm="handleConfirmClick"
       :sumbit-again="submitLoading"
@@ -192,7 +192,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
-import { saveOrEditRuleData } from '@/api/score'
+import { saveOrEditRuleData, getRuleData, goToOpenScore } from '@/api/score'
 import SectionContainer from '@/components/SectionContainer/index.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { RouteRecord, Route } from 'vue-router'
@@ -266,61 +266,88 @@ export default class extends Vue {
     '城市公共抽取比例：'
   ]
   // 开始打分弹框参数
-  private submitLoading: boolean = false;
+  private submitLoading: boolean = false
   // 开始打分按钮文字
   private scoreword: string = '开始打分'
+  private examinationStatus: number = 0 // 考试状态 0 未开始；1 有进行中的考试
+  private timeRemaining: number = -1 // 倒计时时间
 
-  @Watch('$route')
-  private onRouteChange(route: Route) {
-    // if you go to the redirect page, do not update the breadcrumbs
-    // if (route.path.startsWith('/redirect/')) {
-    //   return
-    // }
-    // this.getBreadcrumb()
-    console.log(route)
-    if (route.path === '/energizeMark/set') {
-      this.$refs.roleRef.resetFields()
-      if (localStorage.getItem('roleForm')) {
-        let roleFormData = JSON.parse(localStorage.getItem('roleForm'))
-        this.roleForm = roleFormData
-      } else {
-        this.roleForm.cityGMC = ''
-        this.roleForm.areaGMR = ''
-        this.roleForm.cityPublic = ''
+  mounted() {
+    this.getRuleData()
+  }
+
+  // 查询打分规则
+  private async getRuleData() {
+    try {
+      let { data: res } = await getRuleData()
+      this.roleForm.cityGMC = res.data.gmcWeight
+      this.roleForm.areaGMR = res.data.gmrWeight
+      this.roleForm.cityPublic = res.data.cityPublicWeight
+      this.proportionForm.proportion = res.data.cityPublicProportion
+      if (res.success) {
+        if (res.data) {
+          this.roleForm.cityGMC = res.data.gmcWeight
+          this.roleForm.areaGMR = res.data.gmrWeight
+          this.roleForm.cityPublic = res.data.cityPublicWeight
+          this.proportionForm.proportion = res.data.cityPublicProportion
+          this.examinationStatus = res.data.examinationStatus
+          this.timeRemaining = res.data.timeRemaining
+          if (res.data.examinationStatus) {
+            this.countdown(res.data.timeRemaining)
+          }
+        }
       }
+    } catch (error) {
+      console.log(`getRuleData fail:`, error)
     }
   }
 
   private getMarkArr() {
     return [...this.roleForm, ...this.proportionForm]
   }
+  // 重置
   private resetHandle() {
-    console.log('重置', this.$refs)
-    this.roleForm.cityGMC = ''
-    this.roleForm.areaGMR = ''
-    this.roleForm.cityPublic = ''
-    this.proportionForm.proportion = ''
-    this.$refs.roleRef.resetFields()
-    localStorage.setItem('roleForm', '')
+    (this.$refs['roleRef'] as any).resetFields();
+    (this.$refs['proportionRef'] as any).resetFields()
   }
 
+  // 保存
   private saveHandle() {
     console.log('保存')
     let { cityGMC, areaGMR, cityPublic } = this.roleForm
-    let sum = cityGMC + areaGMR + cityPublic
-    console.log(cityGMC, areaGMR, cityPublic)
-    if (sum !== 100) {
-      this.$message.error('权重之和必须等于100')
-    } else {
-      this.$message({
-        message: '保存成功',
-        type: 'success'
-      })
-      localStorage.setItem('roleForm', JSON.stringify(this.roleForm))
-    }
+    let sum = Number(cityGMC) + Number(areaGMR) + Number(cityPublic);
+    (this.$refs['roleRef'] as any).validate((valid: any) => {
+      if (valid) {
+        if (sum !== 100) {
+          this.$message.error('权重之和必须等于100');
+          (this.$refs['proportionRef'] as any).validate((valid: any) => {
+            if (!valid) {
+              return false
+            }
+          })
+        } else {
+          (this.$refs['proportionRef'] as any).validate((valid: any) => {
+            if (valid) {
+              this.saveOrEditRuleData()
+            } else {
+              return false
+            }
+          })
+        }
+      } else {
+        this.$message.error('权重之和必须等于100');
+        (this.$refs['proportionRef'] as any).validate((valid: any) => {
+          if (!valid) {
+            return false
+          }
+        })
+        return false
+      }
+    })
   }
-  private beforeClose() {
 
+  private beforeClose(done: Function) {
+    done()
   }
   private handleClosed() {
     this.markVisible = false
@@ -329,28 +356,76 @@ export default class extends Vue {
   private scoreHandle() {
     let { cityGMC, areaGMR, cityPublic } = this.roleForm
     let { proportion } = this.proportionForm
-    let sum = cityGMC + areaGMR + cityPublic
-    // if (this.scoreword === '开始打分') {
-    //   this.markVisible = true
-    // }
+    let sum = Number(cityGMC) + Number(areaGMR) + Number(cityPublic)
 
-    if (sum === 100 && proportion && this.scoreword === '开始打分') {
+    if (sum === 100 && Number(proportion) && this.scoreword === '开始打分') {
       this.markVisible = true
+      this.saveOrEditRuleData()
     } else {
-      this.$message.error('请将信息填写正确')
+      (this.$refs['roleRef'] as any).validate((valid: any) => {
+        if (valid) {
+          if (sum !== 100) {
+            this.$message.error('权重之和必须等于100');
+            (this.$refs['proportionRef'] as any).validate((valid: any) => {
+              if (!valid) {
+                return false
+              }
+            })
+          } else {
+            (this.$refs['proportionRef'] as any).validate((valid: any) => {
+              if (!valid) {
+                return false
+              }
+            })
+          }
+        } else {
+          this.$message.error('权重之和必须等于100');
+          (this.$refs['proportionRef'] as any).validate((valid: any) => {
+            if (!valid) {
+              return false
+            }
+          })
+          return false
+        }
+      })
     }
   }
 
   private handleConfirmClick() {
     this.markVisible = false
-    localStorage.setItem('roleForm', JSON.stringify(this.roleForm))
-    this.saveOrEditRuleData()
-    // this.scoreword
+    this.goToOpenScore()
   }
+
+  // 提交打分
+  private async goToOpenScore() {
+    try {
+      const { cityGMC, areaGMR, cityPublic } = this.roleForm
+      const { proportion } = this.proportionForm
+      let params = {
+        cityPublicProportion: proportion,
+        cityPublicWeight: cityPublic,
+        gmcWeight: cityGMC,
+        gmrWeight: areaGMR
+      }
+      let { data: res } = await goToOpenScore(params)
+      if (res.success) {
+        if (res.data) {
+          setTimeout(() => {
+            this.getRuleData()
+          }, 500)
+        }
+        // 查询一下规则
+        console.log('res>>>', res)
+      }
+    } catch (error) {
+      console.log(`goToOpenScore fail:`, error)
+    }
+  }
+
   // 倒计时
-  private countdown() {
+  private countdown(myTime: any) {
     let that = this
-    let time = 10// 30分钟换算成1800秒
+    let time = myTime// 30分钟换算成1800秒
     let intervalFunc = window.setInterval(function() {
       time = time - 1
       let minute = parseInt(time / 60)
@@ -363,26 +438,26 @@ export default class extends Vue {
     }, 1000)
   }
 
-  // 提交打分接口
+  // 保存编辑打分规则接口
   private async saveOrEditRuleData() {
     console.log('调用打分接口')
-    let obj = {
-      cityPublicWeight: this.roleForm.cityPublic,
-      gmcWeight: this.roleForm.cityGMC,
-      gmrWeight: this.roleForm.areaGMR,
-      cityPublicProportion: this.proportionForm.proportion
+    try {
+      let obj = {
+        cityPublicWeight: this.roleForm.cityPublic,
+        gmcWeight: this.roleForm.cityGMC,
+        gmrWeight: this.roleForm.areaGMR,
+        cityPublicProportion: this.proportionForm.proportion
+      }
+      const { data: res } = await saveOrEditRuleData(obj)
+      console.log('res===', res)
+      if (res.success) {
+        if (!res.data) {
+          this.$message.error('保存失败，请稍后重试')
+        }
+      }
+    } catch (error) {
+      console.log(`saveOrEditRuleData fail:`, error)
     }
-    const { data } = await saveOrEditRuleData(obj)
-    if (data) {
-      this.$message({
-        message: '设置打分规则成功',
-        type: 'success'
-      })
-      this.countdown()
-    } else {
-      this.$message.error('设置打分规则失败')
-    }
-    console.log(data)
   }
 }
 </script>
