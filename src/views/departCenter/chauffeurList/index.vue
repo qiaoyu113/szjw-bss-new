@@ -116,6 +116,9 @@
         @pagination="handlePageSizeChange"
       />
     </div>
+    <DetailDialog
+      :driver-id="id"
+    />
   </div>
 </template>
 <script lang="ts">
@@ -123,6 +126,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import Atable from './components/Atable.vue'
+import DetailDialog from './components/DetailDialog.vue'
 import {
   today,
   yesterday,
@@ -148,7 +152,8 @@ interface IState {
     SelfForm,
     Atable,
     doubleInput,
-    Pagination
+    Pagination,
+    DetailDialog
   }
 })
 export default class extends Vue {
@@ -473,6 +478,7 @@ export default class extends Vue {
     this.init()
   }
 }
+
 </script>
 <style lang="scss" scoped>
 .chauffeurListContainer {
