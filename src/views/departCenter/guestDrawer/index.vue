@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 10:25:39
+ * @LastEditTime: 2021-04-21 10:30:31
  * @LastEditors: D.C.base
 -->
 <template>
@@ -27,6 +27,7 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
+          @tag="setTagHandle"
           @handleClick="handleClick"
         />
       </div>
@@ -114,6 +115,9 @@ export default class GuestDrawer extends Vue {
     } else if (val === 'tryRun') {
       this.tryRunShow = true
     }
+  }
+  setTagHandle() {
+    this.tagShow = true
   }
   mounted() {
 

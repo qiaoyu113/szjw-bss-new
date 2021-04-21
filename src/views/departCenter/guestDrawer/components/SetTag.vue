@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-20 19:34:03
+ * @LastEditTime: 2021-04-21 10:32:10
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,6 +11,7 @@
       :visible.sync="showDialog"
       title="给司机打标签"
       :confirm="confirm"
+      :modal="false"
       width="800px"
       :destroy-on-close="false"
       @closed="handleDialogClosed"
