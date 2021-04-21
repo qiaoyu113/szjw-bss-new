@@ -160,7 +160,7 @@
               type="text"
               size="small"
               style="paddingBottom:0"
-              @click.stop="handleCall(row)"
+              @click.stop="handleCall"
             >
               呼叫
             </el-button>
@@ -211,7 +211,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCreatRun"
+              @click.stop="handleCreateRun"
             >
               创建试跑意向
             </el-button>
@@ -306,7 +306,7 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
-  @Prop({ default: [] }) opType!: number[];
+  @Prop({ default: () => [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',
@@ -374,12 +374,16 @@ export default class extends Vue {
     }
   }
   // 外呼
-  handleCall(row:IState) {
-    this.$emit('call', row)
+  handleCall() {
+    this.$emit('handleCall')
   }
   // 打标签
   handleTag() {
-    this.$emit('tag')
+    this.$emit('handleTag')
+  }
+  // 创建试跑
+  handleCreateRun() {
+    this.$emit('handleCreateRun')
   }
   // 撮合
   handleDepart() {
@@ -388,10 +392,6 @@ export default class extends Vue {
   // 查看详情
   handleDetail() {
     this.$emit('detail')
-  }
-  // 创建试跑
-  handleCreatRun() {
-    this.$emit('creatRun')
   }
   // 推线
   handlePutLine() {

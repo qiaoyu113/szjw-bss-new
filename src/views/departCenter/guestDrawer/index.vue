@@ -29,8 +29,9 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
-          @tag="setTagHandle"
-          @handleClick="handleClick"
+          @handleCall="handleCall"
+          @handleTag="setTagHandle"
+          @handleCreateRun="handleCreateRun"
         />
       </div>
     </section>
@@ -67,8 +68,8 @@ interface IState {
 export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
-  private tagShow:boolean = false
-  private tryRunShow:boolean = false
+  private tagShow:boolean = false // 打标签
+  private tryRunShow:boolean = false // 创建试跑
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -97,37 +98,34 @@ export default class GuestDrawer extends Vue {
     this.visible = false
     this.$emit('input', false)
   }
-  handleClick(val: String) {
-    console.log(val)
-    if (val === 'call') {
-      let phone = '18848885135'
-      let repStr = phone.substr(3)
-      let newStr = phone.replace(repStr, '********')
-      this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        console.log(123)
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消拨打'
-        })
+  handleCall() {
+    let phone = '18848885135'
+    let repStr = phone.substr(3)
+    let newStr = phone.replace(repStr, '********')
+    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      console.log(123)
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消拨打'
       })
-    } else if (val === 'tag') {
-      this.tagShow = true
-    } else if (val === 'tryRun') {
-      this.tryRunShow = true
-    }
+    })
+  }
+  // 打标签
+  setTagHandle() {
+    alert('点击率')
+    this.tagShow = true
+  }
+  handleCreateRun() {
+    this.tryRunShow = true
   }
   // 取消创建试跑意向
   handleCancelTryRun1() {
     (this.$refs.cancelTryRun1 as any).showDialog = true
-  }
-  setTagHandle() {
-    alert('点击率')
-    this.tagShow = true
   }
   mounted() {
 
