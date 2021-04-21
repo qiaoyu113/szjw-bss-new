@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-20 19:20:18
+ * @LastEditTime: 2021-04-21 09:17:35
  * @LastEditors: D.C.base
 -->
 <template>
@@ -16,7 +16,7 @@
             :key="index"
             trigger="hover"
             placement="bottom-start"
-            @visible-change="handleChange(item.title,item.multiple,item.options)"
+            @visible-change="handleChange(item)"
             @command="handleCommand"
           >
             <span class="el-dropdown-link">
@@ -35,7 +35,7 @@
         </template>
         <div class="formbox">
           <el-input
-            v-model="keyWords"
+            v-model="listQuery.keyWords"
             placeholder="请输入司机姓名/编号"
             suffix-icon="el-icon-search"
           />
@@ -117,6 +117,7 @@ export default class SearchKeyWords extends Vue {
     }
   ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
+  private key: string = '' // 当前选项是否是多选
   private curSelecteds: array = []
   private selectTitle: string = ''
   private selectedData: any[] = [];
@@ -128,11 +129,19 @@ export default class SearchKeyWords extends Vue {
   ];
   private timeLists:IState[] = []
   private listQuery:IState = {
+    busiType: '', // 所属业务线
+    carType: '', // 车类型
+    hard: '', // 装卸接受度
+    cycle: '', // 结算周期
+    hope: '', // 期望稳定/临时
+    expectType: '', // 期望货品类型
+    expectHard: '', // 期望配送难度
     start: '',
     end: '',
     f1: '',
     f2: '',
-    address: ''
+    address: '',
+    keyWords: ''
   }
   private formItem:any[] = [
     {
@@ -211,17 +220,20 @@ export default class SearchKeyWords extends Vue {
         value: 1,
         label: '专车'
       }],
+      key: 'busiType',
       multiple: true,
       title: '业务线'
     },
     {
       options: this.carLists,
       multiple: true,
+      key: 'carType',
       title: '司机车型'
     },
     {
       options: this.hardOptions,
       multiple: true,
+      key: 'hard',
       title: '期望装卸难度'
     },
     {
@@ -236,11 +248,13 @@ export default class SearchKeyWords extends Vue {
         label: '临时'
       }],
       multiple: false,
+      key: 'hope',
       title: '期望稳定/临时'
     },
     {
       options: this.cycleOptions,
       multiple: true,
+      key: 'cycle',
       title: '期望结算周期'
     },
     {
@@ -254,6 +268,7 @@ export default class SearchKeyWords extends Vue {
         value: '选项3',
         label: '蚵仔煎'
       }],
+      key: 'expectType',
       multiple: true,
       title: '期望货品类型'
     },
@@ -269,6 +284,7 @@ export default class SearchKeyWords extends Vue {
         label: '多点配'
       }],
       multiple: false,
+      key: 'expectHard',
       title: '期望配送难度'
     }
   ]
@@ -276,10 +292,11 @@ export default class SearchKeyWords extends Vue {
     this.selectedData = []
     this.$emit('on-clear')
   }
-  handleChange(title:string, multiple:boolean, options:array) {
-    this.selectTitle = title
-    this.multiple = multiple
-    this.curSelecteds = options
+  handleChange(item:any) {
+    this.selectTitle = item.title
+    this.multiple = item.multiple
+    this.curSelecteds = item.options
+    this.key = item.key
   }
   handleCommand(command:string) {
     let obj = this.curSelecteds.find((item:any) => {
@@ -296,8 +313,8 @@ export default class SearchKeyWords extends Vue {
           this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
           this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
           this.selectedData[index].selected.push(command)
-          console.log(this.selectedData[index].optionIds)
           this.selectedData[index].optionIds.push(id)
+          this.listQuery[this.key] = this.selectedData[index].optionIds
         }
       } else {
         let obj = {
@@ -305,6 +322,7 @@ export default class SearchKeyWords extends Vue {
           optionIds: [id],
           selected: [command]
         }
+        this.listQuery[this.key] = obj.optionIds
         this.selectedData.push(obj)
       }
     } else {
@@ -313,6 +331,7 @@ export default class SearchKeyWords extends Vue {
         optionIds: [id],
         selected: [command]
       }
+      this.listQuery[this.key] = obj.optionIds
       this.selectedData.push(obj)
     }
     console.log(this.selectedData)
