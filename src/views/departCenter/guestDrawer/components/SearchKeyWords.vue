@@ -118,7 +118,7 @@ export default class SearchKeyWords extends Vue {
   ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
   private key: string = '' // 当前选项是否是多选
-  private curSelecteds: array = []
+  private curSelecteds: [] = []
   private selectTitle: string = ''
   private selectedData: any[] = [];
   private hardOptions: IState[] = [ // 装卸接受度

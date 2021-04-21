@@ -355,7 +355,7 @@ export default class extends Vue {
     try {
       let num:number = 5
       if (this.isMore) {
-        num = 1
+        num = 3
       }
       for (let i = 0; i < num; i++) {
         let obj:IState = {

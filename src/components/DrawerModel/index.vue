@@ -12,6 +12,7 @@
     :with-header="false"
     :modal-append-to-body="false"
     size="90%"
+    top="84px"
     @close="closeHandle"
   >
     <div class="">
