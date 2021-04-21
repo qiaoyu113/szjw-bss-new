@@ -164,7 +164,7 @@ export default class extends Vue {
   private formItem:any[] = [
     {
       type: 4,
-      key: 'prohibition',
+      key: 'prohibition1',
       label: '能否闯禁行',
       col: 24,
       options: [
@@ -251,7 +251,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition2',
+      key: 'prohibition3',
       label: '期望账期',
       col: 24,
       options: [
@@ -398,7 +398,7 @@ export default class extends Vue {
     }
   ]
   private rules:IState = {
-    prohibition: [
+    prohibition1: [
       { required: true, message: '请选择是否闯禁行', trigger: 'change' }
     ],
     prohibition2: [

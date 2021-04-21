@@ -154,7 +154,7 @@
               type="text"
               size="small"
               style="paddingBottom:0"
-              @click.stop="handleCall"
+              @click.stop="handleClick('call')"
             >
               呼叫
             </el-button>
@@ -166,7 +166,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleTag"
+              @click.stop="handleClick('tag')"
             >
               打标签
             </el-button>
@@ -205,7 +205,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCreatRun"
+              @click.stop="handleClick('tryRun')"
             >
               创建试跑意向
             </el-button>
@@ -300,7 +300,7 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
-  @Prop({ default: [] }) opType!: number[];
+  @Prop({ default: () => [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',
@@ -367,14 +367,17 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
-  // 外呼
-  handleCall() {
-    this.$emit('call')
+
+  handleClick(type: String) {
+    if (type === 'call') {
+      this.$emit('handleClick', 'call')
+    } else if (type === 'tag') {
+      this.$emit('handleClick', 'tag')
+    } else if (type === 'tryRun') {
+      this.$emit('handleClick', 'tryRun')
+    }
   }
-  // 打标签
-  handleTag() {
-    this.$emit('tag')
-  }
+
   // 撮合
   handleDepart() {
     this.$emit('depart')
@@ -382,10 +385,6 @@ export default class extends Vue {
   // 查看详情
   handleDetail() {
     this.$emit('detail')
-  }
-  // 创建试跑
-  handleCreatRun() {
-    this.$emit('creatRun')
   }
   // 推线
   handlePutLine() {
