@@ -167,12 +167,10 @@ export default class extends Vue {
     try {
       let { data: res } = await getHistorySessionList()
       this.loading = false
-      this.listData = res.data
-      this.getReportInfo(res.data[0].sessionId)
-      // if (res.success) {
-      //   this.listData = res.data
-      //   this.getReportInfo(res.data[0].sessionId)
-      // }
+      if (res.success) {
+        this.listData = res.data
+        this.getReportInfo(res.data[0].sessionId)
+      }
     } catch (error) {
       this.loading = false
       console.log(`getHistorySessionList fail:`, error)

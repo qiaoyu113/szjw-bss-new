@@ -430,7 +430,7 @@ export default class extends Vue {
       time = time - 1
       let minute = parseInt(String(time / 60))
       let second = parseInt(String(time % 60))
-      that.scoreword = minute + '分' + second + '秒'
+      that.scoreword = minute + ':' + second
       if (minute === 0 && second === 0) {
         that.scoreword = '开始打分'
         window.clearInterval(intervalFunc)
