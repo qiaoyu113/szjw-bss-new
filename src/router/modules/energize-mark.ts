@@ -8,7 +8,7 @@ const energizeMarkRouter: RouteConfig = {
   name: 'EnergizeMark',
   meta: {
     title: 'energizeMark',
-    icon: 'chart',
+    icon: 'mark',
     apiUrl: 'root'
   },
   children: [

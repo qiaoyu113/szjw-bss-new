@@ -3,22 +3,22 @@
     <!-- 提示tips -->
     <div class="tips">
       <p>
-        场次：{{ scoreInfo.sessionId }}
+        场次：{{ scoreInfo.sessionId || '-' }}
       </p>
       <p>
         本场时间：{{ scoreInfo.startDate }}-{{ scoreInfo.endDate }}
       </p>
       <p>
-        预计打分人数一共{{ scoreInfo.estimateAllScorer }}人，已提交<span>{{ scoreInfo.allSubmitted }}</span>人，未提交<span>{{ scoreInfo.allUnsubmitted }}</span>人，其中：
+        预计打分人数一共{{ scoreInfo.estimateAllScorer || '0' }}人，已提交<span>{{ scoreInfo.allSubmitted || '0' }}</span>人，未提交<span>{{ scoreInfo.allUnsubmitted || '0' }}</span>人，其中：
       </p>
       <p>
-        GMR({{ scoreInfo.gmrWeight }}%)预计打分{{ scoreInfo.estimateScorerGmr }}人，实际<span>{{ scoreInfo.submittedScorerGmr }}</span>人
+        GMR({{ scoreInfo.gmrWeight || '0' }}%)预计打分{{ scoreInfo.estimateScorerGmr || '0' }}人，实际<span>{{ scoreInfo.submittedScorerGmr || '0' }}</span>人
       </p>
       <p>
-        GMC({{ scoreInfo.gmcWeight }}%)预计打分{{ scoreInfo.estimateScorerGmc }}人，实际打分<span>{{ scoreInfo.submittedScorerGmc }}</span>人
+        GMC({{ scoreInfo.gmcWeight || '0' }}%)预计打分{{ scoreInfo.estimateScorerGmc || '0' }}人，实际打分<span>{{ scoreInfo.submittedScorerGmc || '0' }}</span>人
       </p>
       <p>
-        城市公共({{ scoreInfo.cityWeight }}%)预计打分{{ scoreInfo.estimateScorerCity }}人，实际打分<span>{{ scoreInfo.submittedScorerCity }}</span>人
+        城市公共({{ scoreInfo.cityWeight || '0' }}%)预计打分{{ scoreInfo.estimateScorerCity || '0' }}人，实际打分<span>{{ scoreInfo.submittedScorerCity || '0' }}</span>人
       </p>
     </div>
     <div class="table_box">
@@ -151,7 +151,7 @@ export default class extends Vue {
     this.page.limit = page.limit
     this.getList()
   }
-  // 获取新线维护列表
+  // 获取list
   async getList() {
     this.listLoading = true
     try {
@@ -162,11 +162,11 @@ export default class extends Vue {
 
       let { data: res } = await getScoreStatusList(params)
       if (res.success) {
-        this.listLoading = false
-        this.tableData = res.data
-        this.page.total = res.page.total
-      } else {
-        this.$message.error(res.errorMsg)
+        if (res.data) {
+          this.listLoading = false
+          this.tableData = res.data
+          this.page.total = res.page.total
+        }
       }
     } catch (err) {
       console.log(`getScoreStatusList fail:`, err)
@@ -176,7 +176,9 @@ export default class extends Vue {
   async getScorerNum() {
     let { data: res } = await getScorerNum()
     if (res.success) {
-      this.scoreInfo = res.data
+      if (res.data) {
+        this.scoreInfo = res.data
+      }
     }
   }
 }
