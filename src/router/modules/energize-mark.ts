@@ -9,7 +9,7 @@ const energizeMarkRouter: RouteConfig = {
   meta: {
     title: 'energizeMark',
     icon: 'mark',
-    apiUrl: 'root'
+    apiUrl: ['/v1/score/assess/statistical', '/v1/score/monitor', '/v1/score/rule/setting']
   },
   children: [
     {
