@@ -360,4 +360,7 @@ export default class extends Vue {
   .table_box  >>> .gray {
     background:#d4dae9;
   }
+  .table_box >>> .el-table--enable-row-hover .el-table__body tr:hover > td {
+    background-color: transparent;
+  }
 </style>
