@@ -26,7 +26,7 @@
       <SearchKeyWords />
       <h3>司机匹配线路</h3>
       <div class="lineTable">
-        <AtableDriver
+        <Atable
           :list-query="listQueryDriver"
           :is-more="true"
           @handleCall="handleCall"
@@ -47,7 +47,7 @@ import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
 import CreateTryRun from '../guestList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
-import AtableDriver from '../chauffeurList/components/Atable.vue'
+import Atable from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
 interface IState {
@@ -58,7 +58,7 @@ interface IState {
     DrawerModel,
     SearchKeyWords,
     AtableLine,
-    AtableDriver,
+    Atable,
     CreateTryRun,
     SetTag,
     CancelTryRun
