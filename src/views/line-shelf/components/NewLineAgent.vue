@@ -17,11 +17,11 @@
         <el-table-column
           prop="cityName"
           label="线路城市"
-          width="290"
+          min-width="290"
         />
         <el-table-column
           label="待办条数"
-          width="290"
+          min-width="290"
         >
           <template slot-scope="scope">
             {{ scope.row.num }}条
