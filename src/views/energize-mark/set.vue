@@ -328,7 +328,7 @@ export default class extends Vue {
         } else {
           (this.$refs['proportionRef'] as any).validate((valid: any) => {
             if (valid) {
-              this.saveOrEditRuleData()
+              this.saveOrEditRuleData(true)
             } else {
               return false
             }
@@ -439,7 +439,7 @@ export default class extends Vue {
   }
 
   // 保存编辑打分规则接口
-  private async saveOrEditRuleData() {
+  private async saveOrEditRuleData(isSave: boolean = false) {
     console.log('调用打分接口')
     try {
       let obj = {
@@ -454,7 +454,7 @@ export default class extends Vue {
         if (!res.data) {
           this.$message.error('保存失败，请稍后重试')
         } else {
-          this.$message.success('保存成功！')
+          isSave && this.$message.success('保存成功！')
         }
       }
     } catch (error) {
