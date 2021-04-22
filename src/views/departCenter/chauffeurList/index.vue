@@ -42,9 +42,9 @@
     />
     <SetTag ref="setTag" />
     <DetailDialog
+      actived="third"
       :driver-id="detailId"
       :dialog-table-visible.sync="detailDio"
-      active-name="third"
     />
   </div>
 </template>

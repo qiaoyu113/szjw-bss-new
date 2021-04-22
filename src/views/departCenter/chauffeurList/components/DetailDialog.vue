@@ -6,6 +6,7 @@
       :show-cancel-button="false"
       :show-confirm-button="false"
       append-to-body
+      @open="open"
     >
       <div style="min-height:500px">
         <el-tabs
@@ -73,7 +74,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
@@ -91,21 +92,8 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) dialogTableVisible!: boolean; // 弹框显示
   @Prop({ default: '' }) driverId!: String;
-  @Prop({ default: 'first' }) activeName?: String;
-
-  get active() {
-    console.log('tag', '2222')
-    return this.activeName
-  }
-
-  get show() {
-    return this.dialogTableVisible
-  }
-
-  set show(val:Boolean) {
-    console.log(val, 'val')
-    this.$emit('update:dialogTableVisible', val)
-  }
+  @PropSync('actived', { type: String }) active!: string
+  @PropSync('dialogTableVisible', { type: Boolean }) show!: Boolean
 
   private listQuery: any = {
     carTypeName: '',
@@ -383,8 +371,16 @@ export default class extends Vue {
       label: '创建试跑意向间隔时间'
     }
   ];
+
+  open() {
+    // 请求第一次tab的数据
+    this.getData(this.active)
+  }
   handleClick(tab: any) {
-    console.log(tab.name)
+    this.getData(tab.name)
+  }
+  getData(index:string) {
+    console.log(index, 'get')
   }
 }
 </script>
