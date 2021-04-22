@@ -244,6 +244,13 @@ private async getLineShelfNumSure() {
       label: '原因', // 拒绝原因类型名
       slot: true
     },
+
+    {
+      key: 'rejectionReasons',
+      label: '备注',
+      slot: true,
+      'width': '82px'
+    },
     {
       key: 'lineSaleName',
       label: '外线销售'
@@ -253,12 +260,6 @@ private async getLineShelfNumSure() {
       key: 'cityName',
       label: '线路城市'
 
-    },
-    {
-      key: 'rejectionReasons',
-      label: '备注',
-      slot: true,
-      'width': '82px'
     },
     {
       key: 'updateName',
