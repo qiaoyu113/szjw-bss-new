@@ -20,7 +20,7 @@
     </div>
     <div class="right-container">
       <section-container
-        :title="`场次编号：${scorerNumVO.sessionId}`"
+        :title="`场次编号：${scorerNumVO.sessionId || '-'}`"
         :md="true"
       >
         <!-- 提示tips -->
@@ -29,27 +29,28 @@
             本场时间：{{ scorerNumVO.startDate }}-{{ scorerNumVO.endDate }}
           </p>
           <p>
-            预计打分人数一共{{ scorerNumVO.estimateAllScorer }}人，已提交<span>{{ scorerNumVO.allSubmitted }}</span>人，未提交<span>{{ scorerNumVO.allUnsubmitted }}</span>人，其中：
+            预计打分人数一共{{ scorerNumVO.estimateAllScorer ||'0' }}人，已提交<span>{{ scorerNumVO.allSubmitted ||'0' }}</span>人，未提交<span>{{ scorerNumVO.allUnsubmitted ||'0' }}</span>人，其中：
           </p>
           <p>
-            GMR（{{ scorerNumVO.gmrWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScorerGmr }}人，实际<span>{{ scorerNumVO.submittedScoreGmr }}</span>人
+            GMR（{{ scorerNumVO.gmrWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScorerGmr ||'0' }}人，实际<span>{{ scorerNumVO.submittedScoreGmr ||'0' }}</span>人
           </p>
           <p>
-            GMC（{{ scorerNumVO.gmcWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreGmc }}人，实际打分<span>{{ scorerNumVO.submittedScorerGmc }}</span>人
+            GMC（{{ scorerNumVO.gmcWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreGmc ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerGmc ||'0' }}</span>人
           </p>
           <p>
-            城市公共（{{ scorerNumVO.cityPublicWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreCity }}人，实际打分<span>{{ scorerNumVO.submittedScorerCity }}</span>人，抽取人数：<span>{{ scorerNumVO.cityPublicNum || '0' }}</span>人
+            城市公共（{{ scorerNumVO.cityPublicWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreCity ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerCity ||'0' }}</span>人，抽取人数：<span>{{ scorerNumVO.cityPublicNum || '0' }}</span>人
           </p>
         </div>
       </section-container>
       <!-- table表 -->
       <div class="table_box">
         <div class="head_title">
-          场次：{{ scorerNumVO.sessionId }}
+          场次：{{ scorerNumVO.sessionId || '-' }}
         </div>
         <el-table
           v-loading="listLoading"
           border
+          :show-header="listData.length > 0 ? true : false"
           :data="reportOneLevelScoreVOS"
           :row-class-name="tableRowClassName"
         >
@@ -60,7 +61,7 @@
               #header
             >
               <p>一级部门</p>
-              <p>会计</p>
+              <p>合计</p>
             </template>
             <template slot-scope="scope">
               {{ scope.row.deptName }}
@@ -85,7 +86,7 @@
             <template
               #header
             >
-              <p>GMR（{{ scorerNumVO.gmrWeight }}%）</p>
+              <p>GMR（{{ scorerNumVO.gmrWeight || '0' }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
@@ -98,7 +99,7 @@
             <template
               #header
             >
-              <p>GMC（{{ scorerNumVO.gmcWeight }}%）</p>
+              <p>GMC（{{ scorerNumVO.gmcWeight || '0' }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
@@ -111,7 +112,7 @@
             <template
               #header
             >
-              <p>GG（{{ scorerNumVO.cityPublicWeight }}%）</p>
+              <p>GG（{{ scorerNumVO.cityPublicWeight || '0' }}%）</p>
               <p>100</p>
             </template>
             <template slot-scope="scope">
