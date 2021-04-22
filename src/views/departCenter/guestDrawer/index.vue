@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 17:10:18
+ * @LastEditTime: 2021-04-22 19:09:24
  * @LastEditors: D.C.base
 -->
 <template>
@@ -29,13 +29,18 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
+          :op-type="[1,2,3,4,5]"
           @tag="setTagHandle"
-          @handleClick="handleClick"
+          @call="setCallHandle"
+          @creatRun="creatRunHandle"
         />
       </div>
     </section>
     <SetTag ref="tagShow" />
-    <CreateTryRun v-if="tryRunShow" />
+    <CreateTryRun
+      ref="tryRunShow"
+      :obj="rowData"
+    />
     <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
@@ -68,6 +73,7 @@ export default class GuestDrawer extends Vue {
   private visible : boolean = false // 抽屉显示隐藏
   private tagShow:boolean = false
   private tryRunShow:boolean = false
+  private rowData:object = {}
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -98,36 +104,33 @@ export default class GuestDrawer extends Vue {
     this.visible = false
     this.$emit('input', false)
   }
-  handleClick(val: String) {
-    console.log(val)
-    if (val === 'call') {
-      let phone = '18848885135'
-      let repStr = phone.substr(3)
-      let newStr = phone.replace(repStr, '********')
-      this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        console.log(123)
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消拨打'
-        })
-      })
-    } else if (val === 'tag') {
-      this.tagShow = true
-    } else if (val === 'tryRun') {
-      this.tryRunShow = true
-    }
-  }
   // 取消创建试跑意向
   handleCancelTryRun1() {
     (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
     (this.$refs.tagShow as any).isShow = true
+  }
+  setCallHandle(data:any) {
+    let phone = data.phoneNum
+    let repStr = phone.substr(3)
+    let newStr = phone.replace(repStr, '********')
+    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      console.log(123)
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消拨打'
+      })
+    })
+  }
+  creatRunHandle(data:any) {
+    (this.$refs.tryRunShow as any).showDialog = true
+    this.rowData = data
   }
   mounted() {
 

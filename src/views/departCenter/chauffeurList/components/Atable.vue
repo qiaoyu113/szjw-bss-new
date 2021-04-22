@@ -211,7 +211,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCreatRun"
+              @click.stop="handleCreatRun(row)"
             >
               创建试跑意向
             </el-button>
@@ -312,6 +312,7 @@ export default class extends Vue {
       driverName: '张道松',
       manager: '李加盟经理',
       driverId: 'SJ20210415',
+      phoneNum: '132000000000',
       a: '京东传站',
       b: '李外线经理',
       lineId: 'XL202012300377',
@@ -390,8 +391,8 @@ export default class extends Vue {
     this.$emit('detail')
   }
   // 创建试跑
-  handleCreatRun() {
-    this.$emit('creatRun')
+  handleCreatRun(data:any) {
+    this.$emit('creatRun', data)
   }
   // 推线
   handlePutLine() {

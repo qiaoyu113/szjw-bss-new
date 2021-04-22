@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-22 09:36:04
+ * @LastEditTime: 2021-04-22 19:15:05
  * @LastEditors: D.C.base
 -->
 <template>
@@ -150,8 +150,13 @@ export default class extends Vue {
   private listQuery:IState = {
     prohibition1: '',
     prohibitionAddress: '',
+    address: '',
     prohibition2: '',
-    prohibitionRegion: '',
+    prohibitionRegion: {
+      address: [],
+      areas: []
+    },
+    area2: [],
     hard: '',
     complexity: [],
     period: '',
@@ -232,7 +237,6 @@ export default class extends Vue {
         if (!visible) {
           _this.getDataRegion()
         }
-        // this.$refs['cascader2'].$children.toggleDropDownVisible(false)
       }
     },
     {
@@ -438,6 +442,7 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.setTagFrom as any).submitForm()
+    console.log(this.listQuery)
   }
   // 弹框关闭
   private handleDialogClosed() {
