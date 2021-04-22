@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-21 09:17:35
+ * @LastEditTime: 2021-04-22 09:27:50
  * @LastEditors: D.C.base
 -->
 <template>
@@ -299,7 +299,7 @@ export default class SearchKeyWords extends Vue {
     this.key = item.key
   }
   handleCommand(command:string) {
-    let obj = this.curSelecteds.find((item:any) => {
+    let obj:any = this.curSelecteds.find((item:any) => {
       return item.label === command
     })
     let id = obj.value

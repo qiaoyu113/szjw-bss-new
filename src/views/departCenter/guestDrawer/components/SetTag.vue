@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 17:56:35
+ * @LastEditTime: 2021-04-22 09:36:04
  * @LastEditors: D.C.base
 -->
 <template>
@@ -112,7 +112,7 @@ import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryDat
 interface IState {
   [key: string]: any;
 }
-var _this = {}
+var _this:any = {}
 @Component({
   name: 'SetTag',
   components: {
@@ -122,7 +122,7 @@ var _this = {}
 })
 export default class extends Vue {
   private isShow : boolean = false // 抽屉显示隐藏
-  private countyOptions:Array = []
+  private countyOptions:IState[] = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
     {
@@ -443,13 +443,13 @@ export default class extends Vue {
   private handleDialogClosed() {
     (this.$refs.setTagFrom as any).resetForm()
   }
-  getData() {
+  private getData() {
     setTimeout(async() => {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionAddress])
       this.$set(this.formItem[1], 'countyOptions', res)
     }, 100)
   }
-  getDataRegion() {
+  private getDataRegion() {
     setTimeout(async() => {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
       this.$set(this.formItem[3], 'countyOptions', res)
