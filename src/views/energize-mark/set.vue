@@ -453,6 +453,8 @@ export default class extends Vue {
       if (res.success) {
         if (!res.data) {
           this.$message.error('保存失败，请稍后重试')
+        } else {
+          this.$message.success('保存成功！')
         }
       }
     } catch (error) {
