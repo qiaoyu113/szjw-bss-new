@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-21 09:17:35
+ * @LastEditTime: 2021-04-22 19:29:48
  * @LastEditors: D.C.base
 -->
 <template>
@@ -259,13 +259,13 @@ export default class SearchKeyWords extends Vue {
     },
     {
       options: [{
-        value: '全部',
+        value: '',
         label: '全部'
       }, {
-        value: '选项2',
+        value: '1',
         label: '双皮奶'
       }, {
-        value: '选项3',
+        value: '2',
         label: '蚵仔煎'
       }],
       key: 'expectType',
@@ -274,13 +274,13 @@ export default class SearchKeyWords extends Vue {
     },
     {
       options: [{
-        value: '全部',
+        value: '',
         label: '全部'
       }, {
-        value: '整车',
+        value: '1',
         label: '整车'
       }, {
-        value: '多点配',
+        value: '2',
         label: '多点配'
       }],
       multiple: false,
@@ -299,7 +299,7 @@ export default class SearchKeyWords extends Vue {
     this.key = item.key
   }
   handleCommand(command:string) {
-    let obj = this.curSelecteds.find((item:any) => {
+    let obj:any = this.curSelecteds.find((item:any) => {
       return item.label === command
     })
     let id = obj.value
@@ -312,8 +312,17 @@ export default class SearchKeyWords extends Vue {
         if (selecteds.indexOf(command) === -1) {
           this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
           this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
-          this.selectedData[index].selected.push(command)
-          this.selectedData[index].optionIds.push(id)
+          if (command === '全部') {
+            this.selectedData[index].optionIds = []
+            this.selectedData[index].selected = ['全部']
+          } else {
+            if (this.selectedData[index].optionIds[0] === '') {
+              this.selectedData[index].optionIds.shift()
+              this.selectedData[index].selected.shift()
+            }
+            this.selectedData[index].optionIds.push(id)
+            this.selectedData[index].selected.push(command)
+          }
           this.listQuery[this.key] = this.selectedData[index].optionIds
         }
       } else {

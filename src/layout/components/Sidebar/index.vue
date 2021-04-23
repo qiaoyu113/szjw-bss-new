@@ -98,7 +98,7 @@ export default class extends Vue {
     return AppModule.version
   }
   mounted() {
-    this.$eventBus.$on('setIndex', data => {
+    this.$eventBus.$on('setIndex', (data:boolean) => {
       this.setIndex = data
     })
   }

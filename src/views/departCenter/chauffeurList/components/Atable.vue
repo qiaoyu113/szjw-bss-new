@@ -160,7 +160,7 @@
               type="text"
               size="small"
               style="paddingBottom:0"
-              @click.stop="handleCall"
+              @click.stop="handleCall(row)"
             >
               呼叫
             </el-button>
@@ -211,7 +211,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCreateRun"
+              @click.stop="handleCreatRun(row)"
             >
               创建试跑意向
             </el-button>
@@ -312,6 +312,7 @@ export default class extends Vue {
       driverName: '张道松',
       manager: '李加盟经理',
       driverId: 'SJ20210415',
+      phoneNum: '132000000000',
       a: '京东传站',
       b: '李外线经理',
       lineId: 'XL202012300377',
@@ -374,16 +375,12 @@ export default class extends Vue {
     }
   }
   // 外呼
-  handleCall() {
-    this.$emit('handleCall')
+  handleCall(row:IState) {
+    this.$emit('call', row)
   }
   // 打标签
   handleTag() {
-    this.$emit('handleTag')
-  }
-  // 创建试跑
-  handleCreateRun() {
-    this.$emit('handleCreateRun')
+    this.$emit('tag')
   }
   // 撮合
   handleDepart() {
@@ -392,6 +389,10 @@ export default class extends Vue {
   // 查看详情
   handleDetail() {
     this.$emit('detail')
+  }
+  // 创建试跑
+  handleCreatRun(data:any) {
+    this.$emit('creatRun', data)
   }
   // 推线
   handlePutLine() {

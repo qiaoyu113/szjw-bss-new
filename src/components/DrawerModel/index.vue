@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 14:11:09
+ * @LastEditTime: 2021-04-22 19:15:19
  * @LastEditors: D.C.base
 -->
 <template>
@@ -13,6 +13,7 @@
     :modal-append-to-body="false"
     size="80%"
     top="84px"
+    :modal="false"
     @close="closeHandle"
   >
     <div class="">
@@ -55,6 +56,9 @@ export default class DrawerModel extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+::v-deep .el-drawer__container{
+  background:rgba(0,0,0,0.5);
+}
 .drawerBox {
   // margin-top:84px;
   width: 100%;

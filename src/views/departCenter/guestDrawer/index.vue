@@ -29,14 +29,18 @@
         <Atable
           :list-query="listQueryDriver"
           :is-more="true"
-          @handleCall="handleCall"
-          @handleTag="setTagHandle"
-          @handleCreateRun="handleCreateRun"
+          :op-type="[1,2,3,4,5]"
+          @tag="setTagHandle"
+          @call="setCallHandle"
+          @creatRun="creatRunHandle"
         />
       </div>
     </section>
     <SetTag ref="tagShow" />
-    <CreateTryRun v-if="tryRunShow" />
+    <CreateTryRun
+      ref="tryRunShow"
+      :obj="rowData"
+    />
     <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
@@ -67,8 +71,9 @@ interface IState {
 export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
-  private tagShow:boolean = false // 打标签
-  private tryRunShow:boolean = false // 创建试跑
+  private tagShow:boolean = false
+  private tryRunShow:boolean = false
+  private rowData:object = {}
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -99,8 +104,15 @@ export default class GuestDrawer extends Vue {
     this.visible = false
     this.$emit('input', false)
   }
-  handleCall() {
-    let phone = '18848885135'
+  // 取消创建试跑意向
+  handleCancelTryRun1() {
+    (this.$refs.cancelTryRun1 as any).showDialog = true
+  }
+  setTagHandle() {
+    (this.$refs.tagShow as any).isShow = true
+  }
+  setCallHandle(data:any) {
+    let phone = data.phoneNum
     let repStr = phone.substr(3)
     let newStr = phone.replace(repStr, '********')
     this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -116,16 +128,9 @@ export default class GuestDrawer extends Vue {
       })
     })
   }
-  // 打标签
-  setTagHandle() {
-    (this.$refs.tagShow as any).isShow = true
-  }
-  handleCreateRun() {
-    this.tryRunShow = true
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun1() {
-    (this.$refs.cancelTryRun1 as any).showDialog = true
+  creatRunHandle(data:any) {
+    (this.$refs.tryRunShow as any).showDialog = true
+    this.rowData = data
   }
   mounted() {
 

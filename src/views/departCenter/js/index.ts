@@ -68,8 +68,8 @@ export async function getProviceCityAndCountryData(node: any, resolve: any) {
   } else if (node.level === 1) {
     let params = ['100000']
     params.push(node.value)
-    let groups = await getProvinceList(params)
-    let newData = groups.map(item => ({
+    let groups:any = await getProvinceList(params)
+    let newData = groups.map((item:any) => ({
       value: item.value,
       label: item.label,
       leaf: true
