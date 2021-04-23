@@ -279,9 +279,14 @@ export default class extends Vue {
       overflow: auto;
       background: #d9deef;
       ul {
+        position: fixed;
+        top: 86px;
+        width: 240px;
         list-style: none;
         margin: 0;
         padding: 0;
+        height: calc(100vh - 86px);
+        overflow: auto;
         li {
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -293,6 +298,7 @@ export default class extends Vue {
           line-height: 65px;
           color: #4A4A4A;
           font-size: 18px;
+          cursor: pointer;
         }
         .item-clicked {
           background: #eff3fe;
