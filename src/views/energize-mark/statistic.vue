@@ -1,126 +1,140 @@
 <template>
-  <div class="statistic-container">
-    <div class="left-container">
-      <ul>
-        <li
-          v-for="(item, index) in listData"
-          :key="index"
-          :class="itemIsClicked && itemClick === index ? 'item-clicked' : ''"
-          @click="handleItemClick(item, index)"
-        >
-          {{ item.sessionId.slice(0, 8) }}
-        </li>
-      </ul>
-      <p v-if="loading">
-        加载中...
-      </p>
-      <!-- <p v-if="noMore">
-        没有更多了
-      </p> -->
-    </div>
-    <div class="right-container">
-      <section-container
-        :title="`场次编号：${scorerNumVO.sessionId || '-'}`"
-        :md="true"
-      >
-        <!-- 提示tips -->
-        <div class="tips">
-          <p>
-            本场时间：{{ scorerNumVO.startDate }}-{{ scorerNumVO.endDate }}
-          </p>
-          <p>
-            预计打分人数一共{{ scorerNumVO.estimateAllScorer ||'0' }}人，已提交<span>{{ scorerNumVO.allSubmitted ||'0' }}</span>人，未提交<span>{{ scorerNumVO.allUnsubmitted ||'0' }}</span>人，其中：
-          </p>
-          <p>
-            GMR（{{ scorerNumVO.gmrWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScorerGmr ||'0' }}人，实际<span>{{ scorerNumVO.submittedScoreGmr ||'0' }}</span>人
-          </p>
-          <p>
-            GMC（{{ scorerNumVO.gmcWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreGmc ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerGmc ||'0' }}</span>人
-          </p>
-          <p>
-            城市公共（{{ scorerNumVO.cityPublicWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreCity ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerCity ||'0' }}</span>人，抽取人数：<span>{{ scorerNumVO.cityPublicNum || '0' }}</span>人
-          </p>
-        </div>
-      </section-container>
-      <!-- table表 -->
-      <div class="table_box">
-        <div class="head_title">
-          场次：{{ scorerNumVO.sessionId || '-' }}
-        </div>
-        <el-table
-          v-loading="listLoading"
-          border
-          :show-header="listData.length > 0 ? true : false"
-          :data="reportOneLevelScoreVOS"
-          :row-class-name="tableRowClassName"
-        >
-          <el-table-column
-            align="center"
+  <div>
+    <div
+      v-if="!noPermissionTag"
+      class="statistic-container"
+    >
+      <div class="left-container">
+        <ul>
+          <li
+            v-for="(item, index) in listData"
+            :key="index"
+            :class="itemIsClicked && itemClick === index ? 'item-clicked' : ''"
+            @click="handleItemClick(item, index)"
           >
-            <template
-              #header
-            >
-              <p>一级部门</p>
-              <p>合计</p>
-            </template>
-            <template slot-scope="scope">
-              {{ scope.row.deptName }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-          >
-            <template
-              #header
-            >
-              <p>合计</p>
-              <p>100</p>
-            </template>
-            <template slot-scope="scope">
-              {{ scope.row.totalScore }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-          >
-            <template
-              #header
-            >
-              <p>GMR（{{ scorerNumVO.gmrWeight || '0' }}%）</p>
-              <p>100</p>
-            </template>
-            <template slot-scope="scope">
-              {{ scope.row.gmrScore }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-          >
-            <template
-              #header
-            >
-              <p>GMC（{{ scorerNumVO.gmcWeight || '0' }}%）</p>
-              <p>100</p>
-            </template>
-            <template slot-scope="scope">
-              {{ scope.row.gmcScore }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            align="center"
-          >
-            <template
-              #header
-            >
-              <p>GG（{{ scorerNumVO.cityPublicWeight || '0' }}%）</p>
-              <p>100</p>
-            </template>
-            <template slot-scope="scope">
-              {{ scope.row.cityPublicScore }}
-            </template>
-          </el-table-column>
-        </el-table>
+            {{ item.sessionId.slice(0, 8) }}
+          </li>
+        </ul>
+        <p v-if="loading">
+          加载中...
+        </p>
+        <!-- <p v-if="noMore">
+          没有更多了
+        </p> -->
       </div>
+      <div
+        v-if="!loading"
+        class="right-container"
+      >
+        <section-container
+          :title="`场次编号：${scorerNumVO.sessionId || '-'}`"
+          :md="true"
+        >
+          <!-- 提示tips -->
+          <div class="tips">
+            <p>
+              本场时间：{{ scorerNumVO.startDate }}-{{ scorerNumVO.endDate }}
+            </p>
+            <p>
+              预计打分人数一共{{ scorerNumVO.estimateAllScorer ||'0' }}人，已提交<span>{{ scorerNumVO.allSubmitted ||'0' }}</span>人，未提交<span>{{ scorerNumVO.allUnsubmitted ||'0' }}</span>人，其中：
+            </p>
+            <p>
+              GMR（{{ scorerNumVO.gmrWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScorerGmr ||'0' }}人，实际<span>{{ scorerNumVO.submittedScoreGmr ||'0' }}</span>人
+            </p>
+            <p>
+              GMC（{{ scorerNumVO.gmcWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreGmc ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerGmc ||'0' }}</span>人
+            </p>
+            <p>
+              城市公共（{{ scorerNumVO.cityPublicWeight || '0' }}%）预计打分{{ scorerNumVO.estimateScoreCity ||'0' }}人，实际打分<span>{{ scorerNumVO.submittedScorerCity ||'0' }}</span>人，抽取人数：<span>{{ scorerNumVO.cityPublicNum || '0' }}</span>人
+            </p>
+          </div>
+        </section-container>
+        <!-- table表 -->
+        <div class="table_box">
+          <div class="head_title">
+            场次：{{ scorerNumVO.sessionId || '-' }}
+          </div>
+          <el-table
+            v-loading="listLoading"
+            border
+            :show-header="listData.length > 0 ? true : false"
+            :data="reportOneLevelScoreVOS"
+            :row-class-name="tableRowClassName"
+          >
+            <el-table-column
+              align="center"
+            >
+              <template
+                #header
+              >
+                <p>一级部门</p>
+                <p>合计</p>
+              </template>
+              <template slot-scope="scope">
+                {{ scope.row.deptName }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+            >
+              <template
+                #header
+              >
+                <p>合计</p>
+                <p>100</p>
+              </template>
+              <template slot-scope="scope">
+                {{ scope.row.totalScore }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+            >
+              <template
+                #header
+              >
+                <p>GMR（{{ scorerNumVO.gmrWeight || '0' }}%）</p>
+                <p>100</p>
+              </template>
+              <template slot-scope="scope">
+                {{ scope.row.gmrScore }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+            >
+              <template
+                #header
+              >
+                <p>GMC（{{ scorerNumVO.gmcWeight || '0' }}%）</p>
+                <p>100</p>
+              </template>
+              <template slot-scope="scope">
+                {{ scope.row.gmcScore }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="center"
+            >
+              <template
+                #header
+              >
+                <p>GG（{{ scorerNumVO.cityPublicWeight || '0' }}%）</p>
+                <p>100</p>
+              </template>
+              <template slot-scope="scope">
+                {{ scope.row.cityPublicScore }}
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </div>
+    <div
+      v-else
+      class="no-permission"
+    >
+      当前用户无权限访问列表
     </div>
   </div>
 </template>
@@ -139,6 +153,7 @@ import { getHistorySessionList, getReportInfo } from '@/api/score'
 export default class extends Vue {
   private listData: any[] = []
   private loading: boolean = false
+  private noPermissionTag: boolean = false
   private itemIsClicked: boolean = true
   private itemClick: number = 0
   private listLoading: boolean = false
@@ -168,6 +183,12 @@ export default class extends Vue {
     try {
       let { data: res } = await getHistorySessionList()
       this.loading = false
+      console.log('历史统计列表', res)
+      if (res.errorCode === 440) {
+        // 无权限查看
+        this.noPermissionTag = true
+        return
+      }
       if (res.success) {
         this.listData = res.data
         this.getReportInfo(res.data[0].sessionId)
@@ -338,6 +359,10 @@ export default class extends Vue {
         }
       }
     }
+  }
+  .no-permission {
+    text-align: center;
+    margin-top: 200px;
   }
 </style>
 
