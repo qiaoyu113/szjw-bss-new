@@ -25,6 +25,7 @@ import presetRouter from './modules/preset'
 // import customerRouter from './modules/customer'
 import lineShelf from './modules/line-shelf'
 import clueRouter from './modules/clue'
+import energizeMarkRouter from './modules/energize-mark'
 
 Vue.use(Router)
 
@@ -118,7 +119,7 @@ export const constantRoutes: RouteConfig[] = [
   {
     path: '/redirect',
     component: Layout,
-    redirect: (to:any):string => {
+    redirect: (to: any): string => {
       // 方法接收 目标路由 作为参数
       // return 重定向的 字符串路径/路径对象
       if (store.state.user.isWeakPwd) {
@@ -183,7 +184,7 @@ export const constantRoutes: RouteConfig[] = [
   {
     path: '/profile',
     component: Layout,
-    redirect: (to:any):string => {
+    redirect: (to: any): string => {
       // 方法接收 目标路由 作为参数
       // return 重定向的 字符串路径/路径对象
       if (store.state.user.isWeakPwd) {
@@ -242,6 +243,7 @@ export const asyncRoutes: RouteConfig[] = [
   clueRouter, // 线索管理
   systemRouter, // 系统管理
   presetRouter, // 权限管理
+  energizeMarkRouter, // 赋能打分系统
   {
     path: '*',
     redirect: '/401',
