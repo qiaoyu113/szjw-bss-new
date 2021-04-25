@@ -40,19 +40,18 @@
           slot="mulBtn"
           :class="isPC ? 'btnPc left' : 'mobile'"
         >
-          <div>
-            <el-button
-              type="primary"
-              @click="batchLaunchGuest"
-            >
-              批量发起客邀
-            </el-button>
-            <el-button
-              type="primary"
-            >
-              批量取消客邀
-            </el-button>
-          </div>
+          <el-button
+            type="primary"
+            @click="batchLaunchGuest"
+          >
+            批量发起客邀
+          </el-button>
+          <el-button
+            type="primary"
+          >
+            批量取消客邀
+          </el-button>
+
           <el-button
             type="primary"
             :class="isPC ? '' : 'btnMobile'"
@@ -372,14 +371,14 @@ export default class extends Vue {
       }
     },
     {
-      col: 16,
+      col: 17,
       label: '客邀状态',
       type: 'customerStatus',
       slot: true
     },
     {
       type: 'mulBtn',
-      col: 8,
+      col: 7,
       slot: true,
       w: '0px'
     }
