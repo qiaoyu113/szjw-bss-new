@@ -451,7 +451,9 @@ export default class extends Vue {
       font-size:12px;
       line-height: 20px;
       &.scale {
-        font-size:14px;
+        margin-left: -50%;
+        width: 200%;
+        font-size:18px;
         transform: scale(0.5);
       }
     }
