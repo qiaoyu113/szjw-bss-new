@@ -12,7 +12,12 @@
       <template slot="rents">
         <doubleInput
           v-model="listQuery.rents"
-          :range="[0,2000]"
+          :range="[0,20000]"
+        />
+      </template>
+      <template slot="time">
+        <timeSelect
+          v-model="listQuery.time"
         />
       </template>
       <template slot="driverId">
@@ -83,15 +88,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
-import {
-  today,
-  yesterday,
-  month,
-  lastmonth,
-  threemonth
-} from '@/views/driver-freight/components/date'
 import { getDriverNoAndNameList } from '@/api/driver'
 import doubleInput from './doubleInput.vue'
+import timeSelect from './timeSelect.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../../js'
 interface PageObj {
@@ -108,7 +107,8 @@ interface IState {
   name: 'searchForm',
   components: {
     SelfForm,
-    doubleInput
+    doubleInput,
+    timeSelect
   }
 })
 export default class extends Vue {
@@ -233,18 +233,11 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 3,
-      col: 12,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        'default-time': ['00:00:00', '23:59:59'],
-        pickerOptions: {
-          shortcuts: [today, yesterday, month, lastmonth, threemonth]
-        }
-      },
+      type: 'time',
       label: '可工作时间段',
-      key: 'time'
+      key: 'time',
+      col: 6,
+      slot: true
     },
     {
       type: 'driverId',
@@ -294,8 +287,16 @@ export default class extends Vue {
 
   // 查询
   handleFilterClick() {
-    if (this.listQuery.rents.includes('') || this.listQuery.rents.length < 2) {
-      return this.$message.error('请完善期望运费范围。')
+    let rents = this.listQuery.rents.filter((ele:any) => ele)
+    let time = this.listQuery.time.filter((ele:any) => ele)
+    if (rents.length === 1) {
+      return this.$message.warning('请完善期望运费')
+    }
+    if (rents.length === 2 && rents[1] <= rents[0]) {
+      return this.$message.warning('超出期望运费范围')
+    }
+    if (time.length === 1) {
+      return this.$message.warning('请完善可工作时间段')
     }
     (this.$parent as any).getLists()
   }
