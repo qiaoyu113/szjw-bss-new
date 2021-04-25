@@ -42,7 +42,7 @@
           <template slot-scope="{row}">
             <div class="arrow" />
             <router-link to="#">
-              {{ row.a }}
+              {{ row.basicInfo.name }}
             </router-link>
             <el-popover
               placement="right"
@@ -50,12 +50,13 @@
               trigger="hover"
             >
               <div class="text1">
-                这条线路是异常<el-button
+                <!-- 这条线路是异常<el-button
                   type="text"
                   size="small"
                 >
                   火爆
-                </el-button>,4.2厢货,场景简单,菜鸟也能干...
+                </el-button>,4.2厢货,场景简单,菜鸟也能干... -->
+                {{ row.basicInfo.introduce }}
               </div>
               <i
                 slot="reference"
@@ -63,10 +64,10 @@
               />
             </el-popover>
             <p class="text">
-              ({{ row.b }})
+              ({{ row.basicInfo.post }})
             </p>
             <p class="text">
-              {{ row.lineId }}
+              {{ row.basicInfo.lineId }}
             </p>
             <p class="text">
               窗口期:剩余{{ row.c }}天
@@ -80,10 +81,14 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              {{ row.d }}/{{ row.e }}
+              {{ row.carInfo.type }}/{{ row.carInfo.feature }}
             </p>
-            <p class="text">
-              {{ row.f }}/{{ row.g }}/{{ row.h }}
+            <p
+              v-for="(item,index) in row.carInfo.rules"
+              :key="item.index"
+              class="text"
+            >
+              {{ item }}{{ index===row.carInfo.rules.length-1?'':'/' }}
             </p>
           </template>
         </el-table-column>
@@ -94,10 +99,10 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+              仓地址:{{ row.warehouseSite.province }}-{{ row.warehouseSite.city }}-{{ row.warehouseSite.town }}
             </p>
             <p class="text">
-              配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+              配送区域:{{ row.sendArear.province }}-{{ row.sendArear.city }}-{{ row.sendArear.town }}
             </p>
           </template>
         </el-table-column>
@@ -108,36 +113,36 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              趟运费:{{ row.m1 }}元
+              趟运费:{{ row.Settlement.onceFreight }}元
             </p>
             <p class="text">
-              预计月运费:{{ row.m1 }}元
+              预计月运费:{{ row.Settlement.monthFreight }}元
             </p>
             <p class="text">
-              结算周期:周结
+              结算周期:{{ row.Settlement.period===1?'周结':'' }}
             </p>
             <p class="text">
-              结算天数:7天
+              结算天数:{{ row.Settlement.days }}天
             </p>
           </template>
         </el-table-column>
         <el-table-column
           label="线路特点"
-          width="180"
+          width="220"
           class-name="center"
         >
           <template slot-scope="{row}">
             <p class="text">
-              货品:食品/团购
+              货品:{{ row.lineTrait.product }}
             </p>
             <p class="text">
-              装卸难度:只装不卸
+              装卸难度:{{ row.lineTrait.handlingDifficulty |difficultyFilter }}
             </p>
             <p class="text">
-              配送类型:整车
+              配送类型:{{ row.lineTrait.sendtype===1?'整车':'' }}
             </p>
             <p class="text">
-              工作时间段:{{ row.time }}
+              工作时间段:{{ row.lineTrait.time }}
             </p>
           </template>
         </el-table-column>
@@ -148,16 +153,11 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.a"
+              v-for="item in row.label "
+              :key="item.index"
               class="text"
             >
-              爆款
-            </p>
-            <p class="text">
-              客急
-            </p>
-            <p class="text">
-              客邀线
+              {{ item }}
             </p>
           </template>
         </el-table-column>
@@ -170,22 +170,22 @@
             <p class="text">
               <i
                 class="el-icon-s-custom"
-              /> 老张
+              /> {{ row.status.name }}
             </p>
             <p
               v-if="row.a"
               class="text"
             >
-              已上架
+              {{ row.status.state===1?'已上架':'未上架' }}
             </p>
             <p class="text">
-              已发起客邀
+              {{ row.status.iscustomInvite===1?'已发起客邀':'未发起客邀' }}
             </p>
             <p class="text">
-              待确认意向
+              {{ row.status.intention===1?'待确认意向':'已确认意向' }}
             </p>
             <p class="text">
-              客邀成功
+              {{ row.status.customInviteStatus===1?'客邀成功':'客邀失败' }}
             </p>
           </template>
         </el-table-column>
@@ -294,38 +294,90 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { getLineInfo } from '@/api/line'
 interface IState {
   [key: string]: any;
 }
-@Component
+@Component({
+  name: 'Btable',
+  filters: {
+    difficultyFilter(value:number) {
+      switch (value) {
+        case 1: return '不装卸'
+        case 2: return '只装不卸（轻）'
+        case 3: return '只卸不装（轻）'
+        case 4: return '只装不卸（重）'
+        case 5: return '只卸不装（重）'
+        case 6: return '重装卸（重）'
+      }
+    }
+  }
+})
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
   private tableData:IState[] = [
     {
-      a: '京东传站',
-      b: '李外线经理',
-      lineId: 'XL202012300377',
-      c: '3',
-      d: '4.2米厢货',
-      e: '油车',
-      f: '能闯禁行',
-      g: '能闯限行行',
-      h: '共享',
-      p1: '湖南省',
-      c1: '长沙市',
-      c2: '短沙县',
-      m1: 500,
-      time: '9:00~18:00',
       percent: 80,
       id: 1,
       arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
       brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
       crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-      isOpen: false
+      isOpen: false,
+      basicInfo: {
+        name: '京东传站',
+        post: '李外线经理',
+        lineId: 'XL202012300377',
+        introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...'
+      },
+      carInfo: {
+        type: '4.2米厢货',
+        feature: '油车',
+        rules: ['能闯禁行', '能闯限行', '共享']
+      },
+      warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
+      sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
+      Settlement: {
+        onceFreight: 500,
+        monthFreight: 500,
+        period: 1,
+        days: 7
+      },
+      lineTrait: {
+        product: '食品/团购',
+        handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
+        sendtype: 1, // 1:整车
+        settlementDays: 7,
+        time: '9:00~18:00'
+      },
+      label: ['爆款', '客急', '客邀线'],
+      status: {
+        name: '老王',
+        state: 1, // 1:已上架
+        iscustomInvite: 1, // 1:已发起客邀
+        intention: 1, // 1:待确认意向
+        customInviteStatus: 1// 1:客邀成功
+      }
     }
   ]
+
+  mounted() {
+    console.log(this.listQuery)
+    this.init()
+  }
+
+  init() {
+    this.getLineInfo(this.listQuery)
+  }
+  // 调用接口获取表单数据
+  async getLineInfo(params:IState) {
+    let { data: res } = await getLineInfo(params)
+    if (res.success) {
+      // 赋值
+    }
+  }
+
   // 展开
   toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
