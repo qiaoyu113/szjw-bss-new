@@ -2,13 +2,18 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-21 10:58:07
+<<<<<<< HEAD
+ * @LastEditTime: 2021-04-25 10:02:25
+ * @LastEditors: Please set LastEditors
+=======
+ * @LastEditTime: 2021-04-22 19:15:05
  * @LastEditors: D.C.base
+>>>>>>> department
 -->
 <template>
   <div class="setTag">
     <SelfDialog
-      :visible.sync="visible"
+      :visible.sync="isShow"
       title="给司机打标签"
       :confirm="confirm"
       :modal="false"
@@ -17,7 +22,7 @@
       @closed="handleDialogClosed"
     >
       <self-form
-        ref="cancelForm"
+        ref="setTagFrom"
         :list-query="listQuery"
         :form-item="formItem"
         :rules="rules"
@@ -29,7 +34,7 @@
       >
         <template slot="startTime">
           <el-time-select
-            v-model="listQuery['startTime'].jobStartDate"
+            v-model="listQuery['jobStartDate']"
             class="timeSelect"
             placeholder="起始时间"
             :picker-options="{
@@ -40,20 +45,20 @@
           />
           <span style="padding:0 3px">-</span>
           <el-time-select
-            v-model="listQuery['startTime'].jobEndDate"
+            v-model="listQuery['jobEndDate']"
             class="timeSelect"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['startTime'].jobStartDate
+              minTime: listQuery['jobStartDate']
             }"
           />
         </template>
         <template slot="endTime">
           <el-time-select
-            v-model="listQuery['endTime'].jobStartDate"
+            v-model="listQuery['jobStartDate2']"
             class="timeSelect"
             placeholder="起始时间"
             :picker-options="{
@@ -64,14 +69,14 @@
           />
           <span style="padding:0 3px">-</span>
           <el-time-select
-            v-model="listQuery['endTime'].jobEndDate"
+            v-model="listQuery['jobEndDate2']"
             class="timeSelect"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['endTime'].jobStartDate
+              minTime: listQuery['jobStartDate2']
             }"
           />
         </template>
@@ -112,7 +117,7 @@ import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryDat
 interface IState {
   [key: string]: any;
 }
-var _this = {}
+var _this:any = {}
 @Component({
   name: 'SetTag',
   components: {
@@ -121,9 +126,8 @@ var _this = {}
   }
 })
 export default class extends Vue {
-   @Prop({ default: false }) private value !: boolean
-  private visible : boolean = false // 抽屉显示隐藏
-  private countyOptions:Array = []
+  private isShow : boolean = false // 抽屉显示隐藏
+  private countyOptions:IState[] = []
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
     {
@@ -149,23 +153,32 @@ export default class extends Vue {
   ]
   private timeLists:IState[] = []
   private listQuery:IState = {
+    prohibition1: '',
     prohibitionAddress: '',
+    address: '',
+    prohibition2: '',
+    prohibitionRegion: {
+      address: [],
+      areas: []
+    },
+    area2: [],
+    hard: '',
     complexity: [],
+    period: '',
+    expected: '',
+    isWork: '',
     chargingCode: 0,
     stable: [],
-    startTime: {
-      jobStartDate: '',
-      jobEndDate: ''
-    },
-    endTime: {
-      jobStartDate: '',
-      jobEndDate: ''
-    },
+    starting: '',
+    detailed: '',
+    jobStartDate: null,
+    jobEndDate: null,
+    jobStartDate2: null,
+    jobEndDate2: null,
+    distribution: '',
+    detailed2: '',
+    situation: '',
     remark: ''
-  }
-  @Watch('value')
-  onValueChanged(val: boolean, oldVal: boolean) {
-    this.visible = val
   }
   private formItem:any[] = [
     {
@@ -229,12 +242,11 @@ export default class extends Vue {
         if (!visible) {
           _this.getDataRegion()
         }
-        // this.$refs['cascader2'].$children.toggleDropDownVisible(false)
       }
     },
     {
       type: 4,
-      key: 'a',
+      key: 'hard',
       label: '装卸接受度',
       col: 24,
       options: [
@@ -295,7 +307,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'b',
+      key: 'isWork',
       label: '外边是否有活',
       col: 24,
       options: [
@@ -325,7 +337,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 6,
-      key: ''
+      key: 'detailed'
     },
     {
       slot: true,
@@ -360,7 +372,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 6,
-      key: 'chargingCode4'
+      key: 'detailed2'
     },
     {
       slot: true,
@@ -375,7 +387,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'd',
+      key: 'situation',
       label: '司机情况',
       col: 24,
       options: [
@@ -410,7 +422,7 @@ export default class extends Vue {
     prohibition2: [
       { required: true, message: '请选择是否闯限行', trigger: 'change' }
     ],
-    a: [
+    hard: [
       { required: true, message: '请选择装卸接受度', trigger: 'change' }
     ],
     complexity: [
@@ -419,8 +431,8 @@ export default class extends Vue {
     expected: [
       { required: true, message: '请输入期望的运费', trigger: 'blur' }
     ],
-    b: [
-      { required: true, message: '请选择外边是否有值', trigger: 'change' }
+    isWork: [
+      { required: true, message: '请选择外边是否有活', trigger: 'change' }
     ],
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
@@ -428,31 +440,26 @@ export default class extends Vue {
     distribution: [
       { required: true, message: '请选择配送点', trigger: 'change' }
     ],
-    d: [
+    situation: [
       { required: true, message: '请选择司机情况', trigger: 'change' }
     ]
   }
   // 确定按钮
   private confirm() {
-    (this.$refs.cancelForm as any).submitForm()
-    this.closeHandle()
+    (this.$refs.setTagFrom as any).submitForm()
+    console.log(this.listQuery)
   }
   // 弹框关闭
   private handleDialogClosed() {
-    (this.$refs.cancelForm as any).resetForm()
-    this.closeHandle()
+    (this.$refs.setTagFrom as any).resetForm()
   }
-  closeHandle() {
-    this.visible = false
-    this.$emit('input', false)
-  }
-  getData() {
+  private getData() {
     setTimeout(async() => {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionAddress])
       this.$set(this.formItem[1], 'countyOptions', res)
     }, 100)
   }
-  getDataRegion() {
+  private getDataRegion() {
     setTimeout(async() => {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
       this.$set(this.formItem[3], 'countyOptions', res)

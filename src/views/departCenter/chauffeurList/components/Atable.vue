@@ -211,7 +211,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCreatRun"
+              @click.stop="handleCreatRun(row)"
             >
               创建试跑意向
             </el-button>
@@ -306,12 +306,13 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
-  @Prop({ default: [] }) opType!: number[];
+  @Prop({ default: () => [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',
       manager: '李加盟经理',
       driverId: 'SJ20210415',
+      phoneNum: '132000000000',
       a: '京东传站',
       b: '李外线经理',
       lineId: 'XL202012300377',
@@ -378,8 +379,8 @@ export default class extends Vue {
     this.$emit('call', row)
   }
   // 打标签
-  handleTag() {
-    this.$emit('tag')
+  handleTag(row:IState) {
+    this.$emit('tag', row)
   }
   // 撮合
   handleDepart() {
@@ -390,8 +391,8 @@ export default class extends Vue {
     this.$emit('detail')
   }
   // 创建试跑
-  handleCreatRun() {
-    this.$emit('creatRun')
+  handleCreatRun(data:any) {
+    this.$emit('creatRun', data)
   }
   // 推线
   handlePutLine() {

@@ -1,5 +1,8 @@
 <template>
-  <div :class="{'has-logo': showLogo}">
+  <div
+    :class="{'has-logo': showLogo}"
+    :style="{zIndex: setIndex?'20000':'2001'}"
+  >
     <sidebar-logo
       v-if="showLogo"
       :collapse="isCollapse"
@@ -39,7 +42,6 @@ import { SettingsModule } from '@/store/modules/settings'
 import SidebarItem from './SidebarItem.vue'
 import SidebarLogo from './SidebarLogo.vue'
 import variables from '@/styles/_variables.scss'
-
 @Component({
   name: 'SideBar',
   components: {
@@ -48,6 +50,8 @@ import variables from '@/styles/_variables.scss'
   }
 })
 export default class extends Vue {
+  $eventBus: any
+  private setIndex:boolean = false
   get sidebar() {
     return AppModule.sidebar
   }
@@ -92,6 +96,14 @@ export default class extends Vue {
 
   get Version() {
     return AppModule.version
+  }
+  mounted() {
+    this.$eventBus.$on('setIndex', (data:boolean) => {
+      this.setIndex = data
+    })
+  }
+  destroyed() {
+    this.$eventBus.$off('setIndex')
   }
 }
 </script>

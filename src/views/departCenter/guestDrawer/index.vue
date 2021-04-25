@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-21 10:55:15
+ * @LastEditTime: 2021-04-22 19:09:24
  * @LastEditors: D.C.base
 -->
 <template>
@@ -14,6 +14,7 @@
     <section class="departLine">
       <h3>待撮合线路</h3>
       <AtableLine
+        ref="lineDrawer"
         :list-query="listQueryLine"
         obj="{}"
         :is-more="true"
@@ -29,13 +30,18 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
+          :op-type="[1,2,3,4,5]"
           @tag="setTagHandle"
-          @handleClick="handleClick"
+          @call="setCallHandle"
+          @creatRun="creatRunHandle"
         />
       </div>
     </section>
-    <SetTag v-model="tagShow" />
-    <CreateTryRun v-if="tryRunShow" />
+    <SetTag ref="tagShow" />
+    <CreateTryRun
+      ref="tryRunShow"
+      :obj="rowData"
+    />
     <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
@@ -49,7 +55,6 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
-
 interface IState {
   [key: string]: any;
 }
@@ -69,6 +74,7 @@ export default class GuestDrawer extends Vue {
   private visible : boolean = false // 抽屉显示隐藏
   private tagShow:boolean = false
   private tryRunShow:boolean = false
+  private rowData:object = {}
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -89,45 +95,45 @@ export default class GuestDrawer extends Vue {
     f1: '',
     f2: ''
   }
+  $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
     this.visible = val
+    this.$eventBus.$emit('setIndex', val)
   }
   closeHandle() {
     this.visible = false
-    this.$emit('input', false)
-  }
-  handleClick(val: String) {
-    console.log(val)
-    if (val === 'call') {
-      let phone = '18848885135'
-      let repStr = phone.substr(3)
-      let newStr = phone.replace(repStr, '********')
-      this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        console.log(123)
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消拨打'
-        })
-      })
-    } else if (val === 'tag') {
-      this.tagShow = true
-    } else if (val === 'tryRun') {
-      this.tryRunShow = true
-    }
+    this.$emit('input', false);
+    // 关闭抽屉删掉线路表格的数据
+    (this.$refs.lineDrawer as any).removeTableInfo()
   }
   // 取消创建试跑意向
   handleCancelTryRun1() {
     (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
-    alert('点击率')
-    this.tagShow = true
+    (this.$refs.tagShow as any).isShow = true
+  }
+  setCallHandle(data:any) {
+    let phone = data.phoneNum
+    let repStr = phone.substr(3)
+    let newStr = phone.replace(repStr, '********')
+    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      console.log(123)
+    }).catch(() => {
+      this.$message({
+        type: 'info',
+        message: '已取消拨打'
+      })
+    })
+  }
+  creatRunHandle(data:any) {
+    (this.$refs.tryRunShow as any).showDialog = true
+    this.rowData = data
   }
   mounted() {
 

@@ -37,6 +37,8 @@ export async function getProviceCityCountryData(node: any, resolve: any) {
     params.push(node.value)
     let users = await getProvinceList(params, 3)
     resolve(users)
+  } else {
+    resolve([])
   }
 }
 // 分别获取省、市、县
@@ -45,9 +47,10 @@ export async function getProvinceList(params:string[], level?:number) {
     let { data: res } = await GetCityByCode(params)
     if (res.success) {
       let arr:DictData[] = res.data.map((item:IState) => ({
+        leaf: level ? (level === 3) : false,
         label: item.name,
         value: +item.code,
-        leaf: level === 3
+        disabled: params.length === 1
       }))
       return arr
     } else {
@@ -68,8 +71,8 @@ export async function getProviceCityAndCountryData(node: any, resolve: any) {
   } else if (node.level === 1) {
     let params = ['100000']
     params.push(node.value)
-    let groups = await getProvinceList(params)
-    let newData = groups.map(item => ({
+    let groups:any = await getProvinceList(params)
+    let newData = groups.map((item:any) => ({
       value: item.value,
       label: item.label,
       leaf: true
