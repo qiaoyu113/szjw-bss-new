@@ -58,7 +58,8 @@
         </el-button>
       </div>
       <template slot="start">
-        <el-input
+        <input-range v-model="listQuery.start" />
+        <!-- <el-input
           v-model="listQuery.start"
           v-only-number="{min: 0, max: 20000, precision: 0}"
         />
@@ -67,7 +68,7 @@
         <el-input
           v-model="listQuery.end"
           v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
+        /> -->
       </template>
     </self-form>
     <!-- 表格 -->
@@ -111,6 +112,7 @@ import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
+import InputRange from './components/InputRange.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -127,7 +129,8 @@ interface IState {
     Atable,
     Pagination,
     GuestDrawer,
-    CancelTryRun
+    CancelTryRun,
+    InputRange
   }
 })
 export default class extends Vue {
@@ -142,8 +145,7 @@ export default class extends Vue {
     isBehavior: '',
     isRestriction: '',
     status: '',
-    start: '',
-    end: '',
+    start: [],
     f1: '',
     f2: '',
     key: ''
@@ -235,16 +237,6 @@ export default class extends Vue {
       label: '单趟运费区间',
       key: 'start',
       w: '110px',
-      col: 5,
-      slot: true
-    },
-    {
-      type: 'end',
-      label: ' ',
-      w: '20px',
-      key: 'end',
-      col: 3,
-      class: 'end',
       slot: true
     },
     {
@@ -392,7 +384,7 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    if (this.listQuery.start && this.listQuery.end && Number(this.listQuery.start) > Number(this.listQuery.end)) {
+    if (this.listQuery.start.length > 1 && Number(this.listQuery.start[0]) > Number(this.listQuery.start[1])) {
       return this.$message.warning('单趟运费起始金额不能大于终止金额')
     }
     if (this.listQuery.f1 && this.listQuery.f2 && (this.listQuery.f1 === this.listQuery.f2)) {
