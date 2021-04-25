@@ -38,7 +38,6 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: () => {} }) obj!:IState
-
   private showDialog:boolean = false
   private listQuery:IState = {
     guestCity: 1,
@@ -73,16 +72,20 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.tryForm as any).submitForm()
+    this.saveData()
   }
   // 弹框关闭
   private handleDialogClosed() {
     (this.$refs.tryForm as any).resetForm()
   }
+  private qqq() {
+    console.log(123)
+  }
   // 验证通过
   handlePassChange() {
     this.showDialog = false
   }
-  // 创建试跑意向
+  // 发起客邀
   async saveData() {
     try {
       let params:IState = {

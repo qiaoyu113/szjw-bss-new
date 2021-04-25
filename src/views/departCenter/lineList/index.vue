@@ -41,6 +41,7 @@
           <div>
             <el-button
               type="primary"
+              @click="batchLaunchGuest"
             >
               批量发起客邀
             </el-button>
@@ -491,6 +492,11 @@ export default class extends Vue {
   // 取消客邀
   handleCancelGuest() {
     (this.$refs.cancelGuest as any).showDialog = true
+  }
+  // 批量发起客邀
+  private batchLaunchGuest() {
+    (this.$refs.launchGuest as any).showDialog = true
+    // (this.$refs.launchGuest as any).confirm()
   }
   init() {
     this.getDictList()
