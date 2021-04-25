@@ -529,6 +529,8 @@ export default class extends Vue {
       this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
       this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
       this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
+
+      console.log('listQuery', this.listQuery)
       // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
@@ -614,11 +616,7 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .LineList {
-  .rejectBox{
-      display: flex;
-      align-items: center;
-    }
-    min-width: 860px;
+  min-width: 860px;
   .SuggestForm {
       width: 100%;
       background: #fff;
