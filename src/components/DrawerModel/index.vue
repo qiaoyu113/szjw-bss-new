@@ -60,11 +60,10 @@ export default class DrawerModel extends Vue {
   background:rgba(0,0,0,0.5);
 }
 .drawerBox {
-  // margin-top:84px;
   width: 100%;
   height: 100%;
   ::v-deep .el-drawer{
-    overflow: initial;
+    overflow: auto!important;
     background: #e6e9f0;
   }
 }
