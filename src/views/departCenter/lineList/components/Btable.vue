@@ -194,7 +194,8 @@
           width="180"
           class-name="center"
         >
-          <template slot-scope="{row}">
+          <!-- <template slot-scope="{row}"> -->
+          <template>
             <p class="text">
               <el-button
                 type="text"
@@ -221,7 +222,7 @@
                 查看详情
               </el-button>
             </p>
-            <p
+            <!-- <p
               v-if="isMore"
               class="text"
             >
@@ -231,7 +232,7 @@
               >
                 {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
               </el-button>
-            </p>
+            </p> -->
           </template>
         </el-table-column>
         <el-table-column
@@ -327,23 +328,23 @@ export default class extends Vue {
     }
   ]
   // 展开
-  toogleExpand(row:IState) {
-    let $table:any = this.$refs.lineTable
-    for (let i = 0; i < this.tableData.length; i++) {
-      let item:IState = this.tableData[i]
-      if ((row.id !== item.id)) {
-        row.isOpen = false
-        $table.toggleRowExpansion(item, false)
-      } else if (row.isOpen) {
-        row.isOpen = false
-        $table.toggleRowExpansion(item, false)
-        return false
-      }
-      row.isOpen = true
-      $table.toggleRowExpansion(row)
-    }
-  }
-  // 取消意向
+  // toogleExpand(row:IState) {
+  //   let $table:any = this.$refs.lineTable
+  //   for (let i = 0; i < this.tableData.length; i++) {
+  //     let item:IState = this.tableData[i]
+  //     if ((row.id !== item.id)) {
+  //       row.isOpen = false
+  //       $table.toggleRowExpansion(item, false)
+  //     } else if (row.isOpen) {
+  //       row.isOpen = false
+  //       $table.toggleRowExpansion(item, false)
+  //       return false
+  //     }
+  //     row.isOpen = true
+  //     $table.toggleRowExpansion(row)
+  //   }
+  // }
+  // 取消客邀
   handleCancelGuest() {
     this.$emit('cancelGuest')
   }
