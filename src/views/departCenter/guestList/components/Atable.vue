@@ -214,7 +214,7 @@
               v-if="!isMore"
               type="text"
               size="small"
-              @click.stop="handleMatchClick"
+              @click.stop="handleMatchClick(row)"
             >
               匹配撮合
             </el-button>
@@ -223,7 +223,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCancelTruRun"
+              @click.stop="handleCancelTruRun(row)"
             >
               取消意向
             </el-button>
@@ -309,6 +309,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+const key = 'line_row'
 interface IState {
   [key: string]: any;
 }
@@ -344,7 +345,8 @@ export default class extends Vue {
   }
   // 匹配撮合
   handleMatchClick(row:IState) {
-    this.$emit('match')
+    sessionStorage.setItem(key, JSON.stringify(row))
+    this.$emit('match', row)
   }
   // 查看详情
   handleDetailClick(row:IState) {
@@ -389,10 +391,21 @@ export default class extends Vue {
       //
     }
   }
+  // 抽屉内移出被匹配项(客邀列表是线路)的信息
+  removeTableInfo() {
+    sessionStorage.removeItem(key)
+  }
   mounted() {
-    setTimeout(() => {
-      this.getLists()
-    }, 500)
+    if (!this.isMore) {
+      setTimeout(() => {
+        this.getLists()
+      }, 500)
+    } else if (this.isMore && !this.isShowPercent) {
+      let str = sessionStorage.getItem(key) || ''
+      if (str) {
+        this.tableData = [JSON.parse(str)]
+      }
+    }
   }
 }
 </script>
