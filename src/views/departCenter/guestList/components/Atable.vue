@@ -64,6 +64,9 @@
           >
             窗口期:剩余{{ row.c }}天
           </p>
+          <p class="text scale">
+            {{ row.createDate }}创建
+          </p>
         </template>
       </el-table-column>
       <el-table-column
@@ -214,7 +217,7 @@
               v-if="!isMore"
               type="text"
               size="small"
-              @click.stop="handleMatchClick"
+              @click.stop="handleMatchClick(row)"
             >
               匹配撮合
             </el-button>
@@ -223,7 +226,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCancelTruRun"
+              @click.stop="handleCancelTruRun(row)"
             >
               取消意向
             </el-button>
@@ -309,6 +312,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+const key = 'line_row'
 interface IState {
   [key: string]: any;
 }
@@ -344,7 +348,8 @@ export default class extends Vue {
   }
   // 匹配撮合
   handleMatchClick(row:IState) {
-    this.$emit('match')
+    sessionStorage.setItem(key, JSON.stringify(row))
+    this.$emit('match', row)
   }
   // 查看详情
   handleDetailClick(row:IState) {
@@ -357,6 +362,7 @@ export default class extends Vue {
       if (this.isMore) {
         num = 1
       }
+      this.tableData = []
       for (let i = 0; i < num; i++) {
         let obj:IState = {
           a: '京东传站',
@@ -377,7 +383,8 @@ export default class extends Vue {
           id: 1,
           arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
           brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次']
+          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+          createDate: '2021-04-15 12:00'
         }
         obj.isOpen = false
         obj.id = (i + 1)
@@ -389,10 +396,21 @@ export default class extends Vue {
       //
     }
   }
+  // 抽屉内移出被匹配项(客邀列表是线路)的信息
+  removeTableInfo() {
+    sessionStorage.removeItem(key)
+  }
   mounted() {
-    setTimeout(() => {
-      this.getLists()
-    }, 500)
+    if (!this.isMore) {
+      setTimeout(() => {
+        this.getLists()
+      }, 500)
+    } else if (this.isMore && !this.isShowPercent) {
+      let str = sessionStorage.getItem(key) || ''
+      if (str) {
+        this.tableData = [JSON.parse(str)]
+      }
+    }
   }
 }
 </script>
@@ -432,6 +450,12 @@ export default class extends Vue {
       color:#444444;
       font-size:12px;
       line-height: 20px;
+      &.scale {
+        margin-left: -50%;
+        width: 200%;
+        font-size:18px;
+        transform: scale(0.5);
+      }
     }
     .tip {
       margin:0px;
