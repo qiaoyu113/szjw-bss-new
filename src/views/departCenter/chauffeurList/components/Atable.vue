@@ -379,8 +379,8 @@ export default class extends Vue {
     this.$emit('call', row)
   }
   // 打标签
-  handleTag() {
-    this.$emit('tag')
+  handleTag(row:IState) {
+    this.$emit('tag', row)
   }
   // 撮合
   handleDepart() {
