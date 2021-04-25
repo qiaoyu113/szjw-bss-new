@@ -306,7 +306,7 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
-  @Prop({ default: [] }) opType!: number[];
+  @Prop({ default: () => [] }) opType!: number[];
   private tableData: IState[] = [
     {
       driverName: '张道松',

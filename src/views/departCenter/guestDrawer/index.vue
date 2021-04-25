@@ -14,6 +14,7 @@
     <section class="departLine">
       <h3>待撮合线路</h3>
       <AtableLine
+        ref="lineDrawer"
         :list-query="listQueryLine"
         obj="{}"
         :is-more="true"
@@ -95,7 +96,9 @@ export default class GuestDrawer extends Vue {
   }
   closeHandle() {
     this.visible = false
-    this.$emit('input', false)
+    this.$emit('input', false);
+    // 关闭抽屉删掉线路表格的数据
+    (this.$refs.lineDrawer as any).removeTableInfo()
   }
   handleClick(val: String) {
     console.log(val)
