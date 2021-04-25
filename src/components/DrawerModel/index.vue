@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-22 19:15:19
+ * @LastEditTime: 2021-04-25 11:27:49
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,7 +11,7 @@
     :visible.sync="visible"
     :with-header="false"
     :modal-append-to-body="false"
-    size="80%"
+    size="100%"
     top="84px"
     :modal="false"
     @close="closeHandle"
@@ -56,8 +56,14 @@ export default class DrawerModel extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-::v-deep .el-drawer__container{
+::v-deep .el-drawer__body{
+  height: 100%;
   background:rgba(0,0,0,0.5);
+  padding-left: 20%;
+}
+::v-deep .el-drawer{
+    background: transparent;
+    box-shadow: none;
 }
 .drawerBox {
   // margin-top:84px;
@@ -65,7 +71,7 @@ export default class DrawerModel extends Vue {
   height: 100%;
   ::v-deep .el-drawer{
     overflow: initial;
-    background: #e6e9f0;
+    //background: #e6e9f0;
   }
 }
 .actionBtn{
@@ -75,7 +81,7 @@ export default class DrawerModel extends Vue {
     justify-content: center;
     align-items: center;
     position: absolute;
-    left:-25px;
+    left: calc(20% - 25px);
     top:50%;
     transform: translateY(-50%);
     background: #fff;

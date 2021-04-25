@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-22 19:29:48
+ * @LastEditTime: 2021-04-25 10:56:30
  * @LastEditors: D.C.base
 -->
 <template>
@@ -56,16 +56,43 @@
           class="SuggestForm"
           :pc-col="8"
         >
-          <template slot="start">
+          <template slot="workTime">
+            <el-time-select
+              v-model="listQuery['jobStartDate']"
+              class="timeSelect"
+              placeholder="起始时间"
+              :picker-options="{
+                start: '00:00',
+                step: '01:00',
+                end: '23:00'
+              }"
+            />
+            <span style="padding:0 3px">-</span>
+            <el-time-select
+              v-model="listQuery['jobEndDate']"
+              class="timeSelect"
+              placeholder="结束时间"
+              :picker-options="{
+                start: '00:00',
+                step: '01:00',
+                end: '23:00',
+                minTime: listQuery['jobStartDate']
+              }"
+            />
+          </template>
+          <template slot="freight">
             <el-input
               v-model="listQuery.start"
               v-only-number="{min: 0, max: 20000, precision: 0}"
+              style="min-width:100px"
+              placeholder="请输入"
             />
-          </template>
-          <template slot="end">
+            <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.end"
               v-only-number="{min: 0, max: 20000, precision: 0}"
+              style="min-width:100px"
+              placeholder="请输入"
             />
           </template>
         </self-form>
@@ -136,8 +163,8 @@ export default class SearchKeyWords extends Vue {
     hope: '', // 期望稳定/临时
     expectType: '', // 期望货品类型
     expectHard: '', // 期望配送难度
-    start: '',
-    end: '',
+    jobStartDate: '',
+    jobEndDate: '',
     f1: '',
     f2: '',
     address: '',
@@ -145,53 +172,26 @@ export default class SearchKeyWords extends Vue {
   }
   private formItem:any[] = [
     {
-      type: 2,
+      slot: true,
+      type: 'workTime',
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
         filterable: true,
         style: {
-          width: '100px'
+          width: '140px'
         }
       },
       label: '工作时间段',
-      col: 5,
-      key: 'f1',
-      options: this.timeLists
+      col: 8
     },
     {
-      type: 2,
-      col: 4,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true,
-        style: {
-          width: '100px'
-        }
-      },
-      label: ' ',
-      w: '20px',
-      key: 'f2',
-      class: 'end',
-      options: this.timeLists
-    },
-    {
-      type: 'start',
+      slot: true,
+      type: 'freight',
       label: '单趟运费区间',
       key: 'start',
       w: '110px',
-      col: 5,
-      slot: true
-    },
-    {
-      type: 'end',
-      label: ' ',
-      w: '20px',
-      key: 'end',
-      col: 3,
-      class: 'end',
-      slot: true
+      col: 8
     },
     {
       type: 8,
