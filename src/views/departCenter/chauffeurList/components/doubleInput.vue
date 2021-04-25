@@ -4,6 +4,7 @@
       :value="modelArr[0]"
       v-bind="$attrs"
       class="input"
+      clearable
       placeholder="最低"
       @input="changeInput1"
     />
@@ -12,6 +13,7 @@
       :value="modelArr[1]"
       v-bind="$attrs"
       class="input"
+      clearable
       placeholder="最高"
       @input="changeInput2"
     />
