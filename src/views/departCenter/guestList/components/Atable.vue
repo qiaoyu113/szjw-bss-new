@@ -15,13 +15,32 @@
       :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
+        min-width="70"
+        label=""
+        align="left"
+        class-name="firstColumn"
+      >
+        <template slot-scope="scope">
+          <div class="arrow" />
+          <div
+            v-if="isShowPercent"
+            class="percent"
+          >
+            <template v-if="(scope.$index +1) > 9">
+              {{ scope.$index +1 }}
+            </template>
+            <template v-else>
+              {{ '0'+ (scope.$index + 1) }}
+            </template>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="基础信息"
         min-width="220"
         align="center"
-        class-name="firstColumn"
       >
         <template slot-scope="{row}">
-          <div class="arrow" />
           <!-- <div
             v-if="isShowPercent"
             class="percent"
@@ -358,7 +377,7 @@ export default class extends Vue {
   // 获取列表数据
   async getLists() {
     try {
-      let num:number = 5
+      let num:number = 30
       if (this.isMore) {
         num = 1
       }
@@ -437,10 +456,10 @@ export default class extends Vue {
     }
     .percent {
       position: absolute;
-      top: 35px;
+      top: 50px;
       left: 7px;
       font-size: 12px;
-      color: #639DEC;
+      color: #444444;
       text-align: center;
       width: 40px;
       line-height: 14px;
