@@ -359,6 +359,7 @@ export default class extends Vue {
       if (this.isMore) {
         num = 1
       }
+      this.tableData = []
       for (let i = 0; i < num; i++) {
         let obj:IState = {
           a: '京东传站',

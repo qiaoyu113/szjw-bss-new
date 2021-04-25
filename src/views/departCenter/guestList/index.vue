@@ -58,7 +58,10 @@
         </el-button>
       </div>
       <template slot="start">
-        <input-range v-model="listQuery.start" />
+        <input-range
+          v-model="listQuery.start"
+          :range="[0,20000]"
+        />
         <!-- <el-input
           v-model="listQuery.start"
           v-only-number="{min: 0, max: 20000, precision: 0}"
@@ -112,7 +115,7 @@ import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
-import InputRange from './components/InputRange.vue'
+import InputRange from '../chauffeurList/components/doubleInput.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -134,21 +137,26 @@ interface IState {
   }
 })
 export default class extends Vue {
+  private shareScopeEnd:IState[] = []
+  private value:IState[] = []
   private listLoading:boolean = false
   private showDrawer:boolean = false
   private cityLists:IState[] = [] // 城市列表
   private carLists:IState[] = [] // 车型列表
-  private labelTypeArr:IState[] = [] // 线路肥瘦
+  private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
+  private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private timeLists:IState[] = []
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
+    loadDiff: '',
     isRestriction: '',
     status: '',
     start: [],
     f1: '',
     f2: '',
-    key: ''
+    key: '',
+    g: []
   }
   private formItem:any[] = [
     {
@@ -172,6 +180,17 @@ export default class extends Vue {
       label: '车型',
       key: 'b',
       options: this.carLists
+    },
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true
+      },
+      label: '装卸难度',
+      key: 'loadDiff',
+      options: this.loadDiffArr
     },
     {
       type: 2,
@@ -272,12 +291,20 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityCountryData,
+          checkStrictly: true,
+          multiple: true
+        }
+      },
+      listeners: {
+        'change': (e:any[]) => {
+          this.handleCascaderChange(e, 'g')
         }
       },
       label: '仓库位置',
       key: 'g'
     },
+
     {
       type: 8,
       tagAttrs: {
@@ -285,7 +312,14 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityCountryData,
+          checkStrictly: true,
+          multiple: true
+        }
+      },
+      listeners: {
+        'change': (e:any[]) => {
+          this.handleCascaderChange(e, 'i')
         }
       },
       label: '配送区域',
@@ -384,8 +418,12 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    if (this.listQuery.start.length > 1 && Number(this.listQuery.start[0]) > Number(this.listQuery.start[1])) {
-      return this.$message.warning('单趟运费起始金额不能大于终止金额')
+    if (this.listQuery.start.length === 1) {
+      return this.$message.warning('单趟运费输入不完整')
+    } else if (this.listQuery.start.length === 2) {
+      if (Number(this.listQuery.start[0]) > Number(this.listQuery.start[1])) {
+        return this.$message.warning('单趟运费起始金额不能大于终止金额')
+      }
     }
     if (this.listQuery.f1 && this.listQuery.f2 && (this.listQuery.f1 === this.listQuery.f2)) {
       return this.$message.warning('起始时间与结束时间差>=1小时')
@@ -433,11 +471,12 @@ export default class extends Vue {
   // 获取字典列表
   async getDictList() {
     try {
-      let params:string[] = ['Intentional_compartment', 'line_label']
+      let params:string[] = ['Intentional_compartment', 'line_label', 'line_handling_difficulty']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+        this.loadDiffArr.push(...mapDictData(res.data.line_handling_difficulty || []))
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -447,6 +486,35 @@ export default class extends Vue {
       //
     }
   }
+  // 级联框变化
+  handleCascaderChange(val:IState[], key:string) {
+    // 是否与上次的类型相同
+    let changeFlag = false
+    let changeItem:any = null
+    if (this.shareScopeEnd.length === 0) {
+      this.listQuery[key] = val
+    } else {
+      // 与原数组比对
+      this.listQuery[key].forEach((item:any[]) => {
+        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
+          changeFlag = true
+          changeItem = item
+        }
+      })
+    }
+    if (changeFlag) {
+      this.listQuery[key] = []
+      this.listQuery[key].push(changeItem)
+    }
+    this.shareScopeEnd = this.listQuery[key]
+  }
+
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
