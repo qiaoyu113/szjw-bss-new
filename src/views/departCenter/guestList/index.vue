@@ -289,6 +289,7 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        'collapse-tags': true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
@@ -310,6 +311,7 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        'collapse-tags': true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
