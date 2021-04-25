@@ -19,7 +19,6 @@ export function mapDictData(arr:IState[]):DictData[] {
   }
   return brr
 }
-
 // 获取省、市、县三级联动
 export async function getProviceCityCountryData(node: any, resolve: any) {
   if (node.level === 0) {
@@ -66,8 +65,13 @@ export async function getProvinceList(params:string[], level?:number) {
 export async function getProviceCityAndCountryData(node: any, resolve: any) {
   if (node.level === 0) {
     let params = ['100000']
-    let citys = await getProvinceList(params)
-    resolve(citys)
+    let citys:any = await getProvinceList(params)
+    let newData = citys.map((item:any) => ({
+      value: item.value,
+      label: item.label,
+      disabled: false
+    }))
+    resolve(newData)
   } else if (node.level === 1) {
     let params = ['100000']
     params.push(node.value)
@@ -75,6 +79,7 @@ export async function getProviceCityAndCountryData(node: any, resolve: any) {
     let newData = groups.map((item:any) => ({
       value: item.value,
       label: item.label,
+      disabled: false,
       leaf: true
     }))
     console.log(newData)

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-25 13:44:32
+ * @LastEditTime: 2021-04-25 17:16:01
  * @LastEditors: D.C.base
 -->
 <template>
@@ -55,8 +55,8 @@
           <el-input
             v-model.trim="listQuery['expected']"
             v-only-number="{min: 0, max: 10000, precision: 1}"
-            style="width:100px"
-            clearable="true"
+            style="width:100px;flex:initial"
+            :clearable="true"
             placeholder="请输入期望运费"
           />
         </template>
@@ -203,7 +203,6 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        multiple: true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityAndCountryData
@@ -214,6 +213,9 @@ export default class extends Vue {
         if (!visible) {
           _this.getData()
         }
+      },
+      change(e:any) {
+        _this.handleChange(e, 'prohibitionAddress')
       }
     },
     {
@@ -246,6 +248,9 @@ export default class extends Vue {
         if (!visible) {
           _this.getDataRegion()
         }
+      },
+      change(e:any) {
+        _this.handleChange(e, 'prohibitionRegion')
       }
     },
     {
@@ -478,6 +483,9 @@ export default class extends Vue {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
       this.$set(this.formItem[3], 'countyOptions', res)
     }, 100)
+  }
+  handleChange(val:IState[], key:string) {
+
   }
   // 验证通过
   handlePassChange() {

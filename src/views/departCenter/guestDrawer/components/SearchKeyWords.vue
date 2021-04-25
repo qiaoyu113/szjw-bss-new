@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-25 10:56:30
+ * @LastEditTime: 2021-04-25 16:37:41
  * @LastEditors: D.C.base
 -->
 <template>
@@ -137,6 +137,7 @@ interface IState {
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
+  private shareScopeEnd:IState[] = []
   private carLists:IState[] = [
     {
       value: '',
@@ -201,7 +202,14 @@ export default class SearchKeyWords extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityCountryData,
+          checkStrictly: true,
+          multiple: true
+        }
+      },
+      listeners: {
+        'change': (e:any[]) => {
+          this.handleCascaderChange(e, 'address')
         }
       },
       label: '现居住地址',
@@ -366,6 +374,34 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
+  }
+  // 级联框变化
+  handleCascaderChange(val:IState[], key:string) {
+    // 是否与上次的类型相同
+    let changeFlag = false
+    let changeItem:any = null
+    if (this.shareScopeEnd.length === 0) {
+      this.listQuery[key] = val
+    } else {
+      // 与原数组比对
+      this.listQuery[key].forEach((item:any[]) => {
+        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
+          changeFlag = true
+          changeItem = item
+        }
+      })
+    }
+    if (changeFlag) {
+      this.listQuery[key] = []
+      this.listQuery[key].push(changeItem)
+    }
+    this.shareScopeEnd = this.listQuery[key]
   }
   mounted() {
     this.getOptions()
