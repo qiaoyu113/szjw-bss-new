@@ -42,19 +42,18 @@ export default class extends Vue {
     this.sendMessage(val, 1)
   }
   private blurChange() {
-    if (this.sortModel.length > 0) {
+    if (this.modelArr.filter(ele => ele).length === 2) {
       let some = this.modelArr.some((item, index) => {
         if (+item >= this.sortModel[1] || +item <= this.sortModel[0]) {
           this.$message.warning(`最大范围为${this.sortModel[0]}-${this.sortModel[1]}之间`)
-          this.modelArr.splice(index, 1, '')
-          return true
+          this.modelArr.splice(index, 2, '')
         }
       })
 
       if (some) return
     }
 
-    if (this.modelArr.length > 1 && !this.modelArr.includes('')) {
+    if (this.modelArr.filter(ele => ele).length === 2) {
       if (+this.modelArr[0] >= +this.modelArr[1]) {
         this.$message.warning('后置参数要大于前置参数。')
         return this.modelArr.pop()
@@ -64,7 +63,6 @@ export default class extends Vue {
   @Emit('inputChange')
   sendMessage(e:any, index:number) {
     this.newModelArr.splice(index, 1, e)
-    console.log(this.newModelArr, 'this.newModelArr')
     return this.newModelArr
   }
 }
