@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-25 16:37:41
+ * @LastEditTime: 2021-04-26 09:04:00
  * @LastEditors: D.C.base
 -->
 <template>
@@ -325,6 +325,10 @@ export default class SearchKeyWords extends Vue {
             this.selectedData[index].selected = ['全部']
           } else {
             if (this.selectedData[index].optionIds[0] === '') {
+              this.selectedData[index].optionIds.shift()
+              this.selectedData[index].selected.shift()
+            }
+            if (this.selectedData[index].selected[0] === '全部') {
               this.selectedData[index].optionIds.shift()
               this.selectedData[index].selected.shift()
             }
