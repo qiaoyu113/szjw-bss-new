@@ -246,15 +246,6 @@ export const asyncRoutes: RouteConfig[] = [
   // clueRouter, // 线索管理
   // systemRouter, // 系统管理
   // presetRouter, // 权限管理
-  lineShelf, // 线路货架维护
-  driverCloudRouter, // 司机云
-  freightRouter, // 司机运费账户
-  driverFreight, // 试跑在跑生命周期
-  customerFreight, // 客户运费账户
-  driverAccountRouter, // 司机梧桐账户
-  clueRouter, // 线索管理
-  systemRouter, // 系统管理
-  presetRouter, // 权限管理
   energizeMarkRouter, // 赋能打分系统
   {
     path: '*',
