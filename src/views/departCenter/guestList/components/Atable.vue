@@ -15,13 +15,32 @@
       :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
+        min-width="70"
+        label=""
+        align="left"
+        class-name="firstColumn"
+      >
+        <template slot-scope="scope">
+          <div class="arrow" />
+          <div
+            v-if="isShowPercent"
+            class="percent"
+          >
+            <template v-if="(scope.$index +1) > 9">
+              {{ scope.$index +1 }}
+            </template>
+            <template v-else>
+              {{ '0'+ (scope.$index + 1) }}
+            </template>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="基础信息"
         min-width="220"
         align="center"
-        class-name="firstColumn"
       >
         <template slot-scope="{row}">
-          <div class="arrow" />
           <!-- <div
             v-if="isShowPercent"
             class="percent"
@@ -63,6 +82,9 @@
             :class="obj.c === row.c ? 'blue text' : 'text'"
           >
             窗口期:剩余{{ row.c }}天
+          </p>
+          <p class="text scale">
+            {{ row.createDate }}创建
           </p>
         </template>
       </el-table-column>
@@ -355,7 +377,7 @@ export default class extends Vue {
   // 获取列表数据
   async getLists() {
     try {
-      let num:number = 5
+      let num:number = 30
       if (this.isMore) {
         num = 1
       }
@@ -380,7 +402,8 @@ export default class extends Vue {
           id: 1,
           arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
           brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次']
+          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+          createDate: '2021-04-15 12:00'
         }
         obj.isOpen = false
         obj.id = (i + 1)
@@ -433,10 +456,10 @@ export default class extends Vue {
     }
     .percent {
       position: absolute;
-      top: 35px;
+      top: 50px;
       left: 7px;
       font-size: 12px;
-      color: #639DEC;
+      color: #444444;
       text-align: center;
       width: 40px;
       line-height: 14px;
@@ -446,6 +469,12 @@ export default class extends Vue {
       color:#444444;
       font-size:12px;
       line-height: 20px;
+      &.scale {
+        margin-left: -50%;
+        width: 200%;
+        font-size:18px;
+        transform: scale(0.5);
+      }
     }
     .tip {
       margin:0px;

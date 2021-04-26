@@ -292,13 +292,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
-        }
-      },
-      listeners: {
-        'change': (e:any[]) => {
-          this.handleCascaderChange(e, 'g')
+          checkStrictly: true
         }
       },
       label: '仓库位置',
@@ -313,13 +307,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
-        }
-      },
-      listeners: {
-        'change': (e:any[]) => {
-          this.handleCascaderChange(e, 'i')
+          checkStrictly: true
         }
       },
       label: '配送区域',
@@ -487,33 +475,33 @@ export default class extends Vue {
     }
   }
   // 级联框变化
-  handleCascaderChange(val:IState[], key:string) {
-    // 是否与上次的类型相同
-    let changeFlag = false
-    let changeItem:any = null
-    if (this.shareScopeEnd.length === 0) {
-      this.listQuery[key] = val
-    } else {
-      // 与原数组比对
-      this.listQuery[key].forEach((item:any[]) => {
-        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
-          changeFlag = true
-          changeItem = item
-        }
-      })
-    }
-    if (changeFlag) {
-      this.listQuery[key] = []
-      this.listQuery[key].push(changeItem)
-    }
-    this.shareScopeEnd = this.listQuery[key]
-  }
+  // handleCascaderChange(val:IState[], key:string) {
+  //   // 是否与上次的类型相同
+  //   let changeFlag = false
+  //   let changeItem:any = null
+  //   if (this.shareScopeEnd.length === 0) {
+  //     this.listQuery[key] = val
+  //   } else {
+  //     // 与原数组比对
+  //     this.listQuery[key].forEach((item:any[]) => {
+  //       if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
+  //         changeFlag = true
+  //         changeItem = item
+  //       } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
+  //         // changeFlag = true
+  //         // changeItem = item
+  //       } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
+  //         changeFlag = true
+  //         changeItem = item
+  //       }
+  //     })
+  //   }
+  //   if (changeFlag) {
+  //     this.listQuery[key] = []
+  //     this.listQuery[key].push(changeItem)
+  //   }
+  //   this.shareScopeEnd = this.listQuery[key]
+  // }
 
   init() {
     this.getDictList();

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-25 11:27:49
+ * @LastEditTime: 2021-04-26 08:47:52
  * @LastEditors: D.C.base
 -->
 <template>
@@ -66,11 +66,10 @@ export default class DrawerModel extends Vue {
     box-shadow: none;
 }
 .drawerBox {
-  // margin-top:84px;
   width: 100%;
   height: 100%;
   ::v-deep .el-drawer{
-    overflow: initial;
+    overflow: auto!important;
     //background: #e6e9f0;
   }
 }

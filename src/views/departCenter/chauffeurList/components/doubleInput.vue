@@ -7,7 +7,6 @@
       clearable
       placeholder="最低"
       @input="changeInput1"
-      @blur="blurChange"
     />
     <span class="icon">~</span>
     <el-input
@@ -17,7 +16,6 @@
       clearable
       placeholder="最高"
       @input="changeInput2"
-      @blur="blurChange"
     />
   </div>
 </template>
@@ -43,25 +41,7 @@ export default class extends Vue {
   private changeInput2(val:number) {
     this.sendMessage(val, 1)
   }
-  private blurChange() {
-    if (this.modelArr.filter(ele => ele).length === 2) {
-      let some = this.modelArr.some((item, index) => {
-        if (+item >= this.sortModel[1] || +item <= this.sortModel[0]) {
-          this.$message.warning(`最大范围为${this.sortModel[0]}-${this.sortModel[1]}之间`)
-          this.modelArr.splice(index, 2, '')
-        }
-      })
 
-      if (some) return
-    }
-
-    if (this.modelArr.filter(ele => ele).length === 2) {
-      if (+this.modelArr[0] >= +this.modelArr[1]) {
-        this.$message.warning('后置参数要大于前置参数。')
-        return this.modelArr.pop()
-      }
-    }
-  }
   @Emit('inputChange')
   sendMessage(e:any, index:number) {
     this.newModelArr.splice(index, 1, e)
