@@ -73,6 +73,11 @@
           v-only-number="{min: 0, max: 20000, precision: 0}"
         /> -->
       </template>
+      <template slot="time">
+        <timeSelect
+          v-model="listQuery.time"
+        />
+      </template>
     </self-form>
     <!-- 表格 -->
     <div
@@ -116,6 +121,7 @@ import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
+import TimeSelect from '../chauffeurList/components/timeSelect.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -133,7 +139,8 @@ interface IState {
     Pagination,
     GuestDrawer,
     CancelTryRun,
-    InputRange
+    InputRange,
+    TimeSelect
   }
 })
 export default class extends Vue {
@@ -156,7 +163,8 @@ export default class extends Vue {
     f1: '',
     f2: '',
     key: '',
-    g: []
+    g: [],
+    time: []
   }
   private formItem:any[] = [
     {
@@ -259,31 +267,37 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      col: 5,
+      type: 'time',
+      key: 'time',
       label: '工作时间段',
-      key: 'f1',
-      options: this.timeLists
+      slot: true
     },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: ' ',
-      w: '20px',
-      key: 'f2',
-      col: 3,
-      class: 'end',
-      options: this.timeLists
-    },
+    // {
+    //   type: 2,
+    //   tagAttrs: {
+    //     placeholder: '请选择',
+    //     clearable: true,
+    //     filterable: true
+    //   },
+    //   col: 5,
+    //   label: '工作时间段',
+    //   key: 'f1',
+    //   options: this.timeLists
+    // },
+    // {
+    //   type: 2,
+    //   tagAttrs: {
+    //     placeholder: '请选择',
+    //     clearable: true,
+    //     filterable: true
+    //   },
+    //   label: ' ',
+    //   w: '20px',
+    //   key: 'f2',
+    //   col: 3,
+    //   class: 'end',
+    //   options: this.timeLists
+    // },
     {
       type: 8,
       tagAttrs: {
@@ -406,16 +420,21 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    if (this.listQuery.start.length === 1) {
+    // 单趟运费区间
+    const moneyRange = (this.listQuery.start || []).filter((item:string | number) => item !== '')
+    if (moneyRange.length === 1) {
       return this.$message.warning('单趟运费输入不完整')
-    } else if (this.listQuery.start.length === 2) {
-      if (Number(this.listQuery.start[0]) > Number(this.listQuery.start[1])) {
+    } else if (moneyRange.length === 2) {
+      if (Number(moneyRange[0]) > Number(moneyRange[1])) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
     }
-    if (this.listQuery.f1 && this.listQuery.f2 && (this.listQuery.f1 === this.listQuery.f2)) {
-      return this.$message.warning('起始时间与结束时间差>=1小时')
+    // 工作时间段
+    const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
+    if (timeRange.length === 1) {
+      return this.$message.warning('工作时间段输入不完整')
     }
+
     this.getLists()
   }
   // 重置
