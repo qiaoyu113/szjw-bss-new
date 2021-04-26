@@ -11,15 +11,18 @@
       row-key="id"
       :row-style="{height: '20px'}"
       fit
-      :cell-style="{padding: '5px 20px'}"
-      :header-cell-style="{padding: '6px 20px'}"
+      @selection-change="handleSelectionChange"
     >
       <el-table-column
-        label="基础信息"
+        type="selection"
+        width="55"
+      />
+      <el-table-column
         align="center"
-        min-width="220"
+        min-width="70"
+        class-name="firstColumn"
       >
-        <template slot-scope="{row}">
+        <template slot-scope="scope">
           <div class="arrow" />
           <!-- <div
             v-if="isShowPercent"
@@ -27,6 +30,17 @@
           >
             匹配度{{ row.percent }}%
           </div> -->
+          <template>
+            {{ scope.$index + 1 | addZreo }}
+          </template>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="基础信息"
+        min-width="220"
+        align="center"
+      >
+        <template slot-scope="{row}">
           <div style="textAlign:center">
             <p class="text">
               <span class="cycleTag" />
@@ -48,6 +62,7 @@
       <el-table-column
         label="车辆"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -61,6 +76,7 @@
       <el-table-column
         label="地址信息"
         min-width="240"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -77,6 +93,7 @@
       <el-table-column
         label="结算"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -93,6 +110,7 @@
       <el-table-column
         label="线路忍耐度"
         min-width="200"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -112,6 +130,7 @@
       <el-table-column
         label="标签"
         min-width="100"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -131,6 +150,7 @@
       <el-table-column
         label="状态"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -150,11 +170,10 @@
       <el-table-column
         label="操作"
         min-width="150"
+        align="center"
         fixed="right"
       >
-        <template
-          slot-scope="{row}"
-        >
+        <template slot-scope="{row}">
           <p class="text">
             <el-button
               type="text"
@@ -172,7 +191,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleTag"
+              @click.stop="handleTag(row)"
             >
               打标签
             </el-button>
@@ -185,7 +204,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleDepart"
+              @click.stop="handleDepart(row)"
             >
               匹配撮合
             </el-button>
@@ -198,7 +217,7 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleDetail"
+              @click.stop="handleDetail(row)"
             >
               查看详情
             </el-button>
@@ -224,9 +243,33 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handlePutLine"
+              @click.stop="handlePutLine(row)"
             >
               推线
+            </el-button>
+          </p>
+          <p
+            v-if="opType.includes(5)"
+            class="text"
+          >
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleAllotSome(row)"
+            >
+              分配司撮
+            </el-button>
+          </p>
+          <p
+            v-if="opType.includes(6)"
+            class="text"
+          >
+            <el-button
+              type="text"
+              size="small"
+              @click.stop="handleChooseCity(row)"
+            >
+              更换工作城市
             </el-button>
           </p>
           <p
@@ -300,7 +343,12 @@ interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'chauffeurTable'
+  name: 'chauffeurTable',
+  filters: {
+    addZreo(val: string) {
+      return +val > 9 ? val : `0${val}`
+    }
+  }
 })
 export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
@@ -355,8 +403,59 @@ export default class extends Vue {
         '掉线1次'
       ],
       isOpen: false
+    },
+    {
+      driverName: '张道松00',
+      manager: '李加盟经理',
+      driverId: 'SJ20210415',
+      phoneNum: '132000000000',
+      a: '京东传站',
+      b: '李外线经理',
+      lineId: 'XL202012300377',
+      c: '3',
+      d: '4.2米厢货',
+      e: '油车',
+      f: '能闯禁行',
+      g: '能闯限行行',
+      h: '共享',
+      p1: '湖南省',
+      c1: '长沙市',
+      c2: '短沙县',
+      m1: 500,
+      time: '9:00~18:00',
+      percent: 80,
+      id: 1,
+      arr: [
+        '商贸信息',
+        '已创建30条线路',
+        '15条在跑',
+        '5条线路已掉线',
+        '3条线路在上架找车'
+      ],
+      brr: [
+        '1个点',
+        '每日1趟',
+        '每月12天',
+        '每趟120公里',
+        '走高速',
+        '回单',
+        '城配线',
+        '稳定(2个月)'
+      ],
+      crr: [
+        '已发起3次客邀',
+        '已创建意向3次',
+        '试跑失败2次',
+        '司机爽约1次',
+        '扭头就走1次',
+        '掉线1次'
+      ],
+      isOpen: false
     }
   ];
+  handleSelectionChange(val: IState[]) {
+    this.$emit('checkData', val)
+  }
   // 展开
   toogleExpand(row: IState) {
     let $table: any = this.$refs.chauffeurTable
@@ -375,28 +474,36 @@ export default class extends Vue {
     }
   }
   // 外呼
-  handleCall(row:IState) {
+  handleCall(row: IState) {
     this.$emit('call', row)
   }
   // 打标签
-  handleTag(row:IState) {
+  handleTag(row: IState) {
     this.$emit('tag', row)
   }
   // 撮合
-  handleDepart() {
-    this.$emit('depart')
+  handleDepart(row: IState) {
+    this.$emit('depart', row)
   }
   // 查看详情
-  handleDetail() {
-    this.$emit('detail')
+  handleDetail(row: IState) {
+    this.$emit('detail', row)
   }
   // 创建试跑
-  handleCreatRun(data:any) {
+  handleCreatRun(data: any) {
     this.$emit('creatRun', data)
   }
   // 推线
-  handlePutLine() {
-    this.$emit('line')
+  handlePutLine(row: IState) {
+    this.$emit('line', row)
+  }
+  // 分配司撮
+  handleAllotSome(val: IState) {
+    this.$emit('allotSome', val)
+  }
+  // 更换工作城市
+  handleChooseCity(val: IState) {
+    this.$emit('chooseCity', val)
   }
 }
 </script>
@@ -404,19 +511,19 @@ export default class extends Vue {
 .chauffeurTableContainer {
   .arrow {
     height: 0;
-    border-top: 40px solid #f5a821;
-    border-right: 40px solid transparent;
-    border-left: 40px solid transparent;
+    border-top: 30px solid #f5a821;
+    border-right: 30px solid transparent;
+    border-left: 30px solid transparent;
     transform: rotate(135deg);
     position: absolute;
-    top: -10px;
-    left: -30px;
+    top: -8px;
+    left: -21px;
   }
   .arrow::after {
     content: "司";
     display: inline-block;
     position: relative;
-    bottom: 35px;
+    bottom: 30px;
     left: 5px;
     transform: rotate(-135deg);
     color: white;
@@ -446,8 +553,8 @@ export default class extends Vue {
     font-size: 12px;
     line-height: 20px;
   }
-  .phone{
-    color:#888585;
+  .phone {
+    color: #888585;
     line-height: 12px;
   }
   .tip {
@@ -486,10 +593,10 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-</style>
-
-<style>
 .text1 {
   font-size: 12px;
+}
+.chauffeurTableContainer >>> .firstColumn {
+  overflow: hidden;
 }
 </style>
