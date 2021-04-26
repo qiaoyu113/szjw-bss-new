@@ -29,7 +29,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineTable, MoreLineTable } from '../components'
-import { getFinishedLine, getLineShelfNum, getLineShelfCompletedNum } from '@/api/line-shelf'
+import { getFinishedLine, getLineShelfNum, getLineShelfCompletedNum, getLineSale, getLineCity } from '@/api/line-shelf'
 import SelfTable from '@/components/Base/SelfTable.vue'
   interface IState {
   [key: string]: any;
@@ -51,6 +51,8 @@ interface PageObj {
 export default class extends Vue {
   private active: string = '0'
   private statusActive: number = 0
+    private lineSale:IState = [];
+  private lineCity:IState = [];
   private page: PageObj = {
     page: 1,
     limit: 10,
@@ -58,6 +60,8 @@ export default class extends Vue {
   };
   mounted() {
     this.getLineShelfNumSure()
+    this.getLinesales()
+    this.getLineCitys()
   }
 private numImg = {
   toBeCheckedNum: 0,
@@ -122,6 +126,30 @@ private async getLineShelfNumSure() {
           value: 2
         }
       ]
+    },
+    {
+      type: 2,
+      label: '外线销售',
+      key: 'lineSale',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 8,
+      options: this.lineSale
+    },
+    {
+      type: 2,
+      label: '线路城市',
+      key: 'lineCity',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 8,
+      options: this.lineCity
     },
     {
       type: 3,
@@ -216,11 +244,22 @@ private async getLineShelfNumSure() {
       label: '原因', // 拒绝原因类型名
       slot: true
     },
+
     {
       key: 'rejectionReasons',
       label: '备注',
       slot: true,
       'width': '82px'
+    },
+    {
+      key: 'lineSaleName',
+      label: '外线销售'
+
+    },
+    {
+      key: 'cityName',
+      label: '线路城市'
+
     },
     {
       key: 'updateName',
@@ -263,7 +302,7 @@ private async getLineShelfNumSure() {
       type: 3,
       key: 'agencyTime',
       label: '待办完成时间',
-      col: 12,
+      col: 8,
       tagAttrs: {
         clearable: true,
         pickerOptions: {
@@ -308,6 +347,30 @@ private async getLineShelfNumSure() {
       }
     },
     {
+      type: 2,
+      label: '外线销售',
+      key: 'lineSale',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 8,
+      options: this.lineSale
+    },
+    {
+      type: 2,
+      label: '线路城市',
+      key: 'lineCity',
+      tagAttrs: {
+        placeholder: '请选择',
+        filterable: true,
+        clearable: true
+      },
+      col: 8,
+      options: this.lineCity
+    },
+    {
       slot: true,
       label: '检查状态',
       col: 22,
@@ -349,7 +412,16 @@ private async getLineShelfNumSure() {
        slot: true,
        'width': '72px'
      },
+     {
+       key: 'lineSaleName',
+       label: '外线销售'
 
+     },
+     {
+       key: 'cityName',
+       label: '线路城市'
+
+     },
      {
        key: 'updateName',
        label: '操作人'
@@ -369,9 +441,42 @@ private async getLineShelfNumSure() {
 
    ]
 
-  // 获取新线维护列表
-
-  // 获取冗余线路列表
+   async getLinesales() {
+     let params = {
+       roleTypes: [2],
+       uri: '/v3/line/shelf/maintenance/lineSaleList'
+     }
+     let { data: res } = await getLineSale(params)
+     if (res.success) {
+       let gms = res.data.map(function(item: any) {
+         return {
+           label: item.name,
+           value: item.id
+         }
+       })
+       let lenGm:number = this.lineSale.length
+       if (lenGm > 0) {
+         this.lineSale.splice(0, lenGm)
+       }
+       this.lineSale.push(...gms)
+     }
+   }
+   async getLineCitys() {
+     let { data: res } = await getLineCity()
+     if (res.success) {
+       let city = res.data.map(function(item: any) {
+         return {
+           label: item.name,
+           value: item.code
+         }
+       })
+       let lenGm:number = this.lineCity.length
+       if (lenGm > 0) {
+         this.lineCity.splice(0, lenGm)
+       }
+       this.lineCity.push(...city)
+     }
+   }
 }
 </script>
 
