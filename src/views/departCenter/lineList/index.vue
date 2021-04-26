@@ -305,8 +305,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
+          checkStrictly: true
         }
       },
       listeners: {
@@ -325,8 +324,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
+          checkStrictly: true
         }
       },
       listeners: {
