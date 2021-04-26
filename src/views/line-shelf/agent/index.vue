@@ -21,7 +21,7 @@
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { LineLayout, NewLineAgent } from '../components'
 import RedundantLine from './RedundantLine.vue'
-import { getLineShelfNum } from '@/api/line-shelf'
+import { getLineShelfNum, abc12 } from '@/api/line-shelf'
 @Component({
   name: 'Agent',
   components: {
@@ -41,15 +41,25 @@ export default class extends Vue {
   }
   mounted() {
     this.getLineShelfNumSure()
+    this.qwwer()
   }
 
   private async getLineShelfNumSure() {
     try {
       const { data } = await getLineShelfNum()
-      console.log(data)
+      // console.log(data)
       if (data.success) {
         this.numImg = data.data
       }
+    } catch (error) {
+      return error
+    }
+  }
+
+  private async qwwer() {
+    try {
+      const { data } = await abc12()
+      console.log(data, '1212')
     } catch (error) {
       return error
     }

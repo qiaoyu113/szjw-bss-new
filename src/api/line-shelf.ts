@@ -132,3 +132,33 @@ export const getLineShelfCompletedNum = () => {
     url: `${produce}/v3/line/shelf/maintenance/getlineShelfNewCompletedNum`
   })
 }
+
+export const getCityList = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity`,
+    method: 'get'
+  })
+}
+
+// 获取外线销售
+export const getLineSale = (data:any) => {
+  return request({
+    url: `base/v2/base/user/getSpecifiedLowerUserListByCondition`,
+    method: 'POST',
+    data
+  })
+}
+
+// 获取城市
+export const getLineCity = () => {
+  return request({
+    url: `base_center/open/v1/area/getOpenCityData`,
+    method: 'get'
+  })
+}
+
+export const abc12 = () => {
+  return request({
+    url: `${produce}/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity`
+  })
+}
