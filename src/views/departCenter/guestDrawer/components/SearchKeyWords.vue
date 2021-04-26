@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-22 19:29:48
+ * @LastEditTime: 2021-04-26 09:07:45
  * @LastEditors: D.C.base
 -->
 <template>
@@ -56,16 +56,43 @@
           class="SuggestForm"
           :pc-col="8"
         >
-          <template slot="start">
+          <template slot="workTime">
+            <el-time-select
+              v-model="listQuery['jobStartDate']"
+              class="timeSelect"
+              placeholder="起始时间"
+              :picker-options="{
+                start: '00:00',
+                step: '01:00',
+                end: '23:00'
+              }"
+            />
+            <span style="padding:0 3px">-</span>
+            <el-time-select
+              v-model="listQuery['jobEndDate']"
+              class="timeSelect"
+              placeholder="结束时间"
+              :picker-options="{
+                start: '00:00',
+                step: '01:00',
+                end: '23:00',
+                minTime: listQuery['jobStartDate']
+              }"
+            />
+          </template>
+          <template slot="freight">
             <el-input
               v-model="listQuery.start"
               v-only-number="{min: 0, max: 20000, precision: 0}"
+              style="min-width:100px"
+              placeholder="请输入"
             />
-          </template>
-          <template slot="end">
+            <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.end"
               v-only-number="{min: 0, max: 20000, precision: 0}"
+              style="min-width:100px"
+              placeholder="请输入"
             />
           </template>
         </self-form>
@@ -110,6 +137,7 @@ interface IState {
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
+  private shareScopeEnd:IState[] = []
   private carLists:IState[] = [
     {
       value: '',
@@ -121,6 +149,9 @@ export default class SearchKeyWords extends Vue {
   private curSelecteds: [] = []
   private selectTitle: string = ''
   private selectedData: any[] = [];
+  private expectOptions: IState[] = [ // 期望货品类型
+    { label: '全部', value: '' }
+  ];
   private hardOptions: IState[] = [ // 装卸接受度
     { label: '全部', value: '' }
   ];
@@ -136,8 +167,8 @@ export default class SearchKeyWords extends Vue {
     hope: '', // 期望稳定/临时
     expectType: '', // 期望货品类型
     expectHard: '', // 期望配送难度
-    start: '',
-    end: '',
+    jobStartDate: '',
+    jobEndDate: '',
     f1: '',
     f2: '',
     address: '',
@@ -145,53 +176,26 @@ export default class SearchKeyWords extends Vue {
   }
   private formItem:any[] = [
     {
-      type: 2,
+      slot: true,
+      type: 'workTime',
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
         filterable: true,
         style: {
-          width: '100px'
+          width: '140px'
         }
       },
       label: '工作时间段',
-      col: 5,
-      key: 'f1',
-      options: this.timeLists
+      col: 8
     },
     {
-      type: 2,
-      col: 4,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true,
-        style: {
-          width: '100px'
-        }
-      },
-      label: ' ',
-      w: '20px',
-      key: 'f2',
-      class: 'end',
-      options: this.timeLists
-    },
-    {
-      type: 'start',
+      slot: true,
+      type: 'freight',
       label: '单趟运费区间',
       key: 'start',
       w: '110px',
-      col: 5,
-      slot: true
-    },
-    {
-      type: 'end',
-      label: ' ',
-      w: '20px',
-      key: 'end',
-      col: 3,
-      class: 'end',
-      slot: true
+      col: 8
     },
     {
       type: 8,
@@ -201,7 +205,14 @@ export default class SearchKeyWords extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityCountryData,
+          checkStrictly: true,
+          multiple: true
+        }
+      },
+      listeners: {
+        'change': (e:any[]) => {
+          this.handleCascaderChange(e, 'address')
         }
       },
       label: '现居住地址',
@@ -258,16 +269,7 @@ export default class SearchKeyWords extends Vue {
       title: '期望结算周期'
     },
     {
-      options: [{
-        value: '',
-        label: '全部'
-      }, {
-        value: '1',
-        label: '双皮奶'
-      }, {
-        value: '2',
-        label: '蚵仔煎'
-      }],
+      options: this.expectOptions,
       key: 'expectType',
       multiple: true,
       title: '期望货品类型'
@@ -320,6 +322,10 @@ export default class SearchKeyWords extends Vue {
               this.selectedData[index].optionIds.shift()
               this.selectedData[index].selected.shift()
             }
+            if (this.selectedData[index].selected[0] === '全部') {
+              this.selectedData[index].optionIds.shift()
+              this.selectedData[index].selected.shift()
+            }
             this.selectedData[index].optionIds.push(id)
             this.selectedData[index].selected.push(command)
           }
@@ -350,12 +356,13 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment']
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
         console.log(this.cycleOptions)
       } else {
         this.$message.error(res.errorMsg)
@@ -366,6 +373,34 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
+  }
+  // 级联框变化
+  handleCascaderChange(val:IState[], key:string) {
+    // 是否与上次的类型相同
+    let changeFlag = false
+    let changeItem:any = null
+    if (this.shareScopeEnd.length === 0) {
+      this.listQuery[key] = val
+    } else {
+      // 与原数组比对
+      this.listQuery[key].forEach((item:any[]) => {
+        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
+          changeFlag = true
+          changeItem = item
+        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
+          changeFlag = true
+          changeItem = item
+        }
+      })
+    }
+    if (changeFlag) {
+      this.listQuery[key] = []
+      this.listQuery[key].push(changeItem)
+    }
+    this.shareScopeEnd = this.listQuery[key]
   }
   mounted() {
     this.getOptions()

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-26 09:34:28
+ * @LastEditTime: 2021-04-26 09:39:16
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,10 +11,10 @@
       :visible.sync="isShow"
       title="给司机打标签"
       :confirm="confirm"
+      :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
       :destroy-on-close="false"
-      @closed="handleDialogClosed"
     >
       <self-form
         ref="setTagFrom"
@@ -49,6 +49,15 @@
               end: '23:00',
               minTime: listQuery['jobStartDate']
             }"
+          />
+        </template>
+        <template slot="expected">
+          <el-input
+            v-model.trim="listQuery['expected']"
+            v-only-number="{min: 0, max: 10000, precision: 1}"
+            style="width:100px;flex:initial"
+            :clearable="true"
+            placeholder="请输入期望运费"
           />
         </template>
         <template slot="endTime">
@@ -194,7 +203,6 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        multiple: true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityAndCountryData
@@ -205,6 +213,9 @@ export default class extends Vue {
         if (!visible) {
           _this.getData()
         }
+      },
+      change(e:any) {
+        _this.handleChange(e, 'prohibitionAddress')
       }
     },
     {
@@ -237,6 +248,9 @@ export default class extends Vue {
         if (!visible) {
           _this.getDataRegion()
         }
+      },
+      change(e:any) {
+        _this.handleChange(e, 'prohibitionRegion')
       }
     },
     {
@@ -276,9 +290,10 @@ export default class extends Vue {
       ]
     },
     {
-      type: 1,
+      slot: true,
+      type: 'expected',
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入期望运费',
         clearable: true
       },
       style: {
@@ -446,7 +461,16 @@ export default class extends Vue {
   }
   // 弹框关闭
   private handleDialogClosed() {
-    (this.$refs.setTagFrom as any).resetForm()
+    this.$confirm('是否放弃给司机打标签?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      (this.$refs.setTagFrom as any).resetForm()
+      this.isShow = false
+    }).catch(() => {
+
+    })
   }
   private getData() {
     setTimeout(async() => {
@@ -459,6 +483,9 @@ export default class extends Vue {
       let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
       this.$set(this.formItem[3], 'countyOptions', res)
     }, 100)
+  }
+  handleChange(val:IState[], key:string) {
+
   }
   // 验证通过
   handlePassChange() {
