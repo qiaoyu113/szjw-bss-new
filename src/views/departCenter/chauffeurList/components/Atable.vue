@@ -292,21 +292,32 @@
         </template>
       </el-table-column>
     </el-table>
+    <make-call
+      ref="driverCall"
+      :phone="phone"
+      :call-id="callId"
+    />
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'chauffeurTable'
+  name: 'chauffeurTable',
+  components: {
+    MakeCall
+  }
 })
 export default class extends Vue {
   @Prop({ default: false }) isMore!: boolean;
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
   @Prop({ default: () => [] }) opType!: number[];
+  private phone:string = '15021578502'
+  private callId:string = '123'
   private tableData: IState[] = [
     {
       driverName: '张道松',
@@ -376,7 +387,8 @@ export default class extends Vue {
   }
   // 外呼
   handleCall(row:IState) {
-    this.$emit('call', row)
+    // this.$emit('call', row);
+    (this.$refs.driverCall as any).handleCallClick()
   }
   // 打标签
   handleTag(row:IState) {

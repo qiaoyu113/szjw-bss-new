@@ -17,7 +17,6 @@
       <el-table-column
         min-width="70"
         label=""
-        align="left"
         class-name="firstColumn"
       >
         <template slot-scope="scope">
@@ -41,16 +40,7 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <!-- <div
-            v-if="isShowPercent"
-            class="percent"
-          >
-            匹配度{{ row.percent }}%
-          </div> -->
-
-          <router-link to="#">
-            {{ row.a }}
-          </router-link>
+          {{ row.a }}
           <el-popover
             placement="right"
             width="200"
@@ -91,6 +81,7 @@
       <el-table-column
         label="车辆"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -110,6 +101,7 @@
       <el-table-column
         label="配送信息"
         min-width="240"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -129,6 +121,7 @@
       <el-table-column
         label="结算"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -154,6 +147,7 @@
       <el-table-column
         label="线路特点"
         min-width="200"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -182,6 +176,7 @@
       <el-table-column
         label="标签"
         min-width="100"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -201,6 +196,7 @@
       <el-table-column
         label="状态"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -229,6 +225,7 @@
         label="操作"
         fixed="right"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">

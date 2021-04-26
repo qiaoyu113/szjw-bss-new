@@ -8,6 +8,9 @@ export interface PhoneState {
   originCallNo:string; // 呼入被叫的手机号
   callerProvince:string;
   callerCity:string;
+  url:string;
+  proxyUrl:string;
+  qhbUrl:string;
 }
 
 interface IState {
@@ -22,6 +25,9 @@ class Phone extends VuexModule implements PhoneState {
   public originCallNo = ''
   public callerProvince = ''
   public callerCity = ''
+  public url = ''
+  public proxyUrl = ''
+  public qhbUrl = ''
 
   @Mutation
   private CHANGE_PHONE(payload: IState) {
