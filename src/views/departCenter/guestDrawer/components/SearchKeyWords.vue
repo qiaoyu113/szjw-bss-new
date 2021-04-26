@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-26 09:04:00
+ * @LastEditTime: 2021-04-26 09:07:45
  * @LastEditors: D.C.base
 -->
 <template>
@@ -149,6 +149,9 @@ export default class SearchKeyWords extends Vue {
   private curSelecteds: [] = []
   private selectTitle: string = ''
   private selectedData: any[] = [];
+  private expectOptions: IState[] = [ // 期望货品类型
+    { label: '全部', value: '' }
+  ];
   private hardOptions: IState[] = [ // 装卸接受度
     { label: '全部', value: '' }
   ];
@@ -266,16 +269,7 @@ export default class SearchKeyWords extends Vue {
       title: '期望结算周期'
     },
     {
-      options: [{
-        value: '',
-        label: '全部'
-      }, {
-        value: '1',
-        label: '双皮奶'
-      }, {
-        value: '2',
-        label: '蚵仔煎'
-      }],
+      options: this.expectOptions,
       key: 'expectType',
       multiple: true,
       title: '期望货品类型'
@@ -362,12 +356,13 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment']
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
         console.log(this.cycleOptions)
       } else {
         this.$message.error(res.errorMsg)
