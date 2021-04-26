@@ -1,6 +1,6 @@
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
@@ -152,7 +152,6 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
-  private timeLists:IState[] = []
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
@@ -272,32 +271,6 @@ export default class extends Vue {
       label: '工作时间段',
       slot: true
     },
-    // {
-    //   type: 2,
-    //   tagAttrs: {
-    //     placeholder: '请选择',
-    //     clearable: true,
-    //     filterable: true
-    //   },
-    //   col: 5,
-    //   label: '工作时间段',
-    //   key: 'f1',
-    //   options: this.timeLists
-    // },
-    // {
-    //   type: 2,
-    //   tagAttrs: {
-    //     placeholder: '请选择',
-    //     clearable: true,
-    //     filterable: true
-    //   },
-    //   label: ' ',
-    //   w: '20px',
-    //   key: 'f2',
-    //   col: 3,
-    //   class: 'end',
-    //   options: this.timeLists
-    // },
     {
       type: 8,
       tagAttrs: {
@@ -444,12 +417,14 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true;
-      (this.$refs.lineTable as any).getLists()
+      this.listLoading = true
+      setTimeout(() => {
+        (this.$refs.lineTable as any).getLists()
+      }, 1000)
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
       //
     }
   }
@@ -525,21 +500,16 @@ export default class extends Vue {
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
-    for (let i = 0; i < 24; i++) {
-      let count = i < 9 ? `0${i}:00` : `${i}:00`
-      this.timeLists.push({
-        label: count,
-        value: count
-      })
-    }
   }
   mounted() {
     this.init()
+    this.getLists()
   }
 }
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
+    height:100%;
     .btnPc {
        width: 100%;
        display: flex;

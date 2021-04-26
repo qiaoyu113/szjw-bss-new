@@ -372,7 +372,13 @@ export default class extends Vue {
   }
   // 查看详情
   handleDetailClick(row:IState) {
-
+    let { href } = this.$router.resolve({
+      path: `/lineshelf/linedetail`,
+      query: {
+        id: 'XL202104250009'
+      }
+    })
+    window.open(href, '_blank')
   }
   // 获取列表数据
   async getLists() {
@@ -412,7 +418,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
-      //
+      (this.$parent as any).listLoading = false
     }
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
@@ -420,11 +426,7 @@ export default class extends Vue {
     sessionStorage.removeItem(key)
   }
   mounted() {
-    if (!this.isMore) {
-      setTimeout(() => {
-        this.getLists()
-      }, 500)
-    } else if (this.isMore && !this.isShowPercent) {
+    if (this.isMore && !this.isShowPercent) {
       let str = sessionStorage.getItem(key) || ''
       if (str) {
         this.tableData = [JSON.parse(str)]
