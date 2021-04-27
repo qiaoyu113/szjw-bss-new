@@ -32,7 +32,7 @@
           ref="lineDrawer"
           :list-query="listQueryLine"
           obj="{}"
-          :is-more="true"
+          :is-more="false"
           @cancelTryRun="handleCancelTryRun1"
         />
       </div>
