@@ -28,6 +28,7 @@
         @checkData="checkData"
         @allotSome="allotSome"
         @chooseCity="chooseCity"
+        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
@@ -191,10 +192,13 @@ export default class extends Vue {
     try {
       console.log('getList', this.listQuery)
       this.listLoading = true
+      setTimeout(() => {
+        (this.$refs.Atable as any).getLists()
+      }, 1000)
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
       //
     }
   }
@@ -217,11 +221,21 @@ export default class extends Vue {
     }
     this.getLists()
   }
+  init() {
+    this.getLists()
+  }
+  activated() {
+    this.getLists()
+  }
+  mounted() {
+    this.init()
+  }
 }
 
 </script>
 <style lang="scss" scoped>
 .chauffeurListContainer {
+  height:100%;
   .table_box {
     padding: 30px 30px 0px;
     background: #ffffff;

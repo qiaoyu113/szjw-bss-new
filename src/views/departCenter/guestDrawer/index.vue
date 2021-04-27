@@ -32,15 +32,15 @@
           ref="tableDriver"
           :list-query="listQueryDriver"
           :is-more="true"
-          :op-type="[2,3,4,5]"
-          @call="setCallHandle"
+          :is-show-percent="true"
+          :op-type="[3,4,5]"
           @tag="setTagHandle"
+          @call="setCallHandle"
           @creatRun="creatRunHandle"
           @detail="detailHandle"
         />
       </div>
     </section>
-
     <SetTag ref="tagShow" />
     <CreateTryRun
       ref="tryRunShow"

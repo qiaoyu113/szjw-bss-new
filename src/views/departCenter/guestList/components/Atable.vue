@@ -309,21 +309,6 @@
               </el-button>
             </div>
           </div>
-          <div class="item">
-            <div class="title">
-              撮合信息:
-            </div>
-            <div class="content">
-              <el-button
-                v-for="item in row.crr"
-                :key="item"
-                size="mini"
-                class="btn"
-              >
-                {{ item }}
-              </el-button>
-            </div>
-          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -380,7 +365,7 @@ export default class extends Vue {
   async getLists() {
     try {
       let num:number = 3
-      if (this.isMore) {
+      if (this.isMore && !this.isShowPercent) {
         num = 1
       }
       this.tableData = []
@@ -414,7 +399,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
-      (this.$parent as any).listLoading = false
+      this.$emit('closeLoading')
     }
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
@@ -427,6 +412,8 @@ export default class extends Vue {
       if (str) {
         this.tableData = [JSON.parse(str)]
       }
+    } else if (this.isMore && this.isShowPercent) {
+      this.getLists()
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="makeCall">
-    <h4>
+    <h4 v-if="isShowOp">
       <div class="status">
         通话状态:
         <template v-if="status === 1">
@@ -42,6 +42,7 @@ import { callPhone, hangUp, startRecordTime, clearTimer } from './phone'
 export default class extends Vue {
   @Prop({ default: '' }) phone!:string
   @Prop({ default: '' }) callId!:string
+  @Prop({ default: true }) isShowOp!:boolean
   /**
    *外呼状态变化
    *1:初始状态
