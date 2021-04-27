@@ -54,7 +54,7 @@
               v-model="listQuery.repoLoc"
               placeholder="请选择"
               clearable
-              :props="{checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
+              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
             />
           </el-form-item>
           <el-form-item
@@ -65,7 +65,7 @@
               v-model="listQuery.distLoc"
               placeholder="请选择"
               clearable
-              :props="{checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
+              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
             />
           </el-form-item>
           <el-form-item>
