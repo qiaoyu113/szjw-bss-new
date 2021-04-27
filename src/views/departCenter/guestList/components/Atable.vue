@@ -15,23 +15,32 @@
       :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
-        label="基础信息"
-        min-width="220"
-        align="center"
+        min-width="70"
+        label=""
         class-name="firstColumn"
       >
-        <template slot-scope="{row}">
+        <template slot-scope="scope">
           <div class="arrow" />
-          <!-- <div
+          <div
             v-if="isShowPercent"
             class="percent"
           >
-            匹配度{{ row.percent }}%
-          </div> -->
-
-          <router-link to="#">
-            {{ row.a }}
-          </router-link>
+            <template v-if="(scope.$index +1) > 9">
+              {{ scope.$index +1 }}
+            </template>
+            <template v-else>
+              {{ '0'+ (scope.$index + 1) }}
+            </template>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="基础信息"
+        min-width="220"
+        align="center"
+      >
+        <template slot-scope="{row}">
+          {{ row.a }}
           <el-popover
             placement="right"
             width="200"
@@ -72,6 +81,7 @@
       <el-table-column
         label="车辆"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -91,6 +101,7 @@
       <el-table-column
         label="配送信息"
         min-width="240"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -110,6 +121,7 @@
       <el-table-column
         label="结算"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -135,6 +147,7 @@
       <el-table-column
         label="线路特点"
         min-width="200"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -163,6 +176,7 @@
       <el-table-column
         label="标签"
         min-width="100"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -182,6 +196,7 @@
       <el-table-column
         label="状态"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -210,6 +225,7 @@
         label="操作"
         fixed="right"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -353,12 +369,18 @@ export default class extends Vue {
   }
   // 查看详情
   handleDetailClick(row:IState) {
-
+    let { href } = this.$router.resolve({
+      path: `/lineshelf/linedetail`,
+      query: {
+        id: 'XL202104250009'
+      }
+    })
+    window.open(href, '_blank')
   }
   // 获取列表数据
   async getLists() {
     try {
-      let num:number = 5
+      let num:number = 30
       if (this.isMore) {
         num = 1
       }
@@ -393,7 +415,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
-      //
+      (this.$parent as any).listLoading = false
     }
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
@@ -401,11 +423,7 @@ export default class extends Vue {
     sessionStorage.removeItem(key)
   }
   mounted() {
-    if (!this.isMore) {
-      setTimeout(() => {
-        this.getLists()
-      }, 500)
-    } else if (this.isMore && !this.isShowPercent) {
+    if (this.isMore && !this.isShowPercent) {
       let str = sessionStorage.getItem(key) || ''
       if (str) {
         this.tableData = [JSON.parse(str)]
@@ -437,10 +455,10 @@ export default class extends Vue {
     }
     .percent {
       position: absolute;
-      top: 35px;
+      top: 50px;
       left: 7px;
       font-size: 12px;
-      color: #639DEC;
+      color: #444444;
       text-align: center;
       width: 40px;
       line-height: 14px;

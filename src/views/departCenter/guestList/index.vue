@@ -1,6 +1,6 @@
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
@@ -73,6 +73,11 @@
           v-only-number="{min: 0, max: 20000, precision: 0}"
         /> -->
       </template>
+      <template slot="time">
+        <timeSelect
+          v-model="listQuery.time"
+        />
+      </template>
     </self-form>
     <!-- 表格 -->
     <div
@@ -116,6 +121,7 @@ import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
+import TimeSelect from '../chauffeurList/components/timeSelect.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -133,7 +139,8 @@ interface IState {
     Pagination,
     GuestDrawer,
     CancelTryRun,
-    InputRange
+    InputRange,
+    TimeSelect
   }
 })
 export default class extends Vue {
@@ -145,7 +152,6 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
-  private timeLists:IState[] = []
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
@@ -156,7 +162,8 @@ export default class extends Vue {
     f1: '',
     f2: '',
     key: '',
-    g: []
+    g: [],
+    time: []
   }
   private formItem:any[] = [
     {
@@ -259,30 +266,10 @@ export default class extends Vue {
       slot: true
     },
     {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      col: 5,
+      type: 'time',
+      key: 'time',
       label: '工作时间段',
-      key: 'f1',
-      options: this.timeLists
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: ' ',
-      w: '20px',
-      key: 'f2',
-      col: 3,
-      class: 'end',
-      options: this.timeLists
+      slot: true
     },
     {
       type: 8,
@@ -292,13 +279,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
-        }
-      },
-      listeners: {
-        'change': (e:any[]) => {
-          this.handleCascaderChange(e, 'g')
+          checkStrictly: true
         }
       },
       label: '仓库位置',
@@ -313,13 +294,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
-        }
-      },
-      listeners: {
-        'change': (e:any[]) => {
-          this.handleCascaderChange(e, 'i')
+          checkStrictly: true
         }
       },
       label: '配送区域',
@@ -418,16 +393,21 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    if (this.listQuery.start.length === 1) {
+    // 单趟运费区间
+    const moneyRange = (this.listQuery.start || []).filter((item:string | number) => item !== '')
+    if (moneyRange.length === 1) {
       return this.$message.warning('单趟运费输入不完整')
-    } else if (this.listQuery.start.length === 2) {
-      if (Number(this.listQuery.start[0]) > Number(this.listQuery.start[1])) {
+    } else if (moneyRange.length === 2) {
+      if (Number(moneyRange[0]) > Number(moneyRange[1])) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
     }
-    if (this.listQuery.f1 && this.listQuery.f2 && (this.listQuery.f1 === this.listQuery.f2)) {
-      return this.$message.warning('起始时间与结束时间差>=1小时')
+    // 工作时间段
+    const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
+    if (timeRange.length === 1) {
+      return this.$message.warning('工作时间段输入不完整')
     }
+
     this.getLists()
   }
   // 重置
@@ -437,12 +417,14 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true;
-      (this.$refs.lineTable as any).getLists()
+      this.listLoading = true
+      setTimeout(() => {
+        (this.$refs.lineTable as any).getLists()
+      }, 1000)
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
       //
     }
   }
@@ -487,52 +469,47 @@ export default class extends Vue {
     }
   }
   // 级联框变化
-  handleCascaderChange(val:IState[], key:string) {
-    // 是否与上次的类型相同
-    let changeFlag = false
-    let changeItem:any = null
-    if (this.shareScopeEnd.length === 0) {
-      this.listQuery[key] = val
-    } else {
-      // 与原数组比对
-      this.listQuery[key].forEach((item:any[]) => {
-        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
-          changeFlag = true
-          changeItem = item
-        }
-      })
-    }
-    if (changeFlag) {
-      this.listQuery[key] = []
-      this.listQuery[key].push(changeItem)
-    }
-    this.shareScopeEnd = this.listQuery[key]
-  }
+  // handleCascaderChange(val:IState[], key:string) {
+  //   // 是否与上次的类型相同
+  //   let changeFlag = false
+  //   let changeItem:any = null
+  //   if (this.shareScopeEnd.length === 0) {
+  //     this.listQuery[key] = val
+  //   } else {
+  //     // 与原数组比对
+  //     this.listQuery[key].forEach((item:any[]) => {
+  //       if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
+  //         changeFlag = true
+  //         changeItem = item
+  //       } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
+  //         // changeFlag = true
+  //         // changeItem = item
+  //       } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
+  //         changeFlag = true
+  //         changeItem = item
+  //       }
+  //     })
+  //   }
+  //   if (changeFlag) {
+  //     this.listQuery[key] = []
+  //     this.listQuery[key].push(changeItem)
+  //   }
+  //   this.shareScopeEnd = this.listQuery[key]
+  // }
 
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
-    for (let i = 0; i < 24; i++) {
-      let count = i < 9 ? `0${i}:00` : `${i}:00`
-      this.timeLists.push({
-        label: count,
-        value: count
-      })
-    }
   }
   mounted() {
     this.init()
+    this.getLists()
   }
 }
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
+    height:100%;
     .btnPc {
        width: 100%;
        display: flex;
