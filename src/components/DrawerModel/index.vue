@@ -11,7 +11,7 @@
     :visible.sync="visible"
     :with-header="false"
     :modal-append-to-body="false"
-    size="80%"
+    size="84%"
     top="84px"
     :modal="false"
     @close="closeHandle"
