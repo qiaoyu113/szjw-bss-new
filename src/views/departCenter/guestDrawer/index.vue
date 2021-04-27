@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 14:39:11
+ * @LastEditTime: 2021-04-27 14:41:13
  * @LastEditors: D.C.base
 -->
 <template>
@@ -57,7 +57,6 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
-import { getDocumentRect, on } from '@/utils/dom'
 interface IState {
   [key: string]: any;
 }
