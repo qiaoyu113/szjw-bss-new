@@ -14,7 +14,13 @@
         fit
         :header-cell-style="{padding: '6px 20px'}"
         :cell-style="{padding: '5px 20px'}"
+        @select="handleSelect"
+        @select-all="handleSelectAll"
       >
+        <el-table-column
+          type="selection"
+          width="80"
+        />
         <!-- <el-table-column
           label=""
           width="50"
@@ -35,7 +41,6 @@
         </el-table-column> -->
         <el-table-column
           label="基础信息"
-          width="220"
           align="center"
           class-name="firstColumn"
         >
@@ -94,7 +99,6 @@
         </el-table-column>
         <el-table-column
           label="配送信息"
-          width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -128,7 +132,6 @@
         </el-table-column>
         <el-table-column
           label="线路特点"
-          width="220"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -148,7 +151,7 @@
         </el-table-column>
         <el-table-column
           label="标签"
-          width="180"
+          width="140"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -360,8 +363,52 @@ export default class extends Vue {
         intention: 1, // 1:待确认意向
         customInviteStatus: 1// 1:客邀成功
       }
+    },
+    {
+      percent: 80,
+      id: 2,
+      arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
+      brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
+      crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+      isOpen: false,
+      basicInfo: {
+        name: '京东传站',
+        post: '李外线经理',
+        lineId: 'XL202012300377',
+        introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...'
+      },
+      carInfo: {
+        type: '4.2米厢货',
+        feature: '油车',
+        rules: ['能闯禁行', '能闯限行', '共享']
+      },
+      warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
+      sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
+      Settlement: {
+        onceFreight: 500,
+        monthFreight: 500,
+        period: 1,
+        days: 7
+      },
+      lineTrait: {
+        product: '食品/团购',
+        handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
+        sendtype: 1, // 1:整车
+        settlementDays: 7,
+        time: '9:00~18:00'
+      },
+      label: ['爆款', '客急', '客邀线'],
+      status: {
+        name: '老王',
+        state: 1, // 1:已上架
+        iscustomInvite: 1, // 1:已发起客邀
+        intention: 1, // 1:待确认意向
+        customInviteStatus: 1// 1:客邀成功
+      }
     }
   ]
+
+  private multipleSelection:IState[] = []
 
   mounted() {
     console.log(this.listQuery)
@@ -369,7 +416,7 @@ export default class extends Vue {
   }
 
   init() {
-    this.getLineInfo(this.listQuery)
+    // this.getLineInfo(this.listQuery)
   }
   // 调用接口获取表单数据
   async getLineInfo(params:IState) {
@@ -403,6 +450,14 @@ export default class extends Vue {
   // 发起客邀
   handleLaunchGuest() {
     this.$emit('launchGuest')
+  }
+  // 选择事件
+  handleSelect(selection:[], row:{}) {
+    console.log(selection, row)
+  }
+  // 全选
+  handleSelectAll(selection:[]) {
+    console.log(selection)
   }
 }
 </script>
