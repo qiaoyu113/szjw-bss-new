@@ -200,7 +200,7 @@
               size="small"
               @click.stop="handleDetail"
             >
-              查看详情
+              司机详情
             </el-button>
           </p>
           <!-- type="3" -->

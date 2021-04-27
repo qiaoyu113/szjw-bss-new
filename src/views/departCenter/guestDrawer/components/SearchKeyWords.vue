@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-27 13:45:04
+ * @LastEditTime: 2021-04-27 17:23:52
  * @LastEditors: D.C.base
 -->
 <template>
@@ -36,6 +36,7 @@
         <div class="formbox">
           <el-input
             v-model="listQuery.keyWords"
+            size="small"
             placeholder="请输入司机姓名/编号"
             suffix-icon="el-icon-search"
           />
@@ -90,6 +91,7 @@
             <el-input
               v-model="listQuery.end"
               v-only-number="{min: 0, max: 20000, precision: 0}"
+              :disabled="!listQuery.start"
               style="min-width:100px"
               placeholder="请输入"
             />
@@ -386,6 +388,18 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
+    // 单趟运费区间
+    if (!this.listQuery.start || !this.listQuery.end) {
+      return this.$message.warning('单趟运费输入不完整')
+    } else {
+      if (Number(this.listQuery.start) > Number(this.listQuery.end)) {
+        return this.$message.warning('单趟运费起始金额不能大于终止金额')
+      }
+    }
+    // 工作时间段
+    if (!this.listQuery.jobStartDate || this.listQuery.jobEndDate) {
+      return this.$message.warning('工作时间段输入不完整')
+    }
   }
   // 级联框变化
   handleCascaderChange(val:IState[], key:string) {
@@ -450,6 +464,9 @@ export default class SearchKeyWords extends Vue {
     i{
       color: #606060 !important;
     }
+  }
+  ::v-deep .el-button{
+    height: 32px !important;
   }
   ::v-deep  .el-form-item__label{
    color: #4b4b4b !important;

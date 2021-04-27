@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 15:02:31
+ * @LastEditTime: 2021-04-27 17:30:40
  * @LastEditors: D.C.base
 -->
 <template>
@@ -61,6 +61,14 @@ export default class DrawerModel extends Vue {
   height: 100%;
   background:rgba(0,0,0,0.5);
   padding-left: 20%;
+  >div{
+    height: 100%;
+    overflow: auto;
+    background:#e6e9f0 ;
+  }
+}
+.isDrawer .el-drawer__wrapper{
+  top: 84px;
 }
 ::v-deep .el-drawer{
     background: transparent;

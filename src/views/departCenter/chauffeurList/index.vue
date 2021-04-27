@@ -2,8 +2,10 @@
   <div
     v-loading="listLoading"
     class="chauffeurListContainer"
+    :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC
+      p15: isPC,
+      isDrawer: showDrawer
     }"
   >
     <!-- 查询表单 -->
