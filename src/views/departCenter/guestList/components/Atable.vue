@@ -8,7 +8,6 @@
       stripe
       highlight-current-row
       size="mini"
-      row-key="id"
       :row-style="{height: '20px'}"
       fit
       :header-cell-style="{padding: '6px 20px'}"
@@ -380,7 +379,7 @@ export default class extends Vue {
   // 获取列表数据
   async getLists() {
     try {
-      let num:number = 30
+      let num:number = 3
       if (this.isMore) {
         num = 1
       }

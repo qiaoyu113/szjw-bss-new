@@ -60,18 +60,8 @@
       <template slot="start">
         <input-range
           v-model="listQuery.start"
-          :range="[0,20000]"
+          v-only-number="{min: 1, max: 19999, precision: 0}"
         />
-        <!-- <el-input
-          v-model="listQuery.start"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
-      <template slot="end">
-        <el-input
-          v-model="listQuery.end"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        /> -->
       </template>
       <template slot="time">
         <timeSelect
@@ -468,34 +458,6 @@ export default class extends Vue {
       //
     }
   }
-  // 级联框变化
-  // handleCascaderChange(val:IState[], key:string) {
-  //   // 是否与上次的类型相同
-  //   let changeFlag = false
-  //   let changeItem:any = null
-  //   if (this.shareScopeEnd.length === 0) {
-  //     this.listQuery[key] = val
-  //   } else {
-  //     // 与原数组比对
-  //     this.listQuery[key].forEach((item:any[]) => {
-  //       if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
-  //         changeFlag = true
-  //         changeItem = item
-  //       } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
-  //         // changeFlag = true
-  //         // changeItem = item
-  //       } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
-  //         changeFlag = true
-  //         changeItem = item
-  //       }
-  //     })
-  //   }
-  //   if (changeFlag) {
-  //     this.listQuery[key] = []
-  //     this.listQuery[key].push(changeItem)
-  //   }
-  //   this.shareScopeEnd = this.listQuery[key]
-  // }
 
   init() {
     this.getDictList();
@@ -549,10 +511,6 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-  .GuestListContainer >>> .end .el-form-item__label::before {
-    content:'~';
-    color: #9e9e9e;
-  }
   .isDrawer >>> .el-drawer__wrapper {
     top:84px;
   }
