@@ -14,6 +14,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column
+        v-if="!isMore"
         type="selection"
         width="55"
       />
@@ -337,6 +338,7 @@
     </el-table>
     <make-call
       ref="driverCall"
+      :is-show-op="false"
       :phone="phone"
       :call-id="callId"
     />
@@ -345,6 +347,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
+const key = 'driver_row'
 interface IState {
   [key: string]: any;
 }
@@ -366,104 +369,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) opType!: number[];
   private phone:string = '15021578502'
   private callId:string = '123'
-  private tableData: IState[] = [
-    {
-      driverName: '张道松',
-      manager: '李加盟经理',
-      driverId: 'SJ20210415',
-      phoneNum: '132000000000',
-      a: '京东传站',
-      b: '李外线经理',
-      lineId: 'XL202012300377',
-      c: '3',
-      d: '4.2米厢货',
-      e: '油车',
-      f: '能闯禁行',
-      g: '能闯限行行',
-      h: '共享',
-      p1: '湖南省',
-      c1: '长沙市',
-      c2: '短沙县',
-      m1: 500,
-      time: '9:00~18:00',
-      percent: 80,
-      id: 1,
-      arr: [
-        '商贸信息',
-        '已创建30条线路',
-        '15条在跑',
-        '5条线路已掉线',
-        '3条线路在上架找车'
-      ],
-      brr: [
-        '1个点',
-        '每日1趟',
-        '每月12天',
-        '每趟120公里',
-        '走高速',
-        '回单',
-        '城配线',
-        '稳定(2个月)'
-      ],
-      crr: [
-        '已发起3次客邀',
-        '已创建意向3次',
-        '试跑失败2次',
-        '司机爽约1次',
-        '扭头就走1次',
-        '掉线1次'
-      ],
-      isOpen: false
-    },
-    {
-      driverName: '张道松00',
-      manager: '李加盟经理',
-      driverId: 'SJ20210415',
-      phoneNum: '132000000000',
-      a: '京东传站',
-      b: '李外线经理',
-      lineId: 'XL202012300377',
-      c: '3',
-      d: '4.2米厢货',
-      e: '油车',
-      f: '能闯禁行',
-      g: '能闯限行行',
-      h: '共享',
-      p1: '湖南省',
-      c1: '长沙市',
-      c2: '短沙县',
-      m1: 500,
-      time: '9:00~18:00',
-      percent: 80,
-      id: 1,
-      arr: [
-        '商贸信息',
-        '已创建30条线路',
-        '15条在跑',
-        '5条线路已掉线',
-        '3条线路在上架找车'
-      ],
-      brr: [
-        '1个点',
-        '每日1趟',
-        '每月12天',
-        '每趟120公里',
-        '走高速',
-        '回单',
-        '城配线',
-        '稳定(2个月)'
-      ],
-      crr: [
-        '已发起3次客邀',
-        '已创建意向3次',
-        '试跑失败2次',
-        '司机爽约1次',
-        '扭头就走1次',
-        '掉线1次'
-      ],
-      isOpen: false
-    }
-  ];
+  private tableData: IState[] = [];
   handleSelectionChange(val: IState[]) {
     this.$emit('checkData', val)
   }
@@ -516,6 +422,82 @@ export default class extends Vue {
   // 更换工作城市
   handleChooseCity(val: IState) {
     this.$emit('chooseCity', val)
+  }
+  // 获取列表数据
+  async getLists() {
+    try {
+      let num:number = 3
+      if (this.isMore && !this.isShowPercent) {
+        num = 1
+      }
+      this.tableData = []
+      for (let i = 0; i < num; i++) {
+        let obj:IState = {
+          driverName: '张道松',
+          manager: '李加盟经理',
+          driverId: 'SJ20210415',
+          phoneNum: '132000000000',
+          a: '京东传站',
+          b: '李外线经理',
+          lineId: 'XL202012300377',
+          c: '3',
+          d: '4.2米厢货',
+          e: '油车',
+          f: '能闯禁行',
+          g: '能闯限行行',
+          h: '共享',
+          p1: '湖南省',
+          c1: '长沙市',
+          c2: '短沙县',
+          m1: 500,
+          time: '9:00~18:00',
+          percent: 80,
+          id: 1,
+          arr: [
+            '商贸信息',
+            '已创建30条线路',
+            '15条在跑',
+            '5条线路已掉线',
+            '3条线路在上架找车'
+          ],
+          brr: [
+            '1个点',
+            '每日1趟',
+            '每月12天',
+            '每趟120公里',
+            '走高速',
+            '回单',
+            '城配线',
+            '稳定(2个月)'
+          ],
+          crr: [
+            '已发起3次客邀',
+            '已创建意向3次',
+            '试跑失败2次',
+            '司机爽约1次',
+            '扭头就走1次',
+            '掉线1次'
+          ]
+        }
+        obj.isOpen = false
+        obj.id = (i + 1)
+        this.tableData.push({ ...obj })
+      }
+    } catch (err) {
+      console.log(`get list fail fail:${err}`)
+    } finally {
+      this.$emit('closeLoading')
+    }
+  }
+  mounted() {
+    if (this.isMore && !this.isShowPercent) {
+      let str = sessionStorage.getItem(key) || ''
+      if (str) {
+        this.tableData = [JSON.parse(str)]
+      }
+    } else if (this.isMore && this.isShowPercent) {
+      this.getLists()
+    }
   }
 }
 </script>
