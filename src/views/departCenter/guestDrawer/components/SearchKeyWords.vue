@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-26 09:07:45
+ * @LastEditTime: 2021-04-27 13:45:04
  * @LastEditors: D.C.base
 -->
 <template>
@@ -75,8 +75,7 @@
               :picker-options="{
                 start: '00:00',
                 step: '01:00',
-                end: '23:00',
-                minTime: listQuery['jobStartDate']
+                end: '23:00'
               }"
             />
           </template>
@@ -126,7 +125,7 @@
 import { GetDictionaryList } from '@/api/common'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
@@ -138,6 +137,8 @@ interface IState {
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
   private shareScopeEnd:IState[] = []
+  private citysArry: any[] = []
+  private levelData: any = {}
   private carLists:IState[] = [
     {
       value: '',
@@ -148,7 +149,13 @@ export default class SearchKeyWords extends Vue {
   private key: string = '' // 当前选项是否是多选
   private curSelecteds: [] = []
   private selectTitle: string = ''
-  private selectedData: any[] = [];
+  private selectedData: any[] = [
+    {
+      type: '工作时间段',
+      optionIds: [],
+      selected: ['9:00-18:00']
+    }
+  ];
   private expectOptions: IState[] = [ // 期望货品类型
     { label: '全部', value: '' }
   ];
@@ -173,6 +180,12 @@ export default class SearchKeyWords extends Vue {
     f2: '',
     address: '',
     keyWords: ''
+  }
+  @Watch('listQuery.jobStartDate')
+  onlistQueryChanged(val: any, oldVal: any) {
+    if (this.selectedData[0].type === '工作时间段') {
+      this.selectedData.splice(0, 1)
+    }
   }
   private formItem:any[] = [
     {
@@ -376,30 +389,38 @@ export default class SearchKeyWords extends Vue {
   }
   // 级联框变化
   handleCascaderChange(val:IState[], key:string) {
-    // 是否与上次的类型相同
-    let changeFlag = false
-    let changeItem:any = null
     if (this.shareScopeEnd.length === 0) {
       this.listQuery[key] = val
-    } else {
-      // 与原数组比对
-      this.listQuery[key].forEach((item:any[]) => {
-        if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
-          changeFlag = true
-          changeItem = item
-        } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
-          changeFlag = true
-          changeItem = item
-        }
-      })
     }
-    if (changeFlag) {
-      this.listQuery[key] = []
-      this.listQuery[key].push(changeItem)
+    this.levelData = {}
+    this.listQuery[key].forEach((item:any) => {
+      if (!this.levelData[item[1]]) {
+        this.levelData[item[1]] = []
+      }
+      if (this.levelData[item[1]].indexOf(item[2]) === -1 && item[2] !== undefined) {
+        this.levelData[item[1]].push(item[2])
+      }
+    })
+
+    let cityNum = 0
+    for (let itemKey in this.levelData) {
+      cityNum++
+      if (cityNum > 2) {
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(parseInt(itemKey)) === -1
+        })
+        this.$message.error('最多选择两个市')
+      }
+      if (this.levelData[itemKey].length > 2) {
+        let code = this.levelData[itemKey][2]
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(code) === -1
+        })
+        console.log(this.listQuery[key])
+        this.$message.error('一个市下最多选择两个区')
+      }
     }
+    console.log(this.listQuery[key])
     this.shareScopeEnd = this.listQuery[key]
   }
   mounted() {

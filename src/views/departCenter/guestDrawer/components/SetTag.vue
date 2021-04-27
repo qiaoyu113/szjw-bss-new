@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-26 09:49:50
+ * @LastEditTime: 2021-04-27 14:28:05
  * @LastEditTime: 2021-04-26 09:34:28
  * @LastEditors: D.C.base
 -->
@@ -97,7 +97,7 @@
           <div class="tags">
             <el-radio-group
               v-model="listQuery.remark"
-              size="small"
+              size="mini"
             >
               <el-radio
                 v-for="(item,index) in reasonLists"
@@ -118,7 +118,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryData } from '../../js/index'
+import { getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
 interface IState {
   [key: string]: any;
 }
@@ -206,17 +206,14 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityData
         }
       },
       countyOptions: [],
       listeners(visible:boolean) {
         if (!visible) {
-          _this.getData()
+          _this.getCountryData('prohibitionAddress', 1)
         }
-      },
-      change(e:any) {
-        _this.handleChange(e, 'prohibitionAddress')
       }
     },
     {
@@ -241,17 +238,14 @@ export default class extends Vue {
         multiple: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityData
         }
       },
       countyOptions: [],
       listeners(visible:boolean) {
         if (!visible) {
-          _this.getDataRegion()
+          _this.getCountryData('prohibitionRegion', 3)
         }
-      },
-      change(e:any) {
-        _this.handleChange(e, 'prohibitionRegion')
       }
     },
     {
@@ -334,7 +328,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       label: '起始点',
@@ -369,7 +363,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       label: '配送点',
@@ -473,21 +467,14 @@ export default class extends Vue {
 
     })
   }
-  private getData() {
+  private getCountryData(key:string, index:number) {
     setTimeout(async() => {
-      let res = await getProvinceList(['100000', ...this.listQuery.prohibitionAddress])
-      this.$set(this.formItem[1], 'countyOptions', res)
+      if (!this.listQuery[key]) return false
+      let res = await getProvinceList(['100000', ...this.listQuery[key]])
+      this.$set(this.formItem[index], 'countyOptions', res)
     }, 100)
   }
-  private getDataRegion() {
-    setTimeout(async() => {
-      let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
-      this.$set(this.formItem[3], 'countyOptions', res)
-    }, 100)
-  }
-  handleChange(val:IState[], key:string) {
 
-  }
   // 验证通过
   handlePassChange() {
 

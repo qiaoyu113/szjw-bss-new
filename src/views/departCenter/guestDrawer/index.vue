@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-25 11:25:28
+ * @LastEditTime: 2021-04-27 14:39:11
  * @LastEditors: D.C.base
 -->
 <template>
@@ -28,15 +28,17 @@
       <h3>司机匹配线路</h3>
       <div class="lineTable">
         <AtableDriver
+          ref="tableDriver"
           :list-query="listQueryDriver"
           :is-more="true"
-          :op-type="[1,2,3,4,5]"
+          :op-type="[2,3,4,5]"
           @tag="setTagHandle"
           @call="setCallHandle"
           @creatRun="creatRunHandle"
         />
       </div>
     </section>
+
     <SetTag ref="tagShow" />
     <CreateTryRun
       ref="tryRunShow"
@@ -55,6 +57,7 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
+import { getDocumentRect, on } from '@/utils/dom'
 interface IState {
   [key: string]: any;
 }
@@ -135,6 +138,7 @@ export default class GuestDrawer extends Vue {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
   }
+
   mounted() {
 
   }

@@ -223,7 +223,6 @@
                 v-model="item.value"
                 multiple
                 placeholder="请选择"
-                @change="item.change"
               >
                 <el-option
                   v-for="obj in item.countyOptions"
