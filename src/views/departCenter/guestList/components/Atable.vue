@@ -380,7 +380,7 @@ export default class extends Vue {
   async getLists() {
     try {
       let num:number = 3
-      if (this.isMore) {
+      if (this.isMore && this.isShowPercent === false) {
         num = 1
       }
       this.tableData = []
@@ -427,6 +427,8 @@ export default class extends Vue {
       if (str) {
         this.tableData = [JSON.parse(str)]
       }
+    } else if (this.isMore && this.isShowPercent) {
+      this.getLists()
     }
   }
 }

@@ -31,7 +31,7 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
-          :op-type="[1,2,3,4,5]"
+          :op-type="[3,4,5]"
           @tag="setTagHandle"
           @call="setCallHandle"
           @creatRun="creatRunHandle"

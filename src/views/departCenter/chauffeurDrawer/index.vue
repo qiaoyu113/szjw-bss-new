@@ -16,7 +16,7 @@
       <AtableDriver
         :list-query="listQueryDriver"
         :is-more="true"
-        :op-type="[1,2,3,4,5]"
+        :op-type="[]"
         @tag="setTagHandle"
         @call="setCallHandle"
         @creatRun="creatRunHandle"
@@ -30,19 +30,14 @@
       <div class="lineTable">
         <AtableLine
           ref="lineDrawer"
+          :is-show-percent="true"
           :list-query="listQueryLine"
           obj="{}"
           :is-more="true"
-          @cancelTryRun="handleCancelTryRun1"
         />
       </div>
     </section>
     <SetTag ref="tagShow" />
-    <CreateTryRun
-      ref="tryRunShow"
-      :obj="rowData"
-    />
-    <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
 
@@ -54,7 +49,6 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
-import CancelTryRun from '../chauffeurList/components/CancelTryRun.vue'
 interface IState {
   [key: string]: any;
 }
@@ -65,8 +59,7 @@ interface IState {
     AtableLine,
     AtableDriver,
     CreateTryRun,
-    SetTag,
-    CancelTryRun
+    SetTag
   }
 })
 export default class GuestDrawer extends Vue {
@@ -106,10 +99,6 @@ export default class GuestDrawer extends Vue {
     this.$emit('input', false);
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun1() {
-    (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
     (this.$refs.tagShow as any).isShow = true
