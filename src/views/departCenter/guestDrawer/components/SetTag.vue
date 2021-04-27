@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-26 09:34:28
+ * @LastEditTime: 2021-04-27 18:00:13
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,10 +11,10 @@
       :visible.sync="isShow"
       title="给司机打标签"
       :confirm="confirm"
+      :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
       :destroy-on-close="false"
-      @closed="handleDialogClosed"
     >
       <self-form
         ref="setTagFrom"
@@ -49,6 +49,15 @@
               end: '23:00',
               minTime: listQuery['jobStartDate']
             }"
+          />
+        </template>
+        <template slot="expected">
+          <el-input
+            v-model.trim="listQuery['expected']"
+            v-only-number="{min: 0, max: 10000, precision: 1}"
+            style="width:100px;flex:initial"
+            :clearable="true"
+            placeholder="请输入期望运费"
           />
         </template>
         <template slot="endTime">
@@ -87,7 +96,7 @@
           <div class="tags">
             <el-radio-group
               v-model="listQuery.remark"
-              size="small"
+              size="mini"
             >
               <el-radio
                 v-for="(item,index) in reasonLists"
@@ -108,7 +117,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryData } from '../../js/index'
+import { getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
 interface IState {
   [key: string]: any;
 }
@@ -194,16 +203,15 @@ export default class extends Vue {
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
-        multiple: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityData
         }
       },
       countyOptions: [],
       listeners(visible:boolean) {
         if (!visible) {
-          _this.getData()
+          _this.getCountryData('prohibitionAddress', 1)
         }
       }
     },
@@ -229,13 +237,13 @@ export default class extends Vue {
         multiple: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityData
         }
       },
       countyOptions: [],
       listeners(visible:boolean) {
         if (!visible) {
-          _this.getDataRegion()
+          _this.getCountryData('prohibitionRegion', 3)
         }
       }
     },
@@ -276,9 +284,10 @@ export default class extends Vue {
       ]
     },
     {
-      type: 1,
+      slot: true,
+      type: 'expected',
       tagAttrs: {
-        placeholder: '请输入',
+        placeholder: '请输入期望运费',
         clearable: true
       },
       style: {
@@ -318,7 +327,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       label: '起始点',
@@ -353,7 +362,7 @@ export default class extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       label: '配送点',
@@ -446,20 +455,25 @@ export default class extends Vue {
   }
   // 弹框关闭
   private handleDialogClosed() {
-    (this.$refs.setTagFrom as any).resetForm()
+    this.$confirm('是否放弃给司机打标签?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }).then(() => {
+      (this.$refs.setTagFrom as any).resetForm()
+      this.isShow = false
+    }).catch(() => {
+
+    })
   }
-  private getData() {
+  private getCountryData(key:string, index:number) {
     setTimeout(async() => {
-      let res = await getProvinceList(['100000', ...this.listQuery.prohibitionAddress])
-      this.$set(this.formItem[1], 'countyOptions', res)
+      if (!this.listQuery[key]) return false
+      let res = await getProvinceList(['100000', ...this.listQuery[key]])
+      this.$set(this.formItem[index], 'countyOptions', res)
     }, 100)
   }
-  private getDataRegion() {
-    setTimeout(async() => {
-      let res = await getProvinceList(['100000', ...this.listQuery.prohibitionRegion])
-      this.$set(this.formItem[3], 'countyOptions', res)
-    }, 100)
-  }
+
   // 验证通过
   handlePassChange() {
 
