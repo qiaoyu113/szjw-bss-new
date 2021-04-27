@@ -46,7 +46,7 @@ export async function getProvinceList(params:string[], level?:number) {
   try {
     let { data: res } = await GetCityByCode(params)
     if (res.success) {
-      let arr:DictData[] = res.data.map((item:IState) => ({
+      let arr:DictData[] = res.data.filter((item:IState) => Number(item.code) !== -99).map((item:IState) => ({
         leaf: level ? (level === 3) : false,
         label: item.name,
         value: +item.code,

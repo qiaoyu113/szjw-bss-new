@@ -204,7 +204,7 @@ export default {
     wtSystem: '梧桐系统',
     lnSystem: '雷鸟系统',
     clueSystem: '线索管理系统',
-    dataSystem: '数据管理系统',
+    dataSystem: '赋能打分管理系统',
     authoritySystem: '权限管理',
     roleSystem: '权限管理系统',
     showUser: '查看用户列表',
@@ -212,7 +212,11 @@ export default {
     depart: '撮合中心',
     lineList: '线路列表',
     guestList: '客邀列表',
-    chauffeurList: '司推列表'
+    chauffeurList: '司推列表',
+    energizeMark: '赋能打分系统',
+    statistic: '赋能打分统计',
+    monitor: '赋能打分监控',
+    set: '赋能打分设置'
   },
   navbar: {
     setPassword: '修改密码',

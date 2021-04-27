@@ -38,3 +38,11 @@ export const getLineLabelById = (params:any) =>
     method: 'get',
     params
   })
+
+// 查询线路列表表单信息
+export const getLineInfo = (params:any) =>
+  request({
+    url: `${lineURL}/v2/line/label/getLineInfo`,
+    method: 'post',
+    params
+  })
