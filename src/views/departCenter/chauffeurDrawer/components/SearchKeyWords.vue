@@ -362,6 +362,8 @@ export default class SearchKeyWords extends Vue {
           } else {
             if (this.selectedData[index].optionIds[0] === '') {
               this.selectedData[index].optionIds.shift()
+            }
+            if (this.selectedData[index].selected[0] === '全部') {
               this.selectedData[index].selected.shift()
             }
             this.selectedData[index].optionIds.push(id)
