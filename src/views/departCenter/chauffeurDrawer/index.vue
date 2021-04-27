@@ -9,6 +9,7 @@
   <DrawerModel
     v-model="visible"
     @on-close="closeHandle"
+    @open="handleOpenClick"
   >
     <!-- 撮合线路 -->
     <section class="departLine">
@@ -49,6 +50,7 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
+import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
 }
@@ -119,6 +121,9 @@ export default class GuestDrawer extends Vue {
         message: '已取消拨打'
       })
     })
+  }
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
   }
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
