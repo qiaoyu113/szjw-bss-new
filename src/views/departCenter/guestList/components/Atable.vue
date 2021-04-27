@@ -107,7 +107,7 @@
             class="text"
             :class="obj.p1 === row.p1 ? 'blue text' : 'text'"
           >
-            仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            仓库位置:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
           <p
             class="text"
@@ -119,7 +119,7 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="160"
+        min-width="200"
         align="center"
       >
         <template slot-scope="{row}">
@@ -127,7 +127,18 @@
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
           >
-            趟运费:{{ row.m1 }}元
+            单趟运费:{{ row.m1 }}元
+          </p>
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
+            每日配送趟数:{{ row.m1 }}趟
+          </p>
+          <p
+            class="text"
+          >
+            预计月出车天数:{{ row.m1 }}天
           </p>
           <p
             class="text"
@@ -136,16 +147,13 @@
             预计月运费:{{ row.m1 }}元
           </p>
           <p class="text">
-            结算周期:周结
-          </p>
-          <p class="text">
-            结算天数:7天
+            结算周期/天数:周结/7天
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="线路特点"
-        min-width="200"
+        min-width="260"
         align="center"
       >
         <template slot-scope="{row}">
@@ -162,13 +170,13 @@
             class="text"
             :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
           >
-            配送类型:整车
+            配送复杂度:整车
           </p>
           <p
             class="text"
             :class="obj.time === row.time ? 'blue text' : 'text'"
           >
-            工作时间段:{{ row.time }}
+            工作时间段:{{ row.time }}/稳定/五个月
           </p>
         </template>
       </el-table-column>
@@ -187,9 +195,6 @@
           <p class="text">
             客急
           </p>
-          <p class="text">
-            客邀线
-          </p>
         </template>
       </el-table-column>
       <el-table-column
@@ -203,20 +208,28 @@
               class="el-icon-s-custom"
             /> 老张
           </p>
-          <p
+          <!-- <p
             v-if="row.a"
             class="text"
           >
             已上架
+          </p> -->
+          <p
+            class="text"
+            :a="row.a"
+          >
+            <template v-if="true">
+              <span class="blue">3</span>个城市已客邀
+            </template>
+            <template v-else>
+              天津已客邀
+            </template>
           </p>
-          <p class="text">
-            已发起客邀
-          </p>
-          <p class="text">
+          <!-- <p class="text">
             待确认意向
-          </p>
+          </p> -->
           <p class="text">
-            客邀成功
+            本城已客邀
           </p>
         </template>
       </el-table-column>
@@ -241,18 +254,9 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCancelTruRun(row)"
-            >
-              取消意向
-            </el-button>
-          </p>
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
               @click.stop="handleDetailClick(row)"
             >
-              查看详情
+              查看线路详情
             </el-button>
           </p>
           <p
@@ -357,10 +361,6 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
-  // 取消意向
-  handleCancelTruRun() {
-    this.$emit('cancelTryRun')
-  }
   // 匹配撮合
   handleMatchClick(row:IState) {
     sessionStorage.setItem(key, JSON.stringify(row))
@@ -393,8 +393,8 @@ export default class extends Vue {
           d: '4.2米厢货',
           e: '油车',
           f: '能闯禁行',
-          g: '能闯限行行',
-          h: '共享',
+          g: '能闯限行',
+          h: '单肥',
           p1: '湖南省',
           c1: '长沙市',
           c2: '短沙县',
