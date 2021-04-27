@@ -401,6 +401,7 @@ export default class extends Vue {
   }
   // 撮合
   handleDepart(row: IState) {
+    sessionStorage.setItem(key, JSON.stringify(row))
     this.$emit('depart', row)
   }
   // 查看详情
