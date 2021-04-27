@@ -5,9 +5,9 @@
       :list-query="listQuery"
       :form-item="formItem"
       size="small"
-      label-width="120px"
+      label-width="130px"
       class="p15 SuggestForm"
-      :pc-col="6"
+      :pc-col="8"
     >
       <template slot="rents">
         <doubleInput
@@ -79,6 +79,14 @@
           @click="handleResetClick"
         >
           重置
+        </el-button>
+        <el-button
+          size="small"
+          :class="isPC ? '' : 'btnMobile'"
+          type="primary"
+          @click="handleAllotClick"
+        >
+          批量分配司撮
         </el-button>
       </div>
     </self-form>
@@ -177,7 +185,6 @@ export default class extends Vue {
     {
       type: 8,
       key: 'address',
-      col: 6,
       label: '居住地址',
       tagAttrs: {
         placeholder: '请选择',
@@ -229,33 +236,52 @@ export default class extends Vue {
       type: 'rents',
       label: '期望运费(趟)',
       key: 'rents',
-      col: 6,
       slot: true
     },
     {
       type: 'time',
       label: '可工作时间段',
       key: 'time',
-      col: 6,
       slot: true
     },
     {
       type: 'driverId',
       label: '司机姓名/编号',
       key: 'driverId',
-      col: 6,
       slot: true
+    },
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true
+      },
+      label: '司撮经理',
+      key: 'hard212',
+      options: this.hardOptions
+    },
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true
+      },
+      label: '司机是否分配司撮',
+      key: 'hard2121',
+      options: [{ label: '是', value: 1 }, { label: '否', value: 1 }]
     },
     {
       type: 'status',
       key: 'status',
       label: '司机状态',
-      col: 16,
+      col: 20,
       slot: true
     },
     {
       type: 'btnGroup',
-      col: 8,
+      col: 4,
       slot: true,
       w: '0px'
     }
@@ -292,8 +318,11 @@ export default class extends Vue {
     if (rents.length === 1) {
       return this.$message.warning('请完善期望运费')
     }
-    if (rents.length === 2 && rents[1] <= rents[0]) {
-      return this.$message.warning('超出期望运费范围')
+    if (rents.length === 2 && ((+rents[1] >= 20000 || +rents[0] >= 20000) || (+rents[1] <= 0 || +rents[0] <= 0))) {
+      return this.$message.warning('超出期望运费范围0-20000')
+    }
+    if (rents.length === 2 && +rents[1] <= +rents[0]) {
+      return this.$message.warning('期望运费后置参数大于前置参数')
     }
     if (time.length === 1) {
       return this.$message.warning('请完善可工作时间段')
@@ -303,6 +332,16 @@ export default class extends Vue {
   // 重置
   handleResetClick() {
     (this.$refs['searchForm'] as any).resetForm()
+  }
+  // 批量查询
+  handleAllotClick() {
+    const length = (this.$parent as any).allotData.length
+    if (length > 0) {
+      (this.$parent as any).allotTitle = '批量分配司撮';
+      (this.$parent as any).allotDialog = true
+    } else {
+      this.$message.warning('请选择需要分配的司机')
+    }
   }
   private loadmore() {
     this.getDriverInfo(this.keyWord)
@@ -322,7 +361,7 @@ export default class extends Vue {
         return
       }
       let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/v2/wt-driver-account/management/queryDriverList'
+        url: ''
       })
       if (res.success) {
         if (
