@@ -218,8 +218,17 @@
               <el-button
                 type="text"
                 size="small"
+                @click.stop="handleCancelTruRun(row)"
               >
-                查看详情
+                取消意向
+              </el-button>
+            </p>
+            <p class="text">
+              <el-button
+                type="text"
+                size="small"
+              >
+                查看线路详情
               </el-button>
             </p>
             <!-- <p
@@ -414,6 +423,10 @@ export default class extends Vue {
   // 发起客邀
   handleLaunchGuest() {
     this.$emit('launchGuest')
+  }
+  // 取消意向
+  handleCancelTruRun() {
+    this.$emit('cancelTryRun')
   }
 }
 </script>
