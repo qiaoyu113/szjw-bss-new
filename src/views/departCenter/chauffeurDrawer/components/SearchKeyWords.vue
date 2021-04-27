@@ -1,0 +1,563 @@
+<template>
+  <div class="searchBox">
+    <div class="topSelect">
+      <div class="selectedform">
+        <template
+          v-for="(item,index) in selectList"
+        >
+          <el-dropdown
+            :key="index"
+            trigger="hover"
+            placement="bottom-start"
+            @visible-change="handleChange(item)"
+            @command="handleCommand"
+          >
+            <span class="el-dropdown-link">
+              {{ item.title }}<i class="el-icon-arrow-down el-icon--right" />
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                v-for="(obj,index2) in item.options"
+                :key="index2"
+                :command="obj.label"
+              >
+                {{ obj.label }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </template>
+      </div>
+      <div>
+        <el-form
+          :inline="true"
+          size="mini"
+        >
+          <el-form-item label="工作时间段">
+            <el-select
+              v-model="listQuery.f1"
+              placeholder="开始时间"
+              class="width-100"
+            >
+              <el-option
+                v-for="(item, index) in timeLists"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="">
+            <el-select
+              v-model="listQuery.f2"
+              placeholder="结束时间"
+              class="width-100"
+            >
+              <el-option
+                v-for="(item, index) in timeLists"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="单趟运费区间">
+            <el-input
+              v-model="listQuery.start"
+              v-only-number="{min: 0, max: 20000, precision: 0}"
+              placeholder="最低价格"
+              class="width-80"
+            />
+          </el-form-item>
+          <el-form-item label="">
+            <el-input
+              v-model="listQuery.end"
+              v-only-number="{min: 0, max: 20000, precision: 0}"
+              placeholder="最高价格"
+              class="width-80"
+            />
+          </el-form-item>
+          <el-form-item label="仓库位置">
+            <el-cascader
+              v-model="listQuery.repoLoc"
+              placeholder="请选择"
+              clearable
+              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
+              class="width-120"
+            />
+          </el-form-item>
+          <el-form-item label="配送区域">
+            <el-cascader
+              v-model="listQuery.distLoc"
+              placeholder="请选择"
+              clearable
+              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
+              class="width-120"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-input
+              v-model="listQuery.keyWords"
+              placeholder="线路名称/编号"
+              suffix-icon="el-icon-search"
+              class="width-140"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="searchHandle"
+            >
+              查询
+            </el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <div
+      v-if="selectedData.length>0"
+      class="selectedBox"
+    >
+      <a
+        href="javascript:;"
+        class="clearAll"
+        @click="handleClearAll"
+      >全部清空</a>
+      <ul class="list">
+        <li
+          v-for="(item,index) in selectedData"
+          :key="index"
+        >
+          {{ item.type }}：{{ item.selected.join(",") }}<i
+            class="el-icon-circle-close"
+            @click="clearSelect(index)"
+          />
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { GetDictionaryList } from '@/api/common'
+import SelfForm from '@/components/Base/SelfForm.vue'
+import { mapDictData, getProviceCityCountryData } from '../../js/index'
+import { Vue, Component, Prop } from 'vue-property-decorator'
+interface IState {
+  [key: string]: any;
+}
+@Component({
+  components: {
+    SelfForm
+  }
+})
+export default class SearchKeyWords extends Vue {
+  private keyWords: string = ''
+  private carLists:IState[] = [
+    {
+      value: '',
+      label: '全部'
+    }
+  ] // 车型列表
+  private multiple: boolean = true // 当前选项是否是多选
+  private key: string = '' // 当前选项是否是多选
+  private curSelecteds: [] = []
+  private selectTitle: string = ''
+  private selectedData: any[] = [];
+  private hardOptions: IState[] = [ // 装卸接受度
+    { label: '全部', value: '' }
+  ];
+  private cycleOptions: IState[] = [
+    { label: '全部', value: '' }
+  ];
+  private timeLists:IState[] = []
+  private listQuery:IState = {
+    busiType: '', // 所属业务线
+    carType: '', // 车类型
+    hard: '', // 装卸接受度
+    cycle: '', // 结算周期
+    hope: '', // 期望稳定/临时
+    expectType: '', // 期望货品类型
+    expectHard: '', // 期望配送难度
+    start: '',
+    end: '',
+    f1: '',
+    f2: '',
+    address: '',
+    keyWords: ''
+  };
+  private lineQualities: any[] = [
+    { label: '全部', value: '' }
+  ];
+  private goodsTypes: any[] = [
+    { label: '全部', value: '' }
+  ];
+  private getProviceCityCountryData = getProviceCityCountryData;
+  private formItemWidth: number = 160;
+  private formItem:any[] = [
+    {
+      type: 2,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        style: {
+          width: '100px'
+        }
+      },
+      label: '工作时间段',
+      col: 5,
+      key: 'f1',
+      options: this.timeLists
+    },
+    {
+      type: 2,
+      col: 4,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        style: {
+          width: '100px'
+        }
+      },
+      label: ' ',
+      w: '20px',
+      key: 'f2',
+      class: 'end',
+      options: this.timeLists
+    },
+    {
+      type: 'start',
+      label: '单趟运费区间',
+      key: 'start',
+      w: '110px',
+      col: 5,
+      slot: true
+    },
+    {
+      type: 'end',
+      label: ' ',
+      w: '20px',
+      key: 'end',
+      col: 3,
+      class: 'end',
+      slot: true
+    },
+    {
+      type: 8,
+      col: 7,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
+      },
+      label: '仓库位置',
+      key: 'repoLoc'
+    },
+    {
+      type: 8,
+      col: 7,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
+        }
+      },
+      label: '配送区域',
+      key: 'distLoc'
+    },
+    {
+      type: 'keyword',
+      label: '',
+      key: 'keyword',
+      w: '110px',
+      col: 5,
+      slot: true
+    }
+  ];
+  private selectList: IState[] = [
+    {
+      title: '线路肥瘦',
+      key: 'lineQuality',
+      multiple: true,
+      options: this.lineQualities
+    },
+    {
+      title: '配送车型',
+      key: 'model',
+      multiple: true,
+      options: this.carLists
+    },
+    {
+      title: '装卸难度',
+      key: 'loadDifficulty',
+      multiple: true,
+      options: this.hardOptions
+    },
+    {
+      title: '稳定/临时',
+      key: 'stability',
+      multiple: true,
+      options: [
+        { label: '全部', value: '' },
+        { label: '稳定', value: 1 },
+        { label: '临时', value: 2 }
+      ]
+    },
+    {
+      title: '结算周期',
+      key: 'clearCycle',
+      multiple: true,
+      options: this.cycleOptions
+    },
+    {
+      title: '货品类型',
+      key: 'cargoType',
+      multiple: true,
+      options: this.goodsTypes
+    },
+    {
+      title: '配送类型',
+      key: 'deliverComplexity',
+      multiple: true,
+      options: [
+        { label: '全部', value: '' },
+        { label: '整车', value: 1 },
+        { label: '多点配', value: 2 }
+      ]
+    }
+  ]
+  handleClearAll() {
+    this.selectedData = []
+    this.$emit('on-clear')
+  }
+  handleChange(item:any) {
+    this.selectTitle = item.title
+    this.multiple = item.multiple
+    this.curSelecteds = item.options
+    this.key = item.key
+  }
+  handleCommand(command:string) {
+    let obj:any = this.curSelecteds.find((item:any) => {
+      return item.label === command
+    })
+    let id = obj.value
+    if (this.selectedData.length > 0) {
+      let index = this.selectedData.findIndex((item) => {
+        return item.type === this.selectTitle
+      })
+      if (index > -1) {
+        let selecteds = this.selectedData[index].selected
+        if (selecteds.indexOf(command) === -1) {
+          this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
+          this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
+          if (command === '全部') {
+            this.selectedData[index].optionIds = []
+            this.selectedData[index].selected = ['全部']
+          } else {
+            if (this.selectedData[index].optionIds[0] === '') {
+              this.selectedData[index].optionIds.shift()
+              this.selectedData[index].selected.shift()
+            }
+            this.selectedData[index].optionIds.push(id)
+            this.selectedData[index].selected.push(command)
+          }
+          this.listQuery[this.key] = this.selectedData[index].optionIds
+        }
+      } else {
+        let obj = {
+          type: this.selectTitle,
+          optionIds: [id],
+          selected: [command]
+        }
+        this.listQuery[this.key] = obj.optionIds
+        this.selectedData.push(obj)
+      }
+    } else {
+      let obj = {
+        type: this.selectTitle,
+        optionIds: [id],
+        selected: [command]
+      }
+      this.listQuery[this.key] = obj.optionIds
+      this.selectedData.push(obj)
+    }
+    console.log(this.selectedData)
+  }
+  clearSelect(i: number) {
+    this.selectedData.splice(i, 1)
+  }
+  async getOptions() {
+    try {
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'line_label', 'type_of_goods']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
+        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+        this.lineQualities.push(...mapDictData(res.data.line_label || []))
+        this.goodsTypes.push(...mapDictData(res.data.type_of_goods || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
+  searchHandle() {
+    console.log(this.listQuery)
+  }
+  mounted() {
+    this.getOptions()
+    for (let i = 0; i < 24; i++) {
+      let count = i < 9 ? `0${i}:00` : `${i}:00`
+      this.timeLists.push({
+        label: count,
+        value: count
+      })
+    }
+  }
+}
+</script>
+<style>
+  .el-dropdown-menu{
+      max-height: 300px;
+      overflow: auto;
+  }
+</style>
+<style lang="scss" scoped>
+  .width-140 {
+    width: 140px;
+  }
+  .width-120 {
+    width: 120px;
+  }
+  .width-100 {
+    width: 100px;
+  }
+  .width-90 {
+    width: 90px;
+  }
+  .width-80 {
+    width: 80px;
+  }
+
+.searchBox{
+  background: #fff;
+  ::v-deep .el-dropdown-link{
+    font-size: 14px;
+    color: #494949;
+    i{
+      color: #606060 !important;
+    }
+  }
+  ::v-deep  .el-form-item__label{
+   color: #4b4b4b !important;
+  }
+  ::v-deep .el-dropdown{
+    display: flex;
+    &::after{
+      display: inline-block;
+      content: "";
+      height: 30px;
+      width: 2px;
+      background: #f4f4f6;
+      margin: 0 10px;
+    }
+  }
+  .el-dropdown:nth-last-of-type(1):after{
+      display: none;
+  }
+  .topSelect{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    padding:15px 30px 12px 30px;
+    border-bottom:2px solid #f3f3f5;
+    ::v-deep .el-form-item--small.el-form-item{
+      margin-bottom: 0;
+    }
+    ::v-deep .selfForm{
+      padding-left: 0;
+    }
+    .selectedform{
+      display: flex;
+      flex-wrap: wrap;
+      line-height: 36px;
+    }
+    .formbox{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 250px;
+      margin-left: 20px;
+      .el-input{
+        margin-right: 10px;
+      }
+      .el-button{
+        height: 36px;
+      }
+    }
+    .formList{
+      display: flex;
+      align-items: center;
+      .formItem{
+        display: inline-block;
+        margin-right: 10px;
+        margin-top: 10px;
+        .line{
+          text-align: center;
+          height: 36px;
+          line-height: 36px;
+        }
+      }
+    }
+  }
+  .selectedBox{
+    display: flex;
+    color: #909196;
+    padding: 10px 20px 10px 30px;
+    font-size: 14px;
+    .clearAll{
+      display: inline-block;
+      width: 60px;
+      height: 30px;
+      line-height: 30px;
+      margin-bottom: 10px;
+    }
+    .list{
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+      padding-left: 0;
+      margin: 0;
+      margin-left: 20px;
+      li{
+        display: flex;
+        align-items: center;
+        background: #eef2f3;
+        line-height: 30px;
+        height: 30px;
+        font-size: 14px;
+        border-radius: 30px;
+        list-style: none;
+        padding: 0 5px 0 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        i{
+          color: #8e929b;
+          margin-left: 15px;
+          font-size: 18px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+</style>

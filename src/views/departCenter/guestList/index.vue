@@ -1,6 +1,6 @@
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="GuestListContainer"
     :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
@@ -60,18 +60,8 @@
       <template slot="start">
         <input-range
           v-model="listQuery.start"
-          :range="[0,20000]"
+          v-only-number="{min: 1, max: 19999, precision: 0}"
         />
-        <!-- <el-input
-          v-model="listQuery.start"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        />
-      </template>
-      <template slot="end">
-        <el-input
-          v-model="listQuery.end"
-          v-only-number="{min: 0, max: 20000, precision: 0}"
-        /> -->
       </template>
       <template slot="time">
         <timeSelect
@@ -90,7 +80,6 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
-        @cancelTryRun="handleCancelTryRun"
       />
       <pagination
         :operation-list="[]"
@@ -152,13 +141,12 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
-  private timeLists:IState[] = []
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
     loadDiff: '',
     isRestriction: '',
-    status: '',
+    status: 1,
     start: [],
     f1: '',
     f2: '',
@@ -272,32 +260,6 @@ export default class extends Vue {
       label: '工作时间段',
       slot: true
     },
-    // {
-    //   type: 2,
-    //   tagAttrs: {
-    //     placeholder: '请选择',
-    //     clearable: true,
-    //     filterable: true
-    //   },
-    //   col: 5,
-    //   label: '工作时间段',
-    //   key: 'f1',
-    //   options: this.timeLists
-    // },
-    // {
-    //   type: 2,
-    //   tagAttrs: {
-    //     placeholder: '请选择',
-    //     clearable: true,
-    //     filterable: true
-    //   },
-    //   label: ' ',
-    //   w: '20px',
-    //   key: 'f2',
-    //   col: 3,
-    //   class: 'end',
-    //   options: this.timeLists
-    // },
     {
       type: 8,
       tagAttrs: {
@@ -378,20 +340,8 @@ export default class extends Vue {
 
   private statusLists:IState[] = [
     {
-      label: '全部',
-      value: ''
-    },
-    {
-      label: '已发起客邀',
+      label: '本城客邀线',
       value: 1
-    },
-    {
-      label: '客邀成功',
-      value: 2
-    },
-    {
-      label: '司推成功',
-      value: 3
     }
   ]
   // 表格分页
@@ -444,12 +394,14 @@ export default class extends Vue {
   // 获取列表
   async getLists() {
     try {
-      this.listLoading = true;
-      (this.$refs.lineTable as any).getLists()
+      this.listLoading = true
+      setTimeout(() => {
+        (this.$refs.lineTable as any).getLists()
+      }, 1000)
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
       //
     }
   }
@@ -471,10 +423,6 @@ export default class extends Vue {
   handleMatchTryRun() {
     this.showDrawer = true
   }
-  // 取消创建试跑意向
-  handleCancelTryRun() {
-    (this.$refs.cancelTryRun as any).showDialog = true
-  }
   // 获取字典列表
   async getDictList() {
     try {
@@ -493,53 +441,20 @@ export default class extends Vue {
       //
     }
   }
-  // 级联框变化
-  // handleCascaderChange(val:IState[], key:string) {
-  //   // 是否与上次的类型相同
-  //   let changeFlag = false
-  //   let changeItem:any = null
-  //   if (this.shareScopeEnd.length === 0) {
-  //     this.listQuery[key] = val
-  //   } else {
-  //     // 与原数组比对
-  //     this.listQuery[key].forEach((item:any[]) => {
-  //       if (item[0] !== this.shareScopeEnd[0][0]) { // 一级标签不同
-  //         changeFlag = true
-  //         changeItem = item
-  //       } else if (item[1] !== this.shareScopeEnd[0][1]) { // 一级标签相同但是二级标签不同
-  //         // changeFlag = true
-  //         // changeItem = item
-  //       } else if ((!item[2] && this.shareScopeEnd[0][2]) || (item[2] && !this.shareScopeEnd[0][2]) || (item[2] && item[2] === -99) || (this.shareScopeEnd[0][2] === -99)) {
-  //         changeFlag = true
-  //         changeItem = item
-  //       }
-  //     })
-  //   }
-  //   if (changeFlag) {
-  //     this.listQuery[key] = []
-  //     this.listQuery[key].push(changeItem)
-  //   }
-  //   this.shareScopeEnd = this.listQuery[key]
-  // }
 
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
-    for (let i = 0; i < 24; i++) {
-      let count = i < 9 ? `0${i}:00` : `${i}:00`
-      this.timeLists.push({
-        label: count,
-        value: count
-      })
-    }
   }
   mounted() {
     this.init()
+    this.getLists()
   }
 }
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
+    height:100%;
     .btnPc {
        width: 100%;
        display: flex;
@@ -579,10 +494,6 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-  .GuestListContainer >>> .end .el-form-item__label::before {
-    content:'~';
-    color: #9e9e9e;
-  }
   .isDrawer >>> .el-drawer__wrapper {
     top:84px;
   }

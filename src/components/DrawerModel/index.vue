@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-26 08:47:52
+ * @LastEditTime: 2021-04-27 15:02:31
  * @LastEditors: D.C.base
 -->
 <template>
@@ -15,6 +15,7 @@
     top="84px"
     :modal="false"
     @close="closeHandle"
+    @open="handleOpenClick"
   >
     <div class="">
       <slot />
@@ -50,8 +51,8 @@ export default class DrawerModel extends Vue {
     this.$emit('input', false)
     this.$emit('on-close')
   }
-  mounted() {
-
+  handleOpenClick() {
+    this.$emit('open')
   }
 }
 </script>
