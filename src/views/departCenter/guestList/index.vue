@@ -23,19 +23,9 @@
         slot="status"
         :class="isPC ? 'btnPc left' : 'mobile'"
       >
-        <el-radio-group
-          v-model="listQuery.status"
-          size="small"
-          @change="handleStatusChange"
-        >
-          <el-radio-button
-            v-for="item in statusLists"
-            :key="item.value"
-            :label="item.value"
-          >
-            {{ item.label }}
-          </el-radio-button>
-        </el-radio-group>
+        <el-button type="primary">
+          本城客邀线
+        </el-button>
       </div>
       <div
         slot="btnGroup"
@@ -80,7 +70,6 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
-        @cancelTryRun="handleCancelTryRun"
       />
       <pagination
         :operation-list="[]"
@@ -147,7 +136,6 @@ export default class extends Vue {
     isBehavior: '',
     loadDiff: '',
     isRestriction: '',
-    status: '',
     start: [],
     f1: '',
     f2: '',
@@ -338,25 +326,6 @@ export default class extends Vue {
       w: '0px'
     }
   ]
-
-  private statusLists:IState[] = [
-    {
-      label: '全部',
-      value: ''
-    },
-    {
-      label: '已发起客邀',
-      value: 1
-    },
-    {
-      label: '客邀成功',
-      value: 2
-    },
-    {
-      label: '司推成功',
-      value: 3
-    }
-  ]
   // 表格分页
   private page :PageObj= {
     page: 1,
@@ -435,10 +404,6 @@ export default class extends Vue {
   // 匹配撮合
   handleMatchTryRun() {
     this.showDrawer = true
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun() {
-    (this.$refs.cancelTryRun as any).showDialog = true
   }
   // 获取字典列表
   async getDictList() {
