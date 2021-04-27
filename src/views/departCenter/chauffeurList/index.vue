@@ -46,6 +46,7 @@
       :driver-id="detailId"
       :dialog-table-visible.sync="detailDio"
     />
+    <ChauffeureDrawer v-model="showDrawer" />
   </div>
 </template>
 <script lang="ts">
@@ -57,6 +58,8 @@ import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import SetTag from '../guestDrawer/components/SetTag.vue'
+import ChauffeureDrawer from '../chauffeurDrawer/index.vue'
+
 interface PageObj {
   page: number;
   limit: number;
@@ -74,7 +77,8 @@ interface IState {
     CallPhone,
     SearchForm,
     SetTag,
-    DetailDialog
+    DetailDialog,
+    ChauffeureDrawer
   }
 })
 export default class extends Vue {
@@ -106,6 +110,7 @@ export default class extends Vue {
   private detailDio:Boolean = false
   private detailId:string = ''
   private showTag:Boolean = false
+  private showDrawer: Boolean = false
   // 表格分页
   private page: PageObj = {
     page: 1,
@@ -141,7 +146,7 @@ export default class extends Vue {
     (this.$refs['setTag'] as any).showDialog = true
   }
   depart() {
-    console.log('depart')
+    this.showDrawer = true
   }
   detail() {
     console.log('detail')
