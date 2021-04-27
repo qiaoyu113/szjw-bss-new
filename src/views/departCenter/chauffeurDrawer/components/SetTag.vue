@@ -2,13 +2,8 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-17 10:13:08
-<<<<<<< HEAD
- * @LastEditTime: 2021-04-25 10:02:25
- * @LastEditors: Please set LastEditors
-=======
- * @LastEditTime: 2021-04-22 19:15:05
+ * @LastEditTime: 2021-04-27 16:09:51
  * @LastEditors: D.C.base
->>>>>>> department
 -->
 <template>
   <div class="setTag">
@@ -113,7 +108,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { getProviceCityAndCountryData, getProvinceList, getProviceCityCountryData } from '../../js/index'
+import { getProviceCityAndCountry, getProvinceList, getProviceCityCountryData } from '../../js/index'
 interface IState {
   [key: string]: any;
 }
@@ -202,7 +197,7 @@ export default class extends Vue {
         multiple: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       countyOptions: [],
@@ -234,7 +229,7 @@ export default class extends Vue {
         multiple: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityAndCountryData
+          lazyLoad: getProviceCityAndCountry
         }
       },
       countyOptions: [],

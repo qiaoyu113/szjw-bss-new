@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-22 19:09:24
+ * @LastEditTime: 2021-04-27 17:58:16
  * @LastEditors: D.C.base
 -->
 <template>
@@ -29,6 +29,7 @@
       <h3>司机匹配线路</h3>
       <div class="lineTable">
         <AtableDriver
+          ref="tableDriver"
           :list-query="listQueryDriver"
           :is-more="true"
           :is-show-percent="true"
@@ -36,6 +37,7 @@
           @tag="setTagHandle"
           @call="setCallHandle"
           @creatRun="creatRunHandle"
+          @detail="detailHandle"
         />
       </div>
     </section>
@@ -45,6 +47,11 @@
       :obj="rowData"
     />
     <cancel-tryRun ref="cancelTryRun1" />
+    <DetailDialog
+      actived="third"
+      :driver-id="detailId"
+      :dialog-table-visible.sync="detailDialog"
+    />
   </DrawerModel>
 </template>
 
@@ -57,6 +64,7 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
+import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
@@ -69,7 +77,8 @@ interface IState {
     AtableDriver,
     CreateTryRun,
     SetTag,
-    CancelTryRun
+    CancelTryRun,
+    DetailDialog
   }
 })
 export default class GuestDrawer extends Vue {
@@ -78,6 +87,8 @@ export default class GuestDrawer extends Vue {
   private tagShow:boolean = false
   private tryRunShow:boolean = false
   private rowData:object = {}
+  private detailDialog:Boolean = false
+  private detailId:string = ''
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -141,6 +152,9 @@ export default class GuestDrawer extends Vue {
   handleOpenClick() {
     AppModule.CloseSideBar(false)
   }
+  detailHandle() {
+    this.detailDialog = true
+  }
   mounted() {
 
   }
@@ -151,10 +165,10 @@ export default class GuestDrawer extends Vue {
   width: 100%;
   height: 100%;
   overflow: auto;
-  ::v-deep .el-drawer{
+  /* ::v-deep .el-drawer{
     overflow: initial;
     background: #e6e9f0;
-  }
+  } */
 }
 .departLine{
   padding: 20px 30px;

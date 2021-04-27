@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-22 19:09:24
+ * @LastEditTime: 2021-04-27 17:27:46
  * @LastEditors: D.C.base
 -->
 <template>
@@ -136,7 +136,7 @@ export default class GuestDrawer extends Vue {
   overflow: auto;
   ::v-deep .el-drawer{
     overflow: initial;
-    background: #e6e9f0;
+    //background: #e6e9f0;
   }
 }
 .departLine{
