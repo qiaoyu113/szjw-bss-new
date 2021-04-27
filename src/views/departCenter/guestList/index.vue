@@ -80,7 +80,6 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
-        @cancelTryRun="handleCancelTryRun"
       />
       <pagination
         :operation-list="[]"
@@ -435,10 +434,6 @@ export default class extends Vue {
   // 匹配撮合
   handleMatchTryRun() {
     this.showDrawer = true
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun() {
-    (this.$refs.cancelTryRun as any).showDialog = true
   }
   // 获取字典列表
   async getDictList() {
