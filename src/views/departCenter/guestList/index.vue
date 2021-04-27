@@ -80,7 +80,6 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
-        @cancelTryRun="handleCancelTryRun"
       />
       <pagination
         :operation-list="[]"
@@ -147,7 +146,7 @@ export default class extends Vue {
     isBehavior: '',
     loadDiff: '',
     isRestriction: '',
-    status: '',
+    status: 1,
     start: [],
     f1: '',
     f2: '',
@@ -341,20 +340,8 @@ export default class extends Vue {
 
   private statusLists:IState[] = [
     {
-      label: '全部',
-      value: ''
-    },
-    {
-      label: '已发起客邀',
+      label: '本城客邀线',
       value: 1
-    },
-    {
-      label: '客邀成功',
-      value: 2
-    },
-    {
-      label: '司推成功',
-      value: 3
     }
   ]
   // 表格分页
@@ -435,10 +422,6 @@ export default class extends Vue {
   // 匹配撮合
   handleMatchTryRun() {
     this.showDrawer = true
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun() {
-    (this.$refs.cancelTryRun as any).showDialog = true
   }
   // 获取字典列表
   async getDictList() {
