@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-26 08:47:52
+ * @LastEditTime: 2021-04-27 17:56:46
  * @LastEditors: D.C.base
 -->
 <template>
@@ -15,6 +15,7 @@
     top="84px"
     :modal="false"
     @close="closeHandle"
+    @open="handleOpenClick"
   >
     <div class="">
       <slot />
@@ -24,7 +25,7 @@
       class="actionBtn"
       @click="closeHandle"
     >
-      <i class="el-icon-d-arrow-left" />
+      <i class="el-icon-d-arrow-right" />
     </a>
   </el-drawer>
 </template>
@@ -50,8 +51,8 @@ export default class DrawerModel extends Vue {
     this.$emit('input', false)
     this.$emit('on-close')
   }
-  mounted() {
-
+  handleOpenClick() {
+    this.$emit('open')
   }
 }
 </script>
@@ -60,6 +61,14 @@ export default class DrawerModel extends Vue {
   height: 100%;
   background:rgba(0,0,0,0.5);
   padding-left: 20%;
+  >div{
+    height: 100%;
+    overflow: auto;
+    background:#e6e9f0 ;
+  }
+}
+.isDrawer .el-drawer__wrapper{
+  top: 84px;
 }
 ::v-deep .el-drawer{
     background: transparent;

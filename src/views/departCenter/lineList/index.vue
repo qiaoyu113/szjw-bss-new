@@ -1,7 +1,7 @@
 
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="LineList"
     :class="{
       p15: isPC
@@ -69,48 +69,20 @@
         <template slot="freightSection">
           <input-range
             v-model="listQuery.freightSection"
-            :range="[0,20000]"
+            v-only-number="{min: 1, max: 19999, precision: 0}"
+          />
+        </template>
+        <template slot="time">
+          <timeSelect
+            v-model="listQuery.time"
           />
         </template>
       </self-form>
       <div class="table_box">
         <div class="middle" />
         <span>筛选结果：{{ 111 }}条</span>
-        <!-- <self-table
-          ref="RefundForm"
-          :index="listQuery.status === '3'"
-          :is-p30="false"
-          :operation-list="[]"
-          :table-data="tableData"
-          :columns="columns"
-          row-key="id"
-          :page="page"
-          @onPageSize="handlePageSize"
-          @selection-change="handleSelectionChange"
-        >
-          <template v-slot:op="scope">
-            <el-button
-              type="text"
-              size="small"
-              @click="handleClick(scope.row)"
-            >
-              发起客邀
-            </el-button>
-            <el-button
-              type="text"
-              size="small"
-            >
-              取消客邀
-            </el-button>
-            <el-button
-              type="text"
-              size="small"
-            >
-              查看详情
-            </el-button>
-          </template>
-        </self-table> -->
         <Btable
+          ref="listTable"
           :list-query="listQuery"
           :is-show-percent="true"
           :obj="{}"
@@ -147,6 +119,7 @@ import { getLineSearch } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
+import timeSelect from '../chauffeurList/components/timeSelect.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 interface PageObj {
@@ -167,14 +140,16 @@ interface IState {
     Pagination,
     LaunchGuest,
     CancelGuest,
-    InputRange
+    InputRange,
+    timeSelect
   }
 })
 export default class extends Vue {
   private obj:IState = {}
   private listLoading:boolean = false
   private carLists:IState[] = [] // 车型列表
-  private labelTypeArr:IState[] = [] // 线路肥瘦
+  private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
+  private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private timeLists:IState[] = []
   private shareScopeEnd:IState[] = []
   // private multipleSelection: any[] = []
@@ -186,7 +161,7 @@ export default class extends Vue {
     lineFineness: '',
     handlingDifficulty: '',
     freightSection: [],
-    workTime: '',
+    time: [],
     warehouseLocation: '',
     distributionArea: '',
     stabilityTemporary: '',
@@ -231,69 +206,28 @@ export default class extends Vue {
         placeholder: '请选择',
         clearable: true
       },
-      options: [
-        {
-          label: '全部',
-          value: ''
-        },
-        {
-          label: '不装卸',
-          value: 1
-        },
-        {
-          label: '只装不卸（轻）',
-          value: 2
-        },
-        {
-          label: '只卸不装（轻）',
-          value: 3
-        },
-        {
-          label: '只装不卸（重）',
-          value: 4
-        },
-        {
-          label: '只卸不装（重）',
-          value: 5
-        },
-        {
-          label: '重装卸（重）',
-          value: 6
-        }
-      ]
+      options: this.loadDiffArr
     },
     {
       type: 'freightSection',
       label: '单趟运费区间',
       key: 'freightSection',
       w: '110px',
-      slot: true
+      slot: true,
+      listeners: {
+        input: () => {
+          this.listQuery.freightSection[0] = this.listQuery.freightSection[0].replace(
+            /[^\d]/g,
+            ''
+          )
+        }
+      }
     },
     {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      col: 5,
+      type: 'time',
       label: '工作时间段',
-      key: 'workStartTime',
-      options: this.timeLists
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: ' ',
-      w: '20px',
-      key: 'workEndTime',
-      col: 3,
-      class: 'end',
-      options: this.timeLists
+      key: 'time',
+      slot: true
     },
     {
       type: 8,
@@ -305,8 +239,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
+          checkStrictly: true
         }
       },
       listeners: {
@@ -325,8 +258,7 @@ export default class extends Vue {
         props: {
           lazy: true,
           lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
+          checkStrictly: true
         }
       },
       listeners: {
@@ -405,40 +337,6 @@ export default class extends Vue {
       text: '司推撮合成功'
     }
   ]
-  // private columns:any[] = [
-  //   {
-  //     key: 'basicsMessage',
-  //     label: '基础信息'
-  //   },
-  //   {
-  //     key: 'car',
-  //     label: '车辆'
-  //   },
-  //   {
-  //     key: 'deliveryMessage',
-  //     label: '配送信息'
-  //   },
-  //   {
-  //     key: 'settlement',
-  //     label: '结算'
-  //   },
-  //   {
-  //     key: 'lineCharacteristic',
-  //     label: '线路特点'
-  //   },
-  //   {
-  //     key: 'label',
-  //     label: '标签'
-  //   },
-  //   {
-  //     key: 'status',
-  //     label: '状态'
-  //   },
-  //   {
-  //     key: 'op',
-  //     label: '操作'
-  //   }
-  // ]
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -482,15 +380,22 @@ export default class extends Vue {
   }
   // 查询
   handleFilterClick() {
-    if (this.listQuery.freightSection.length === 1) {
+    // 单趟运费区间
+    const moneyRange = (this.listQuery.freightSection || []).filter((item:string | number) => item !== '')
+    if (moneyRange.length === 1) {
       return this.$message.warning('单趟运费输入不完整')
-    } else if (this.listQuery.freightSection.length === 2) {
-      if (Number(this.listQuery.freightSection[0]) > Number(this.listQuery.freightSection[1])) {
+    } else if (moneyRange.length === 2) {
+      if (Number(moneyRange[0]) > Number(moneyRange[1])) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
     }
-    if (this.listQuery.workStartTime && this.listQuery.workEndTime && (this.listQuery.workStartTime === this.listQuery.workEndTime)) {
-      return this.$message.warning('起始时间与结束时间差>=1小时')
+    if (Number(moneyRange[0] > 20000) || Number(moneyRange[1] > 20000)) {
+      return this.$message.warning('单趟运费输入在0-20000之间')
+    }
+    // 工作时间段
+    const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
+    if (timeRange.length === 1) {
+      return this.$message.warning('工作时间段输入不完整')
     }
     this.getList()
   }
@@ -501,9 +406,8 @@ export default class extends Vue {
       carType: '',
       lineFineness: '',
       handlingDifficulty: '',
-      freightSection: '',
-      workStartTime: '',
-      workEndTime: '',
+      freightSection: [],
+      time: [],
       warehouseLocation: '',
       distributionArea: '',
       stabilityTemporary: '',
@@ -515,38 +419,40 @@ export default class extends Vue {
   private async getList() {
     try {
       this.listLoading = true
-      let params: IState = {
-        page: this.page.page,
-        limit: this.page.limit
-      }
-      if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
-        params.workCity = this.listQuery.workCity[1]
-      }
-      this.listQuery.carType !== '' && (params.carType = this.listQuery.carTpe)
-      this.listQuery.lineFineness !== '' && (params.lineFineness = this.listQuery.lineFineness)
-      this.listQuery.handlingDifficulty !== '' && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
-      this.listQuery.freightSection !== '' && (params.freightSection = this.listQuery.freightSection)
-      this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
-      this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
-      this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
-
-      console.log('listQuery', this.listQuery)
+      // let params: IState = {
+      //   page: this.page.page,
+      //   limit: this.page.limit
+      // }
+      // if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
+      //   params.workCity = this.listQuery.workCity[1]
+      // }
+      // this.listQuery.carType !== '' && (params.carType = this.listQuery.carTpe)
+      // this.listQuery.lineFineness !== '' && (params.lineFineness = this.listQuery.lineFineness)
+      // this.listQuery.handlingDifficulty !== '' && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
+      // this.listQuery.freightSection !== '' && (params.freightSection = this.listQuery.freightSection)
+      // this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
+      // this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
+      // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
+      setTimeout(() => {
+        (this.$refs.listTable as any).getLists()
+      }, 1000)
+      // console.log('listQuery', this.listQuery)
       // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
     } finally {
-      this.listLoading = false
-      //
+      // this.listLoading = false
     }
   }
   // 获取字典列表
   async getDictList() {
     try {
-      let params:string[] = ['Intentional_compartment', 'line_label']
+      let params:string[] = ['Intentional_compartment', 'line_label', 'line_handling_difficulty']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+        this.loadDiffArr.push(...mapDictData(res.data.line_handling_difficulty || []))
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -598,25 +504,20 @@ export default class extends Vue {
     // (this.$refs.launchGuest as any).confirm()
   }
   init() {
-    this.getDictList()
+    this.getDictList();
+    (this.$refs.selectForm as any).loadQueryLineByKeyword()
   }
   mounted() {
-    this.init();
-    (this.$refs.selectForm as any).loadQueryLineByKeyword()
-    for (let i = 0; i < 24; i++) {
-      let count = i < 9 ? `0${i}:00` : `${i}:00`
-      this.timeLists.push({
-        label: count,
-        value: count
-      })
-    }
+    this.init()
+    this.getList()
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .LineList {
-  min-width: 860px;
+   min-width: 860px;
+   height:100%;
   .SuggestForm {
       width: 100%;
       background: #fff;

@@ -8,7 +8,6 @@
       stripe
       highlight-current-row
       size="mini"
-      row-key="id"
       :row-style="{height: '20px'}"
       fit
       :header-cell-style="{padding: '6px 20px'}"
@@ -17,7 +16,6 @@
       <el-table-column
         min-width="70"
         label=""
-        align="left"
         class-name="firstColumn"
       >
         <template slot-scope="scope">
@@ -41,16 +39,7 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <!-- <div
-            v-if="isShowPercent"
-            class="percent"
-          >
-            匹配度{{ row.percent }}%
-          </div> -->
-
-          <router-link to="#">
-            {{ row.a }}
-          </router-link>
+          {{ row.a }}
           <el-popover
             placement="right"
             width="200"
@@ -91,6 +80,7 @@
       <el-table-column
         label="车辆"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -110,13 +100,14 @@
       <el-table-column
         label="配送信息"
         min-width="240"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
             class="text"
             :class="obj.p1 === row.p1 ? 'blue text' : 'text'"
           >
-            仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            仓库位置:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
           </p>
           <p
             class="text"
@@ -128,14 +119,26 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="160"
+        min-width="200"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
           >
-            趟运费:{{ row.m1 }}元
+            单趟运费:{{ row.m1 }}元
+          </p>
+          <p
+            class="text"
+            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+          >
+            每日配送趟数:{{ row.m1 }}趟
+          </p>
+          <p
+            class="text"
+          >
+            预计月出车天数:{{ row.m1 }}天
           </p>
           <p
             class="text"
@@ -144,16 +147,14 @@
             预计月运费:{{ row.m1 }}元
           </p>
           <p class="text">
-            结算周期:周结
-          </p>
-          <p class="text">
-            结算天数:7天
+            结算周期/天数:周结/7天
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="线路特点"
-        min-width="200"
+        min-width="260"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -169,19 +170,20 @@
             class="text"
             :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
           >
-            配送类型:整车
+            配送复杂度:整车
           </p>
           <p
             class="text"
             :class="obj.time === row.time ? 'blue text' : 'text'"
           >
-            工作时间段:{{ row.time }}
+            工作时间段:{{ row.time }}/稳定/五个月
           </p>
         </template>
       </el-table-column>
       <el-table-column
         label="标签"
         min-width="100"
+        align="center"
       >
         <template slot-scope="{row}">
           <p
@@ -193,14 +195,12 @@
           <p class="text">
             客急
           </p>
-          <p class="text">
-            客邀线
-          </p>
         </template>
       </el-table-column>
       <el-table-column
         label="状态"
         min-width="160"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -208,20 +208,28 @@
               class="el-icon-s-custom"
             /> 老张
           </p>
-          <p
+          <!-- <p
             v-if="row.a"
             class="text"
           >
             已上架
+          </p> -->
+          <p
+            class="text"
+            :a="row.a"
+          >
+            <template v-if="true">
+              <span class="blue">3</span>个城市已客邀
+            </template>
+            <template v-else>
+              天津已客邀
+            </template>
           </p>
-          <p class="text">
-            已发起客邀
-          </p>
-          <p class="text">
+          <!-- <p class="text">
             待确认意向
-          </p>
+          </p> -->
           <p class="text">
-            客邀成功
+            本城已客邀
           </p>
         </template>
       </el-table-column>
@@ -229,6 +237,7 @@
         label="操作"
         fixed="right"
         min-width="150"
+        align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
@@ -245,18 +254,9 @@
             <el-button
               type="text"
               size="small"
-              @click.stop="handleCancelTruRun(row)"
-            >
-              取消意向
-            </el-button>
-          </p>
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
               @click.stop="handleDetailClick(row)"
             >
-              查看详情
+              查看线路详情
             </el-button>
           </p>
           <p
@@ -361,10 +361,6 @@ export default class extends Vue {
       $table.toggleRowExpansion(row)
     }
   }
-  // 取消意向
-  handleCancelTruRun() {
-    this.$emit('cancelTryRun')
-  }
   // 匹配撮合
   handleMatchClick(row:IState) {
     sessionStorage.setItem(key, JSON.stringify(row))
@@ -372,12 +368,18 @@ export default class extends Vue {
   }
   // 查看详情
   handleDetailClick(row:IState) {
-
+    let { href } = this.$router.resolve({
+      path: `/lineshelf/linedetail`,
+      query: {
+        id: 'XL202104250009'
+      }
+    })
+    window.open(href, '_blank')
   }
   // 获取列表数据
   async getLists() {
     try {
-      let num:number = 30
+      let num:number = 3
       if (this.isMore) {
         num = 1
       }
@@ -391,8 +393,8 @@ export default class extends Vue {
           d: '4.2米厢货',
           e: '油车',
           f: '能闯禁行',
-          g: '能闯限行行',
-          h: '共享',
+          g: '能闯限行',
+          h: '单肥',
           p1: '湖南省',
           c1: '长沙市',
           c2: '短沙县',
@@ -412,7 +414,7 @@ export default class extends Vue {
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
-      //
+      (this.$parent as any).listLoading = false
     }
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
@@ -420,11 +422,7 @@ export default class extends Vue {
     sessionStorage.removeItem(key)
   }
   mounted() {
-    if (!this.isMore) {
-      setTimeout(() => {
-        this.getLists()
-      }, 500)
-    } else if (this.isMore && !this.isShowPercent) {
+    if (this.isMore && !this.isShowPercent) {
       let str = sessionStorage.getItem(key) || ''
       if (str) {
         this.tableData = [JSON.parse(str)]
@@ -459,7 +457,7 @@ export default class extends Vue {
       top: 50px;
       left: 7px;
       font-size: 12px;
-      color: #444444;
+      color: #639DEC;
       text-align: center;
       width: 40px;
       line-height: 14px;
