@@ -9,6 +9,7 @@
   <DrawerModel
     v-model="visible"
     @on-close="closeHandle"
+    @open="handleOpenClick"
   >
     <!-- 撮合线路 -->
     <section class="departLine">
@@ -55,6 +56,7 @@ import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
 import CancelTryRun from '../guestList/components/CancelTryRun.vue'
+import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
 }
@@ -134,6 +136,9 @@ export default class GuestDrawer extends Vue {
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
+  }
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
   }
   mounted() {
 
