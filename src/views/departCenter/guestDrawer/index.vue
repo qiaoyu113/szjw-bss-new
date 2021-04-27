@@ -31,6 +31,7 @@
         <AtableDriver
           :list-query="listQueryDriver"
           :is-more="true"
+          :is-show-percent="true"
           :op-type="[3,4,5]"
           @tag="setTagHandle"
           @call="setCallHandle"

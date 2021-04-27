@@ -70,6 +70,7 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
+        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
