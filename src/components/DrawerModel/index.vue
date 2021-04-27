@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 17:30:40
+ * @LastEditTime: 2021-04-27 17:56:46
  * @LastEditors: D.C.base
 -->
 <template>
@@ -25,7 +25,7 @@
       class="actionBtn"
       @click="closeHandle"
     >
-      <i class="el-icon-d-arrow-left" />
+      <i class="el-icon-d-arrow-right" />
     </a>
   </el-drawer>
 </template>

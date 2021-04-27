@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 17:28:26
+ * @LastEditTime: 2021-04-27 17:58:16
  * @LastEditors: D.C.base
 -->
 <template>
@@ -33,6 +33,7 @@
           :list-query="listQueryDriver"
           :is-more="true"
           :op-type="[2,3,4,5]"
+          @call="setCallHandle"
           @tag="setTagHandle"
           @creatRun="creatRunHandle"
           @detail="detailHandle"
