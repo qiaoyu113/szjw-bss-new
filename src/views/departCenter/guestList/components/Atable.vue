@@ -309,21 +309,6 @@
               </el-button>
             </div>
           </div>
-          <div class="item">
-            <div class="title">
-              撮合信息:
-            </div>
-            <div class="content">
-              <el-button
-                v-for="item in row.crr"
-                :key="item"
-                size="mini"
-                class="btn"
-              >
-                {{ item }}
-              </el-button>
-            </div>
-          </div>
         </template>
       </el-table-column>
     </el-table>
