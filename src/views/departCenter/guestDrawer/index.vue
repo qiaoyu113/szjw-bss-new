@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 19:25:02
+ * @LastEditTime: 2021-04-27 19:32:06
  * @LastEditors: D.C.base
 -->
 <template>
@@ -33,6 +33,7 @@ import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import MatchDriver from './components/MatchDriver.vue'
+import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
 }
@@ -70,7 +71,9 @@ export default class GuestDrawer extends Vue {
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
   }
-
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
+  }
   mounted() {
 
   }

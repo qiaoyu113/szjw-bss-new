@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:38:14
- * @LastEditTime: 2021-04-27 19:29:31
+ * @LastEditTime: 2021-04-27 19:31:51
  * @LastEditors: D.C.base
 -->
 <template>
@@ -43,7 +43,7 @@ import SetTag from './SetTag.vue'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { AppModule } from '@/store/modules/app'
+
 interface IState {
   [key: string]: any;
 }
@@ -98,9 +98,6 @@ export default class DepartLine extends Vue {
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
-  }
-  handleOpenClick() {
-    AppModule.CloseSideBar(false)
   }
   detailHandle() {
     this.detailDialog = true
