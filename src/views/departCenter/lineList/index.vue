@@ -1,7 +1,7 @@
 
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="LineList"
     :class="{
       p15: isPC
@@ -69,6 +69,7 @@
         <template slot="freightSection">
           <input-range
             v-model="listQuery.freightSection"
+            v-only-number="{min: 1, max: 19999, precision: 0}"
           />
         </template>
         <template slot="time">
@@ -80,40 +81,6 @@
       <div class="table_box">
         <div class="middle" />
         <span>筛选结果：{{ 111 }}条</span>
-        <!-- <self-table
-          ref="RefundForm"
-          :index="listQuery.status === '3'"
-          :is-p30="false"
-          :operation-list="[]"
-          :table-data="tableData"
-          :columns="columns"
-          row-key="id"
-          :page="page"
-          @onPageSize="handlePageSize"
-          @selection-change="handleSelectionChange"
-        >
-          <template v-slot:op="scope">
-            <el-button
-              type="text"
-              size="small"
-              @click="handleClick(scope.row)"
-            >
-              发起客邀
-            </el-button>
-            <el-button
-              type="text"
-              size="small"
-            >
-              取消客邀
-            </el-button>
-            <el-button
-              type="text"
-              size="small"
-            >
-              查看详情
-            </el-button>
-          </template>
-        </self-table> -->
         <Btable
           ref="listTable"
           :list-query="listQuery"
@@ -467,14 +434,14 @@ export default class extends Vue {
       // this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
       // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
       setTimeout(() => {
-        (this.$refs.listTable as any).getList()
+        (this.$refs.listTable as any).getLists()
       }, 1000)
       // console.log('listQuery', this.listQuery)
       // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
     }
   }
   // 获取字典列表
@@ -549,7 +516,8 @@ export default class extends Vue {
 
 <style lang="scss" scoped>
 .LineList {
-  min-width: 860px;
+   min-width: 860px;
+   height:100%;
   .SuggestForm {
       width: 100%;
       background: #fff;

@@ -15,6 +15,7 @@
     top="84px"
     :modal="false"
     @close="closeHandle"
+    @open="handleOpenClick"
   >
     <div class="">
       <slot />
@@ -50,8 +51,8 @@ export default class DrawerModel extends Vue {
     this.$emit('input', false)
     this.$emit('on-close')
   }
-  mounted() {
-
+  handleOpenClick() {
+    this.$emit('open')
   }
 }
 </script>
