@@ -2,13 +2,14 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 17:27:46
+ * @LastEditTime: 2021-04-27 18:20:49
  * @LastEditors: D.C.base
 -->
 <template>
   <DrawerModel
     v-model="visible"
     @on-close="closeHandle"
+    @open="handleOpenClick"
   >
     <!-- 撮合线路 -->
     <section class="departLine">
@@ -49,6 +50,7 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
+import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
 }
@@ -123,6 +125,9 @@ export default class GuestDrawer extends Vue {
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
+  }
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
   }
   mounted() {
 
