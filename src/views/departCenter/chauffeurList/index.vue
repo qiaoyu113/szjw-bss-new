@@ -58,7 +58,6 @@
       @close="closeAllot"
     />
     <chooseCity :dialog-visible.sync="cityDio" />
-    >>>>>>> department_lws
   </div>
 </template>
 <script lang="ts">
