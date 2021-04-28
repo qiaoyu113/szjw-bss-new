@@ -34,7 +34,7 @@
   </div>
 </template>
 <script>
-import throttle from 'lodash.throttle'
+import throttle from '@/utils/throttle'
 import { on, off, getDocumentRect } from '@/utils/dom'
 const prefixCls = 'ivu-scroll'
 const dragConfig = {
