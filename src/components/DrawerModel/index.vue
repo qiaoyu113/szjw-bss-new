@@ -1,10 +1,3 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 17:56:46
- * @LastEditors: D.C.base
--->
 <template>
   <el-drawer
     class="drawerBox"

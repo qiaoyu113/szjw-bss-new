@@ -142,6 +142,7 @@ export default class SearchKeyWords extends Vue {
   ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
   private key: string = '' // 当前选项是否是多选
+  private tempItem: [] = []
   private curSelecteds: [] = []
   private selectTitle: string = ''
   private selectedData: any[] = [
@@ -395,8 +396,15 @@ export default class SearchKeyWords extends Vue {
       return this.$message.warning('开始时间和结束时间不能一样')
     }
   }
+  getArrDifference(arr1:any, arr2:any) {
+    return arr1.concat(arr2).filter(function(v, i, arr) {
+      return arr.indexOf(v) === arr.lastIndexOf(v)
+    })
+  }
   // 级联框变化
   handleCascaderChange(val:IState[], key:string) {
+    let changeItem = this.getArrDifference(this.shareScopeEnd, this.listQuery[key])[0]
+    console.log(changeItem)
     if (this.shareScopeEnd.length === 0) {
       this.listQuery[key] = val
     }
@@ -415,20 +423,18 @@ export default class SearchKeyWords extends Vue {
       cityNum++
       if (cityNum > 2) {
         this.listQuery[key] = this.listQuery[key].filter((item:any) => {
-          return item.indexOf(parseInt(itemKey)) === -1
+          return item.indexOf(parseInt(changeItem[1])) === -1
         })
         this.$message.error('最多选择两个市')
       }
       if (this.levelData[itemKey].length > 2) {
-        let code = this.levelData[itemKey][2]
+        let code = changeItem[2]
         this.listQuery[key] = this.listQuery[key].filter((item:any) => {
           return item.indexOf(code) === -1
         })
-        console.log(this.listQuery[key])
         this.$message.error('一个市下最多选择两个区')
       }
     }
-    console.log(this.listQuery[key])
     this.shareScopeEnd = this.listQuery[key]
   }
   mounted() {
