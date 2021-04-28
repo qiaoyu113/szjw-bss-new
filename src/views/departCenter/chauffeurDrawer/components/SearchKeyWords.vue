@@ -27,63 +27,58 @@
           </el-dropdown>
         </template>
       </div>
-      <div>
-        <el-form
-          inline
+      <div class="form-container">
+        <div>单趟运费区间&nbsp;</div>
+        <el-input
+          v-model="listQuery.f1"
+          v-only-number="{min: 0, max: 20000, precision: 0}"
+          placeholder="最低价格"
+          class="width-80"
           size="mini"
-          style="display: flex; align-items: center;"
+        />
+        <span>~</span>
+        <el-input
+          v-model="listQuery.f2"
+          v-only-number="{min: 0, max: 20000, precision: 0}"
+          placeholder="最高价格"
+          class="width-80"
+          size="mini"
+        />
+        <div>&nbsp;&nbsp;仓库位置&nbsp;</div>
+        <el-cascader
+          v-model="listQuery.repoLoc"
+          placeholder="请选择"
+          clearable
+          :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
+          size="mini"
+          @change="onSelectionChange($event, 'repoLoc')"
+        />
+        <div>&nbsp;&nbsp;配送区域&nbsp;</div>
+        <el-cascader
+          v-model="listQuery.distLoc"
+          placeholder="请选择"
+          clearable
+          :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
+          class="width-180"
+          size="mini"
+          @change="onSelectionChange($event, 'distLoc')"
+        />
+        <div>&nbsp;&nbsp;&nbsp;</div>
+        <el-input
+          v-model="listQuery.keyWords"
+          placeholder="线路名称/编号"
+          suffix-icon="el-icon-search"
+          class="width-180"
+          size="mini"
+        />
+        <div>&nbsp;</div>
+        <el-button
+          type="primary"
+          size="mini"
+          @click="searchHandle"
         >
-          <el-form-item label="单趟运费区间">
-            <el-input
-              v-model="listQuery.f1"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
-              placeholder="最低价格"
-              class="width-80"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-input
-              v-model="listQuery.f2"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
-              placeholder="最高价格"
-              class="width-80"
-            />
-          </el-form-item>
-          <el-form-item label="仓库位置">
-            <el-cascader
-              v-model="listQuery.repoLoc"
-              placeholder="请选择"
-              clearable
-              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
-            />
-          </el-form-item>
-          <el-form-item
-            label="配送区域"
-            style="margin-right: 20px;"
-          >
-            <el-cascader
-              v-model="listQuery.distLoc"
-              placeholder="请选择"
-              clearable
-              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-input
-              v-model="listQuery.keyWords"
-              placeholder="线路名称/编号"
-              suffix-icon="el-icon-search"
-            />
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              type="primary"
-              @click="searchHandle"
-            >
-              查询
-            </el-button>
-          </el-form-item>
-        </el-form>
+          查询
+        </el-button>
       </div>
     </div>
     <div
@@ -167,6 +162,8 @@ export default class SearchKeyWords extends Vue {
   ];
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
+  private shareScopeEnd:IState[] = [];
+  private levelData: any = {};
   private selectList: IState[] = [
     {
       title: '线路肥瘦',
@@ -229,6 +226,45 @@ export default class SearchKeyWords extends Vue {
       options: this.timeLists
     }
   ]
+  getArrDifference(arr1:any, arr2:any) {
+    return arr1.concat(arr2).filter(function(v:any, i:number, arr:IState[]) {
+      return arr.indexOf(v) === arr.lastIndexOf(v)
+    })
+  }
+  onSelectionChange(val:IState[], key:string) {
+    let changeItem = this.getArrDifference(this.shareScopeEnd, this.listQuery[key])[0]
+    if (this.shareScopeEnd.length === 0) {
+      this.listQuery[key] = val
+    }
+    this.levelData = {}
+    this.listQuery[key].forEach((item:any) => {
+      if (!this.levelData[item[1]]) {
+        this.levelData[item[1]] = []
+      }
+      if (this.levelData[item[1]].indexOf(item[2]) === -1 && item[2] !== undefined) {
+        this.levelData[item[1]].push(item[2])
+      }
+    })
+
+    let cityNum = 0
+    for (let itemKey in this.levelData) {
+      cityNum++
+      if (cityNum > 2) {
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(parseInt(changeItem[1])) === -1
+        })
+        this.$message.error('最多选择两个市')
+      }
+      if (this.levelData[itemKey].length > 2) {
+        let code = changeItem[2]
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(code) === -1
+        })
+        this.$message.error('一个市下最多选择两个区')
+      }
+    }
+    this.shareScopeEnd = this.listQuery[key]
+  }
   handleClearAll() {
     this.selectedData = []
     this.$emit('on-clear')
@@ -330,6 +366,19 @@ export default class SearchKeyWords extends Vue {
   }
 </style>
 <style lang="scss" scoped>
+  .form-container {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #333;
+    flex-wrap: wrap;
+  }
+  .form-container > * {
+    margin-bottom: 10px;
+  }
+  .width-180 {
+    width: 180px;
+  }
   .width-140 {
     width: 140px;
   }
@@ -379,12 +428,6 @@ export default class SearchKeyWords extends Vue {
     // align-items: center;
     padding:15px 30px 10px 30px;
     border-bottom:2px solid #f3f3f5;
-    ::v-deep .el-form-item--mini.el-form-item{
-      margin-bottom: 0;
-    }
-    ::v-deep .selfForm{
-      padding-left: 0;
-    }
     .selectedform{
       display: flex;
       flex-wrap: wrap;

@@ -33,6 +33,7 @@
       <h3>司机匹配线路</h3>
       <div class="lineTable">
         <AtableLine
+          ref="lineTableDrawer"
           :line-table-data="lineTableData"
           :is-show-percent="true"
           obj="{}"
@@ -134,7 +135,6 @@ export default class GuestDrawer extends Vue {
       this.rowData = data
     }
     mounted() {
-
     }
 }
 </script>

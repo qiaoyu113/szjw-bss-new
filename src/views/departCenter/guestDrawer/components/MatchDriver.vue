@@ -22,7 +22,6 @@
       ref="tryRunShow"
       :obj="rowData"
     />
-
     <DetailDialog
       actived="third"
       :driver-id="detailId"
