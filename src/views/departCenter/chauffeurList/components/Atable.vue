@@ -31,7 +31,7 @@
           >
             匹配度{{ row.percent }}%
           </div> -->
-          <template>
+          <template v-if="isShowPercent">
             {{ scope.$index + 1 | addZreo }}
           </template>
         </template>

@@ -19,6 +19,7 @@
         :list-query="listQueryDriver"
         :driver-table-data.sync="driverTableData"
         :is-more="true"
+        :is-show-percent="false"
         :op-type="[]"
         @tag="setTagHandle"
         @call="setCallHandle"

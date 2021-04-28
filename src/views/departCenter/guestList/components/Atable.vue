@@ -24,12 +24,7 @@
             v-if="isShowPercent"
             class="percent"
           >
-            <template v-if="(scope.$index +1) > 9">
-              {{ scope.$index +1 }}
-            </template>
-            <template v-else>
-              {{ '0'+ (scope.$index + 1) }}
-            </template>
+            {{ scope.$index + 1 | addZreo }}
           </div>
         </template>
       </el-table-column>
@@ -301,7 +296,12 @@ interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'lineTable'
+  name: 'lineTable',
+  filters: {
+    addZreo(val: string) {
+      return +val > 9 ? val : `0${val}`
+    }
+  }
 })
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
