@@ -254,6 +254,7 @@
             class="text"
           >
             <el-button
+              v-if="!opType.includes(-1)"
               type="text"
               size="small"
               @click.stop="handleAllotSome(row)"
