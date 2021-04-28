@@ -6,7 +6,8 @@
   >
     <div
       v-infinite-scroll="load"
-      style="overflow:auto"
+      class="infiniteScroll"
+      style="overflow:auto;height: 100%;"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -20,7 +21,7 @@
         />
       </section>
       <!-- 撮合匹配的司机列表 -->
-      <MatchDriver />
+      <MatchDriver ref="matchDriver" />
     </div>
   </DrawerModel>
 </template>
@@ -77,6 +78,7 @@ export default class GuestDrawer extends Vue {
     AppModule.CloseSideBar(false)
   }
   load() {
+    (this.$refs.matchDriver as any).getLists()
     // alert(1)
   }
   mounted() {
