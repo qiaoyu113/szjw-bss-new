@@ -6,10 +6,10 @@ const isServer = Vue.prototype.$isServer
  * @param el    HTMLElement
  * @return {object}
  */
-export function getRect(el) {
+export function getRect(el:any) {
   if (!el) return null
 
-  if (el instanceof window.SVGElement) {
+  if (el instanceof (window as any).SVGElement) {
     let rect = el.getBoundingClientRect()
 
     return {
