@@ -67,10 +67,10 @@
         ref="lineTable"
         :list-query="listQuery"
         :is-more="false"
+        :line-table-data="tableData"
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
-        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
@@ -84,8 +84,6 @@
     <GuestDrawer
       v-model="showDrawer"
     />
-
-    <cancel-tryRun ref="cancelTryRun" />
   </div>
 </template>
 <script lang="ts">
@@ -96,357 +94,384 @@ import Atable from './components/Atable.vue'
 import Pagination from '@/components/Pagination/index.vue'
 
 import GuestDrawer from '../guestDrawer/index.vue'
-import CancelTryRun from './components/CancelTryRun.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import TimeSelect from '../chauffeurList/components/timeSelect.vue'
-interface PageObj {
-  page:number,
-  limit:number,
-  total?:number
-}
-
-interface IState {
-  [key: string]: any;
-}
-@Component({
-  name: 'GuestList',
-  components: {
-    SelfForm,
-    Atable,
-    Pagination,
-    GuestDrawer,
-    CancelTryRun,
-    InputRange,
-    TimeSelect
+  interface PageObj {
+    page:number,
+    limit:number,
+    total?:number
   }
-})
+
+  interface IState {
+    [key: string]: any;
+  }
+  @Component({
+    name: 'GuestList',
+    components: {
+      SelfForm,
+      Atable,
+      Pagination,
+      GuestDrawer,
+      InputRange,
+      TimeSelect
+    }
+  })
 export default class extends Vue {
-  private shareScopeEnd:IState[] = []
-  private value:IState[] = []
-  private listLoading:boolean = false
-  private showDrawer:boolean = false
-  private cityLists:IState[] = [] // 城市列表
-  private carLists:IState[] = [] // 车型列表
-  private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
-  private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
-  private listQuery:IState = {
-    labelType: '',
-    isBehavior: '',
-    loadDiff: '',
-    isRestriction: '',
-    start: [],
-    f1: '',
-    f2: '',
-    key: '',
-    g: [],
-    time: []
-  }
-  private formItem:any[] = [
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: '城市',
-      key: 'a',
-      options: this.cityLists
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: '车型',
-      key: 'b',
-      options: this.carLists
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: '装卸难度',
-      key: 'loadDiff',
-      options: this.loadDiffArr
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: '线路肥瘦',
-      key: 'labelType',
-      options: this.labelTypeArr
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
-      label: '是否闯禁行',
-      key: 'isBehavior',
-      options: [
-        {
-          label: '全部',
-          value: ''
+    private tableData:IState[] = []
+    private listLoading:boolean = false
+    private showDrawer:boolean = false
+    private cityLists:IState[] = [] // 城市列表
+    private carLists:IState[] = [] // 车型列表
+    private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
+    private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
+    private listQuery:IState = {
+      labelType: '',
+      isBehavior: '',
+      loadDiff: '',
+      isRestriction: '',
+      start: [],
+      f1: '',
+      f2: '',
+      key: '',
+      g: [],
+      time: []
+    }
+    private formItem:any[] = [
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
         },
-        {
-          label: '是',
-          value: 1
-        },
-        {
-          label: '否',
-          value: 2
-        }
-      ]
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
+        label: '城市',
+        key: 'a',
+        options: this.cityLists
       },
-      label: '是否闯限行',
-      key: 'isRestriction',
-      options: [
-        {
-          label: '全部',
-          value: ''
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
         },
-        {
-          label: '是',
-          value: 1
-        },
-        {
-          label: '否',
-          value: 2
-        }
-      ]
-    },
-    {
-      type: 'start',
-      label: '单趟运费区间',
-      key: 'start',
-      w: '110px',
-      slot: true
-    },
-    {
-      type: 'time',
-      key: 'time',
-      label: '工作时间段',
-      slot: true
-    },
-    {
-      type: 8,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        props: {
-          lazy: true,
-          lazyLoad: getProviceCityCountryData,
-          checkStrictly: true
-        }
+        label: '车型',
+        key: 'b',
+        options: this.carLists
       },
-      label: '仓库位置',
-      key: 'g'
-    },
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
+        },
+        label: '装卸难度',
+        key: 'loadDiff',
+        options: this.loadDiffArr
+      },
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
+        },
+        label: '线路肥瘦',
+        key: 'labelType',
+        options: this.labelTypeArr
+      },
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
+        },
+        label: '是否闯禁行',
+        key: 'isBehavior',
+        options: [
+          {
+            label: '全部',
+            value: ''
+          },
+          {
+            label: '是',
+            value: 1
+          },
+          {
+            label: '否',
+            value: 2
+          }
+        ]
+      },
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          filterable: true
+        },
+        label: '是否闯限行',
+        key: 'isRestriction',
+        options: [
+          {
+            label: '全部',
+            value: ''
+          },
+          {
+            label: '是',
+            value: 1
+          },
+          {
+            label: '否',
+            value: 2
+          }
+        ]
+      },
+      {
+        type: 'start',
+        label: '单趟运费区间',
+        key: 'start',
+        w: '110px',
+        slot: true
+      },
+      {
+        type: 'time',
+        key: 'time',
+        label: '工作时间段',
+        slot: true
+      },
+      {
+        type: 8,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          props: {
+            lazy: true,
+            lazyLoad: getProviceCityCountryData,
+            checkStrictly: true
+          }
+        },
+        label: '仓库位置',
+        key: 'g'
+      },
 
-    {
-      type: 8,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        props: {
-          lazy: true,
-          lazyLoad: getProviceCityCountryData,
-          checkStrictly: true
+      {
+        type: 8,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true,
+          props: {
+            lazy: true,
+            lazyLoad: getProviceCityCountryData,
+            checkStrictly: true
+          }
+        },
+        label: '配送区域',
+        key: 'i'
+      },
+      {
+        type: 15,
+        label: '线路名称/编号',
+        key: 'key',
+        slot: true,
+        w: '110px',
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true
         }
       },
-      label: '配送区域',
-      key: 'i'
-    },
-    {
-      type: 15,
-      label: '线路名称/编号',
-      key: 'key',
-      slot: true,
-      w: '110px',
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true
+      {
+        type: 2,
+        tagAttrs: {
+          placeholder: '请选择',
+          clearable: true
+        },
+        label: '稳定/临时',
+        key: 'j',
+        options: [
+          {
+            label: '全部',
+            value: ''
+          },
+          {
+            label: '稳定',
+            value: 1
+          },
+          {
+            label: '临时',
+            value: 2
+          }
+        ]
+      },
+      {
+        type: 'status',
+        key: 'status',
+        label: '客邀状态',
+        col: 16,
+        slot: true
+      },
+      {
+        type: 'btnGroup',
+        col: 8,
+        slot: true,
+        w: '0px'
       }
-    },
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true
-      },
-      label: '稳定/临时',
-      key: 'j',
-      options: [
-        {
-          label: '全部',
-          value: ''
-        },
-        {
-          label: '稳定',
-          value: 1
-        },
-        {
-          label: '临时',
-          value: 2
-        }
-      ]
-    },
-    {
-      type: 'status',
-      key: 'status',
-      label: '客邀状态',
-      col: 16,
-      slot: true
-    },
-    {
-      type: 'btnGroup',
-      col: 8,
-      slot: true,
-      w: '0px'
+    ]
+    // 表格分页
+    private page :PageObj= {
+      page: 1,
+      limit: 30,
+      total: 0
     }
-  ]
-  // 表格分页
-  private page :PageObj= {
-    page: 1,
-    limit: 30,
-    total: 0
-  }
-  // 判断是否是PC
-  get isPC() {
-    return SettingsModule.isPC
-  }
-  // 根据关键字查线路id
-  async loadLineByKeyword(params:IState) {
-    try {
-      let { data: res } = await getLineSearch(params)
-      let result:any[] = res.data.map((item:any) => ({
-        label: item.lineName,
-        value: item.lineId
-      }))
-      return result
-    } catch (err) {
-      console.log(`get driver list fail:${err}`)
-      return []
+    // 判断是否是PC
+    get isPC() {
+      return SettingsModule.isPC
     }
-  }
-  // 查询
-  handleFilterClick() {
-    // 单趟运费区间
-    const moneyRange = (this.listQuery.start || []).filter((item:string | number) => item !== '')
-    if (moneyRange.length === 1) {
-      return this.$message.warning('单趟运费输入不完整')
-    } else if (moneyRange.length === 2) {
-      if (Number(moneyRange[0]) > Number(moneyRange[1])) {
-        return this.$message.warning('单趟运费起始金额不能大于终止金额')
+    // 根据关键字查线路id
+    async loadLineByKeyword(params:IState) {
+      try {
+        let { data: res } = await getLineSearch(params)
+        let result:any[] = res.data.map((item:any) => ({
+          label: item.lineName,
+          value: item.lineId
+        }))
+        return result
+      } catch (err) {
+        console.log(`get driver list fail:${err}`)
+        return []
       }
     }
-    // 工作时间段
-    const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
-    if (timeRange.length === 1) {
-      return this.$message.warning('工作时间段输入不完整')
-    }
-
-    this.getLists()
-  }
-  // 重置
-  handleResetClick() {
-    this.listQuery = {}
-  }
-  // 获取列表
-  async getLists() {
-    try {
-      this.listLoading = true
-      setTimeout(() => {
-        (this.$refs.lineTable as any).getLists()
-      }, 1000)
-    } catch (err) {
-      console.log(`getlists fail:${err}`)
-    } finally {
-      // this.listLoading = false
-      //
-    }
-  }
-  // 客邀状态变化
-  handleStatusChange(val:string|number) {
-    console.log('xxx:', val)
-  }
-  // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
-    this.getLists()
-  }
-  // 匹配撮合
-  handleMatchTryRun() {
-    this.showDrawer = true
-  }
-  // 获取字典列表
-  async getDictList() {
-    try {
-      let params:string[] = ['Intentional_compartment', 'line_label', 'line_handling_difficulty']
-      let { data: res } = await GetDictionaryList(params)
-      if (res.success) {
-        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
-        this.loadDiffArr.push(...mapDictData(res.data.line_handling_difficulty || []))
-      } else {
-        this.$message.error(res.errorMsg)
+    // 查询
+    handleFilterClick() {
+      // 单趟运费区间
+      const moneyRange = (this.listQuery.start || []).filter((item:string | number) => item !== '')
+      if (moneyRange.length === 1) {
+        return this.$message.warning('单趟运费输入不完整')
+      } else if (moneyRange.length === 2) {
+        if (Number(moneyRange[0]) > Number(moneyRange[1])) {
+          return this.$message.warning('单趟运费起始金额不能大于终止金额')
+        }
       }
-    } catch (err) {
-      console.log(`get dict list fail:${err}`)
-    } finally {
-      //
-    }
-  }
+      // 工作时间段
+      const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
+      if (timeRange.length === 1) {
+        return this.$message.warning('工作时间段输入不完整')
+      }
 
-  init() {
-    this.getDictList();
-    (this.$refs.selectForm as any).loadQueryLineByKeyword()
-  }
-  mounted() {
-    this.init()
-    this.getLists()
-  }
+      this.getLists()
+    }
+    // 重置
+    handleResetClick() {
+      this.listQuery = {}
+    }
+    // 获取列表数据
+    async getLists() {
+      try {
+        this.tableData = []
+        this.listLoading = true
+        let num:number = 3
+        for (let i = 0; i < num; i++) {
+          let obj:IState = {
+            a: '京东传站',
+            b: '李外线经理',
+            lineId: 'XL202012300377',
+            c: '3',
+            d: '4.2米厢货',
+            e: '油车',
+            f: '能闯禁行',
+            g: '能闯限行',
+            h: '单肥',
+            p1: '湖南省',
+            c1: '长沙市',
+            c2: '短沙县',
+            m1: 500,
+            time: '9:00~18:00',
+            percent: 80,
+            id: 1,
+            arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
+            brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
+            crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+            createDate: '2021-04-15 12:00'
+          }
+          obj.isOpen = false
+          obj.id = (i + 1)
+          this.tableData.push({ ...obj })
+        }
+      } catch (err) {
+        console.log(`get list fail fail:${err}`)
+      } finally {
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1000)
+      }
+    }
+    // 客邀状态变化
+    handleStatusChange(val:string|number) {
+      console.log('xxx:', val)
+    }
+    // 分页
+    handlePageSizeChange(page:number, limit:number) {
+      if (page) {
+        this.page.page = page
+      }
+      if (limit) {
+        this.page.limit = limit
+      }
+      this.getLists()
+    }
+    // 匹配撮合
+    handleMatchTryRun() {
+      this.showDrawer = true
+    }
+    // 获取字典列表
+    async getDictList() {
+      try {
+        let params:string[] = ['Intentional_compartment', 'line_label', 'line_handling_difficulty']
+        let { data: res } = await GetDictionaryList(params)
+        if (res.success) {
+          this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+          this.labelTypeArr.push(...mapDictData(res.data.line_label || []))
+          this.loadDiffArr.push(...mapDictData(res.data.line_handling_difficulty || []))
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(`get dict list fail:${err}`)
+      } finally {
+        //
+      }
+    }
+
+    init() {
+      this.getDictList();
+      (this.$refs.selectForm as any).loadQueryLineByKeyword()
+    }
+    activated() {
+      this.getLists()
+    }
+    mounted() {
+      this.init()
+      this.getLists()
+    }
 }
 </script>
 <style lang="scss" scoped>
   .GuestListContainer {
     height:100%;
     .btnPc {
-       width: 100%;
-       display: flex;
-       flex-flow: row nowrap;
-       justify-content: flex-end;
-       &.left {
-         justify-content: flex-start;
-       }
-     }
+      width: 100%;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: flex-end;
+      &.left {
+        justify-content: flex-start;
+      }
+    }
     .mobile {
       width:100%;
       text-align: center;

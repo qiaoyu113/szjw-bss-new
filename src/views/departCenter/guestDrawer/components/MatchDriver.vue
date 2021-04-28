@@ -32,7 +32,6 @@
 import SearchKeyWords from './SearchKeyWords.vue'
 import AtableDriver from '../../chauffeurList/components/Atable.vue'
 import SetTag from './SetTag.vue'
-import CancelTryRun from '../../guestList/components/CancelTryRun.vue'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -45,7 +44,6 @@ interface IState {
     AtableDriver,
     SearchKeyWords,
     SetTag,
-    CancelTryRun,
     CreateTryRun,
     DetailDialog
   }
