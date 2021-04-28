@@ -6,21 +6,21 @@
   >
     <div
       v-infinite-scroll="load"
-      style="overflow:auto"
+      class="infiniteScroll"
+      style="overflow:auto;height: 100%;"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
         <h3>待撮合线路</h3>
         <AtableLine
           ref="lineDrawer"
-          :list-query="listQueryLine"
+          :line-table-data.sync="lineTableData"
           obj="{}"
           :is-more="true"
-          @cancelTryRun="handleCancelTryRun1"
         />
       </section>
       <!-- 撮合匹配的司机列表 -->
-      <MatchDriver />
+      <MatchDriver ref="matchDriver" />
     </div>
   </DrawerModel>
 </template>
@@ -47,6 +47,8 @@ export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
+  private lineTableData:IState[] = [] // 线路列表
+  private driverTableData:IState[] = [] // 司机列表
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
