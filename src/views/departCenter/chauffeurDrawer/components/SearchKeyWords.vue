@@ -29,48 +29,21 @@
       </div>
       <div>
         <el-form
-          :inline="true"
+          inline
           size="mini"
+          style="display: flex; align-items: center;"
         >
-          <el-form-item label="工作时间段">
-            <el-select
-              v-model="listQuery.f1"
-              placeholder="开始时间"
-              class="width-100"
-            >
-              <el-option
-                v-for="(item, index) in timeLists"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="">
-            <el-select
-              v-model="listQuery.f2"
-              placeholder="结束时间"
-              class="width-100"
-            >
-              <el-option
-                v-for="(item, index) in timeLists"
-                :key="index"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
           <el-form-item label="单趟运费区间">
             <el-input
-              v-model="listQuery.start"
+              v-model="listQuery.f1"
               v-only-number="{min: 0, max: 20000, precision: 0}"
               placeholder="最低价格"
               class="width-80"
             />
           </el-form-item>
-          <el-form-item label="">
+          <el-form-item>
             <el-input
-              v-model="listQuery.end"
+              v-model="listQuery.f2"
               v-only-number="{min: 0, max: 20000, precision: 0}"
               placeholder="最高价格"
               class="width-80"
@@ -81,17 +54,18 @@
               v-model="listQuery.repoLoc"
               placeholder="请选择"
               clearable
-              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
-              class="width-120"
+              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
             />
           </el-form-item>
-          <el-form-item label="配送区域">
+          <el-form-item
+            label="配送区域"
+            style="margin-right: 20px;"
+          >
             <el-cascader
               v-model="listQuery.distLoc"
               placeholder="请选择"
               clearable
-              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
-              class="width-120"
+              :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
             />
           </el-form-item>
           <el-form-item>
@@ -99,7 +73,6 @@
               v-model="listQuery.keyWords"
               placeholder="线路名称/编号"
               suffix-icon="el-icon-search"
-              class="width-140"
             />
           </el-form-item>
           <el-form-item>
@@ -171,18 +144,19 @@ export default class SearchKeyWords extends Vue {
   ];
   private timeLists:IState[] = []
   private listQuery:IState = {
-    busiType: '', // 所属业务线
-    carType: '', // 车类型
-    hard: '', // 装卸接受度
-    cycle: '', // 结算周期
-    hope: '', // 期望稳定/临时
-    expectType: '', // 期望货品类型
-    expectHard: '', // 期望配送难度
+    lineQuality: '', // 线路肥瘦
+    model: '', // 车型
+    loadDifficulty: '', // 装卸难易度
+    stability: '', // 稳定/临时
+    clearCycle: '', // 结算周期
+    cargoType: '', // 货品类型
+    deliverComplexity: '', // 配送类型/复杂度
     start: '',
     end: '',
     f1: '',
     f2: '',
-    address: '',
+    repoLoc: '',
+    distLoc: '',
     keyWords: ''
   };
   private lineQualities: any[] = [
@@ -193,93 +167,6 @@ export default class SearchKeyWords extends Vue {
   ];
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
-  private formItem:any[] = [
-    {
-      type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true,
-        style: {
-          width: '100px'
-        }
-      },
-      label: '工作时间段',
-      col: 5,
-      key: 'f1',
-      options: this.timeLists
-    },
-    {
-      type: 2,
-      col: 4,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true,
-        style: {
-          width: '100px'
-        }
-      },
-      label: ' ',
-      w: '20px',
-      key: 'f2',
-      class: 'end',
-      options: this.timeLists
-    },
-    {
-      type: 'start',
-      label: '单趟运费区间',
-      key: 'start',
-      w: '110px',
-      col: 5,
-      slot: true
-    },
-    {
-      type: 'end',
-      label: ' ',
-      w: '20px',
-      key: 'end',
-      col: 3,
-      class: 'end',
-      slot: true
-    },
-    {
-      type: 8,
-      col: 7,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        props: {
-          lazy: true,
-          lazyLoad: getProviceCityCountryData
-        }
-      },
-      label: '仓库位置',
-      key: 'repoLoc'
-    },
-    {
-      type: 8,
-      col: 7,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        props: {
-          lazy: true,
-          lazyLoad: getProviceCityCountryData
-        }
-      },
-      label: '配送区域',
-      key: 'distLoc'
-    },
-    {
-      type: 'keyword',
-      label: '',
-      key: 'keyword',
-      w: '110px',
-      col: 5,
-      slot: true
-    }
-  ];
   private selectList: IState[] = [
     {
       title: '线路肥瘦',
@@ -330,6 +217,16 @@ export default class SearchKeyWords extends Vue {
         { label: '整车', value: 1 },
         { label: '多点配', value: 2 }
       ]
+    },
+    {
+      title: '开始工作时间',
+      key: 'start',
+      options: this.timeLists
+    },
+    {
+      title: '结束工作时间',
+      key: 'end',
+      options: this.timeLists
     }
   ]
   handleClearAll() {
@@ -476,13 +373,13 @@ export default class SearchKeyWords extends Vue {
       display: none;
   }
   .topSelect{
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    align-items: center;
-    padding:15px 30px 12px 30px;
+    // display: flex;
+    // justify-content: space-between;
+    // flex-wrap: wrap;
+    // align-items: center;
+    padding:15px 30px 10px 30px;
     border-bottom:2px solid #f3f3f5;
-    ::v-deep .el-form-item--small.el-form-item{
+    ::v-deep .el-form-item--mini.el-form-item{
       margin-bottom: 0;
     }
     ::v-deep .selfForm{
