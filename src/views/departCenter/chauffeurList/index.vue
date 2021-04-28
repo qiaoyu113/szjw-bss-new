@@ -17,7 +17,7 @@
     <div class="table_box">
       <Atable
         ref="Atable"
-        :table-data="tableData"
+        :driver-table-data="tableData"
         :is-show-percent="false"
         :is-more="false"
         :op-type="[2,1,5,6]"
@@ -28,7 +28,6 @@
         @checkData="checkData"
         @allotSome="allotSome"
         @chooseCity="chooseCity"
-        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
@@ -73,177 +72,229 @@ import SetTag from '../guestDrawer/components/SetTag.vue'
 import ChauffeureDrawer from '../chauffeurDrawer/index.vue'
 import allotDio from './components/allotDio.vue'
 import chooseCity from './components/chooseCity.vue'
-interface PageObj {
-  page: number;
-  limit: number;
-  total?: number;
-}
-
-interface IState {
-  [key: string]: any;
-}
-@Component({
-  name: 'ChauffeurList',
-  components: {
-    Atable,
-    Pagination,
-    CallPhone,
-    SearchForm,
-    SetTag,
-    DetailDialog,
-    ChauffeureDrawer,
-    allotDio,
-    chooseCity
+  interface PageObj {
+    page: number;
+    limit: number;
+    total?: number;
   }
-})
+
+  interface IState {
+    [key: string]: any;
+  }
+  @Component({
+    name: 'ChauffeurList',
+    components: {
+      Atable,
+      Pagination,
+      CallPhone,
+      SearchForm,
+      SetTag,
+      DetailDialog,
+      ChauffeureDrawer,
+      allotDio,
+      chooseCity
+    }
+  })
 export default class extends Vue {
-  private listQuery: IState = {
-    busiType: null,
-    carType: '',
-    carKind: null,
-    driverId: '',
-    address: '',
-    hard: null,
-    hope: null,
-    cycle: null,
-    rents: [],
-    time: [],
-    status: ''
-  };
-  private listLoading: boolean = false;
-  private callPhoneDio: boolean = false;
-  private clueType: number = 0;
-  private clueId: string = '';
-  private phone: string = '';
-  private tableData: IState[] = [{}, {}];
-  private callObj: IState = {
-    callPhoneDio: false,
-    clueType: 0,
-    clueId: '',
-    phone: ''
-  };
-  private detailDio:Boolean = false
-  private cityDio:Boolean = false
-  private allotDialog:Boolean = false
-  private allotTitle:string = ''
-  private detailId:string = ''
-  private showTag:Boolean = false
-  private showDrawer: Boolean = false
-  private allotData:IState[] = []
-  private checkOne:IState = {}
-  // 表格分页
-  private page: PageObj = {
-    page: 1,
-    limit: 30,
-    total: 0
-  };
-  get isPC() {
-    return SettingsModule.isPC
-  }
+    private tableData:IState[] = [];
+    private listQuery: IState = {
+      busiType: null,
+      carType: '',
+      carKind: null,
+      driverId: '',
+      address: '',
+      hard: null,
+      hope: null,
+      cycle: null,
+      rents: [],
+      time: [],
+      status: ''
+    };
+    private listLoading: boolean = false;
+    private callPhoneDio: boolean = false;
+    private clueType: number = 0;
+    private clueId: string = '';
+    private phone: string = '';
+    private callObj: IState = {
+      callPhoneDio: false,
+      clueType: 0,
+      clueId: '',
+      phone: ''
+    };
+    private detailDio:Boolean = false
+    private cityDio:Boolean = false
+    private allotDialog:Boolean = false
+    private allotTitle:string = ''
+    private detailId:string = ''
+    private showTag:Boolean = false
+    private showDrawer: Boolean = false
+    private allotData:IState[] = []
+    private checkOne:IState = {}
+    // 表格分页
+    private page: PageObj = {
+      page: 1,
+      limit: 30,
+      total: 0
+    };
+    get isPC() {
+      return SettingsModule.isPC
+    }
 
-  call(row:IState) {
-    console.log(row)
-    let phone = '18848885135'
-    let repStr = phone.substr(3)
-    let newStr = phone.replace(repStr, '********')
-    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-      .then(() => {
-        console.log(123)
+    call(row:IState) {
+      console.log(row)
+      let phone = '18848885135'
+      let repStr = phone.substr(3)
+      let newStr = phone.replace(repStr, '********')
+      this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
-      .catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消拨打'
+        .then(() => {
+          console.log(123)
         })
-      })
-  }
-  tag(row:IState) {
-    console.log('tag');
-    (this.$refs['setTag'] as any).showDialog = true
-  }
-  depart() {
-    this.showDrawer = true
-  }
-  checkData(data:IState[]) {
-    this.allotData = data
-  }
-  allotSome(val:IState) {
-    this.allotTitle = '分配司撮'
-    this.allotDialog = true
-    this.checkOne = val
-  }
-  chooseCity(val:IState) {
-    this.cityDio = true
-    this.checkOne = val
-  }
-  detail() {
-    console.log('detail')
-    this.detailDio = true
-  }
-  closeAllot() {
-    (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
-  }
-  // 获取列表
-  async getLists() {
-    try {
-      console.log('getList', this.listQuery)
-      this.listLoading = true
-      setTimeout(() => {
-        (this.$refs.Atable as any).getLists()
-      }, 1000)
-    } catch (err) {
-      console.log(`getlists fail:${err}`)
-    } finally {
-      // this.listLoading = false
-      //
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消拨打'
+          })
+        })
     }
-  }
-  // 客邀状态变化
-  handleStatusChange(val: string | number) {
-    console.log('xxx:', val)
-  }
-  // 线路名称/编号 模糊搜索
-  querySearch(queryString: string, cb: Function) {
-    // eslint-disable-next-line standard/no-callback-literal
-    cb([])
-  }
-  // 分页
-  handlePageSizeChange(page: number, limit: number) {
-    if (page) {
-      this.page.page = page
+    tag(row:IState) {
+      console.log('tag');
+      (this.$refs['setTag'] as any).showDialog = true
     }
-    if (limit) {
-      this.page.limit = limit
+    depart() {
+      this.showDrawer = true
     }
-    this.getLists()
-  }
-  init() {
-    this.getLists()
-  }
-  activated() {
-    this.getLists()
-  }
-  mounted() {
-    this.init()
-  }
+    checkData(data:IState[]) {
+      this.allotData = data
+    }
+    allotSome(val:IState) {
+      this.allotTitle = '分配司撮'
+      this.allotDialog = true
+      this.checkOne = val
+    }
+    chooseCity(val:IState) {
+      this.cityDio = true
+      this.checkOne = val
+    }
+    detail() {
+      console.log('detail')
+      this.detailDio = true
+    }
+    closeAllot() {
+      (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
+    }
+
+    // 获取列表数据
+    async getLists() {
+      try {
+        this.listLoading = true
+        let num:number = 3
+        this.tableData = []
+        for (let i = 0; i < num; i++) {
+          let obj:IState = {
+            driverName: '张道松',
+            manager: '李加盟经理',
+            driverId: 'SJ20210415',
+            phoneNum: '132000000000',
+            a: '京东传站',
+            b: '李外线经理',
+            lineId: 'XL202012300377',
+            c: '3',
+            d: '4.2米厢货',
+            e: '油车',
+            f: '能闯禁行',
+            g: '能闯限行行',
+            h: '共享',
+            p1: '湖南省',
+            c1: '长沙市',
+            c2: '短沙县',
+            m1: 500,
+            time: '9:00~18:00',
+            percent: 80,
+            id: 1,
+            arr: [
+              '商贸信息',
+              '已创建30条线路',
+              '15条在跑',
+              '5条线路已掉线',
+              '3条线路在上架找车'
+            ],
+            brr: [
+              '1个点',
+              '每日1趟',
+              '每月12天',
+              '每趟120公里',
+              '走高速',
+              '回单',
+              '城配线',
+              '稳定(2个月)'
+            ],
+            crr: [
+              '已发起3次客邀',
+              '已创建意向3次',
+              '试跑失败2次',
+              '司机爽约1次',
+              '扭头就走1次',
+              '掉线1次'
+            ]
+          }
+          obj.isOpen = false
+          obj.id = (i + 1)
+          this.tableData.push({ ...obj })
+        }
+      } catch (err) {
+        console.log(`get list fail fail:${err}`)
+      } finally {
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1000)
+      }
+    }
+    // 客邀状态变化
+    handleStatusChange(val: string | number) {
+      console.log('xxx:', val)
+    }
+    // 线路名称/编号 模糊搜索
+    querySearch(queryString: string, cb: Function) {
+      // eslint-disable-next-line standard/no-callback-literal
+      cb([])
+    }
+    // 分页
+    handlePageSizeChange(page: number, limit: number) {
+      if (page) {
+        this.page.page = page
+      }
+      if (limit) {
+        this.page.limit = limit
+      }
+      this.getLists()
+    }
+    init() {
+      this.getLists()
+    }
+    activated() {
+      this.getLists()
+    }
+    mounted() {
+      this.init()
+    }
 }
 
 </script>
 <style lang="scss" scoped>
-.chauffeurListContainer {
-  height:100%;
-  .table_box {
-    padding: 30px 30px 0px;
-    background: #ffffff;
-    -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-    box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
-    overflow: hidden;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+  .chauffeurListContainer {
+    height:100%;
+    .table_box {
+      padding: 30px 30px 0px;
+      background: #ffffff;
+      -webkit-box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+      box-shadow: 4px 4px 10px 0 rgba(218, 218, 218, 0.5);
+      overflow: hidden;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
   }
-}
 </style>

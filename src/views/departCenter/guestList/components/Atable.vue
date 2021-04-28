@@ -2,7 +2,7 @@
   <div class="lineTableContainer">
     <el-table
       ref="lineTable"
-      :data="tableData"
+      :data="_tableData"
       style="width: 100%"
       border
       stripe
@@ -127,19 +127,8 @@
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
           >
-            单趟运费:{{ row.m1 }}元/每日{{ row.m1 }}趟/{{ row.m1 }}天
+            单趟运费:{{ row.m1 }}元/{{ row.m1 }}趟/{{ row.m1 }}天
           </p>
-          <!-- <p
-            class="text"
-            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
-          >
-            每日配送趟数:{{ row.m1 }}趟
-          </p>
-          <p
-            class="text"
-          >
-            预计月出车天数:{{ row.m1 }}天
-          </p> -->
           <p
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
@@ -208,12 +197,6 @@
               class="el-icon-s-custom"
             /> 老张
           </p>
-          <!-- <p
-            v-if="row.a"
-            class="text"
-          >
-            已上架
-          </p> -->
           <p
             class="text"
             :a="row.a"
@@ -225,9 +208,6 @@
               天津已客邀
             </template>
           </p>
-          <!-- <p class="text">
-            待确认意向
-          </p> -->
           <p class="text">
             本城已客邀
           </p>
@@ -326,25 +306,32 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
-  @Prop({ default: () => {} }) listQuery!:IState
   @Prop({ default: () => {} }) obj!:IState
-  private tableData:IState[] = []
+  @Prop({ default: () => [] }) lineTableData!:IState[]
+
+  get _tableData() {
+    return this.lineTableData
+  }
+  set _tableData(val:IState[]) {
+    this.$emit('update:lineTableData', val)
+  }
+
   // 展开
   toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
-    for (let i = 0; i < this.tableData.length; i++) {
-      let item:IState = this.tableData[i]
-      if ((row.id !== item.id)) {
-        row.isOpen = false
-        $table.toggleRowExpansion(item, false)
-      } else if (row.isOpen) {
+    for (let i = 0; i < this._tableData.length; i++) {
+      let item:IState = this._tableData[i]
+      if ((row.id === item.id) && row.isOpen) {
         row.isOpen = false
         $table.toggleRowExpansion(item, false)
         return false
+      } else {
+        item.isOpen = false
+        $table.toggleRowExpansion(item, false)
       }
-      row.isOpen = true
-      $table.toggleRowExpansion(row)
     }
+    row.isOpen = true
+    $table.toggleRowExpansion(row, true)
   }
   // 匹配撮合
   handleMatchClick(row:IState) {
@@ -361,47 +348,6 @@ export default class extends Vue {
     })
     window.open(href, '_blank')
   }
-  // 获取列表数据
-  async getLists() {
-    try {
-      let num:number = 3
-      if (this.isMore && !this.isShowPercent) {
-        num = 1
-      }
-      this.tableData = []
-      for (let i = 0; i < num; i++) {
-        let obj:IState = {
-          a: '京东传站',
-          b: '李外线经理',
-          lineId: 'XL202012300377',
-          c: '3',
-          d: '4.2米厢货',
-          e: '油车',
-          f: '能闯禁行',
-          g: '能闯限行',
-          h: '单肥',
-          p1: '湖南省',
-          c1: '长沙市',
-          c2: '短沙县',
-          m1: 500,
-          time: '9:00~18:00',
-          percent: 80,
-          id: 1,
-          arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-          brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-          createDate: '2021-04-15 12:00'
-        }
-        obj.isOpen = false
-        obj.id = (i + 1)
-        this.tableData.push({ ...obj })
-      }
-    } catch (err) {
-      console.log(`get list fail fail:${err}`)
-    } finally {
-      this.$emit('closeLoading')
-    }
-  }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
   removeTableInfo() {
     sessionStorage.removeItem(key)
@@ -410,10 +356,8 @@ export default class extends Vue {
     if (this.isMore && !this.isShowPercent) {
       let str = sessionStorage.getItem(key) || ''
       if (str) {
-        this.tableData = [JSON.parse(str)]
+        this._tableData = [JSON.parse(str)]
       }
-    } else if (this.isMore && this.isShowPercent) {
-      this.getLists()
     }
   }
 }
