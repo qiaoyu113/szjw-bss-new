@@ -79,9 +79,7 @@ export default class GuestDrawer extends Vue {
     AppModule.CloseSideBar(false)
   }
   loadMoreHandle() {
-    setTimeout(() => {
-      (this.$refs.matchDriver as any).getLists()
-    }, 1000)
+    (this.$refs.matchDriver as any).getLists()
   }
   mounted() {
 
