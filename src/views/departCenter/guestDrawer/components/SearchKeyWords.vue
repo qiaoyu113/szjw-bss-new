@@ -1,10 +1,3 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-27 19:17:17
- * @LastEditors: D.C.base
--->
 <template>
   <div class="searchBox">
     <div class="topSelect">

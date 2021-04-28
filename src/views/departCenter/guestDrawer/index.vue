@@ -1,10 +1,3 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-28 09:17:45
- * @LastEditors: D.C.base
--->
 <template>
   <DrawerModel
     v-model="visible"
@@ -75,6 +68,10 @@ export default class GuestDrawer extends Vue {
     this.$emit('input', false);
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
+  }
+  // 取消创建试跑意向
+  handleCancelTryRun1() {
+    (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   handleOpenClick() {
     AppModule.CloseSideBar(false)

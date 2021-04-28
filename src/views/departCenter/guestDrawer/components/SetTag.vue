@@ -1,10 +1,3 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-17 10:13:08
- * @LastEditTime: 2021-04-27 18:00:13
- * @LastEditors: D.C.base
--->
 <template>
   <div class="setTag">
     <SelfDialog
