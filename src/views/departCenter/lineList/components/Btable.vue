@@ -154,25 +154,61 @@
           class-name="center"
         >
           <template slot-scope="{row}">
-            <p class="text">
-              <i
-                class="el-icon-s-custom"
-              /> {{ row.status.name }}
-            </p>
+            <template v-if="row.status.isAllowInvite">
+              <p
+                v-show="(row.status.city.length===1||row.status.city.length===2)&&row.status.isInviteSuccess!==1"
+                class="text"
+              >
+                {{ `${row.status.city[0]}${row.status.city[1]?"、"+row.status.city[1]:"" }` }}已客邀
+              </p>
+              <p
+                v-show="row.status.city.length>2"
+                class="text"
+              >
+                <el-popover
+                  placement="top-start"
+                  min-width="200"
+                  trigger="hover"
+                >
+                  <div class="text1">
+                    {{ row.status.city | cityListFilter }}
+                  </div>
+                  <span
+                    slot="reference"
+                    style="color:orange"
+                  >{{ row.status.city.length }}<span style="color:#444">个城市已客邀</span></span>
+                </el-popover>
+              </p>
+              <p
+                v-show="row.status.isLocationInvite===1&&row.status.locationCitySuccess!==1&&row.status.isInviteSuccess!==1"
+                class="text"
+              >
+                本城已客邀
+              </p>
+              <p
+                v-show="row.status.isLocationInvite===0&&row.status.locationCitySuccess!==1&&row.status.isInviteSuccess!==1"
+                class="text"
+              >
+                本城未客邀
+              </p>
+              <p
+                v-show="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===1"
+                class="text"
+              >
+                本城客邀撮合成功
+              </p>
+              <p
+                v-show="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===0"
+                class="text"
+              >
+                {{ row.status.city[0] }}客邀撮合成功
+              </p>
+            </template>
             <p
-              v-if="row.a"
+              v-else
               class="text"
             >
-              {{ row.status.state===1?'已上架':'未上架' }}
-            </p>
-            <p class="text">
-              {{ row.status.iscustomInvite===1?'已发起客邀':'未发起客邀' }}
-            </p>
-            <p class="text">
-              {{ row.status.intention===1?'待确认意向':'已确认意向' }}
-            </p>
-            <p class="text">
-              {{ row.status.customInviteStatus===1?'客邀成功':'客邀失败' }}
+              不可发起客邀
             </p>
           </template>
         </el-table-column>
@@ -182,8 +218,11 @@
           class-name="center"
         >
           <!-- <template slot-scope="{row}"> -->
-          <template>
-            <p class="text">
+          <template slot-scope="{row}">
+            <p
+              v-if="row.status.isLocationInvite===0&&row.status.isInviteSuccess===0&&row.status.isAllowInvite===1"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -192,7 +231,10 @@
                 发起客邀
               </el-button>
             </p>
-            <p class="text">
+            <p
+              v-if="row.status.isLocationInvite===1&&row.status.isAllowInvite===1&&row.status.isInviteSuccess===0"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -201,7 +243,10 @@
                 取消客邀
               </el-button>
             </p>
-            <p class="text">
+            <p
+              v-if="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===1"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -210,7 +255,10 @@
                 取消意向
               </el-button>
             </p>
-            <p class="text">
+            <p
+              v-if="!row.status.locationCitySuccess"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -289,13 +337,21 @@ interface IState {
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
-        case 1: return ' 不装卸'
+        case 1: return '不装卸'
         case 2: return '只装不卸（轻）'
         case 3: return '只卸不装（轻）'
         case 4: return '只装不卸（重）'
         case 5: return '只卸不装（重）'
         case 6: return '重装卸（重）'
       }
+    },
+    cityListFilter(value:[]) {
+      let str = ''
+      value.forEach(item => {
+        str += item + '、'
+      })
+      str = str.slice(0, str.length - 1)
+      return str
     }
   }
 })
@@ -360,15 +416,57 @@ export default class extends Vue {
           },
           label: ['爆款', '客急', '客邀线'],
           status: {
-            name: '老王',
-            state: 1, // 1:已上架
-            iscustomInvite: 1, // 1:已发起客邀
-            intention: 1, // 1:待确认意向
-            customInviteStatus: 1// 1:客邀成功
+            city: ['天津', '北京'],
+            isLocationInvite: 1, // 本城是否已客邀
+            isAllowInvite: 1, // 是否可发起客邀
+            isInviteSuccess: 0, // 是否客邀撮合成功
+            locationCitySuccess: 0// 本城客邀撮合成功
           }
         }
         obj.id = (i + 1)
         this.tableData.push({ ...obj })
+      }
+      this.tableData[1].status = {
+        city: ['天津'],
+        isLocationInvite: 1, // 本城是否已客邀
+        isAllowInvite: 1, // 是否可发起客邀
+        isInviteSuccess: 0, // 是否客邀撮合成功
+        locationCitySuccess: 0// 本城客邀撮合成功
+      }
+      this.tableData[2].status = {
+        city: ['天津', '北京', '上海', '南京'],
+        isLocationInvite: 0, // 本城是否已客邀
+        isAllowInvite: 1, // 是否可发起客邀
+        isInviteSuccess: 0, // 是否客邀撮合成功
+        locationCitySuccess: 0// 本城客邀撮合成功
+      }
+      this.tableData[3].status = {
+        city: [],
+        isLocationInvite: 0, // 本城是否已客邀
+        isAllowInvite: 1, // 是否可发起客邀
+        isInviteSuccess: 1, // 是否客邀撮合成功
+        locationCitySuccess: 1// 本城客邀撮合成功
+      }
+      this.tableData[4].status = {
+        city: ['天津'],
+        isLocationInvite: 0, // 本城是否已客邀
+        isAllowInvite: 1, // 是否可发起客邀
+        isInviteSuccess: 1, // 是否客邀撮合成功
+        locationCitySuccess: 0// 本城客邀撮合成功
+      }
+      this.tableData[4].status = {
+        city: ['天津'],
+        isLocationInvite: 0, // 本城是否已客邀
+        isAllowInvite: 0, // 是否可发起客邀
+        isInviteSuccess: 0, // 是否客邀撮合成功
+        locationCitySuccess: 0// 本城客邀撮合成功
+      }
+      this.tableData[5].status = {
+        city: ['天津'],
+        isLocationInvite: 0, // 本城是否已客邀
+        isAllowInvite: 1, // 是否可发起客邀
+        isInviteSuccess: 1, // 是否客邀撮合成功
+        locationCitySuccess: 0// 本城客邀撮合成功
       }
     } catch (err) {
       console.log(`get list fail fail:${err}`)
