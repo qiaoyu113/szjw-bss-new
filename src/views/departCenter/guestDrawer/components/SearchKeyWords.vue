@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:37:27
- * @LastEditTime: 2021-04-27 17:23:52
+ * @LastEditTime: 2021-04-27 19:17:17
  * @LastEditors: D.C.base
 -->
 <template>
@@ -335,10 +335,8 @@ export default class SearchKeyWords extends Vue {
           } else {
             if (this.selectedData[index].optionIds[0] === '') {
               this.selectedData[index].optionIds.shift()
-              this.selectedData[index].selected.shift()
             }
             if (this.selectedData[index].selected[0] === '全部') {
-              this.selectedData[index].optionIds.shift()
               this.selectedData[index].selected.shift()
             }
             this.selectedData[index].optionIds.push(id)
@@ -397,8 +395,11 @@ export default class SearchKeyWords extends Vue {
       }
     }
     // 工作时间段
-    if (!this.listQuery.jobStartDate || this.listQuery.jobEndDate) {
+    if (!this.listQuery.jobStartDate || !this.listQuery.jobEndDate) {
       return this.$message.warning('工作时间段输入不完整')
+    }
+    if (this.listQuery.jobStartDate === this.listQuery.jobEndDate) {
+      return this.$message.warning('开始时间和结束时间不能一样')
     }
   }
   // 级联框变化

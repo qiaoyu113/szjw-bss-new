@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 17:58:16
+ * @LastEditTime: 2021-04-27 19:37:08
  * @LastEditors: D.C.base
 -->
 <template>
@@ -23,35 +23,7 @@
       />
     </section>
     <!-- 撮合匹配的司机列表 -->
-    <section class="matchDriver">
-      <!-- 搜索项 -->
-      <SearchKeyWords />
-      <h3>司机匹配线路</h3>
-      <div class="lineTable">
-        <AtableDriver
-          ref="tableDriver"
-          :list-query="listQueryDriver"
-          :is-more="true"
-          :is-show-percent="true"
-          :op-type="[3,4,5]"
-          @tag="setTagHandle"
-          @call="setCallHandle"
-          @creatRun="creatRunHandle"
-          @detail="detailHandle"
-        />
-      </div>
-    </section>
-    <SetTag ref="tagShow" />
-    <CreateTryRun
-      ref="tryRunShow"
-      :obj="rowData"
-    />
-    <cancel-tryRun ref="cancelTryRun1" />
-    <DetailDialog
-      actived="third"
-      :driver-id="detailId"
-      :dialog-table-visible.sync="detailDialog"
-    />
+    <MatchDriver />
   </DrawerModel>
 </template>
 
@@ -59,12 +31,8 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
-import CreateTryRun from '../guestList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
-import AtableDriver from '../chauffeurList/components/Atable.vue'
-import SetTag from './components/SetTag.vue'
-import CancelTryRun from '../guestList/components/CancelTryRun.vue'
-import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
+import MatchDriver from './components/MatchDriver.vue'
 import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
@@ -74,32 +42,14 @@ interface IState {
     DrawerModel,
     SearchKeyWords,
     AtableLine,
-    AtableDriver,
-    CreateTryRun,
-    SetTag,
-    CancelTryRun,
-    DetailDialog
+    MatchDriver
   }
 })
 export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
-  private tagShow:boolean = false
-  private tryRunShow:boolean = false
   private rowData:object = {}
-  private detailDialog:Boolean = false
-  private detailId:string = ''
   private listQueryLine:IState = {
-    labelType: '',
-    isBehavior: '',
-    isRestriction: '',
-    status: '',
-    start: '',
-    end: '',
-    f1: '',
-    f2: ''
-  }
-  private listQueryDriver:IState = {
     labelType: '',
     isBehavior: '',
     isRestriction: '',
@@ -121,39 +71,8 @@ export default class GuestDrawer extends Vue {
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
   }
-  // 取消创建试跑意向
-  handleCancelTryRun1() {
-    (this.$refs.cancelTryRun1 as any).showDialog = true
-  }
-  setTagHandle() {
-    (this.$refs.tagShow as any).isShow = true
-  }
-  setCallHandle(data:any) {
-    let phone = data.phoneNum
-    let repStr = phone.substr(3)
-    let newStr = phone.replace(repStr, '********')
-    this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
-      console.log(123)
-    }).catch(() => {
-      this.$message({
-        type: 'info',
-        message: '已取消拨打'
-      })
-    })
-  }
-  creatRunHandle(data:any) {
-    (this.$refs.tryRunShow as any).showDialog = true
-    this.rowData = data
-  }
   handleOpenClick() {
     AppModule.CloseSideBar(false)
-  }
-  detailHandle() {
-    this.detailDialog = true
   }
   mounted() {
 
