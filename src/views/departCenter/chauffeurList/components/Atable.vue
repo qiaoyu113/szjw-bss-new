@@ -98,10 +98,10 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            运费趟:{{ row.m1 }}元
+            运费运费（趟）:{{ row.m1 }}元
           </p>
           <p class="text">
-            期望月:{{ row.m1 }}元
+            期望运费（月）:{{ row.m1 }}元
           </p>
           <p class="text">
             期望账期:现结/周结
@@ -118,13 +118,13 @@
             期望货品:食品/团购
           </p>
           <p class="text">
-            期望装卸难度:只装不卸
+            期望装卸度:只装不卸
           </p>
           <p class="text">
-            期望类型:整车
+            期望配送复杂度:整车
           </p>
           <p class="text">
-            工作时间段:{{ row.time }}
+            可工作时间段:{{ row.time }}
           </p>
         </template>
       </el-table-column>
@@ -445,7 +445,7 @@ export default class extends Vue {
           d: '4.2米厢货',
           e: '油车',
           f: '能闯禁行',
-          g: '能闯限行行',
+          g: '能闯限行',
           h: '共享',
           p1: '湖南省',
           c1: '长沙市',

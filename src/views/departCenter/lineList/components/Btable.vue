@@ -14,7 +14,7 @@
         fit
         :header-cell-style="{padding: '6px 20px'}"
         :cell-style="{padding: '5px 20px'}"
-        @selection-change="selectHandle"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column
           type="selection"
@@ -136,7 +136,6 @@
         <el-table-column
           label="标签"
           min-width="180"
-          width="140"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -206,21 +205,19 @@
               <el-button
                 type="text"
                 size="small"
+                @click.stop="handleCancelTryRun"
               >
-                查看详情
+                取消意向
               </el-button>
             </p>
-            <!-- <p
-              v-if="isMore"
-              class="text"
-            >
+            <p class="text">
               <el-button
-                size="mini"
-                @click.stop="toogleExpand(row)"
+                type="text"
+                size="small"
               >
-                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+                查看线路详情
               </el-button>
-            </p> -->
+            </p>
           </template>
         </el-table-column>
         <el-table-column
@@ -292,7 +289,7 @@ interface IState {
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
-        case 1: return '不装卸'
+        case 1: return ' 不装卸'
         case 2: return '只装不卸（轻）'
         case 3: return '只卸不装（轻）'
         case 4: return '只装不卸（重）'
@@ -405,6 +402,11 @@ export default class extends Vue {
   handleLaunchGuest() {
     this.$emit('launchGuest')
   }
+  // 取消意向
+  handleCancelTryRun() {
+    this.$emit('cancelTryRun')
+  }
+
   // 选择事件
   handleSelect(selection:[], row:{}) {
     console.log(selection, row)
@@ -413,6 +415,11 @@ export default class extends Vue {
   selectHandle(selection:[]) {
     console.log(selection)
     this.$emit('select')
+  }
+  // 勾选
+  handleSelectionChange(selection:[]) {
+    console.log('勾选项', selection)
+    this.$emit('SelectionChange')
   }
 }
 </script>

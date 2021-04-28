@@ -129,9 +129,7 @@ export default class GuestDrawer extends Vue {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
   }
-  handleOpenClick() {
-    AppModule.CloseSideBar(false)
-  }
+
   mounted() {
 
   }

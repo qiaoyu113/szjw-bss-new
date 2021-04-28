@@ -119,7 +119,7 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="200"
+        min-width="240"
         align="center"
       >
         <template slot-scope="{row}">
@@ -127,9 +127,9 @@
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
           >
-            单趟运费:{{ row.m1 }}元
+            单趟运费:{{ row.m1 }}元/每日{{ row.m1 }}趟/{{ row.m1 }}天
           </p>
-          <p
+          <!-- <p
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
           >
@@ -139,7 +139,7 @@
             class="text"
           >
             预计月出车天数:{{ row.m1 }}天
-          </p>
+          </p> -->
           <p
             class="text"
             :class="obj.m1 === row.m1 ? 'blue text' : 'text'"

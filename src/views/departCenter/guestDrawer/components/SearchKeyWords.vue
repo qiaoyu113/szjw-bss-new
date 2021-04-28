@@ -254,7 +254,7 @@ export default class SearchKeyWords extends Vue {
       options: this.hardOptions,
       multiple: true,
       key: 'hard',
-      title: '期望装卸难度'
+      title: '装卸接受度'
     },
     {
       options: [{
@@ -296,7 +296,7 @@ export default class SearchKeyWords extends Vue {
       }],
       multiple: false,
       key: 'expectHard',
-      title: '期望配送难度'
+      title: '期望配送复杂度'
     }
   ]
   handleClearAll() {
