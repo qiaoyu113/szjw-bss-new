@@ -91,6 +91,19 @@ export default class DepartLine extends Vue {
   detailHandle() {
     this.detailDialog = true
   }
+  // 获取列表
+  async getLists() {
+    try {
+      setTimeout(() => {
+        (this.$refs.tableDriver as any).getLists()
+      }, 1000)
+    } catch (err) {
+      console.log(`getlists fail:${err}`)
+    } finally {
+      // this.listLoading = false
+      //
+    }
+  }
   mounted() {
 
   }
