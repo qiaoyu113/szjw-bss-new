@@ -7,8 +7,10 @@
       <AtableDriver
         ref="tableDriver"
         :list-query="listQuery"
+        :is-show-percent="true"
+        :driver-table-data="driverTableData"
         :is-more="true"
-        :op-type="[2,3,4,5]"
+        :op-type="[-1,2,3,4,5]"
         @call="setCallHandle"
         @tag="setTagHandle"
         @creatRun="creatRunHandle"
@@ -52,8 +54,10 @@ interface IState {
 export default class DepartLine extends Vue {
   private tryRunShow:boolean = false
   private rowData:object = {}
+  private driverTableData:IState[] = [] // 司机列表
   private detailDialog:Boolean = false
   private detailId:string = ''
+  private pageSize:number = 1
   private listQuery:IState = {
     labelType: '',
     isBehavior: '',
@@ -91,21 +95,72 @@ export default class DepartLine extends Vue {
   detailHandle() {
     this.detailDialog = true
   }
-  // 获取列表
+  // 获取列表数据
   async getLists() {
     try {
-      setTimeout(() => {
-        (this.$refs.tableDriver as any).getLists()
-      }, 1000)
+      this.pageSize++
+      let num:number = 3
+      // this.driverTableData = []
+      for (let i = 0; i < num; i++) {
+        let obj:IState = {
+          driverName: '张道松',
+          manager: '李加盟经理',
+          driverId: 'SJ20210415',
+          phoneNum: '132000000000',
+          a: '京东传站',
+          b: '李外线经理',
+          lineId: 'XL202012300377',
+          c: '3',
+          d: '4.2米厢货',
+          e: '油车',
+          f: '能闯禁行',
+          g: '能闯限行行',
+          h: '共享',
+          p1: '湖南省',
+          c1: '长沙市',
+          c2: '短沙县',
+          m1: 500,
+          time: '9:00~18:00',
+          percent: 80,
+          id: (this.pageSize - 1) * 3 + i,
+          arr: [
+            '商贸信息',
+            '已创建30条线路',
+            '15条在跑',
+            '5条线路已掉线',
+            '3条线路在上架找车'
+          ],
+          brr: [
+            '1个点',
+            '每日1趟',
+            '每月12天',
+            '每趟120公里',
+            '走高速',
+            '回单',
+            '城配线',
+            '稳定(2个月)'
+          ],
+          crr: [
+            '已发起3次客邀',
+            '已创建意向3次',
+            '试跑失败2次',
+            '司机爽约1次',
+            '扭头就走1次',
+            '掉线1次'
+          ]
+        }
+        obj.isOpen = false
+        obj.id = ((this.pageSize - 1) * 3 + i + 1)
+        this.driverTableData.push({ ...obj })
+      }
     } catch (err) {
-      console.log(`getlists fail:${err}`)
+      console.log(`get list fail fail:${err}`)
     } finally {
-      // this.listLoading = false
-      //
+      console.log('')
     }
   }
   mounted() {
-
+    this.getLists()
   }
 }
 </script>

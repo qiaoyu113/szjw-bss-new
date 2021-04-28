@@ -5,7 +5,7 @@
     @open="handleOpenClick"
   >
     <div
-      v-infinite-scroll="load"
+      v-infinite-scroll="loadMoreHandle"
       class="infiniteScroll"
       style="overflow:auto;height: 100%;"
     >
@@ -48,7 +48,6 @@ export default class GuestDrawer extends Vue {
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
   private lineTableData:IState[] = [] // 线路列表
-  private driverTableData:IState[] = [] // 司机列表
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -78,8 +77,10 @@ export default class GuestDrawer extends Vue {
   handleOpenClick() {
     AppModule.CloseSideBar(false)
   }
-  load() {
-    // alert(1)
+  loadMoreHandle() {
+    setTimeout(() => {
+      (this.$refs.matchDriver as any).getLists()
+    }, 1000)
   }
   mounted() {
 
