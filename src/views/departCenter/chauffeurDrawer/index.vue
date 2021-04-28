@@ -2,13 +2,14 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-22 19:09:24
+ * @LastEditTime: 2021-04-27 18:20:49
  * @LastEditors: D.C.base
 -->
 <template>
   <DrawerModel
     v-model="visible"
     @on-close="closeHandle"
+    @open="handleOpenClick"
   >
     <!-- 撮合线路 -->
     <section class="departLine">
@@ -16,7 +17,7 @@
       <AtableDriver
         :list-query="listQueryDriver"
         :is-more="true"
-        :op-type="[1,2,3,4,5]"
+        :op-type="[]"
         @tag="setTagHandle"
         @call="setCallHandle"
         @creatRun="creatRunHandle"
@@ -30,19 +31,14 @@
       <div class="lineTable">
         <AtableLine
           ref="lineDrawer"
+          :is-show-percent="true"
           :list-query="listQueryLine"
           obj="{}"
           :is-more="true"
-          @cancelTryRun="handleCancelTryRun1"
         />
       </div>
     </section>
     <SetTag ref="tagShow" />
-    <CreateTryRun
-      ref="tryRunShow"
-      :obj="rowData"
-    />
-    <cancel-tryRun ref="cancelTryRun1" />
   </DrawerModel>
 </template>
 
@@ -54,7 +50,7 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import SetTag from './components/SetTag.vue'
-import CancelTryRun from '../chauffeurList/components/CancelTryRun.vue'
+import { AppModule } from '@/store/modules/app'
 interface IState {
   [key: string]: any;
 }
@@ -65,8 +61,7 @@ interface IState {
     AtableLine,
     AtableDriver,
     CreateTryRun,
-    SetTag,
-    CancelTryRun
+    SetTag
   }
 })
 export default class GuestDrawer extends Vue {
@@ -107,10 +102,6 @@ export default class GuestDrawer extends Vue {
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
   }
-  // 取消创建试跑意向
-  handleCancelTryRun1() {
-    (this.$refs.cancelTryRun1 as any).showDialog = true
-  }
   setTagHandle() {
     (this.$refs.tagShow as any).isShow = true
   }
@@ -131,9 +122,15 @@ export default class GuestDrawer extends Vue {
       })
     })
   }
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
+  }
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData = data
+  }
+  handleOpenClick() {
+    AppModule.CloseSideBar(false)
   }
   mounted() {
 
@@ -147,7 +144,7 @@ export default class GuestDrawer extends Vue {
   overflow: auto;
   ::v-deep .el-drawer{
     overflow: initial;
-    background: #e6e9f0;
+    //background: #e6e9f0;
   }
 }
 .departLine{

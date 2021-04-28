@@ -14,28 +14,15 @@
         fit
         :header-cell-style="{padding: '6px 20px'}"
         :cell-style="{padding: '5px 20px'}"
+        @selection-change="handleSelectionChange"
       >
-        <!-- <el-table-column
-          label=""
-          width="50"
-          class-name="noP"
-        >
-          <template slot-scope="{row}">
-            <div class="arrow" />
-            <div class="name">
-              线
-            </div>
-            <div
-              v-if="isShowPercent"
-              class="percent"
-            >
-              匹配度{{ row.percent }}%
-            </div>
-          </template>
-        </el-table-column> -->
+        <el-table-column
+          type="selection"
+          width="80"
+        />
         <el-table-column
           label="基础信息"
-          width="220"
+          min-width="220"
           align="center"
           class-name="firstColumn"
         >
@@ -46,7 +33,7 @@
             </router-link>
             <el-popover
               placement="right"
-              width="200"
+              min-width="200"
               trigger="hover"
             >
               <div class="text1">
@@ -76,7 +63,7 @@
         </el-table-column>
         <el-table-column
           label="车辆"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -94,7 +81,7 @@
         </el-table-column>
         <el-table-column
           label="配送信息"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -108,7 +95,7 @@
         </el-table-column>
         <el-table-column
           label="结算"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -128,7 +115,7 @@
         </el-table-column>
         <el-table-column
           label="线路特点"
-          width="220"
+          min-width="220"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -148,7 +135,7 @@
         </el-table-column>
         <el-table-column
           label="标签"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -163,7 +150,7 @@
         </el-table-column>
         <el-table-column
           label="状态"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -191,7 +178,7 @@
         </el-table-column>
         <el-table-column
           label="操作"
-          width="180"
+          min-width="180"
           class-name="center"
         >
           <!-- <template slot-scope="{row}"> -->
@@ -218,30 +205,10 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelTruRun(row)"
               >
-                取消意向
+                查看详情
               </el-button>
             </p>
-            <p class="text">
-              <el-button
-                type="text"
-                size="small"
-              >
-                查看线路详情
-              </el-button>
-            </p>
-            <!-- <p
-              v-if="isMore"
-              class="text"
-            >
-              <el-button
-                size="mini"
-                @click.stop="toogleExpand(row)"
-              >
-                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
-              </el-button>
-            </p> -->
           </template>
         </el-table-column>
         <el-table-column
@@ -313,7 +280,7 @@ interface IState {
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
-        case 1: return '不装卸'
+        case 1: return ' 不装卸'
         case 2: return '只装不卸（轻）'
         case 3: return '只卸不装（轻）'
         case 4: return '只装不卸（重）'
@@ -328,6 +295,8 @@ export default class extends Vue {
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
   private tableData:IState[] = []
+
+  private multipleSelection:IState[] = []
 
   mounted() {
     console.log(this.listQuery)
@@ -424,9 +393,19 @@ export default class extends Vue {
   handleLaunchGuest() {
     this.$emit('launchGuest')
   }
-  // 取消意向
-  handleCancelTruRun() {
-    this.$emit('cancelTryRun')
+  // 选择事件
+  handleSelect(selection:[], row:{}) {
+    console.log(selection, row)
+  }
+  // 勾选
+  selectHandle(selection:[]) {
+    console.log(selection)
+    this.$emit('select')
+  }
+  // 勾选
+  handleSelectionChange(selection:[]) {
+    console.log('勾选项', selection)
+    this.$emit('SelectionChange')
   }
 }
 </script>

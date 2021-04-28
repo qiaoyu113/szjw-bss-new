@@ -1,48 +1,50 @@
 <template>
   <SelfDialog
-    :visible.sync="showDialog"
-    title="取消试跑意向"
+    :visible.sync="show"
     append-to-body
-    :confirm="confirm"
     width="500px"
+    title="更换工作城市"
+    :confirm="confirm"
     custom-class="a1111"
     :destroy-on-close="false"
-    @closed="handleDialogClosed"
+    @close="close"
   >
     <self-form
-      ref="cancelForm"
+      ref="cityForm"
       :list-query="listQuery"
       :form-item="formItem"
       :rules="rules"
       size="small"
-      label-width="200px"
       class="p15 SuggestForm"
       :pc-col="24"
       @onPass="handlePassChange"
     />
+    <span class="remark">注：操作更换工作城市后，您将不能在本城市下看到该司机！</span>
   </SelfDialog>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop, PropSync, Emit } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+
 interface IState {
   [key: string]: any;
 }
 @Component({
-  name: 'CreateTryRun',
+  name: 'chooseCity',
   components: {
     SelfDialog,
     SelfForm
   }
 })
 export default class extends Vue {
-  private showDialog:boolean = false
-  private cancelOptions:IState[] = [] // 取消原因
-  private listQuery:IState = {
+  @Prop({ default: false }) dialogVisible!: boolean; // 弹框显示
+  @PropSync('dialogVisible', { type: Boolean }) show!: Boolean;
+  private cityList: IState[] = [];
+  private listQuery: IState = {
     a: ''
-  }
-  private formItem:any[] = [
+  };
+  private formItem: any[] = [
     {
       type: 2,
       tagAttrs: {
@@ -50,33 +52,37 @@ export default class extends Vue {
         clearable: true,
         filterable: true
       },
-      label: '取消创建试跑意向的原因?',
+      label: '新工作城市',
       key: 'a',
-      options: this.cancelOptions
+      options: this.cityList
     }
-  ]
-  private rules:IState = {
+  ];
+  private rules: IState = {
     a: [
-      { required: true, message: '请选择取消创建试跑意向的原因', trigger: 'blur' }
+      {
+        required: true,
+        message: '请选择新工作城市',
+        trigger: 'blur'
+      }
     ]
+  };
+
+  private close() {
+    (this.$refs.cityForm as any).resetForm()
   }
   // 确定按钮
   private confirm() {
-    (this.$refs.cancelForm as any).submitForm()
-  }
-  // 弹框关闭
-  private handleDialogClosed() {
-    (this.$refs.cancelForm as any).resetForm()
+    (this.$refs.cityForm as any).submitForm()
   }
   // 验证通过
   handlePassChange() {
-
+    this.$message.success('“由XX更换至XX”')
+    // (this.$parent as any).getLists()
   }
 }
 </script>
-
-<style>
-.a1111 .el-dialog__header{
+<style scoped>
+.a1111 .el-dialog__header {
   padding: 0;
   height: 40px;
   line-height: 40px;
@@ -87,5 +93,10 @@ export default class extends Vue {
   font-weight: bold;
   color: #ffffff;
   text-align: left;
+}
+.remark{
+  display: inline-block;
+  width: 100%;
+  text-align: center;
 }
 </style>

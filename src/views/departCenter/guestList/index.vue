@@ -23,19 +23,9 @@
         slot="status"
         :class="isPC ? 'btnPc left' : 'mobile'"
       >
-        <el-radio-group
-          v-model="listQuery.status"
-          size="small"
-          @change="handleStatusChange"
-        >
-          <el-radio-button
-            v-for="item in statusLists"
-            :key="item.value"
-            :label="item.value"
-          >
-            {{ item.label }}
-          </el-radio-button>
-        </el-radio-group>
+        <el-button type="primary">
+          本城客邀线
+        </el-button>
       </div>
       <div
         slot="btnGroup"
@@ -80,6 +70,7 @@
         :is-show-percent="false"
         :obj="{}"
         @match="handleMatchTryRun"
+        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
@@ -146,7 +137,6 @@ export default class extends Vue {
     isBehavior: '',
     loadDiff: '',
     isRestriction: '',
-    status: 1,
     start: [],
     f1: '',
     f2: '',
@@ -335,13 +325,6 @@ export default class extends Vue {
       col: 8,
       slot: true,
       w: '0px'
-    }
-  ]
-
-  private statusLists:IState[] = [
-    {
-      label: '本城客邀线',
-      value: 1
     }
   ]
   // 表格分页

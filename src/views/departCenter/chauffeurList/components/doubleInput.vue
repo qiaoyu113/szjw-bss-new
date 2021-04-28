@@ -35,11 +35,11 @@ export default class extends Vue {
   get sortModel() {
     return (this.range as number[]).sort((a, b) => a - b)
   }
-  private changeInput1(val:number) {
-    this.sendMessage(val, 0)
+  private changeInput1(val:string) {
+    this.sendMessage(val.replace(/[^\d]/g, ''), 0)
   }
-  private changeInput2(val:number) {
-    this.sendMessage(val, 1)
+  private changeInput2(val:string) {
+    this.sendMessage(val.replace(/[^\d]/g, ''), 1)
   }
 
   @Emit('inputChange')
