@@ -79,8 +79,9 @@
         </template>
       </self-form>
       <div class="table_box">
-        <div class="middle" />
-        <span>筛选结果：{{ 111 }}条</span>
+        <div class="middle">
+          <span>筛选结果：{{ 111 }}条</span>
+        </div>
         <Btable
           ref="listTable"
           :list-query="listQuery"
