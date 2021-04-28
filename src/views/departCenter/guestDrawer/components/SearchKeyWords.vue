@@ -195,6 +195,7 @@ export default class SearchKeyWords extends Vue {
           width: '140px'
         }
       },
+      w: '90px',
       label: '工作时间段',
       col: 8
     },
@@ -224,6 +225,7 @@ export default class SearchKeyWords extends Vue {
           this.handleCascaderChange(e, 'address')
         }
       },
+      w: '100px',
       label: '现居住地址',
       key: 'address'
     }
@@ -397,14 +399,13 @@ export default class SearchKeyWords extends Vue {
     }
   }
   getArrDifference(arr1:any, arr2:any) {
-    return arr1.concat(arr2).filter(function(v, i, arr) {
+    return arr1.concat(arr2).filter(function(v:any, i:number, arr:IState[]) {
       return arr.indexOf(v) === arr.lastIndexOf(v)
     })
   }
   // 级联框变化
   handleCascaderChange(val:IState[], key:string) {
     let changeItem = this.getArrDifference(this.shareScopeEnd, this.listQuery[key])[0]
-    console.log(changeItem)
     if (this.shareScopeEnd.length === 0) {
       this.listQuery[key] = val
     }
@@ -463,6 +464,11 @@ export default class SearchKeyWords extends Vue {
     color: #494949;
     i{
       color: #606060 !important;
+    }
+  }
+  ::v-deep .el-form{
+    .el-col{
+      padding: 0 !important;
     }
   }
   ::v-deep .el-button{
