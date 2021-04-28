@@ -455,6 +455,7 @@ export default class extends Vue {
       this.getLists()
     }
     mounted() {
+      //
       this.init()
       this.getLists()
     }
