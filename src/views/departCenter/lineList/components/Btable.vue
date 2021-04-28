@@ -14,7 +14,7 @@
         fit
         :header-cell-style="{padding: '6px 20px'}"
         :cell-style="{padding: '5px 20px'}"
-        @selection-change="selectHandle"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column
           type="selection"
@@ -136,7 +136,6 @@
         <el-table-column
           label="标签"
           min-width="180"
-          width="140"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -210,17 +209,6 @@
                 查看详情
               </el-button>
             </p>
-            <!-- <p
-              v-if="isMore"
-              class="text"
-            >
-              <el-button
-                size="mini"
-                @click.stop="toogleExpand(row)"
-              >
-                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
-              </el-button>
-            </p> -->
           </template>
         </el-table-column>
         <el-table-column
@@ -413,6 +401,11 @@ export default class extends Vue {
   selectHandle(selection:[]) {
     console.log(selection)
     this.$emit('select')
+  }
+  // 勾选
+  handleSelectionChange(selection:[]) {
+    console.log('勾选项', selection)
+    this.$emit('SelectionChange')
   }
 }
 </script>
