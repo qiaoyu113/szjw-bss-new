@@ -26,70 +26,91 @@
             </el-dropdown-menu>
           </el-dropdown>
         </template>
-        <div class="formbox">
-          <el-input
-            v-model="listQuery.keyWords"
-            size="small"
-            placeholder="请输入司机姓名/编号"
-            suffix-icon="el-icon-search"
-          />
-          <el-button
-            type="primary"
-            size="small"
-            @click="searchHandle"
-          >
-            查询
-          </el-button>
-        </div>
       </div>
-      <div class="formList">
-        <self-form
-          :list-query="listQuery"
-          :form-item="formItem"
-          size="small"
-          class="SuggestForm"
-          :pc-col="8"
+      <div>
+        <el-form
+          :inline="true"
+          size="mini"
         >
-          <template slot="workTime">
-            <el-time-select
-              v-model="listQuery['jobStartDate']"
-              class="timeSelect"
-              placeholder="起始时间"
-              :picker-options="{
-                start: '00:00',
-                step: '01:00',
-                end: '23:00'
-              }"
-            />
-            <span style="padding:0 3px">-</span>
-            <el-time-select
-              v-model="listQuery['jobEndDate']"
-              class="timeSelect"
+          <el-form-item label="工作时间段">
+            <el-select
+              v-model="listQuery.f1"
+              placeholder="开始时间"
+              class="width-100"
+            >
+              <el-option
+                v-for="(item, index) in timeLists"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="">
+            <el-select
+              v-model="listQuery.f2"
               placeholder="结束时间"
-              :picker-options="{
-                start: '00:00',
-                step: '01:00',
-                end: '23:00'
-              }"
-            />
-          </template>
-          <template slot="freight">
+              class="width-100"
+            >
+              <el-option
+                v-for="(item, index) in timeLists"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="单趟运费区间">
             <el-input
               v-model="listQuery.start"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              style="min-width:100px"
-              placeholder="请输入"
+              placeholder="最低价格"
+              class="width-80"
             />
-            <span style="margin:0 5px">-</span>
+          </el-form-item>
+          <el-form-item label="">
             <el-input
               v-model="listQuery.end"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              :disabled="!listQuery.start"
-              style="min-width:100px"
-              placeholder="请输入"
+              placeholder="最高价格"
+              class="width-80"
             />
-          </template>
-        </self-form>
+          </el-form-item>
+          <el-form-item label="仓库位置">
+            <el-cascader
+              v-model="listQuery.repoLoc"
+              placeholder="请选择"
+              clearable
+              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
+              class="width-120"
+            />
+          </el-form-item>
+          <el-form-item label="配送区域">
+            <el-cascader
+              v-model="listQuery.distLoc"
+              placeholder="请选择"
+              clearable
+              :props="{lazy: true, lazyLoad: getProviceCityCountryData}"
+              class="width-120"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-input
+              v-model="listQuery.keyWords"
+              placeholder="线路名称/编号"
+              suffix-icon="el-icon-search"
+              class="width-140"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              @click="searchHandle"
+            >
+              查询
+            </el-button>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
     <div
@@ -120,7 +141,7 @@
 import { GetDictionaryList } from '@/api/common'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 interface IState {
   [key: string]: any;
 }
@@ -131,9 +152,6 @@ interface IState {
 })
 export default class SearchKeyWords extends Vue {
   private keyWords: string = ''
-  private shareScopeEnd:IState[] = []
-  private citysArry: any[] = []
-  private levelData: any = {}
   private carLists:IState[] = [
     {
       value: '',
@@ -144,16 +162,7 @@ export default class SearchKeyWords extends Vue {
   private key: string = '' // 当前选项是否是多选
   private curSelecteds: [] = []
   private selectTitle: string = ''
-  private selectedData: any[] = [
-    {
-      type: '工作时间段',
-      optionIds: [],
-      selected: ['9:00-18:00']
-    }
-  ];
-  private expectOptions: IState[] = [ // 期望货品类型
-    { label: '全部', value: '' }
-  ];
+  private selectedData: any[] = [];
   private hardOptions: IState[] = [ // 装卸接受度
     { label: '全部', value: '' }
   ];
@@ -169,41 +178,70 @@ export default class SearchKeyWords extends Vue {
     hope: '', // 期望稳定/临时
     expectType: '', // 期望货品类型
     expectHard: '', // 期望配送难度
-    jobStartDate: '',
-    jobEndDate: '',
+    start: '',
+    end: '',
     f1: '',
     f2: '',
     address: '',
     keyWords: ''
-  }
-  @Watch('listQuery.jobStartDate')
-  onlistQueryChanged(val: any, oldVal: any) {
-    if (this.selectedData[0].type === '工作时间段') {
-      this.selectedData.splice(0, 1)
-    }
-  }
+  };
+  private lineQualities: any[] = [
+    { label: '全部', value: '' }
+  ];
+  private goodsTypes: any[] = [
+    { label: '全部', value: '' }
+  ];
+  private getProviceCityCountryData = getProviceCityCountryData;
+  private formItemWidth: number = 160;
   private formItem:any[] = [
     {
-      slot: true,
-      type: 'workTime',
+      type: 2,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
         filterable: true,
         style: {
-          width: '140px'
+          width: '100px'
         }
       },
       label: '工作时间段',
-      col: 8
+      col: 5,
+      key: 'f1',
+      options: this.timeLists
     },
     {
-      slot: true,
-      type: 'freight',
+      type: 2,
+      col: 4,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        filterable: true,
+        style: {
+          width: '100px'
+        }
+      },
+      label: ' ',
+      w: '20px',
+      key: 'f2',
+      class: 'end',
+      options: this.timeLists
+    },
+    {
+      type: 'start',
       label: '单趟运费区间',
       key: 'start',
       w: '110px',
-      col: 8
+      col: 5,
+      slot: true
+    },
+    {
+      type: 'end',
+      label: ' ',
+      w: '20px',
+      key: 'end',
+      col: 3,
+      class: 'end',
+      slot: true
     },
     {
       type: 8,
@@ -213,89 +251,85 @@ export default class SearchKeyWords extends Vue {
         clearable: true,
         props: {
           lazy: true,
-          lazyLoad: getProviceCityCountryData,
-          checkStrictly: true,
-          multiple: true
+          lazyLoad: getProviceCityCountryData
         }
       },
-      listeners: {
-        'change': (e:any[]) => {
-          this.handleCascaderChange(e, 'address')
+      label: '仓库位置',
+      key: 'repoLoc'
+    },
+    {
+      type: 8,
+      col: 7,
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: getProviceCityCountryData
         }
       },
-      label: '现居住地址',
-      key: 'address'
+      label: '配送区域',
+      key: 'distLoc'
+    },
+    {
+      type: 'keyword',
+      label: '',
+      key: 'keyword',
+      w: '110px',
+      col: 5,
+      slot: true
     }
-  ]
+  ];
   private selectList: IState[] = [
     {
-      options: [{
-        value: '',
-        label: '全部'
-      }, {
-        value: 0,
-        label: '共享'
-      }, {
-        value: 1,
-        label: '专车'
-      }],
-      key: 'busiType',
+      title: '线路肥瘦',
+      key: 'lineQuality',
       multiple: true,
-      title: '业务线'
+      options: this.lineQualities
     },
     {
-      options: this.carLists,
+      title: '配送车型',
+      key: 'model',
       multiple: true,
-      key: 'carType',
-      title: '司机车型'
+      options: this.carLists
     },
     {
-      options: this.hardOptions,
+      title: '装卸难度',
+      key: 'loadDifficulty',
       multiple: true,
-      key: 'hard',
-      title: '装卸接受度'
+      options: this.hardOptions
     },
     {
-      options: [{
-        value: '',
-        label: '全部'
-      }, {
-        value: 1,
-        label: '稳定'
-      }, {
-        value: 2,
-        label: '临时'
-      }],
-      multiple: false,
-      key: 'hope',
-      title: '期望稳定/临时'
-    },
-    {
-      options: this.cycleOptions,
+      title: '稳定/临时',
+      key: 'stability',
       multiple: true,
-      key: 'cycle',
-      title: '期望结算周期'
+      options: [
+        { label: '全部', value: '' },
+        { label: '稳定', value: 1 },
+        { label: '临时', value: 2 }
+      ]
     },
     {
-      options: this.expectOptions,
-      key: 'expectType',
+      title: '结算周期',
+      key: 'clearCycle',
       multiple: true,
-      title: '期望货品类型'
+      options: this.cycleOptions
     },
     {
-      options: [{
-        value: '',
-        label: '全部'
-      }, {
-        value: '1',
-        label: '整车'
-      }, {
-        value: '2',
-        label: '多点配'
-      }],
-      multiple: false,
-      key: 'expectHard',
-      title: '期望配送复杂度'
+      title: '货品类型',
+      key: 'cargoType',
+      multiple: true,
+      options: this.goodsTypes
+    },
+    {
+      title: '配送类型',
+      key: 'deliverComplexity',
+      multiple: true,
+      options: [
+        { label: '全部', value: '' },
+        { label: '整车', value: 1 },
+        { label: '多点配', value: 2 }
+      ]
     }
   ]
   handleClearAll() {
@@ -362,14 +396,14 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'line_label', 'type_of_goods']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
-        console.log(this.cycleOptions)
+        this.lineQualities.push(...mapDictData(res.data.line_label || []))
+        this.goodsTypes.push(...mapDictData(res.data.type_of_goods || []))
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -379,57 +413,6 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
-    // 单趟运费区间
-    if (!this.listQuery.start || !this.listQuery.end) {
-      return this.$message.warning('单趟运费输入不完整')
-    } else {
-      if (Number(this.listQuery.start) > Number(this.listQuery.end)) {
-        return this.$message.warning('单趟运费起始金额不能大于终止金额')
-      }
-    }
-    // 工作时间段
-    if (!this.listQuery.jobStartDate || !this.listQuery.jobEndDate) {
-      return this.$message.warning('工作时间段输入不完整')
-    }
-    if (this.listQuery.jobStartDate === this.listQuery.jobEndDate) {
-      return this.$message.warning('开始时间和结束时间不能一样')
-    }
-  }
-  // 级联框变化
-  handleCascaderChange(val:IState[], key:string) {
-    if (this.shareScopeEnd.length === 0) {
-      this.listQuery[key] = val
-    }
-    this.levelData = {}
-    this.listQuery[key].forEach((item:any) => {
-      if (!this.levelData[item[1]]) {
-        this.levelData[item[1]] = []
-      }
-      if (this.levelData[item[1]].indexOf(item[2]) === -1 && item[2] !== undefined) {
-        this.levelData[item[1]].push(item[2])
-      }
-    })
-
-    let cityNum = 0
-    for (let itemKey in this.levelData) {
-      cityNum++
-      if (cityNum > 2) {
-        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
-          return item.indexOf(parseInt(itemKey)) === -1
-        })
-        this.$message.error('最多选择两个市')
-      }
-      if (this.levelData[itemKey].length > 2) {
-        let code = this.levelData[itemKey][2]
-        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
-          return item.indexOf(code) === -1
-        })
-        console.log(this.listQuery[key])
-        this.$message.error('一个市下最多选择两个区')
-      }
-    }
-    console.log(this.listQuery[key])
-    this.shareScopeEnd = this.listQuery[key]
   }
   mounted() {
     this.getOptions()
@@ -450,6 +433,22 @@ export default class SearchKeyWords extends Vue {
   }
 </style>
 <style lang="scss" scoped>
+  .width-140 {
+    width: 140px;
+  }
+  .width-120 {
+    width: 120px;
+  }
+  .width-100 {
+    width: 100px;
+  }
+  .width-90 {
+    width: 90px;
+  }
+  .width-80 {
+    width: 80px;
+  }
+
 .searchBox{
   background: #fff;
   ::v-deep .el-dropdown-link{
@@ -458,9 +457,6 @@ export default class SearchKeyWords extends Vue {
     i{
       color: #606060 !important;
     }
-  }
-  ::v-deep .el-button{
-    height: 32px !important;
   }
   ::v-deep  .el-form-item__label{
    color: #4b4b4b !important;
@@ -476,7 +472,7 @@ export default class SearchKeyWords extends Vue {
       margin: 0 10px;
     }
   }
-  .el-dropdown:nth-last-of-type(2):after{
+  .el-dropdown:nth-last-of-type(1):after{
       display: none;
   }
   .topSelect{
@@ -484,7 +480,7 @@ export default class SearchKeyWords extends Vue {
     justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
-    padding:15px 30px 0 30px;
+    padding:15px 30px 12px 30px;
     border-bottom:2px solid #f3f3f5;
     ::v-deep .el-form-item--small.el-form-item{
       margin-bottom: 0;

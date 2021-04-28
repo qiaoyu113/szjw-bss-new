@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-22 19:15:19
+ * @LastEditTime: 2021-04-27 17:56:46
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,10 +11,11 @@
     :visible.sync="visible"
     :with-header="false"
     :modal-append-to-body="false"
-    size="80%"
+    size="100%"
     top="84px"
     :modal="false"
     @close="closeHandle"
+    @open="handleOpenClick"
   >
     <div class="">
       <slot />
@@ -24,7 +25,7 @@
       class="actionBtn"
       @click="closeHandle"
     >
-      <i class="el-icon-d-arrow-left" />
+      <i class="el-icon-d-arrow-right" />
     </a>
   </el-drawer>
 </template>
@@ -50,21 +51,35 @@ export default class DrawerModel extends Vue {
     this.$emit('input', false)
     this.$emit('on-close')
   }
-  mounted() {
-
+  handleOpenClick() {
+    this.$emit('open')
   }
 }
 </script>
 <style lang="scss" scoped>
-::v-deep .el-drawer__container{
+::v-deep .el-drawer__body{
+  height: 100%;
   background:rgba(0,0,0,0.5);
+  padding-left: 20%;
+  >div{
+    height: 100%;
+    overflow: auto;
+    background:#e6e9f0 ;
+  }
+}
+.isDrawer .el-drawer__wrapper{
+  top: 84px;
+}
+::v-deep .el-drawer{
+    background: transparent;
+    box-shadow: none;
 }
 .drawerBox {
   width: 100%;
   height: 100%;
   ::v-deep .el-drawer{
     overflow: auto!important;
-    background: #e6e9f0;
+    //background: #e6e9f0;
   }
 }
 .actionBtn{
@@ -74,7 +89,7 @@ export default class DrawerModel extends Vue {
     justify-content: center;
     align-items: center;
     position: absolute;
-    left:-25px;
+    left: calc(20% - 25px);
     top:50%;
     transform: translateY(-50%);
     background: #fff;

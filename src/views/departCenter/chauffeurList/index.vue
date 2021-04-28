@@ -1,9 +1,11 @@
 <template>
   <div
-    v-loading="listLoading"
+    v-loading.body="listLoading"
     class="chauffeurListContainer"
+    :style="{'overflow': showDrawer ?'hidden':'auto'}"
     :class="{
-      p15: isPC
+      p15: isPC,
+      isDrawer: showDrawer
     }"
   >
     <!-- 查询表单 -->
@@ -14,15 +16,19 @@
     <!-- 表格 -->
     <div class="table_box">
       <Atable
-        key="chauffeurTable"
+        ref="Atable"
         :table-data="tableData"
         :is-show-percent="false"
         :is-more="false"
-        :op-type="[2,1]"
+        :op-type="[2,1,5,6]"
         @call="call"
         @tag="tag"
         @detail="detail"
         @depart="depart"
+        @checkData="checkData"
+        @allotSome="allotSome"
+        @chooseCity="chooseCity"
+        @closeLoading="listLoading = false"
       />
       <pagination
         :operation-list="[]"
@@ -46,6 +52,13 @@
       :driver-id="detailId"
       :dialog-table-visible.sync="detailDio"
     />
+    <ChauffeureDrawer v-model="showDrawer" />
+    <allotDio
+      :dialog-visible.sync="allotDialog"
+      :allot-title="allotTitle"
+      @close="closeAllot"
+    />
+    <chooseCity :dialog-visible.sync="cityDio" />
   </div>
 </template>
 <script lang="ts">
@@ -57,6 +70,9 @@ import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import SetTag from '../guestDrawer/components/SetTag.vue'
+import ChauffeureDrawer from '../chauffeurDrawer/index.vue'
+import allotDio from './components/allotDio.vue'
+import chooseCity from './components/chooseCity.vue'
 interface PageObj {
   page: number;
   limit: number;
@@ -74,7 +90,10 @@ interface IState {
     CallPhone,
     SearchForm,
     SetTag,
-    DetailDialog
+    DetailDialog,
+    ChauffeureDrawer,
+    allotDio,
+    chooseCity
   }
 })
 export default class extends Vue {
@@ -104,8 +123,14 @@ export default class extends Vue {
     phone: ''
   };
   private detailDio:Boolean = false
+  private cityDio:Boolean = false
+  private allotDialog:Boolean = false
+  private allotTitle:string = ''
   private detailId:string = ''
   private showTag:Boolean = false
+  private showDrawer: Boolean = false
+  private allotData:IState[] = []
+  private checkOne:IState = {}
   // 表格分页
   private page: PageObj = {
     page: 1,
@@ -141,21 +166,39 @@ export default class extends Vue {
     (this.$refs['setTag'] as any).showDialog = true
   }
   depart() {
-    console.log('depart')
+    this.showDrawer = true
+  }
+  checkData(data:IState[]) {
+    this.allotData = data
+  }
+  allotSome(val:IState) {
+    this.allotTitle = '分配司撮'
+    this.allotDialog = true
+    this.checkOne = val
+  }
+  chooseCity(val:IState) {
+    this.cityDio = true
+    this.checkOne = val
   }
   detail() {
     console.log('detail')
     this.detailDio = true
+  }
+  closeAllot() {
+    (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
   }
   // 获取列表
   async getLists() {
     try {
       console.log('getList', this.listQuery)
       this.listLoading = true
+      setTimeout(() => {
+        (this.$refs.Atable as any).getLists()
+      }, 1000)
     } catch (err) {
       console.log(`getlists fail:${err}`)
     } finally {
-      this.listLoading = false
+      // this.listLoading = false
       //
     }
   }
@@ -178,11 +221,21 @@ export default class extends Vue {
     }
     this.getLists()
   }
+  init() {
+    this.getLists()
+  }
+  activated() {
+    this.getLists()
+  }
+  mounted() {
+    this.init()
+  }
 }
 
 </script>
 <style lang="scss" scoped>
 .chauffeurListContainer {
+  height:100%;
   .table_box {
     padding: 30px 30px 0px;
     background: #ffffff;
