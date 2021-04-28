@@ -280,7 +280,7 @@ interface IState {
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
-        case 1: return '不装卸'
+        case 1: return ' 不装卸'
         case 2: return '只装不卸（轻）'
         case 3: return '只卸不装（轻）'
         case 4: return '只装不卸（重）'
