@@ -2,7 +2,7 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 19:37:08
+ * @LastEditTime: 2021-04-28 09:17:45
  * @LastEditors: D.C.base
 -->
 <template>
@@ -11,19 +11,24 @@
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <!-- 撮合线路 -->
-    <section class="departLine">
-      <h3>待撮合线路</h3>
-      <AtableLine
-        ref="lineDrawer"
-        :list-query="listQueryLine"
-        obj="{}"
-        :is-more="true"
-        @cancelTryRun="handleCancelTryRun1"
-      />
-    </section>
-    <!-- 撮合匹配的司机列表 -->
-    <MatchDriver />
+    <div
+      v-infinite-scroll="load"
+      style="overflow:auto"
+    >
+      <!-- 撮合线路 -->
+      <section class="departLine">
+        <h3>待撮合线路</h3>
+        <AtableLine
+          ref="lineDrawer"
+          :list-query="listQueryLine"
+          obj="{}"
+          :is-more="true"
+          @cancelTryRun="handleCancelTryRun1"
+        />
+      </section>
+      <!-- 撮合匹配的司机列表 -->
+      <MatchDriver />
+    </div>
   </DrawerModel>
 </template>
 
@@ -73,6 +78,9 @@ export default class GuestDrawer extends Vue {
   }
   handleOpenClick() {
     AppModule.CloseSideBar(false)
+  }
+  load() {
+    // alert(1)
   }
   mounted() {
 
