@@ -79,8 +79,9 @@
         </template>
       </self-form>
       <div class="table_box">
-        <div class="middle" />
-        <span>筛选结果：{{ 111 }}条</span>
+        <div class="middle">
+          <span>筛选结果：{{ 111 }}条</span>
+        </div>
         <Btable
           ref="listTable"
           :list-query="listQuery"
@@ -88,6 +89,7 @@
           :obj="{}"
           @launchGuest="handleLaunchGuest"
           @cancelGuest="handleCancelGuest"
+          @cancelTryRun="handleCancelTryRun"
         />
         <pagination
           :operation-list="[]"
@@ -103,6 +105,7 @@
         :obj="obj"
       />
       <cancel-guest ref="cancelGuest" />
+      <cancel-tryRun ref="cancelTryRun" />
     </div>
   </div>
 </template>
@@ -122,6 +125,7 @@ import CancelGuest from './components/CancelGuest.vue'
 import timeSelect from '../chauffeurList/components/timeSelect.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
+import CancelTryRun from './components/CancelTryRun.vue'
 interface PageObj {
   page:number,
   limit:number,
@@ -141,7 +145,8 @@ interface IState {
     LaunchGuest,
     CancelGuest,
     InputRange,
-    timeSelect
+    timeSelect,
+    CancelTryRun
   }
 })
 export default class extends Vue {
@@ -213,15 +218,7 @@ export default class extends Vue {
       label: '单趟运费区间',
       key: 'freightSection',
       w: '110px',
-      slot: true,
-      listeners: {
-        input: () => {
-          this.listQuery.freightSection[0] = this.listQuery.freightSection[0].replace(
-            /[^\d]/g,
-            ''
-          )
-        }
-      }
+      slot: true
     },
     {
       type: 'time',
@@ -327,14 +324,6 @@ export default class extends Vue {
     {
       name: '3',
       text: '已发起客邀'
-    },
-    {
-      name: '4',
-      text: '客邀撮合成功'
-    },
-    {
-      name: '2',
-      text: '司推撮合成功'
     }
   ]
   // 判断是否是PC
@@ -503,6 +492,11 @@ export default class extends Vue {
     (this.$refs.launchGuest as any).showDialog = true
     // (this.$refs.launchGuest as any).confirm()
   }
+  // 取消创建试跑意向
+  handleCancelTryRun() {
+    (this.$refs.cancelTryRun as any).showDialog = true
+  }
+
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()

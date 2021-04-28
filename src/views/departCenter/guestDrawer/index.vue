@@ -1,28 +1,28 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-27 19:37:08
- * @LastEditors: D.C.base
--->
 <template>
   <DrawerModel
     v-model="visible"
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <!-- 撮合线路 -->
-    <section class="departLine">
-      <h3>待撮合线路</h3>
-      <AtableLine
-        ref="lineDrawer"
-        :list-query="listQueryLine"
-        obj="{}"
-        :is-more="true"
-      />
-    </section>
-    <!-- 撮合匹配的司机列表 -->
-    <MatchDriver />
+    <div
+      v-infinite-scroll="load"
+      class="infiniteScroll"
+      style="overflow:auto;height: 100%;"
+    >
+      <!-- 撮合线路 -->
+      <section class="departLine">
+        <h3>待撮合线路</h3>
+        <AtableLine
+          ref="lineDrawer"
+          :list-query="listQueryLine"
+          obj="{}"
+          :is-more="true"
+          @cancelTryRun="handleCancelTryRun1"
+        />
+      </section>
+      <!-- 撮合匹配的司机列表 -->
+      <MatchDriver ref="matchDriver" />
+    </div>
   </DrawerModel>
 </template>
 
@@ -70,8 +70,16 @@ export default class GuestDrawer extends Vue {
     // 关闭抽屉删掉线路表格的数据
     (this.$refs.lineDrawer as any).removeTableInfo()
   }
+  // 取消创建试跑意向
+  handleCancelTryRun1() {
+    (this.$refs.cancelTryRun1 as any).showDialog = true
+  }
   handleOpenClick() {
     AppModule.CloseSideBar(false)
+  }
+  load() {
+    (this.$refs.matchDriver as any).getLists()
+    // alert(1)
   }
   mounted() {
 

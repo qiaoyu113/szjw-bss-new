@@ -1,10 +1,3 @@
-<!--
- * @Description:
- * @Author: 听雨
- * @Date: 2021-04-13 14:38:14
- * @LastEditTime: 2021-04-27 19:31:51
- * @LastEditors: D.C.base
--->
 <template>
   <section class="matchDriver">
     <!-- 搜索项 -->
@@ -39,6 +32,7 @@
 import SearchKeyWords from './SearchKeyWords.vue'
 import AtableDriver from '../../chauffeurList/components/Atable.vue'
 import SetTag from './SetTag.vue'
+import CancelTryRun from '../../guestList/components/CancelTryRun.vue'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -51,6 +45,7 @@ interface IState {
     AtableDriver,
     SearchKeyWords,
     SetTag,
+    CancelTryRun,
     CreateTryRun,
     DetailDialog
   }
@@ -96,6 +91,19 @@ export default class DepartLine extends Vue {
   }
   detailHandle() {
     this.detailDialog = true
+  }
+  // 获取列表
+  async getLists() {
+    try {
+      setTimeout(() => {
+        (this.$refs.tableDriver as any).getLists()
+      }, 1000)
+    } catch (err) {
+      console.log(`getlists fail:${err}`)
+    } finally {
+      // this.listLoading = false
+      //
+    }
   }
   mounted() {
 
