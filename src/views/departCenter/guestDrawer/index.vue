@@ -4,10 +4,9 @@
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <div
-      v-infinite-scroll="load"
-      class="infiniteScroll"
-      style="overflow:auto;height: 100%;"
+    <Scroll
+      :on-reach-bottom="loadMoreHandle"
+      :distance-to-edge="0"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -21,7 +20,7 @@
       </section>
       <!-- 撮合匹配的司机列表 -->
       <MatchDriver ref="matchDriver" />
-    </div>
+    </Scroll>
   </DrawerModel>
 </template>
 
@@ -29,6 +28,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
+import Scroll from '@/components/Scroll/index.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import MatchDriver from './components/MatchDriver.vue'
 import { AppModule } from '@/store/modules/app'
@@ -37,6 +37,7 @@ interface IState {
 }
 @Component({
   components: {
+    Scroll,
     DrawerModel,
     SearchKeyWords,
     AtableLine,
@@ -48,7 +49,6 @@ export default class GuestDrawer extends Vue {
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
   private lineTableData:IState[] = [] // 线路列表
-  private driverTableData:IState[] = [] // 司机列表
   private listQueryLine:IState = {
     labelType: '',
     isBehavior: '',
@@ -78,8 +78,10 @@ export default class GuestDrawer extends Vue {
   handleOpenClick() {
     AppModule.CloseSideBar(false)
   }
-  load() {
-    // alert(1)
+  loadMoreHandle() {
+    setTimeout(() => {
+      (this.$refs.matchDriver as any).getLists()
+    }, 1000)
   }
   mounted() {
 
