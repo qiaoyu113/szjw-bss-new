@@ -51,7 +51,7 @@
           clearable
           :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
           size="mini"
-          @change="onSelectionChange"
+          @change="onSelectionChange($event, 'repoLoc')"
         />
         <div>&nbsp;&nbsp;配送区域&nbsp;</div>
         <el-cascader
@@ -61,6 +61,7 @@
           :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
           class="width-180"
           size="mini"
+          @change="onSelectionChange($event, 'distLoc')"
         />
         <div>&nbsp;&nbsp;&nbsp;</div>
         <el-input
@@ -161,7 +162,8 @@ export default class SearchKeyWords extends Vue {
   ];
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
-  private cachedRepoLoctions: any[] = [];
+  private shareScopeEnd:IState[] = [];
+  private levelData: any = {};
   private selectList: IState[] = [
     {
       title: '线路肥瘦',
@@ -224,15 +226,44 @@ export default class SearchKeyWords extends Vue {
       options: this.timeLists
     }
   ]
-  onSelectionChange(values: any) {
-    // const vals: [] = []
-    // values.map((sel: any) => {
-    //   const [province, city, county] = sel
-    //   if (!vals[city]) {
-    //     vals[city] = []
-    //   }
-    // })
-    console.log(values)
+  getArrDifference(arr1:any, arr2:any) {
+    return arr1.concat(arr2).filter(function(v:any, i:number, arr:IState[]) {
+      return arr.indexOf(v) === arr.lastIndexOf(v)
+    })
+  }
+  onSelectionChange(val:IState[], key:string) {
+    let changeItem = this.getArrDifference(this.shareScopeEnd, this.listQuery[key])[0]
+    if (this.shareScopeEnd.length === 0) {
+      this.listQuery[key] = val
+    }
+    this.levelData = {}
+    this.listQuery[key].forEach((item:any) => {
+      if (!this.levelData[item[1]]) {
+        this.levelData[item[1]] = []
+      }
+      if (this.levelData[item[1]].indexOf(item[2]) === -1 && item[2] !== undefined) {
+        this.levelData[item[1]].push(item[2])
+      }
+    })
+
+    let cityNum = 0
+    for (let itemKey in this.levelData) {
+      cityNum++
+      if (cityNum > 2) {
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(parseInt(changeItem[1])) === -1
+        })
+        this.$message.error('最多选择两个市')
+      }
+      if (this.levelData[itemKey].length > 2) {
+        let code = changeItem[2]
+        this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+          return item.indexOf(code) === -1
+        })
+        this.$message.error('一个市下最多选择两个区')
+      }
+    }
+    this.shareScopeEnd = this.listQuery[key]
   }
   handleClearAll() {
     this.selectedData = []
