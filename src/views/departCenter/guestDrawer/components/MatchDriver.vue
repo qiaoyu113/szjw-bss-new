@@ -27,7 +27,6 @@
       ref="tryRunShow"
       :obj="rowData"
     />
-    <cancel-tryRun ref="cancelTryRun1" />
     <DetailDialog
       actived="third"
       :driver-id="detailId"
@@ -70,10 +69,6 @@ export default class DepartLine extends Vue {
     end: '',
     f1: '',
     f2: ''
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun1() {
-    (this.$refs.cancelTryRun1 as any).showDialog = true
   }
   setTagHandle() {
     (this.$refs.tagShow as any).isShow = true

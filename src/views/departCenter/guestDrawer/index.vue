@@ -19,7 +19,6 @@
         :list-query="listQueryLine"
         obj="{}"
         :is-more="true"
-        @cancelTryRun="handleCancelTryRun1"
       />
     </section>
     <!-- 撮合匹配的司机列表 -->
