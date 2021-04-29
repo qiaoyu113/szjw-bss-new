@@ -187,11 +187,6 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
-            <i
-              class="el-icon-s-custom"
-            /> 老张
-          </p>
           <p
             class="text"
             :a="row.a"
@@ -223,6 +218,16 @@
               @click.stop="handleMatchClick(row)"
             >
               匹配撮合
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              v-if="isShowPercent"
+              type="text"
+              size="small"
+              @click.stop="handleCreateTryRunClick(row)"
+            >
+              创建试跑意向
             </el-button>
           </p>
           <p class="text">
@@ -337,6 +342,10 @@ export default class extends Vue {
   handleMatchClick(row:IState) {
     sessionStorage.setItem(key, JSON.stringify(row))
     this.$emit('match', row)
+  }
+  // 创建试跑意向
+  handleCreateTryRunClick(row:IState) {
+    this.$emit('tryRun')
   }
   // 查看详情
   handleDetailClick(row:IState) {
