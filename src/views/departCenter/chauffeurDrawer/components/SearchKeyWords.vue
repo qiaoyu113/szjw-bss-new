@@ -95,7 +95,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ item.selected.join(",") }}<i
+          {{ item.type }}：{{ item.selected.join(item.key === 'workRange' ? '~' : ',') }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -282,13 +282,14 @@ export default class SearchKeyWords extends Vue {
     let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
-        return item.type === this.selectTitle
+        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workRange'))
       })
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
         if (selecteds.indexOf(command) === -1) {
-          this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
-          this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
+          const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+          this.selectedData[index].selected = (this.multiple || isWorkRange) ? this.selectedData[index].selected : []
+          this.selectedData[index].optionIds = (this.multiple || isWorkRange) ? this.selectedData[index].optionIds : []
           if (command === '全部') {
             this.selectedData[index].optionIds = []
             this.selectedData[index].selected = ['全部']
@@ -299,30 +300,38 @@ export default class SearchKeyWords extends Vue {
             if (this.selectedData[index].selected[0] === '全部') {
               this.selectedData[index].selected.shift()
             }
-            this.selectedData[index].optionIds.push(id)
-            this.selectedData[index].selected.push(command)
+            if (!isWorkRange) {
+              this.selectedData[index].optionIds.push(id)
+              this.selectedData[index].selected.push(command)
+            } else {
+              if (this.key === 'start') {
+                this.selectedData[index].optionIds.splice(0, 1, id)
+                this.selectedData[index].selected.splice(0, 1, command)
+              } else {
+                this.selectedData[index].optionIds.splice(1, 1, id)
+                this.selectedData[index].selected.splice(1, 1, command)
+              }
+            }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
         }
       } else {
-        let obj = {
-          type: this.selectTitle,
-          optionIds: [id],
-          selected: [command]
-        }
-        this.listQuery[this.key] = obj.optionIds
-        this.selectedData.push(obj)
+        this.initSelectItem(id, command)
       }
     } else {
-      let obj = {
-        type: this.selectTitle,
-        optionIds: [id],
-        selected: [command]
-      }
-      this.listQuery[this.key] = obj.optionIds
-      this.selectedData.push(obj)
+      this.initSelectItem(id, command)
     }
-    console.log(this.selectedData)
+  }
+  initSelectItem(id: any, command: any) {
+    const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+    let obj = {
+      type: isWorkRange ? '工作时间段' : this.selectTitle,
+      key: isWorkRange ? 'workRange' : this.key,
+      optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+      selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+    }
+    this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+    this.selectedData.push(obj)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
