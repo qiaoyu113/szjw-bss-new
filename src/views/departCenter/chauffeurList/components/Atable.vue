@@ -369,8 +369,8 @@ export default class extends Vue {
     @Prop({ default: () => {} }) listQuery!: IState;
     @Prop({ default: () => [] }) opType!: number[];
     @Prop({ default: () => [] }) driverTableData!: IState[];
-    private phone:string = '15021578502'
-    private callId:string = '123'
+    private phone:string = ''
+    private callId:string|number = ''
 
     get _tableData() {
       return this.driverTableData
@@ -400,8 +400,15 @@ export default class extends Vue {
     }
     // 外呼
     handleCall(row: IState) {
-      this.$emit('call', row);
-      (this.$refs.driverCall as any).handleCallClick()
+      this.$emit('call', row)
+    }
+    // 调用外呼方法
+    callPhone(phone:string, callId:string|number) {
+      this.phone = phone
+      this.callId = callId
+      setTimeout(() => {
+        (this.$refs.driverCall as any).handleCallClick()
+      }, 20)
     }
     // 打标签
     handleTag(row: IState) {

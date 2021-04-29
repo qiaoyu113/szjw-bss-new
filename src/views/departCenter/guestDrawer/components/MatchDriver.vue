@@ -79,7 +79,7 @@ export default class DepartLine extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      console.log(123)
+      (this.$refs.tableDriver as any).callPhone(phone, '123')
     }).catch(() => {
       this.$message({
         type: 'info',
