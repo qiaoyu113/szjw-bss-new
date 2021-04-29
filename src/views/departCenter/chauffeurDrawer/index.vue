@@ -29,7 +29,7 @@
           :op-type="[]"
           @tag="setTagHandle"
           @call="setCallHandle"
-          @creatRun="creatRunHandle"
+          @creatRun="onCreateTryRun"
         />
       </section>
       <!-- 撮合匹配的司机列表 -->
@@ -52,6 +52,10 @@
       </section>
       <SetTag ref="tagShow" />
     </Scroll>
+    <CreateTryRun
+      ref="tryRunShow"
+      :obj="rowData"
+    />
   </DrawerModel>
 </template>
 
@@ -85,6 +89,7 @@ export default class GuestDrawer extends Vue {
     private tagShow:boolean = false
     private pageSize:number = 1
     private tryRunShow:boolean = false
+    private showTryRun:boolean = false
     private rowData:object = {}
     private lineTableData:IState[] = [] // 线路列表
     private driverTableData:IState[] = [] // 司机列表
@@ -143,7 +148,7 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
     }
-    creatRunHandle(data:any) {
+    onCreateTryRun(data:any) {
       (this.$refs.tryRunShow as any).showDialog = true
       this.rowData = data
     }
@@ -185,9 +190,6 @@ export default class GuestDrawer extends Vue {
       } finally {
         console.log('')
       }
-    }
-    onCreateTryRun(driver: object) {
-      console.log('driver', driver)
     }
     loadMoreHandle() {
       this.getLists()

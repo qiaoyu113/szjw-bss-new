@@ -67,6 +67,7 @@
           v-model="listQuery.keyWords"
           placeholder="选择/搜索线路名称/编号"
           filterable
+          clearable
           :options="lineList"
           size="mini"
         >
