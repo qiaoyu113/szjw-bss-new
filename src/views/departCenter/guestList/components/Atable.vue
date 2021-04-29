@@ -343,7 +343,7 @@ export default class extends Vue {
   }
   // 创建试跑意向
   handleCreateTryRunClick(row:IState) {
-    this.$emit('tryRun')
+    this.$emit('tryRun', row)
   }
   // 查看详情
   handleDetailClick(row:IState) {
