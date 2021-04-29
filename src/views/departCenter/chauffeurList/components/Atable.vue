@@ -9,7 +9,6 @@
       highlight-current-row
       size="mini"
       row-key="id"
-      :row-style="{height: '20px'}"
       fit
       @selection-change="handleSelectionChange"
     >
@@ -20,7 +19,7 @@
       />
       <el-table-column
         align="center"
-        min-width="70"
+        min-width="50"
         class-name="firstColumn"
       >
         <template slot-scope="scope">
@@ -38,7 +37,7 @@
       </el-table-column>
       <el-table-column
         label="基础信息"
-        min-width="220"
+        min-width="100"
         align="center"
       >
         <template slot-scope="{row}">
@@ -62,7 +61,7 @@
       </el-table-column>
       <el-table-column
         label="车辆"
-        min-width="150"
+        min-width="170"
         align="center"
       >
         <template slot-scope="{row}">
@@ -76,7 +75,7 @@
       </el-table-column>
       <el-table-column
         label="地址信息"
-        min-width="240"
+        min-width="220"
         align="center"
       >
         <template slot-scope="{row}">
@@ -93,7 +92,7 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="160"
+        min-width="130"
         align="center"
       >
         <template slot-scope="{row}">
@@ -110,7 +109,7 @@
       </el-table-column>
       <el-table-column
         label="线路忍耐度"
-        min-width="200"
+        min-width="160"
         align="center"
       >
         <template slot-scope="{row}">
@@ -130,7 +129,7 @@
       </el-table-column>
       <el-table-column
         label="标签"
-        min-width="100"
+        min-width="80"
         align="center"
       >
         <template slot-scope="{row}">
@@ -150,7 +149,7 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        min-width="160"
+        min-width="100"
         align="center"
       >
         <template slot-scope="{row}">
