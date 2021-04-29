@@ -8,13 +8,11 @@
       stripe
       highlight-current-row
       size="mini"
-      :row-style="{height: '20px'}"
+
       fit
-      :header-cell-style="{padding: '6px 20px'}"
-      :cell-style="{padding: '5px 20px'}"
     >
       <el-table-column
-        min-width="70"
+        min-width="50"
         label=""
         class-name="firstColumn"
       >
@@ -30,7 +28,7 @@
       </el-table-column>
       <el-table-column
         label="基础信息"
-        min-width="220"
+        min-width="140"
         align="center"
       >
         <template slot-scope="{row}">
@@ -94,7 +92,7 @@
       </el-table-column>
       <el-table-column
         label="配送信息"
-        min-width="240"
+        min-width="200"
         align="center"
       >
         <template slot-scope="{row}">
@@ -114,7 +112,7 @@
       </el-table-column>
       <el-table-column
         label="结算"
-        min-width="240"
+        min-width="190"
         align="center"
       >
         <template slot-scope="{row}">
@@ -137,7 +135,7 @@
       </el-table-column>
       <el-table-column
         label="线路特点"
-        min-width="260"
+        min-width="220"
         align="center"
       >
         <template slot-scope="{row}">
@@ -166,7 +164,7 @@
       </el-table-column>
       <el-table-column
         label="标签"
-        min-width="100"
+        min-width="60"
         align="center"
       >
         <template slot-scope="{row}">
@@ -183,15 +181,10 @@
       </el-table-column>
       <el-table-column
         label="状态"
-        min-width="160"
+        min-width="110"
         align="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
-            <i
-              class="el-icon-s-custom"
-            /> 老张
-          </p>
           <p
             class="text"
             :a="row.a"
@@ -211,7 +204,7 @@
       <el-table-column
         label="操作"
         fixed="right"
-        min-width="150"
+        min-width="110"
         align="center"
       >
         <template slot-scope="{row}">
@@ -223,6 +216,16 @@
               @click.stop="handleMatchClick(row)"
             >
               匹配撮合
+            </el-button>
+          </p>
+          <p class="text">
+            <el-button
+              v-if="isShowPercent"
+              type="text"
+              size="small"
+              @click.stop="handleCreateTryRunClick(row)"
+            >
+              创建试跑意向
             </el-button>
           </p>
           <p class="text">
@@ -337,6 +340,10 @@ export default class extends Vue {
   handleMatchClick(row:IState) {
     sessionStorage.setItem(key, JSON.stringify(row))
     this.$emit('match', row)
+  }
+  // 创建试跑意向
+  handleCreateTryRunClick(row:IState) {
+    this.$emit('tryRun')
   }
   // 查看详情
   handleDetailClick(row:IState) {

@@ -19,22 +19,19 @@
         :pc-col="8"
       >
         <template slot="customerStatus">
-          <el-badge
+          <el-button
             v-for="item in btns"
             :key="item.text"
+            type="primary"
+            :plain="item.name !== listQuery.customerStatus"
+            margin-right="20px"
+            @click="() => {
+              listQuery.customerStatus = item.name
+              handleFilterClick()
+            }"
           >
-            <el-button
-              type="primary"
-              margin-right="20px"
-              :plain="item.name !== listQuery.customerStatus"
-              @click="() => {
-                listQuery.customerStatus = item.name
-                handleFilterClick()
-              }"
-            >
-              {{ item.text }}
-            </el-button>
-          </el-badge>
+            {{ item.text }}
+          </el-button>
         </template>
         <div
           slot="mulBtn"
@@ -87,9 +84,9 @@
           :list-query="listQuery"
           :is-show-percent="true"
           :obj="{}"
-          @launchGuest="handleLaunchGuest"
-          @cancelGuest="handleCancelGuest"
-          @cancelTryRun="handleCancelTryRun"
+          @launchGuest="handleLaunchGuest($event)"
+          @cancelGuest="handleCancelGuest($event)"
+          @cancelTryRun="handleCancelTryRun($event)"
         />
         <pagination
           :operation-list="[]"
@@ -171,7 +168,7 @@ export default class extends Vue {
     distributionArea: '',
     stabilityTemporary: '',
     lineName: '',
-    status: ''
+    customerStatus: ''
   }
   private formItem:any[] = [
     {
@@ -322,7 +319,7 @@ export default class extends Vue {
       text: '未发起客邀'
     },
     {
-      name: '3',
+      name: '2',
       text: '已发起客邀'
     }
   ]
@@ -480,12 +477,14 @@ export default class extends Vue {
     this.shareScopeEnd = this.listQuery[key]
   }
   // 发起客邀
-  handleLaunchGuest() {
+  handleLaunchGuest(id:number) {
     (this.$refs.launchGuest as any).showDialog = true
+    console.log('id', id)
   }
   // 取消客邀
-  handleCancelGuest() {
+  handleCancelGuest(id:number) {
     (this.$refs.cancelGuest as any).showDialog = true
+    console.log('id', id)
   }
   // 批量发起客邀
   private batchLaunchGuest() {
@@ -493,8 +492,9 @@ export default class extends Vue {
     // (this.$refs.launchGuest as any).confirm()
   }
   // 取消创建试跑意向
-  handleCancelTryRun() {
+  handleCancelTryRun(id:number) {
     (this.$refs.cancelTryRun as any).showDialog = true
+    console.log('id', id)
   }
 
   init() {
