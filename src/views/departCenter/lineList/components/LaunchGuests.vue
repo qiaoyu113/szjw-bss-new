@@ -98,7 +98,7 @@ export default class extends Vue {
         this.$message.success('操作成功')
         this.$emit('success')
       } else {
-        this.$message.error(res.errorMsg)
+        // this.$message.error(res.errorMsg)
       }
     } catch (err) {
       console.log(`launch guest fail:${err}`)

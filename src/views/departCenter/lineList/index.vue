@@ -19,22 +19,20 @@
         :pc-col="8"
       >
         <template slot="customerStatus">
-          <el-badge
+          <el-button
             v-for="item in btns"
             :key="item.text"
+            type="primary"
+            autofocus="item.focus"
+            margin-right="20px"
+            :plain="item.name !== listQuery.customerStatus"
+            @click="() => {
+              listQuery.customerStatus = item.name
+              handleFilterClick()
+            }"
           >
-            <el-button
-              type="primary"
-              margin-right="20px"
-              :plain="item.name !== listQuery.customerStatus"
-              @click="() => {
-                listQuery.customerStatus = item.name
-                handleFilterClick()
-              }"
-            >
-              {{ item.text }}
-            </el-button>
-          </el-badge>
+            {{ item.text }}
+          </el-button>
         </template>
         <div
           slot="mulBtn"
@@ -315,15 +313,18 @@ export default class extends Vue {
   private btns:any[] = [
     {
       name: '',
-      text: '全部'
+      text: '全部',
+      focus: true
     },
     {
       name: '1',
-      text: '未发起客邀'
+      text: '未发起客邀',
+      focus: false
     },
     {
       name: '3',
-      text: '已发起客邀'
+      text: '已发起客邀',
+      focus: false
     }
   ]
   // 判断是否是PC
