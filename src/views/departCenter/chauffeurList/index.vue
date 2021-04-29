@@ -142,7 +142,7 @@ export default class extends Vue {
 
     call(row:IState) {
       console.log(row)
-      let phone = '18848885135'
+      let phone = '18838928206'
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -151,7 +151,7 @@ export default class extends Vue {
         type: 'warning'
       })
         .then(() => {
-          console.log(123)
+          (this.$refs.Atable as any).callPhone(phone, '123')
         })
         .catch(() => {
           this.$message({
