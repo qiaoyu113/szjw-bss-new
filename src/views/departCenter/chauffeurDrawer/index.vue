@@ -52,7 +52,10 @@
       </section>
       <SetTag ref="tagShow" />
     </Scroll>
-    <CreateTryRun ref="tryRunShow" />
+    <CreateTryRun
+      ref="tryRunShow"
+      :obj="rowData"
+    />
   </DrawerModel>
 </template>
 
@@ -145,9 +148,9 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
     }
-    onCreateTryRun(data:any) { // todo
-    //   (this.$refs.tryRunShow as any).showDialog = true
-    //   this.rowData = data
+    onCreateTryRun(data:any) {
+      (this.$refs.tryRunShow as any).showDialog = true
+      this.rowData = data
     }
     // 获取列表数据
     async getLists() {
