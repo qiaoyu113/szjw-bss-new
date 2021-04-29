@@ -23,9 +23,8 @@
             v-for="item in btns"
             :key="item.text"
             type="primary"
-            autofocus="item.focus"
-            margin-right="20px"
             :plain="item.name !== listQuery.customerStatus"
+            margin-right="20px"
             @click="() => {
               listQuery.customerStatus = item.name
               handleFilterClick()
@@ -169,7 +168,7 @@ export default class extends Vue {
     distributionArea: '',
     stabilityTemporary: '',
     lineName: '',
-    status: ''
+    customerStatus: ''
   }
   private formItem:any[] = [
     {
@@ -313,18 +312,15 @@ export default class extends Vue {
   private btns:any[] = [
     {
       name: '',
-      text: '全部',
-      focus: true
+      text: '全部'
     },
     {
       name: '1',
-      text: '未发起客邀',
-      focus: false
+      text: '未发起客邀'
     },
     {
-      name: '3',
-      text: '已发起客邀',
-      focus: false
+      name: '2',
+      text: '已发起客邀'
     }
   ]
   // 判断是否是PC
