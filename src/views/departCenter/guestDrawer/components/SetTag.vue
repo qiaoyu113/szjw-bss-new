@@ -7,20 +7,21 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      :destroy-on-close="false"
     >
       <self-form
         ref="setTagFrom"
         :list-query="listQuery"
         :form-item="formItem"
         :rules="rules"
-        size="small"
+        size="mini"
         label-width="130px"
         class="p15 SuggestForm"
         :pc-col="24"
         @onPass="handlePassChange"
       >
-        <template slot="startTime">
+        <template
+          slot="startTime"
+        >
           <el-time-select
             v-model="listQuery['jobStartDate']"
             class="timeSelect"
@@ -47,13 +48,15 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expected']"
-            v-only-number="{min: 0, max: 10000, precision: 1}"
+            v-only-number="{min: 0, max: 20000, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
-            placeholder="请输入期望运费"
+            placeholder="请输入"
           />
         </template>
-        <template slot="endTime">
+        <template
+          slot="endTime"
+        >
           <el-time-select
             v-model="listQuery['jobStartDate2']"
             class="timeSelect"
@@ -87,19 +90,19 @@
             placeholder="请输入内容"
           />
           <div class="tags">
-            <el-radio-group
-              v-model="listQuery.remark"
+            <el-checkbox-group
+              v-model="listQuery.tags"
               size="mini"
             >
-              <el-radio
+              <el-checkbox
                 v-for="(item,index) in reasonLists"
                 :key="index"
                 border
                 :label="item.value"
               >
                 {{ item.label }}
-              </el-radio>
-            </el-radio-group>
+              </el-checkbox>
+            </el-checkbox-group>
           </div>
         </template>
       </self-form>
@@ -154,10 +157,7 @@ export default class extends Vue {
     prohibitionAddress: '',
     address: '',
     prohibition2: '',
-    prohibitionRegion: {
-      address: [],
-      areas: []
-    },
+    prohibitionRegion: '',
     area2: [],
     hard: '',
     complexity: [],
@@ -175,7 +175,32 @@ export default class extends Vue {
     distribution: '',
     detailed2: '',
     situation: '',
+    tags: [],
     remark: ''
+  }
+  @Watch('listQuery.prohibition1')
+  onlistQueryChanged(val: any, oldVal: any) {
+    this.formItem[1].hidden = !val
+  }
+  @Watch('listQuery.prohibition2')
+  onlistQueryRegionChanged(val: any, oldVal: any) {
+    this.formItem[3].hidden = !val
+  }
+  @Watch('listQuery.isWork')
+  onlistQueryWorkChanged(val: any, oldVal: any) {
+    this.formItem[10].hidden = !val
+    this.formItem[11].hidden = !val
+    this.formItem[12].hidden = !val
+    this.formItem[13].hidden = !val
+    this.formItem[14].hidden = !val
+    this.formItem[15].hidden = !val
+  }
+  @Watch('listQuery.tags')
+  onlistQuerytagsChanged(val: any, oldVal: any) {
+    if (val.length > 1) {
+      this.listQuery.tags.shift()
+    }
+    this.listQuery.remark = ''
   }
   private formItem:any[] = [
     {
@@ -190,12 +215,15 @@ export default class extends Vue {
     },
     {
       type: 16,
+      hidden: false,
       key: 'prohibitionAddress',
       label: '可闯禁行区域',
       col: 24,
+      value: [],
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        multiple: true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityData
@@ -220,6 +248,7 @@ export default class extends Vue {
     },
     {
       type: 16,
+      hidden: false,
       key: 'prohibitionRegion',
       label: '可闯限行区域',
       col: 24,
@@ -280,7 +309,7 @@ export default class extends Vue {
       slot: true,
       type: 'expected',
       tagAttrs: {
-        placeholder: '请输入期望运费',
+        placeholder: '请输入',
         clearable: true
       },
       style: {
@@ -308,13 +337,14 @@ export default class extends Vue {
       label: '外边是否有活',
       col: 24,
       options: [
-        { label: '没有', value: 0 },
-        { label: '有', value: 1 }
+        { label: '没有', value: false },
+        { label: '有', value: true }
       ]
     },
     {
       type: 8,
       col: 10,
+      hidden: false,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -329,6 +359,7 @@ export default class extends Vue {
     {
       type: 1,
       w: '0px',
+      hidden: false,
       tagAttrs: {
         placeholder: '请输入详细地址',
         clearable: true
@@ -338,6 +369,7 @@ export default class extends Vue {
     },
     {
       slot: true,
+      hidden: false,
       type: 'startTime',
       w: '0px',
       tagAttrs: {
@@ -350,6 +382,7 @@ export default class extends Vue {
     {
       type: 8,
       col: 10,
+      hidden: false,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -364,6 +397,7 @@ export default class extends Vue {
     {
       type: 1,
       w: '0px',
+      hidden: false,
       tagAttrs: {
         placeholder: '请输入详细地址',
         clearable: true
@@ -373,6 +407,7 @@ export default class extends Vue {
     },
     {
       slot: true,
+      hidden: false,
       type: 'endTime',
       w: '0px',
       tagAttrs: {
@@ -388,13 +423,13 @@ export default class extends Vue {
       label: '司机情况',
       col: 24,
       options: [
-        { label: '着急试跑', value: 1 },
-        { label: '想跟跑', value: 2 },
-        { label: '考虑退费', value: 3 },
-        { label: '威胁司撮要退费', value: 4 },
-        { label: '铁了心要退费', value: 5 },
-        { label: '不要再给我打电话', value: 6 },
-        { label: '想请假', value: 7 }
+        { label: '着急试跑', value: '1' },
+        { label: '想跟跑', value: '2' },
+        { label: '考虑退费', value: '3' },
+        { label: '威胁司撮要退费', value: '4' },
+        { label: '铁了心要退费', value: '5' },
+        { label: '不要再给我打电话', value: '6' },
+        { label: '想请假', value: '7' }
       ]
     },
     {
@@ -413,32 +448,29 @@ export default class extends Vue {
     }
   ]
   private rules:IState = {
-    prohibition1: [
-      { required: true, message: '请选择是否闯禁行', trigger: 'change' }
+    prohibitionAddress: [
+      { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
-    prohibition2: [
-      { required: true, message: '请选择是否闯限行', trigger: 'change' }
-    ],
-    hard: [
-      { required: true, message: '请选择装卸接受度', trigger: 'change' }
-    ],
-    complexity: [
-      { required: true, message: '请选择配送复杂度', trigger: 'change' }
-    ],
-    expected: [
-      { required: true, message: '请输入期望的运费', trigger: 'blur' }
-    ],
-    isWork: [
-      { required: true, message: '请选择外边是否有活', trigger: 'change' }
+    prohibitionRegion: [
+      { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
     ],
+    detailed: [
+      { required: true, message: '请填写详情地址', trigger: 'change' }
+    ],
+    startTime: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
     distribution: [
       { required: true, message: '请选择配送点', trigger: 'change' }
     ],
-    situation: [
-      { required: true, message: '请选择司机情况', trigger: 'change' }
+    detailed2: [
+      { required: true, message: '请填写详情地址', trigger: 'change' }
+    ],
+    endTime: [
+      { required: true, message: '请选择时间', trigger: 'change' }
     ]
   }
   // 确定按钮
@@ -501,14 +533,17 @@ export default class extends Vue {
   top:5px;
   left: 5px;
   flex-wrap: wrap;
-  ::v-deep .el-radio{
+  ::v-deep .el-checkbox{
     margin: 0;
     margin-left: 0 !important;
     margin-right: 5px;
     padding: 0 10px 0 0;
 
   }
-  ::v-deep .el-radio__input{
+  ::v-deep .el-checkbox{
+    line-height: 26px;
+  }
+  ::v-deep .el-checkbox__input{
     display: none;
   }
 }

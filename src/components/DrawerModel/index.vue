@@ -53,7 +53,7 @@ export default class DrawerModel extends Vue {
 ::v-deep .el-drawer__body{
   height: 100%;
   background:rgba(0,0,0,0.5);
-  padding-left: 20%;
+  padding-left: 18%;
   >div{
     height: 100%;
     overflow: auto;
@@ -82,7 +82,7 @@ export default class DrawerModel extends Vue {
     justify-content: center;
     align-items: center;
     position: absolute;
-    left: calc(20% - 25px);
+    left: calc(18% - 25px);
     top:50%;
     transform: translateY(-50%);
     background: #fff;

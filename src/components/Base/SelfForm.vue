@@ -21,6 +21,7 @@
         :offset="item.offset|| 0"
       >
         <el-form-item
+          v-if="!item.hidden"
           :label="item.label"
           :prop="item.key"
           :label-width="item.w"
@@ -130,6 +131,7 @@
             v-else-if="item.type ===8"
             ref="cascader"
             v-model="listQuery[item.key]"
+            :style="item.style"
             v-bind="item.tagAttrs || {}"
             :options="item.options"
             v-on="item.listeners"

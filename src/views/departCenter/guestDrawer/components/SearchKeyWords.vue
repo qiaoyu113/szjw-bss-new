@@ -26,70 +26,57 @@
             </el-dropdown-menu>
           </el-dropdown>
         </template>
-        <div class="formbox">
-          <el-input
-            v-model="listQuery.keyWords"
-            size="small"
-            placeholder="请输入司机姓名/编号"
-            suffix-icon="el-icon-search"
-          />
-          <el-button
-            type="primary"
-            size="small"
-            @click="searchHandle"
-          >
-            查询
-          </el-button>
-        </div>
       </div>
       <div class="formList">
         <self-form
           :list-query="listQuery"
           :form-item="formItem"
-          size="small"
+          size="mini"
           class="SuggestForm"
           :pc-col="8"
         >
-          <template slot="workTime">
-            <el-time-select
-              v-model="listQuery['jobStartDate']"
-              class="timeSelect"
-              placeholder="起始时间"
-              :picker-options="{
-                start: '00:00',
-                step: '01:00',
-                end: '23:00'
-              }"
-            />
-            <span style="padding:0 3px">-</span>
-            <el-time-select
-              v-model="listQuery['jobEndDate']"
-              class="timeSelect"
-              placeholder="结束时间"
-              :picker-options="{
-                start: '00:00',
-                step: '01:00',
-                end: '23:00'
-              }"
-            />
-          </template>
           <template slot="freight">
             <el-input
-              v-model="listQuery.start"
+              v-model="listQuery.f1"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              style="min-width:100px"
+              style="width:100px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
-              v-model="listQuery.end"
+              v-model="listQuery.f2"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              :disabled="!listQuery.start"
-              style="min-width:100px"
+              :disabled="!listQuery.f1"
+              style="width:100px"
               placeholder="请输入"
             />
           </template>
+          <template slot="keyWords">
+            <el-select
+              v-model="listQuery.keyWords"
+              placeholder="选择/搜索线路名称/编号"
+              filterable
+              clearable
+              :options="lineList"
+              size="mini"
+            >
+              <el-option
+                v-for="it in lineList"
+                :key="it.value"
+                :value="it.value"
+                :label="it.label"
+              />
+            </el-select>
+          </template>
         </self-form>
+        <el-button
+          type="primary"
+          size="mini"
+          style="margin-top: -8px;"
+          @click="searchHandle"
+        >
+          查询
+        </el-button>
       </div>
     </div>
     <div
@@ -106,7 +93,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ item.selected.join(",") }}<i
+          {{ item.type }}：{{ item.selected.join(item.key === 'workRange' ? '~' : ',') }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -142,14 +129,14 @@ export default class SearchKeyWords extends Vue {
   ] // 车型列表
   private multiple: boolean = true // 当前选项是否是多选
   private key: string = '' // 当前选项是否是多选
-  private tempItem: [] = []
   private curSelecteds: [] = []
   private selectTitle: string = ''
   private selectedData: any[] = [
     {
+      key: 'workRange',
       type: '工作时间段',
-      optionIds: [],
-      selected: ['9:00-18:00']
+      optionIds: ['09:00', '18:00'],
+      selected: ['09:00', '18:00']
     }
   ];
   private expectOptions: IState[] = [ // 期望货品类型
@@ -161,6 +148,10 @@ export default class SearchKeyWords extends Vue {
   private cycleOptions: IState[] = [
     { label: '全部', value: '' }
   ];
+  private lineList: any = [
+    { label: '线路1', value: 'line1' },
+    { label: '线路2', value: 'line2' }
+  ]
   private timeLists:IState[] = []
   private listQuery:IState = {
     busiType: '', // 所属业务线
@@ -170,8 +161,7 @@ export default class SearchKeyWords extends Vue {
     hope: '', // 期望稳定/临时
     expectType: '', // 期望货品类型
     expectHard: '', // 期望配送难度
-    jobStartDate: '',
-    jobEndDate: '',
+    workTime: '',
     f1: '',
     f2: '',
     address: '',
@@ -186,30 +176,12 @@ export default class SearchKeyWords extends Vue {
   private formItem:any[] = [
     {
       slot: true,
-      type: 'workTime',
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true,
-        style: {
-          width: '140px'
-        }
-      },
-      w: '90px',
-      label: '工作时间段',
-      col: 8
-    },
-    {
-      slot: true,
       type: 'freight',
       label: '单趟运费区间',
-      key: 'start',
-      w: '110px',
-      col: 8
+      w: '90px'
     },
     {
       type: 8,
-      col: 7,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -225,9 +197,26 @@ export default class SearchKeyWords extends Vue {
           this.handleCascaderChange(e, 'address')
         }
       },
-      w: '100px',
+      style: {
+        width: '200px'
+      },
+      w: '80px',
       label: '现居住地址',
       key: 'address'
+    },
+    {
+      slot: true,
+      label: '',
+      type: 'keyWords',
+      tagAttrs: {
+        placeholder: '请输入司机姓名/编号',
+        clearable: true,
+        'suffix-icon': 'el-icon-search'
+      },
+      style: {
+        width: '200px',
+        marginLeft: '10px'
+      }
     }
   ]
   private selectList: IState[] = [
@@ -299,6 +288,16 @@ export default class SearchKeyWords extends Vue {
       multiple: false,
       key: 'expectHard',
       title: '期望配送复杂度'
+    },
+    {
+      title: '开始工作时间',
+      key: 'start',
+      options: this.timeLists
+    },
+    {
+      title: '结束工作时间',
+      key: 'end',
+      options: this.timeLists
     }
   ]
   handleClearAll() {
@@ -306,7 +305,8 @@ export default class SearchKeyWords extends Vue {
     this.$emit('on-clear')
   }
   handleChange(item:any) {
-    this.selectTitle = item.title
+    console.log(item)
+    this.selectTitle = item.label || item.title
     this.multiple = item.multiple
     this.curSelecteds = item.options
     this.key = item.key
@@ -318,13 +318,14 @@ export default class SearchKeyWords extends Vue {
     let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
-        return item.type === this.selectTitle
+        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workRange'))
       })
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
         if (selecteds.indexOf(command) === -1) {
-          this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
-          this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
+          const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+          this.selectedData[index].selected = (this.multiple || isWorkRange) ? this.selectedData[index].selected : []
+          this.selectedData[index].optionIds = (this.multiple || isWorkRange) ? this.selectedData[index].optionIds : []
           if (command === '全部') {
             this.selectedData[index].optionIds = []
             this.selectedData[index].selected = ['全部']
@@ -335,30 +336,39 @@ export default class SearchKeyWords extends Vue {
             if (this.selectedData[index].selected[0] === '全部') {
               this.selectedData[index].selected.shift()
             }
-            this.selectedData[index].optionIds.push(id)
-            this.selectedData[index].selected.push(command)
+            if (!isWorkRange) {
+              this.selectedData[index].optionIds.push(id)
+              this.selectedData[index].selected.push(command)
+            } else {
+              if (this.key === 'start') {
+                this.selectedData[index].optionIds.splice(0, 1, id)
+                this.selectedData[index].selected.splice(0, 1, command)
+              } else {
+                this.selectedData[index].optionIds.splice(1, 1, id)
+                this.selectedData[index].selected.splice(1, 1, command)
+              }
+            }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
         }
       } else {
-        let obj = {
-          type: this.selectTitle,
-          optionIds: [id],
-          selected: [command]
-        }
-        this.listQuery[this.key] = obj.optionIds
-        this.selectedData.push(obj)
+        this.initSelectItem(id, command)
       }
     } else {
-      let obj = {
-        type: this.selectTitle,
-        optionIds: [id],
-        selected: [command]
-      }
-      this.listQuery[this.key] = obj.optionIds
-      this.selectedData.push(obj)
+      this.initSelectItem(id, command)
     }
     console.log(this.selectedData)
+  }
+  initSelectItem(id: any, command: any) {
+    const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+    let obj = {
+      type: isWorkRange ? '工作时间段' : this.selectTitle,
+      key: isWorkRange ? 'workRange' : this.key,
+      optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+      selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+    }
+    this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+    this.selectedData.push(obj)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
@@ -383,19 +393,12 @@ export default class SearchKeyWords extends Vue {
   searchHandle() {
     console.log(this.listQuery)
     // 单趟运费区间
-    if (!this.listQuery.start || !this.listQuery.end) {
+    if ((this.listQuery.f1 && !this.listQuery.f2) || (!this.listQuery.f1 && this.listQuery.f2)) {
       return this.$message.warning('单趟运费输入不完整')
     } else {
       if (Number(this.listQuery.start) > Number(this.listQuery.end)) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
-    }
-    // 工作时间段
-    if (!this.listQuery.jobStartDate || !this.listQuery.jobEndDate) {
-      return this.$message.warning('工作时间段输入不完整')
-    }
-    if (this.listQuery.jobStartDate === this.listQuery.jobEndDate) {
-      return this.$message.warning('开始时间和结束时间不能一样')
     }
   }
   getArrDifference(arr1:any, arr2:any) {
@@ -452,43 +455,54 @@ export default class SearchKeyWords extends Vue {
 </script>
 <style>
   .el-dropdown-menu{
-      max-height: 300px;
+      max-height: 250px;
       overflow: auto;
   }
 </style>
 <style lang="scss" scoped>
+.formList{
+  width:100%;
+}
 .searchBox{
   background: #fff;
   ::v-deep .el-dropdown-link{
-    font-size: 14px;
+    font-size: 12px;
     color: #494949;
     i{
       color: #606060 !important;
     }
   }
+   ::v-deep .el-col-8{
+     width: auto;
+  }
   ::v-deep .el-form{
     .el-col{
       padding: 0 !important;
     }
-  }
-  ::v-deep .el-button{
-    height: 32px !important;
+    .el-input__inner::placeholder{
+      font-size: 12px;
+    }
+    .el-cascader,.el-input{
+      flex:initial
+    }
   }
   ::v-deep  .el-form-item__label{
    color: #4b4b4b !important;
+   font-size: 12px;
   }
   ::v-deep .el-dropdown{
     display: flex;
+    align-items: center;
     &::after{
       display: inline-block;
       content: "";
-      height: 30px;
+      height: 24px;
       width: 2px;
       background: #f4f4f6;
       margin: 0 10px;
     }
   }
-  .el-dropdown:nth-last-of-type(2):after{
+  .el-dropdown:nth-last-of-type(1):after{
       display: none;
   }
   .topSelect{
@@ -498,11 +512,16 @@ export default class SearchKeyWords extends Vue {
     align-items: center;
     padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
-    ::v-deep .el-form-item--small.el-form-item{
-      margin-bottom: 0;
+    ::v-deep .el-form-item{
+      margin-bottom: 5px !important;
     }
     ::v-deep .selfForm{
       padding-left: 0;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      .el-select{
+        margin-left: 10px;
+      }
     }
     .selectedform{
       display: flex;
@@ -515,11 +534,9 @@ export default class SearchKeyWords extends Vue {
       align-items: center;
       width: 250px;
       margin-left: 20px;
-      .el-input{
-        margin-right: 10px;
-      }
+
       .el-button{
-        height: 36px;
+        height: 28px !important;
       }
     }
     .formList{

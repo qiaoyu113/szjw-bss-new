@@ -24,10 +24,16 @@
         :style="{paddingBottom: wrapperPadding.paddingBottom}"
       >
         <p
-          v-show="showBottomLoader"
+          v-if="showBottomLoader"
           class="bottomLoader"
         >
-          加载中。。。
+          加载中...
+        </p>
+        <p
+          v-if="stopSlide"
+          class="bottomLoader"
+        >
+          没有更多了
         </p>
       </div>
     </div>
@@ -81,6 +87,7 @@ export default {
       isLoading: false,
       pointerTouchDown: null,
       touchScroll: false,
+      height: 0,
       handleScroll: () => {},
       pointerUpHandler: () => {},
       pointerMoveHandler: () => {},
@@ -90,6 +97,14 @@ export default {
     }
   },
   computed: {
+    wrapperClasses() {
+      return [
+        `${prefixCls}-loader-wrapper`,
+        {
+          [`${prefixCls}-loader-wrapper-active`]: this.active
+        }
+      ]
+    },
     wrapClasses() {
       return `${prefixCls}-wrapper`
     },
@@ -97,7 +112,7 @@ export default {
       return [
         `${prefixCls}-container`,
         {
-          [`${prefixCls}-container-loading`]: this.showBodyLoader && this.stopSlide
+          [`${prefixCls}-container-loading`]: this.showBodyLoader
         }
       ]
     },
@@ -117,9 +132,6 @@ export default {
         paddingTop: this.topRubberPadding + 'px',
         paddingBottom: this.bottomRubberPadding + 'px'
       }
-    },
-    height() {
-      return getDocumentRect().clientHeight - 84
     }
   },
   created() {
@@ -127,7 +139,18 @@ export default {
     this.pointerUpHandler = this.onPointerUp.bind(this) // because we need the same function to add and remove event handlers
     this.pointerMoveHandler = throttle(this.onPointerMove, 50, { leading: false })
   },
+  mounted() {
+    let self = this
+    window.onresize = function() {
+      self.heightWrap()
+    }
+    this.heightWrap()
+  },
   methods: {
+    // eslint-disable-next-line vue/no-dupe-keys
+    heightWrap() {
+      this.height = getDocumentRect().clientHeight - 84
+    },
     // just to improve feeling of loading and avoid scroll trailing events fired by the browser
     waitOneSecond() {
       return new Promise(resolve => {
@@ -195,7 +218,7 @@ export default {
       }
     },
     onWheel(event) {
-      if (this.isLoading) return
+      if (this.isLoading || this.stopSlide) return
       // get the wheel direction
       const wheelDelta = event.wheelDelta ? event.wheelDelta : -(event.detail || event.deltaY)
       this.stretchEdge(wheelDelta)
@@ -227,7 +250,7 @@ export default {
     },
     onScroll() {
       const el = this.$refs.scrollContainer
-      if (this.isLoading || !el) return
+      if (this.isLoading || this.stopSlide || !el) return
       const scrollDirection = Math.sign(this.lastScroll - el.scrollTop) // IE has no Math.sign, check that webpack polyfills this
       const displacement = el.scrollHeight - el.clientHeight - el.scrollTop
       const topNegativeProximity = this.topProximityThreshold < 0 ? this.topProximityThreshold : 0
@@ -286,9 +309,11 @@ export default {
 </script>
 <style lang="scss" scoped>
   .bottomLoader{
-    padding: 10px 0;
+    padding: 10px 0 30px;
     font-size: 14px;
     text-align: center;
+    margin: 0;
+    background: #fff;
   }
   .ivu-scroll-wrapper {
     width:auto;
