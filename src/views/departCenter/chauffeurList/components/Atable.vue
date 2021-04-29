@@ -209,19 +209,6 @@
               匹配撮合
             </el-button>
           </p>
-          <!-- type="2" -->
-          <p
-            v-if="opType.includes(2)"
-            class="text"
-          >
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handleDetail(row)"
-            >
-              司机详情
-            </el-button>
-          </p>
           <!-- type="3" -->
           <p
             v-if="opType.includes(3)"
@@ -312,6 +299,7 @@
               <el-button
                 size="mini"
                 type="text"
+                @click.stop="handleDetail(row)"
               >
                 立即查看
               </el-button>
