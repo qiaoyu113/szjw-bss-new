@@ -30,6 +30,7 @@
           @tag="setTagHandle"
           @call="setCallHandle"
           @creatRun="onCreateTryRun"
+          @detail="onViewDriverDetail"
         />
       </section>
       <!-- 撮合匹配的司机列表 -->
@@ -56,6 +57,11 @@
       ref="tryRunShow"
       :obj="rowData"
     />
+    <DetailDialog
+      actived="third"
+      :driver-id="detailId"
+      :dialog-table-visible.sync="detailDio"
+    />
   </DrawerModel>
 </template>
 
@@ -67,6 +73,7 @@ import DrawerModel from '@/components/DrawerModel/index.vue'
 import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
+import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from './components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
   interface IState {
@@ -80,7 +87,8 @@ import { AppModule } from '@/store/modules/app'
       AtableLine,
       AtableDriver,
       CreateTryRun,
-      SetTag
+      SetTag,
+      DetailDialog
     }
   })
 export default class GuestDrawer extends Vue {
@@ -113,11 +121,16 @@ export default class GuestDrawer extends Vue {
       f1: '',
       f2: ''
     }
+    private detailDio:Boolean = false
+    private detailId:string = ''
     $eventBus: any
     @Watch('value')
     onValueChanged(val: boolean, oldVal: boolean) {
       this.visible = val
       this.$eventBus.$emit('setIndex', val)
+    }
+    onViewDriverDetail() {
+      this.detailDio = true
     }
     closeHandle() {
       this.visible = false
