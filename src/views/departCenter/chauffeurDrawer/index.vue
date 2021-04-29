@@ -17,7 +17,9 @@
     >
       <!-- 撮合线路 -->
       <section class="departLine">
-        <h3>待撮合司机</h3>
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 16px;">
+          待撮合司机
+        </div>
         <AtableDriver
           ref="driverDrawer"
           :list-query="listQueryDriver"
@@ -34,7 +36,9 @@
       <section class="matchDriver">
         <!-- 搜索项 -->
         <SearchKeyWords />
-        <h3>司机匹配线路</h3>
+        <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
+          司机匹配线路
+        </div>
         <div class="lineTable">
           <AtableLine
             ref="lineTableDrawer"
@@ -42,6 +46,7 @@
             :is-show-percent="true"
             obj="{}"
             :is-more="true"
+            @tryRun="onCreateTryRun"
           />
         </div>
       </section>
@@ -180,6 +185,9 @@ export default class GuestDrawer extends Vue {
       } finally {
         console.log('')
       }
+    }
+    onCreateTryRun(driver: object) {
+      console.log('driver', driver)
     }
     loadMoreHandle() {
       this.getLists()

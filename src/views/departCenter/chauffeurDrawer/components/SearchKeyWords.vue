@@ -59,18 +59,24 @@
           placeholder="请选择"
           clearable
           :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
-          class="width-180"
           size="mini"
           @change="onSelectionChange($event, 'distLoc')"
         />
         <div>&nbsp;&nbsp;&nbsp;</div>
-        <el-input
+        <el-select
           v-model="listQuery.keyWords"
-          placeholder="线路名称/编号"
-          suffix-icon="el-icon-search"
-          class="width-180"
+          placeholder="选择/搜索线路名称/编号"
+          filterable
+          :options="lineList"
           size="mini"
-        />
+        >
+          <el-option
+            v-for="it in lineList"
+            :key="it.value"
+            :value="it.value"
+            :label="it.label"
+          />
+        </el-select>
         <div>&nbsp;</div>
         <el-button
           type="primary"
@@ -160,6 +166,10 @@ export default class SearchKeyWords extends Vue {
   private goodsTypes: any[] = [
     { label: '全部', value: '' }
   ];
+  private lineList: any = [
+    { label: '线路1', value: 'line1' },
+    { label: '线路2', value: 'line2' }
+  ]
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
   private shareScopeEnd:IState[] = [];
@@ -378,27 +388,12 @@ export default class SearchKeyWords extends Vue {
   .form-container {
     display: flex;
     align-items: center;
-    font-size: 13px;
+    font-size: 12px;
     color: #333;
     flex-wrap: wrap;
   }
   .form-container > * {
     margin-bottom: 10px;
-  }
-  .width-180 {
-    width: 180px;
-  }
-  .width-140 {
-    width: 140px;
-  }
-  .width-120 {
-    width: 120px;
-  }
-  .width-100 {
-    width: 100px;
-  }
-  .width-90 {
-    width: 90px;
   }
   .width-80 {
     width: 80px;
@@ -407,7 +402,7 @@ export default class SearchKeyWords extends Vue {
 .searchBox{
   background: #fff;
   ::v-deep .el-dropdown-link{
-    font-size: 14px;
+    font-size: 12px;
     color: #494949;
     i{
       color: #606060 !important;
@@ -418,10 +413,11 @@ export default class SearchKeyWords extends Vue {
   }
   ::v-deep .el-dropdown{
     display: flex;
+    align-items: center;
     &::after{
       display: inline-block;
       content: "";
-      height: 30px;
+      height: 24px;
       width: 2px;
       background: #f4f4f6;
       margin: 0 10px;
@@ -431,11 +427,7 @@ export default class SearchKeyWords extends Vue {
       display: none;
   }
   .topSelect{
-    // display: flex;
-    // justify-content: space-between;
-    // flex-wrap: wrap;
-    // align-items: center;
-    padding:15px 30px 10px 30px;
+    padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
     .selectedform{
       display: flex;
