@@ -262,6 +262,7 @@
               <el-button
                 type="text"
                 size="small"
+                @click.stop="handleDetailClick(row)"
               >
                 查看线路详情
               </el-button>
@@ -503,6 +504,16 @@ export default class extends Vue {
   // 取消意向
   handleCancelTryRun() {
     this.$emit('cancelTryRun')
+  }
+  // 查看详情
+  handleDetailClick(row:IState) {
+    let { href } = this.$router.resolve({
+      path: `/lineshelf/linedetail`,
+      query: {
+        id: 'XL202104250009'
+      }
+    })
+    window.open(href, '_blank')
   }
 
   // 选择事件
