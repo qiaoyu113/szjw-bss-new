@@ -433,7 +433,8 @@ export default class SearchKeyWords extends Vue {
     .selectedform{
       display: flex;
       flex-wrap: wrap;
-      line-height: 36px;
+      line-height: 26px;
+      padding-bottom: 5px;
     }
     .formbox{
       display: flex;
