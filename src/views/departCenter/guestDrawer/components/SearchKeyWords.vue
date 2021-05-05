@@ -72,7 +72,6 @@
         <el-button
           type="primary"
           size="mini"
-          style="margin-top: -8px;"
           @click="searchHandle"
         >
           查询
@@ -486,6 +485,9 @@ export default class SearchKeyWords extends Vue {
       flex:initial
     }
   }
+  ::v-deep .el-button--mini{
+    margin-top: 5px;
+  }
   ::v-deep  .el-form-item__label{
    color: #4b4b4b !important;
    font-size: 12px;
@@ -513,7 +515,7 @@ export default class SearchKeyWords extends Vue {
     padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
     ::v-deep .el-form-item{
-      margin-bottom: 5px !important;
+      // margin-bottom: 5px !important;
     }
     ::v-deep .selfForm{
       padding-left: 0;
@@ -526,7 +528,8 @@ export default class SearchKeyWords extends Vue {
     .selectedform{
       display: flex;
       flex-wrap: wrap;
-      line-height: 36px;
+      line-height: 26px;
+      padding-bottom: 5px;
     }
     .formbox{
       display: flex;
@@ -541,7 +544,7 @@ export default class SearchKeyWords extends Vue {
     }
     .formList{
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       .formItem{
         display: inline-block;
         margin-right: 10px;
@@ -557,7 +560,7 @@ export default class SearchKeyWords extends Vue {
   .selectedBox{
     display: flex;
     color: #909196;
-    padding: 10px 20px 10px 30px;
+    padding: 10px 20px 0 30px;
     font-size: 14px;
     .clearAll{
       display: inline-block;

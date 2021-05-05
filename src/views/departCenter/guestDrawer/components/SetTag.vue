@@ -20,22 +20,30 @@
         @onPass="handlePassChange"
       >
         <template
-          slot="startTime"
+          slot="jobStartDate"
         >
           <el-time-select
             v-model="listQuery['jobStartDate']"
             class="timeSelect"
+            prop="jobStartDate"
             placeholder="起始时间"
+            style="width:50px"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00'
             }"
           />
-          <span style="padding:0 3px">-</span>
+        </template>
+        <template
+          slot="jobEndDate"
+        >
+          <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
             v-model="listQuery['jobEndDate']"
             class="timeSelect"
+            prop="jobEndDate"
+            style="width:50px"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
@@ -55,22 +63,28 @@
           />
         </template>
         <template
-          slot="endTime"
+          slot="jobStartDate2"
         >
           <el-time-select
             v-model="listQuery['jobStartDate2']"
             class="timeSelect"
             placeholder="起始时间"
+            prop="jobStartDate2"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00'
             }"
           />
-          <span style="padding:0 3px">-</span>
+        </template>
+        <template
+          slot="jobEndDate2"
+        >
+          <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
             v-model="listQuery['jobEndDate2']"
             class="timeSelect"
+            prop="jobEndDate2"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
@@ -128,6 +142,8 @@ var _this:any = {}
 export default class extends Vue {
   private isShow : boolean = false // 抽屉显示隐藏
   private countyOptions:IState[] = []
+  private prohibitAreaList:any = [] // 禁行区域
+  private limitAreaList:any = [] // 限行区域
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
     {
@@ -155,10 +171,10 @@ export default class extends Vue {
   private listQuery:IState = {
     prohibition1: '',
     prohibitionAddress: '',
-    address: '',
+    prohibitArea: [],
     prohibition2: '',
     prohibitionRegion: '',
-    area2: [],
+    limitArea: [],
     hard: '',
     complexity: [],
     period: '',
@@ -168,8 +184,6 @@ export default class extends Vue {
     stable: [],
     starting: '',
     detailed: '',
-    jobStartDate: null,
-    jobEndDate: null,
     jobStartDate2: null,
     jobEndDate2: null,
     distribution: '',
@@ -181,19 +195,23 @@ export default class extends Vue {
   @Watch('listQuery.prohibition1')
   onlistQueryChanged(val: any, oldVal: any) {
     this.formItem[1].hidden = !val
+    this.formItem[2].hidden = !val
   }
   @Watch('listQuery.prohibition2')
   onlistQueryRegionChanged(val: any, oldVal: any) {
-    this.formItem[3].hidden = !val
+    this.formItem[4].hidden = !val
+    this.formItem[5].hidden = !val
   }
   @Watch('listQuery.isWork')
   onlistQueryWorkChanged(val: any, oldVal: any) {
-    this.formItem[10].hidden = !val
-    this.formItem[11].hidden = !val
     this.formItem[12].hidden = !val
     this.formItem[13].hidden = !val
     this.formItem[14].hidden = !val
     this.formItem[15].hidden = !val
+    this.formItem[16].hidden = !val
+    this.formItem[17].hidden = !val
+    this.formItem[18].hidden = !val
+    this.formItem[19].hidden = !val
   }
   @Watch('listQuery.tags')
   onlistQuerytagsChanged(val: any, oldVal: any) {
@@ -214,12 +232,11 @@ export default class extends Vue {
       ]
     },
     {
-      type: 16,
+      type: 8,
       hidden: false,
       key: 'prohibitionAddress',
       label: '可闯禁行区域',
-      col: 24,
-      value: [],
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -229,12 +246,26 @@ export default class extends Vue {
           lazyLoad: getProviceCityData
         }
       },
-      countyOptions: [],
-      listeners(visible:boolean) {
-        if (!visible) {
-          _this.getCountryData('prohibitionAddress', 1)
+      listeners: {
+        'visible-change': (visible:boolean) => {
+          if (!visible) {
+            _this.getCountryData('prohibitionAddress', 1)
+          }
         }
       }
+    },
+    {
+      type: 2,
+      col: 14,
+      hidden: false,
+      key: 'prohibitArea',
+      label: '',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        multiple: true
+      },
+      options: this.prohibitAreaList
     },
     {
       type: 4,
@@ -247,12 +278,11 @@ export default class extends Vue {
       ]
     },
     {
-      type: 16,
+      type: 8,
       hidden: false,
       key: 'prohibitionRegion',
       label: '可闯限行区域',
-      col: 24,
-      value: [],
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -262,12 +292,26 @@ export default class extends Vue {
           lazyLoad: getProviceCityData
         }
       },
-      countyOptions: [],
-      listeners(visible:boolean) {
-        if (!visible) {
-          _this.getCountryData('prohibitionRegion', 3)
+      listeners: {
+        'visible-change': (visible:boolean) => {
+          if (!visible) {
+            _this.getCountryData('prohibitionAddress', 3)
+          }
         }
       }
+    },
+    {
+      type: 2,
+      col: 14,
+      hidden: false,
+      key: 'limitArea',
+      label: '',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        multiple: true
+      },
+      options: this.limitAreaList
     },
     {
       type: 4,
@@ -370,14 +414,26 @@ export default class extends Vue {
     {
       slot: true,
       hidden: false,
-      type: 'startTime',
+      type: 'jobStartDate',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 8,
-      key: 'startTime'
+      col: 4,
+      key: 'jobStartDate'
+    },
+    {
+      slot: true,
+      hidden: false,
+      type: 'jobEndDate',
+      w: '0px',
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true
+      },
+      col: 4,
+      key: 'jobEndDate'
     },
     {
       type: 8,
@@ -408,14 +464,26 @@ export default class extends Vue {
     {
       slot: true,
       hidden: false,
-      type: 'endTime',
+      type: 'jobStartDate2',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 8,
-      key: 'endTime'
+      col: 4,
+      key: 'jobStartDate2'
+    },
+    {
+      slot: true,
+      hidden: false,
+      type: 'jobEndDate2',
+      w: '0px',
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true
+      },
+      col: 4,
+      key: 'jobEndDate2'
     },
     {
       type: 4,
@@ -451,7 +519,13 @@ export default class extends Vue {
     prohibitionAddress: [
       { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
+    prohibitArea: [
+      { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
+    ],
     prohibitionRegion: [
+      { required: true, message: '请选择可闯限行区域', trigger: 'change' }
+    ],
+    limitArea: [
       { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
     starting: [
@@ -460,7 +534,16 @@ export default class extends Vue {
     detailed: [
       { required: true, message: '请填写详情地址', trigger: 'change' }
     ],
-    startTime: [
+    jobStartDate: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobEndDate: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobStartDate2: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobEndDate2: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
     distribution: [
@@ -486,6 +569,10 @@ export default class extends Vue {
       type: 'warning'
     }).then(() => {
       (this.$refs.setTagFrom as any).resetForm()
+      this.listQuery.prohibitionAddress = ''
+      this.listQuery.prohibitionRegion = ''
+      this.listQuery.starting = ''
+      this.listQuery.distribution = ''
       this.isShow = false
     }).catch(() => {
 
@@ -494,9 +581,14 @@ export default class extends Vue {
   private getCountryData(key:string, index:number) {
     setTimeout(async() => {
       if (!this.listQuery[key]) return false
-      let res = await getProvinceList(['100000', ...this.listQuery[key]])
-      this.$set(this.formItem[index], 'countyOptions', res)
-    }, 100)
+      let res:any = await getProvinceList(['100000', ...this.listQuery[key]])
+      if (index === 1) {
+        this.prohibitAreaList.push(...res)
+        console.log(this.prohibitAreaList)
+      } else {
+        this.limitAreaList.push(...res)
+      }
+    }, 10)
   }
 
   // 验证通过
@@ -526,6 +618,9 @@ export default class extends Vue {
   .el-input__inner{
     padding-right: 5px;
   }
+}
+::v-deep .el-form-item__content{
+    margin: 0 !important;
 }
 .tags{
   display: flex;

@@ -172,7 +172,7 @@ export default class DepartLine extends Vue {
   padding-bottom: 20px;
   h3{
     padding: 0 30px;
-    margin-top: 0;
+    margin-top: 15px;
   }
   .lineTable{
     width:100%;
