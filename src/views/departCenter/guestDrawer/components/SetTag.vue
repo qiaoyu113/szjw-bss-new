@@ -101,6 +101,8 @@
             type="textarea"
             :rows="2"
             clearable
+            maxlength="20"
+            show-word-limit
             placeholder="请输入内容"
           />
           <div class="tags">
@@ -291,7 +293,7 @@ export default class extends Vue {
       listeners: {
         'visible-change': (visible:boolean) => {
           if (!visible) {
-            _this.getCountryData('prohibitionRegion', 6)
+            _this.getCountryData('prohibitionRegion', 5)
           }
         }
       }
@@ -478,14 +480,6 @@ export default class extends Vue {
       slot: true,
       type: 'remark',
       label: '备注:',
-      tagAttrs: {
-        placeholder: '请输入',
-        maxlength: 300,
-        type: 'textarea',
-        'show-word-limit': true,
-        rows: '5',
-        clearable: true
-      },
       key: 'remark'
     }
   ]
@@ -609,7 +603,6 @@ export default class extends Vue {
   }
 }
 .remark ::v-deep .el-textarea__inner{
-  padding-top: 50px;
-  padding-bottom: 10px;
+  padding-top: 40px;
 }
 </style>
