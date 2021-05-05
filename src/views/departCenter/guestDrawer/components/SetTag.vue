@@ -142,8 +142,6 @@ var _this:any = {}
 export default class extends Vue {
   private isShow : boolean = false // 抽屉显示隐藏
   private countyOptions:IState[] = []
-  private prohibitAreaList:any = [] // 禁行区域
-  private limitAreaList:any = [] // 限行区域
   private cancelOptions:IState[] = [] // 取消原因
   private reasonLists:IState[] = [
     {
@@ -210,8 +208,6 @@ export default class extends Vue {
     this.formItem[15].hidden = !val
     this.formItem[16].hidden = !val
     this.formItem[17].hidden = !val
-    this.formItem[18].hidden = !val
-    this.formItem[19].hidden = !val
   }
   @Watch('listQuery.tags')
   onlistQuerytagsChanged(val: any, oldVal: any) {
@@ -249,7 +245,7 @@ export default class extends Vue {
       listeners: {
         'visible-change': (visible:boolean) => {
           if (!visible) {
-            _this.getCountryData('prohibitionAddress', 1)
+            _this.getCountryData('prohibitionAddress', 2)
           }
         }
       }
@@ -265,7 +261,7 @@ export default class extends Vue {
         clearable: true,
         multiple: true
       },
-      options: this.prohibitAreaList
+      options: []
     },
     {
       type: 4,
@@ -295,7 +291,7 @@ export default class extends Vue {
       listeners: {
         'visible-change': (visible:boolean) => {
           if (!visible) {
-            _this.getCountryData('prohibitionAddress', 3)
+            _this.getCountryData('prohibitionRegion', 6)
           }
         }
       }
@@ -311,7 +307,7 @@ export default class extends Vue {
         clearable: true,
         multiple: true
       },
-      options: this.limitAreaList
+      options: []
     },
     {
       type: 4,
@@ -387,7 +383,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      col: 10,
+      col: 12,
       hidden: false,
       tagAttrs: {
         placeholder: '请选择',
@@ -399,17 +395,6 @@ export default class extends Vue {
       },
       label: '起始点',
       key: 'starting'
-    },
-    {
-      type: 1,
-      w: '0px',
-      hidden: false,
-      tagAttrs: {
-        placeholder: '请输入详细地址',
-        clearable: true
-      },
-      col: 6,
-      key: 'detailed'
     },
     {
       slot: true,
@@ -437,7 +422,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      col: 10,
+      col: 12,
       hidden: false,
       tagAttrs: {
         placeholder: '请选择',
@@ -449,17 +434,6 @@ export default class extends Vue {
       },
       label: '配送点',
       key: 'distribution'
-    },
-    {
-      type: 1,
-      w: '0px',
-      hidden: false,
-      tagAttrs: {
-        placeholder: '请输入详细地址',
-        clearable: true
-      },
-      col: 6,
-      key: 'detailed2'
     },
     {
       slot: true,
@@ -531,9 +505,6 @@ export default class extends Vue {
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
     ],
-    detailed: [
-      { required: true, message: '请填写详情地址', trigger: 'change' }
-    ],
     jobStartDate: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
@@ -548,12 +519,6 @@ export default class extends Vue {
     ],
     distribution: [
       { required: true, message: '请选择配送点', trigger: 'change' }
-    ],
-    detailed2: [
-      { required: true, message: '请填写详情地址', trigger: 'change' }
-    ],
-    endTime: [
-      { required: true, message: '请选择时间', trigger: 'change' }
     ]
   }
   // 确定按钮
@@ -581,13 +546,14 @@ export default class extends Vue {
   private getCountryData(key:string, index:number) {
     setTimeout(async() => {
       if (!this.listQuery[key]) return false
+      console.log(this.listQuery[key])
       let res:any = await getProvinceList(['100000', ...this.listQuery[key]])
-      if (index === 1) {
-        this.prohibitAreaList.push(...res)
-        console.log(this.prohibitAreaList)
+      if (key === 'prohibitionAddress') {
+        this.listQuery.prohibitArea = []
       } else {
-        this.limitAreaList.push(...res)
+        this.listQuery.limitArea = []
       }
+      this.$set(this.formItem[index], 'options', res)
     }, 10)
   }
 
