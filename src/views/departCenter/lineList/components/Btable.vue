@@ -333,7 +333,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineInfo } from '@/api/line'
+import { getLineInfo } from '@/api/lineList'
 import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
@@ -383,6 +383,10 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
+    // 调用查询接口
+    let params = {}
+    let { data: res } = await getLineInfo(params)
+    console.log('res', res)
     try {
       let num:number = 10
       if (this.isMore) {
