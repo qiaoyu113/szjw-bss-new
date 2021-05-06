@@ -20,49 +20,44 @@
           width="40"
         />
         <el-table-column
-          min-width="50"
-          label=""
+          label="基础信息"
+          min-width="190"
+          align="center"
           class-name="firstColumn"
         >
-          <template>
-            <div class="arrow" />
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="基础信息"
-          min-width="140"
-          align="center"
-        >
           <template slot-scope="{row}">
-            <p class="text">
-              {{ row.basicInfo.name }}
-              <el-popover
-                placement="right"
-                min-width="200"
-                trigger="hover"
-              >
-                <div class="text1">
-                  {{ row.basicInfo.introduce }}
-                </div>
-                <i
-                  slot="reference"
-                  class="el-icon-chat-dot-round"
-                />
-              </el-popover>
-            </p>
+            <div class="arrow" />
+            <div style="margin-left:50px;">
+              <p class="text">
+                {{ row.basicInfo.name }}
+                <el-popover
+                  placement="right"
+                  min-width="200"
+                  trigger="hover"
+                >
+                  <div class="text1">
+                    {{ row.basicInfo.introduce }}
+                  </div>
+                  <i
+                    slot="reference"
+                    class="el-icon-chat-dot-round"
+                  />
+                </el-popover>
+              </p>
 
-            <p class="text">
-              ({{ row.basicInfo.post }})
-            </p>
-            <p class="text">
-              {{ row.basicInfo.lineId }}
-            </p>
-            <p class="text">
-              窗口期:剩余{{ row.basicInfo.day }}天
-            </p>
-            <p class="text scale">
-              {{ row.basicInfo.createDate }}创建
-            </p>
+              <p class="text">
+                ({{ row.basicInfo.post }})
+              </p>
+              <p class="text">
+                {{ row.basicInfo.lineId }}
+              </p>
+              <p class="text">
+                窗口期:剩余{{ row.basicInfo.day }}天
+              </p>
+              <p class="text scale">
+                {{ row.basicInfo.createDate }}创建
+              </p>
+            </div>
           </template>
         </el-table-column>
         <el-table-column
@@ -177,7 +172,7 @@
                   </div>
                   <span
                     slot="reference"
-                    style="color:orange"
+                    class="orange"
                   >{{ row.status.city.length }}<span style="color:#444">个城市已客邀</span></span>
                 </el-popover>
               </p>
@@ -546,6 +541,12 @@ export default class extends Vue {
         background: #F7F7F7;
         border-radius:6px;
       }
+    }
+    .blue {
+      color:#639DEC
+    }
+    .orange {
+      color:#f5a821;
     }
   }
 </style>

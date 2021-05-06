@@ -1,5 +1,6 @@
 // Parse the time to string
 import Vue from 'vue'
+import dayjs from 'dayjs'
 import {
   getOfficeByTypeAndOfficeId,
   getOfficeByType,
@@ -592,5 +593,13 @@ async function getCityGroupForLine(cityCode:number, clueType:any = 0) {
     console.log(`get group fail:${err}`)
   } finally {
     //
+  }
+}
+
+export const formatDate = (time: number | Date, cFormat:string = 'YYYY-MM-DD HH:mm:ss') => {
+  if (time) {
+    return dayjs(time).format(cFormat)
+  } else {
+    return ''
   }
 }

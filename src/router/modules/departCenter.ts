@@ -8,7 +8,7 @@ const departCenterRouter: RouteConfig = {
   name: 'Depart',
   meta: {
     title: 'depart',
-    icon: 'delivery',
+    icon: 'depart',
     apiUrl: 'root',
     alwaysShow: true
   },
