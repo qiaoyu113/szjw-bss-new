@@ -8,7 +8,6 @@
       stripe
       highlight-current-row
       size="mini"
-
       fit
     >
       <el-table-column
@@ -32,25 +31,27 @@
         align="center"
       >
         <template slot-scope="{row}">
-          {{ row.a }}
-          <el-popover
-            placement="right"
-            width="200"
-            trigger="hover"
-          >
-            <div class="text1">
-              这条线路是异常<el-button
-                type="text"
-                size="small"
-              >
-                火爆
-              </el-button>,4.2厢货,场景简单,菜鸟也能干...
-            </div>
-            <i
-              slot="reference"
-              class="el-icon-chat-dot-round"
-            />
-          </el-popover>
+          <p class="text">
+            {{ row.a }}
+            <el-popover
+              placement="right"
+              width="200"
+              trigger="hover"
+            >
+              <div class="text1">
+                这条线路是异常<el-button
+                  type="text"
+                  size="small"
+                >
+                  火爆
+                </el-button>,4.2厢货,场景简单,菜鸟也能干...
+              </div>
+              <i
+                slot="reference"
+                class="el-icon-chat-dot-round"
+              />
+            </el-popover>
+          </p>
           <p :class="obj.b === row.b ? 'blue text' : 'text'">
             ({{ row.b }})
           </p>
@@ -405,6 +406,7 @@ export default class extends Vue {
       color:#444444;
       font-size:12px;
       line-height: 20px;
+      text-align: left;
       &.scale {
         margin-left: -50%;
         width: 200%;

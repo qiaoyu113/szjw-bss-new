@@ -10,7 +10,6 @@
         highlight-current-row
         size="mini"
         row-key="id"
-        :row-style="{height: '20px'}"
         fit
         @selection-change="handleSelectionChange"
       >
@@ -21,32 +20,37 @@
           width="40"
         />
         <el-table-column
+          min-width="50"
+          label=""
+          class-name="firstColumn"
+        >
+          <template>
+            <div class="arrow" />
+          </template>
+        </el-table-column>
+        <el-table-column
           label="基础信息"
           min-width="140"
           align="center"
-          class-name="firstColumn"
         >
           <template slot-scope="{row}">
-            <div class="arrow" />
-            <router-link
-              style="color:#639DEC"
-              to="#"
-            >
+            <p class="text">
               {{ row.basicInfo.name }}
-            </router-link>
-            <el-popover
-              placement="right"
-              min-width="200"
-              trigger="hover"
-            >
-              <div class="text1">
-                {{ row.basicInfo.introduce }}
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
+              <el-popover
+                placement="right"
+                min-width="200"
+                trigger="hover"
+              >
+                <div class="text1">
+                  {{ row.basicInfo.introduce }}
+                </div>
+                <i
+                  slot="reference"
+                  class="el-icon-chat-dot-round"
+                />
+              </el-popover>
+            </p>
+
             <p class="text">
               ({{ row.basicInfo.post }})
             </p>
@@ -562,6 +566,7 @@ export default class extends Vue {
         font-size:18px;
         transform: scale(0.5);
       }
+      text-align: left;
     }
     .tip {
       margin:0px;
