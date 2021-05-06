@@ -123,6 +123,7 @@ import timeSelect from '../chauffeurList/components/timeSelect.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
+import { showWork } from '@/utils'
 interface PageObj {
   page:number,
   limit:number,
@@ -172,12 +173,17 @@ export default class extends Vue {
   }
   private formItem:any[] = [
     {
-      type: 2,
+      type: 8,
       key: 'workCity',
-      label: '城市',
+      col: 8,
+      label: '所属城市',
       tagAttrs: {
-        placeholder: '请选择',
-        clearable: true
+        placeholder: '请选择所属城市',
+        clearable: true,
+        props: {
+          lazy: true,
+          lazyLoad: showWork
+        }
       }
     },
     {
