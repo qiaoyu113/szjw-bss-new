@@ -10,10 +10,7 @@
         highlight-current-row
         size="mini"
         row-key="id"
-        :row-style="{height: '20px'}"
         fit
-        :header-cell-style="{padding: '6px 20px'}"
-        :cell-style="{padding: '5px 20px'}"
         @selection-change="handleSelectionChange"
       >
         <el-table-column
@@ -21,35 +18,43 @@
           width="80"
         />
         <el-table-column
+          min-width="50"
+          label=""
+          class-name="firstColumn"
+        >
+          <template>
+            <div class="arrow" />
+          </template>
+        </el-table-column>
+        <el-table-column
           label="基础信息"
           min-width="220"
           align="center"
-          class-name="firstColumn"
         >
           <template slot-scope="{row}">
-            <div class="arrow" />
-            <router-link to="#">
+            <p class="text">
               {{ row.basicInfo.name }}
-            </router-link>
-            <el-popover
-              placement="right"
-              min-width="200"
-              trigger="hover"
-            >
-              <div class="text1">
-                <!-- 这条线路是异常<el-button
+              <el-popover
+                placement="right"
+                min-width="200"
+                trigger="hover"
+              >
+                <div class="text1">
+                  <!-- 这条线路是异常<el-button
                   type="text"
                   size="small"
                 >
                   火爆
                 </el-button>,4.2厢货,场景简单,菜鸟也能干... -->
-                {{ row.basicInfo.introduce }}
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
+                  {{ row.basicInfo.introduce }}
+                </div>
+                <i
+                  slot="reference"
+                  class="el-icon-chat-dot-round"
+                />
+              </el-popover>
+            </p>
+
             <p class="text">
               ({{ row.basicInfo.post }})
             </p>
@@ -568,6 +573,7 @@ export default class extends Vue {
       color:#444444;
       font-size:12px;
       line-height: 20px;
+      text-align: left;
     }
     .tip {
       margin:0px;
