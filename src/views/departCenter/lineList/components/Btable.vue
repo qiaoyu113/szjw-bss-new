@@ -35,14 +35,14 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              {{ row.basicInfo.name }}
+              {{ row.lineName }}
               <el-popover
                 placement="right"
                 min-width="200"
                 trigger="hover"
               >
                 <div class="text1">
-                  {{ row.basicInfo.introduce }}
+                  {{ row.lineName }}
                 </div>
                 <i
                   slot="reference"
@@ -52,16 +52,16 @@
             </p>
 
             <p class="text">
-              ({{ row.basicInfo.post }})
+              ({{ row.lineSaleName }})
             </p>
             <p class="text">
-              {{ row.basicInfo.lineId }}
+              {{ row.lineSaleId }}
             </p>
             <p class="text">
-              窗口期:剩余{{ row.basicInfo.day }}天
+              窗口期:剩余{{ row.dayNum }}天
             </p>
             <p class="text scale">
-              {{ row.basicInfo.createDate }}创建
+              {{ row.lineCreateDate }}创建
             </p>
           </template>
         </el-table-column>
@@ -72,12 +72,19 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              {{ row.carInfo.type }}/{{ row.carInfo.feature }}
+              {{ row.carType }}/{{ row.cargoType }}
             </p>
             <p
+              v-if="row.isBehavior===1"
               class="text"
             >
-              {{ row.carInfo.rules.join('/') }}
+              能闯禁行
+            </p>
+            <p
+              v-if="row.isRestriction===1"
+              class="text"
+            >
+              能闯限行
             </p>
           </template>
         </el-table-column>
@@ -88,10 +95,10 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              仓地址:{{ row.warehouseSite.province }}-{{ row.warehouseSite.city }}-{{ row.warehouseSite.town }}
+              仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.sendArear.province }}-{{ row.sendArear.city }}-{{ row.sendArear.town }}
+              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
             </p>
           </template>
         </el-table-column>
@@ -102,16 +109,16 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              趟运费:{{ row.Settlement.onceFreight }}元
+              单趟运费:{{ row.everyTripGuaranteed }}元
             </p>
             <p class="text">
-              预计月运费:{{ row.Settlement.monthFreight }}元
+              每日{{ row.everyTripGuaranteed }}趟/{{ row.monthNum }}天(元)
             </p>
             <p class="text">
-              结算周期:{{ row.Settlement.period===1?'周结':'' }}
+              预计月运费:{{ row.shipperOffer }}元
             </p>
             <p class="text">
-              结算天数:{{ row.Settlement.days }}天
+              结算周期/天数:{{ row.settlementCycle }}/7天
             </p>
           </template>
         </el-table-column>
@@ -122,16 +129,16 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              货品:{{ row.lineTrait.product }}
+              货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.lineTrait.handlingDifficulty |difficultyFilter }}
+              装卸难度:{{ row.handlingDifficulty |difficultyFilter }}
             </p>
             <p class="text">
-              配送复杂度:{{ row.lineTrait.sendtype===1?'整车':'' }}
+              配送复杂度:{{ row.distributionWay }}
             </p>
             <p class="text">
-              工作时间段:{{ row.lineTrait.time }}
+              工作时间段:{{ row.workingHours }}/{{ row.lineCategory }}/{{ row.stabilityRate }}
             </p>
           </template>
         </el-table-column>
@@ -142,11 +149,15 @@
         >
           <template slot-scope="{row}">
             <p
-              v-for="item in row.label "
-              :key="item.index"
+              v-show="row.isHot===1"
               class="text"
             >
-              {{ item }}
+              爆款
+            </p>
+            <p
+              class="text"
+            >
+              {{ row.urgent }}
             </p>
           </template>
         </el-table-column>
@@ -156,31 +167,37 @@
           class-name="center"
         >
           <template slot-scope="{row}">
-            <template v-if="row.status.isAllowInvite">
-              <p
-                v-show="(row.status.city.length===1||row.status.city.length===2)&&row.status.isInviteSuccess!==1"
-                class="text"
+            <p
+              v-show="row.inviteCitys.length===1"
+              class="text"
+            >
+              {{ row.inviteCitys[0] }}已客邀
+            </p>
+            <p
+              v-show="row.inviteCitys.length===2"
+              class="text"
+            >
+              {{ row.inviteCitys[0]+'、'+row.inviteCitys[1] }}已客邀
+            </p>
+            <p
+              v-show="row.inviteCitys.length>2"
+              class="text"
+            >
+              <el-popover
+                placement="top-start"
+                min-width="200"
+                trigger="hover"
               >
-                {{ `${row.status.city[0]}${row.status.city[1]?"、"+row.status.city[1]:"" }` }}已客邀
-              </p>
-              <p
-                v-show="row.status.city.length>2"
-                class="text"
-              >
-                <el-popover
-                  placement="top-start"
-                  min-width="200"
-                  trigger="hover"
-                >
-                  <div class="text1">
-                    {{ row.status.city | cityListFilter }}
-                  </div>
-                  <span
-                    slot="reference"
-                    style="color:orange"
-                  >{{ row.status.city.length }}<span style="color:#444">个城市已客邀</span></span>
-                </el-popover>
-              </p>
+                <div class="text1">
+                  {{ row.inviteCitys | cityListFilter }}
+                </div>
+                <span
+                  slot="reference"
+                  style="color:orange"
+                >{{ row.inviteCitys.length }}<span style="color:#444">个城市已客邀</span></span>
+              </el-popover>
+            </p>
+            <!--
               <p
                 v-show="row.status.isLocationInvite===1&&row.status.locationCitySuccess!==1&&row.status.isInviteSuccess!==1"
                 class="text"
@@ -204,36 +221,34 @@
                 class="text"
               >
                 {{ row.status.city[0] }}客邀撮合成功
-              </p>
-            </template>
-            <p
+              </p> -->
+            <!-- <p
               v-else
               class="text"
             >
               不可发起客邀
-            </p>
+            </p> -->
           </template>
         </el-table-column>
         <el-table-column
+          fixed="right"
           label="操作"
           min-width="110"
           class-name="center"
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.status.isLocationInvite===0&&row.status.isInviteSuccess===0&&row.status.isAllowInvite===1"
               class="text"
             >
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleLaunchGuest(row.id)"
+                @click.stop="handleLaunchGuest(row)"
               >
                 发起客邀
               </el-button>
             </p>
             <p
-              v-if="row.status.isLocationInvite===1&&row.status.isAllowInvite===1&&row.status.isInviteSuccess===0"
               class="text"
             >
               <el-button
@@ -245,7 +260,6 @@
               </el-button>
             </p>
             <p
-              v-if="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===1"
               class="text"
             >
               <el-button
@@ -257,7 +271,6 @@
               </el-button>
             </p>
             <p
-              v-if="!row.status.locationCitySuccess"
               class="text"
             >
               <el-button
@@ -326,119 +339,128 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    // 调用查询接口
-    let params = {}
-    let { data: res } = await getLineInfo(params)
-    console.log('res', res)
     try {
-      let num:number = 10
-      if (this.isMore) {
-        num = 1
-      }
-      this.tableData = []
-      for (let i = 0; i < num; i++) {
-        let obj:IState = {
-          percent: 80,
-          id: 1,
-          arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-          brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-          crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-          isOpen: false,
-          basicInfo: {
-            name: '京东传站',
-            post: '李外线经理',
-            lineId: 'XL202012300377',
-            introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...',
-            createDate: '2021-04-15 12:00',
-            day: 3
-          },
-          carInfo: {
-            type: '4.2米厢货',
-            feature: '油车',
-            rules: ['能闯禁行', '能闯限行', '单肥']
-          },
-          warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
-          sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
-          Settlement: {
-            onceFreight: 500,
-            monthFreight: 500,
-            period: 1,
-            days: 7
-          },
-          lineTrait: {
-            product: '食品/团购',
-            handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
-            sendtype: 1, // 1:整车
-            settlementDays: 7,
-            time: '9:00~18:00/稳定/五个月'
-          },
-          label: ['爆款', '客急'],
-          status: {
-            city: ['天津', '北京'],
-            isLocationInvite: 1, // 本城是否已客邀
-            isAllowInvite: 1, // 是否可发起客邀
-            isInviteSuccess: 0, // 是否客邀撮合成功
-            locationCitySuccess: 0// 本城客邀撮合成功
-          }
-        }
-        obj.id = (i + 1)
-        this.tableData.push({ ...obj })
-      }
-      this.tableData[1].status = {
-        city: ['天津'],
-        isLocationInvite: 1, // 本城是否已客邀
-        isAllowInvite: 1, // 是否可发起客邀
-        isInviteSuccess: 0, // 是否客邀撮合成功
-        locationCitySuccess: 0// 本城客邀撮合成功
-      }
-      this.tableData[2].status = {
-        city: ['天津', '北京', '上海', '南京'],
-        isLocationInvite: 0, // 本城是否已客邀
-        isAllowInvite: 1, // 是否可发起客邀
-        isInviteSuccess: 0, // 是否客邀撮合成功
-        locationCitySuccess: 0// 本城客邀撮合成功
-      }
-      this.tableData[3].status = {
-        city: [],
-        isLocationInvite: 0, // 本城是否已客邀
-        isAllowInvite: 1, // 是否可发起客邀
-        isInviteSuccess: 1, // 是否客邀撮合成功
-        locationCitySuccess: 1// 本城客邀撮合成功
-      }
-      this.tableData[4].status = {
-        city: ['天津'],
-        isLocationInvite: 0, // 本城是否已客邀
-        isAllowInvite: 1, // 是否可发起客邀
-        isInviteSuccess: 1, // 是否客邀撮合成功
-        locationCitySuccess: 0// 本城客邀撮合成功
-      }
-      this.tableData[4].status = {
-        city: ['天津'],
-        isLocationInvite: 0, // 本城是否已客邀
-        isAllowInvite: 0, // 是否可发起客邀
-        isInviteSuccess: 0, // 是否客邀撮合成功
-        locationCitySuccess: 0// 本城客邀撮合成功
-      }
-      this.tableData[5].status = {
-        city: ['天津'],
-        isLocationInvite: 0, // 本城是否已客邀
-        isAllowInvite: 1, // 是否可发起客邀
-        isInviteSuccess: 1, // 是否客邀撮合成功
-        locationCitySuccess: 0// 本城客邀撮合成功
-      }
+    // 调用查询接口
+      let params = {}
+      let { data: res } = await getLineInfo(params)
+      console.log('res', res)
+      this.tableData.push({ ...res })
+      console.log('this.tableData', this.tableData)
     } catch (err) {
-      console.log(`get list fail fail:${err}`)
+      console.log('err', err)
     } finally {
       (this.$parent as any).listLoading = false
     }
+    // try {
+    //   let num:number = 10
+    //   if (this.isMore) {
+    //     num = 1
+    //   }
+    //   this.tableData = []
+    //   for (let i = 0; i < num; i++) {
+    //     let obj:IState = {
+    //       percent: 80,
+    //       id: 1,
+    //       arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
+    //       brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
+    //       crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
+    //       isOpen: false,
+    //       basicInfo: {
+    //         name: '京东传站',
+    //         post: '李外线经理',
+    //         lineId: 'XL202012300377',
+    //         introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...',
+    //         createDate: '2021-04-15 12:00',
+    //         day: 3
+    //       },
+    //       carInfo: {
+    //         type: '4.2米厢货',
+    //         feature: '油车',
+    //         rules: ['能闯禁行', '能闯限行', '单肥']
+    //       },
+    //       warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
+    //       sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
+    //       Settlement: {
+    //         onceFreight: 500,
+    //         monthFreight: 500,
+    //         period: 1,
+    //         days: 7
+    //       },
+    //       lineTrait: {
+    //         product: '食品/团购',
+    //         handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
+    //         sendtype: 1, // 1:整车
+    //         settlementDays: 7,
+    //         time: '9:00~18:00/稳定/五个月'
+    //       },
+    //       label: ['爆款', '客急'],
+    //       status: {
+    //         city: ['天津', '北京'],
+    //         isLocationInvite: 1, // 本城是否已客邀
+    //         isAllowInvite: 1, // 是否可发起客邀
+    //         isInviteSuccess: 0, // 是否客邀撮合成功
+    //         locationCitySuccess: 0// 本城客邀撮合成功
+    //       }
+    //     }
+    //     obj.id = (i + 1)
+    //     this.tableData.push({ ...obj })
+    //   }
+    //   this.tableData[1].status = {
+    //     city: ['天津'],
+    //     isLocationInvite: 1, // 本城是否已客邀
+    //     isAllowInvite: 1, // 是否可发起客邀
+    //     isInviteSuccess: 0, // 是否客邀撮合成功
+    //     locationCitySuccess: 0// 本城客邀撮合成功
+    //   }
+    //   this.tableData[2].status = {
+    //     city: ['天津', '北京', '上海', '南京'],
+    //     isLocationInvite: 0, // 本城是否已客邀
+    //     isAllowInvite: 1, // 是否可发起客邀
+    //     isInviteSuccess: 0, // 是否客邀撮合成功
+    //     locationCitySuccess: 0// 本城客邀撮合成功
+    //   }
+    //   this.tableData[3].status = {
+    //     city: [],
+    //     isLocationInvite: 0, // 本城是否已客邀
+    //     isAllowInvite: 1, // 是否可发起客邀
+    //     isInviteSuccess: 1, // 是否客邀撮合成功
+    //     locationCitySuccess: 1// 本城客邀撮合成功
+    //   }
+    //   this.tableData[4].status = {
+    //     city: ['天津'],
+    //     isLocationInvite: 0, // 本城是否已客邀
+    //     isAllowInvite: 1, // 是否可发起客邀
+    //     isInviteSuccess: 1, // 是否客邀撮合成功
+    //     locationCitySuccess: 0// 本城客邀撮合成功
+    //   }
+    //   this.tableData[4].status = {
+    //     city: ['天津'],
+    //     isLocationInvite: 0, // 本城是否已客邀
+    //     isAllowInvite: 0, // 是否可发起客邀
+    //     isInviteSuccess: 0, // 是否客邀撮合成功
+    //     locationCitySuccess: 0// 本城客邀撮合成功
+    //   }
+    //   this.tableData[5].status = {
+    //     city: ['天津'],
+    //     isLocationInvite: 0, // 本城是否已客邀
+    //     isAllowInvite: 1, // 是否可发起客邀
+    //     isInviteSuccess: 1, // 是否客邀撮合成功
+    //     locationCitySuccess: 0// 本城客邀撮合成功
+    //   }
+    // } catch (err) {
+    //   console.log(`get list fail fail:${err}`)
+    // } finally {
+    //   (this.$parent as any).listLoading = false
+    // }
   }
   // 取消客邀
   handleCancelGuest(id:number) {
     this.$emit('cancelGuest', id)
   }
   // 发起客邀
-  handleLaunchGuest(id:number) {
-    this.$emit('launchGuest', id)
+  handleLaunchGuest(row:{}) {
+    console.log('row', row)
+    this.$emit('launchGuest')
   }
   // 取消意向
   handleCancelTryRun(id:number) {
