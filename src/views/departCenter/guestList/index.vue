@@ -99,6 +99,7 @@ import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import TimeSelect from '../chauffeurList/components/timeSelect.vue'
+import { showWork } from '@/utils'
   interface PageObj {
     page:number,
     limit:number,
@@ -123,7 +124,6 @@ export default class extends Vue {
     private tableData:IState[] = []
     private listLoading:boolean = false
     private showDrawer:boolean = false
-    private cityLists:IState[] = [] // 城市列表
     private carLists:IState[] = [] // 车型列表
     private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
     private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
@@ -137,19 +137,23 @@ export default class extends Vue {
       f2: '',
       key: '',
       g: [],
+      workCity: [],
       time: []
     }
     private formItem:any[] = [
       {
-        type: 2,
+        type: 8,
+        key: 'workCity',
+        col: 8,
+        label: '所属城市',
         tagAttrs: {
-          placeholder: '请选择',
+          placeholder: '请选择所属城市',
           clearable: true,
-          filterable: true
-        },
-        label: '城市',
-        key: 'a',
-        options: this.cityLists
+          props: {
+            lazy: true,
+            lazyLoad: showWork
+          }
+        }
       },
       {
         type: 2,

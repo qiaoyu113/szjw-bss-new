@@ -10,7 +10,6 @@
         highlight-current-row
         size="mini"
         row-key="id"
-        :row-style="{height: '20px'}"
         fit
         @selection-change="handleSelectionChange"
       >
@@ -21,32 +20,37 @@
           width="40"
         />
         <el-table-column
+          min-width="50"
+          label=""
+          class-name="firstColumn"
+        >
+          <template>
+            <div class="arrow" />
+          </template>
+        </el-table-column>
+        <el-table-column
           label="基础信息"
           min-width="140"
           align="center"
-          class-name="firstColumn"
         >
           <template slot-scope="{row}">
-            <div class="arrow" />
-            <router-link
-              style="color:#639DEC"
-              to="#"
-            >
+            <p class="text">
               {{ row.basicInfo.name }}
-            </router-link>
-            <el-popover
-              placement="right"
-              min-width="200"
-              trigger="hover"
-            >
-              <div class="text1">
-                {{ row.basicInfo.introduce }}
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
+              <el-popover
+                placement="right"
+                min-width="200"
+                trigger="hover"
+              >
+                <div class="text1">
+                  {{ row.basicInfo.introduce }}
+                </div>
+                <i
+                  slot="reference"
+                  class="el-icon-chat-dot-round"
+                />
+              </el-popover>
+            </p>
+
             <p class="text">
               ({{ row.basicInfo.post }})
             </p>
@@ -63,7 +67,7 @@
         </el-table-column>
         <el-table-column
           label="车辆"
-          min-width="130"
+          min-width="150"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -71,11 +75,9 @@
               {{ row.carInfo.type }}/{{ row.carInfo.feature }}
             </p>
             <p
-              v-for="(item,index) in row.carInfo.rules"
-              :key="item.index"
               class="text"
             >
-              {{ item }}{{ index===row.carInfo.rules.length-1?'':'/' }}
+              {{ row.carInfo.rules.join('/') }}
             </p>
           </template>
         </el-table-column>
@@ -95,7 +97,7 @@
         </el-table-column>
         <el-table-column
           label="结算"
-          min-width="150"
+          min-width="190"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -115,7 +117,7 @@
         </el-table-column>
         <el-table-column
           label="线路特点"
-          min-width="200"
+          min-width="240"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -135,7 +137,7 @@
         </el-table-column>
         <el-table-column
           label="标签"
-          min-width="70"
+          min-width="60"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -217,7 +219,6 @@
           min-width="110"
           class-name="center"
         >
-          <!-- <template slot-scope="{row}"> -->
           <template slot-scope="{row}">
             <p
               v-if="row.status.isLocationInvite===0&&row.status.isInviteSuccess===0&&row.status.isAllowInvite===1"
@@ -269,67 +270,13 @@
             </p>
           </template>
         </el-table-column>
-        <el-table-column
-          v-if="isMore"
-          type="expand"
-          width="1"
-          class-name="expand"
-        >
-          <template slot-scope="{row}">
-            <div class="item">
-              <div class="title">
-                项目信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.arr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
-            <div class="item">
-              <div class="title">
-                配送信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.brr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
-            <div class="item">
-              <div class="title">
-                撮合信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.crr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
       </el-table>
     </template>
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineInfo } from '@/api/line'
+import { getLineInfo } from '@/api/lineList'
 import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
@@ -379,6 +326,10 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
+    // 调用查询接口
+    let params = {}
+    let { data: res } = await getLineInfo(params)
+    console.log('res', res)
     try {
       let num:number = 10
       if (this.isMore) {
@@ -419,7 +370,7 @@ export default class extends Vue {
             handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
             sendtype: 1, // 1:整车
             settlementDays: 7,
-            time: '9:00~18:00 | 稳定 |2-4个月'
+            time: '9:00~18:00/稳定/五个月'
           },
           label: ['爆款', '客急'],
           status: {
@@ -562,6 +513,7 @@ export default class extends Vue {
         font-size:18px;
         transform: scale(0.5);
       }
+      text-align: left;
     }
     .tip {
       margin:0px;
@@ -612,16 +564,6 @@ export default class extends Vue {
 .lineTableContainer >>> .firstColumn {
   overflow: hidden;
 }
-/* .lineTableContainer >>> .expand .cell */
-/* .lineTableContainer >>> .noP .cell {
-  padding: 0px!important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50px;
-  height: 100%;
-  text-align: right;
-} */
 </style>
 
 <style>
