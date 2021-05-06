@@ -59,18 +59,25 @@
           placeholder="请选择"
           clearable
           :props="{multiple: true, checkStrictly: true, lazy: true, lazyLoad: getProviceCityCountryData}"
-          class="width-180"
           size="mini"
           @change="onSelectionChange($event, 'distLoc')"
         />
         <div>&nbsp;&nbsp;&nbsp;</div>
-        <el-input
+        <el-select
           v-model="listQuery.keyWords"
-          placeholder="线路名称/编号"
-          suffix-icon="el-icon-search"
-          class="width-180"
+          placeholder="选择/搜索线路名称/编号"
+          filterable
+          clearable
+          :options="lineList"
           size="mini"
-        />
+        >
+          <el-option
+            v-for="it in lineList"
+            :key="it.value"
+            :value="it.value"
+            :label="it.label"
+          />
+        </el-select>
         <div>&nbsp;</div>
         <el-button
           type="primary"
@@ -95,7 +102,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ item.selected.join(",") }}<i
+          {{ item.type }}：{{ item.selected.join(item.key === 'workRange' ? '~' : ',') }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -160,6 +167,10 @@ export default class SearchKeyWords extends Vue {
   private goodsTypes: any[] = [
     { label: '全部', value: '' }
   ];
+  private lineList: any = [
+    { label: '线路1', value: 'line1' },
+    { label: '线路2', value: 'line2' }
+  ]
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
   private shareScopeEnd:IState[] = [];
@@ -282,13 +293,14 @@ export default class SearchKeyWords extends Vue {
     let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
-        return item.type === this.selectTitle
+        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workRange'))
       })
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
         if (selecteds.indexOf(command) === -1) {
-          this.selectedData[index].selected = !this.multiple ? [] : this.selectedData[index].selected
-          this.selectedData[index].optionIds = !this.multiple ? [] : this.selectedData[index].optionIds
+          const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+          this.selectedData[index].selected = (this.multiple || isWorkRange) ? this.selectedData[index].selected : []
+          this.selectedData[index].optionIds = (this.multiple || isWorkRange) ? this.selectedData[index].optionIds : []
           if (command === '全部') {
             this.selectedData[index].optionIds = []
             this.selectedData[index].selected = ['全部']
@@ -299,30 +311,38 @@ export default class SearchKeyWords extends Vue {
             if (this.selectedData[index].selected[0] === '全部') {
               this.selectedData[index].selected.shift()
             }
-            this.selectedData[index].optionIds.push(id)
-            this.selectedData[index].selected.push(command)
+            if (!isWorkRange) {
+              this.selectedData[index].optionIds.push(id)
+              this.selectedData[index].selected.push(command)
+            } else {
+              if (this.key === 'start') {
+                this.selectedData[index].optionIds.splice(0, 1, id)
+                this.selectedData[index].selected.splice(0, 1, command)
+              } else {
+                this.selectedData[index].optionIds.splice(1, 1, id)
+                this.selectedData[index].selected.splice(1, 1, command)
+              }
+            }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
         }
       } else {
-        let obj = {
-          type: this.selectTitle,
-          optionIds: [id],
-          selected: [command]
-        }
-        this.listQuery[this.key] = obj.optionIds
-        this.selectedData.push(obj)
+        this.initSelectItem(id, command)
       }
     } else {
-      let obj = {
-        type: this.selectTitle,
-        optionIds: [id],
-        selected: [command]
-      }
-      this.listQuery[this.key] = obj.optionIds
-      this.selectedData.push(obj)
+      this.initSelectItem(id, command)
     }
-    console.log(this.selectedData)
+  }
+  initSelectItem(id: any, command: any) {
+    const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+    let obj = {
+      type: isWorkRange ? '工作时间段' : this.selectTitle,
+      key: isWorkRange ? 'workRange' : this.key,
+      optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+      selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+    }
+    this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+    this.selectedData.push(obj)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
@@ -369,27 +389,12 @@ export default class SearchKeyWords extends Vue {
   .form-container {
     display: flex;
     align-items: center;
-    font-size: 13px;
+    font-size: 12px;
     color: #333;
     flex-wrap: wrap;
   }
   .form-container > * {
     margin-bottom: 10px;
-  }
-  .width-180 {
-    width: 180px;
-  }
-  .width-140 {
-    width: 140px;
-  }
-  .width-120 {
-    width: 120px;
-  }
-  .width-100 {
-    width: 100px;
-  }
-  .width-90 {
-    width: 90px;
   }
   .width-80 {
     width: 80px;
@@ -398,7 +403,7 @@ export default class SearchKeyWords extends Vue {
 .searchBox{
   background: #fff;
   ::v-deep .el-dropdown-link{
-    font-size: 14px;
+    font-size: 12px;
     color: #494949;
     i{
       color: #606060 !important;
@@ -409,10 +414,11 @@ export default class SearchKeyWords extends Vue {
   }
   ::v-deep .el-dropdown{
     display: flex;
+    align-items: center;
     &::after{
       display: inline-block;
       content: "";
-      height: 30px;
+      height: 24px;
       width: 2px;
       background: #f4f4f6;
       margin: 0 10px;
@@ -422,16 +428,13 @@ export default class SearchKeyWords extends Vue {
       display: none;
   }
   .topSelect{
-    // display: flex;
-    // justify-content: space-between;
-    // flex-wrap: wrap;
-    // align-items: center;
-    padding:15px 30px 10px 30px;
+    padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
     .selectedform{
       display: flex;
       flex-wrap: wrap;
-      line-height: 36px;
+      line-height: 26px;
+      padding-bottom: 5px;
     }
     .formbox{
       display: flex;

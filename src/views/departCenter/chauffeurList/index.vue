@@ -10,6 +10,7 @@
   >
     <!-- 查询表单 -->
     <searchForm
+      ref="searchForm"
       :list-query="listQuery"
       @status="handleStatusChange"
     />
@@ -162,7 +163,7 @@ export default class extends Vue {
     }
     tag(row:IState) {
       console.log('tag');
-      (this.$refs['setTag'] as any).showDialog = true
+      (this.$refs.setTag as any).isShow = true
     }
     depart() {
       this.showDrawer = true
@@ -180,7 +181,6 @@ export default class extends Vue {
       this.checkOne = val
     }
     detail() {
-      console.log('detail')
       this.detailDio = true
     }
     closeAllot() {
@@ -243,6 +243,7 @@ export default class extends Vue {
           }
           obj.isOpen = false
           obj.id = (i + 1)
+          obj.driverName = obj.driverName + obj.id
           this.tableData.push({ ...obj })
         }
       } catch (err) {
@@ -273,10 +274,16 @@ export default class extends Vue {
       this.getLists()
     }
     init() {
+      let id:any = this.$route.query.id
+      if (id) {
+        this.listQuery.driverId = id as string
+        this.depart();
+        (this.$refs['searchForm'] as any).getDriverInfo(id)
+      }
       this.getLists()
     }
     activated() {
-      this.getLists()
+      this.init()
     }
     mounted() {
       this.init()

@@ -7,34 +7,43 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      :destroy-on-close="false"
     >
       <self-form
         ref="setTagFrom"
         :list-query="listQuery"
         :form-item="formItem"
         :rules="rules"
-        size="small"
+        size="mini"
         label-width="130px"
         class="p15 SuggestForm"
         :pc-col="24"
         @onPass="handlePassChange"
       >
-        <template slot="startTime">
+        <template
+          slot="jobStartDate"
+        >
           <el-time-select
             v-model="listQuery['jobStartDate']"
             class="timeSelect"
+            prop="jobStartDate"
             placeholder="起始时间"
+            style="width:50px"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00'
             }"
           />
-          <span style="padding:0 3px">-</span>
+        </template>
+        <template
+          slot="jobEndDate"
+        >
+          <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
             v-model="listQuery['jobEndDate']"
             class="timeSelect"
+            prop="jobEndDate"
+            style="width:50px"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
@@ -47,27 +56,35 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expected']"
-            v-only-number="{min: 0, max: 10000, precision: 1}"
+            v-only-number="{min: 0, max: 20000, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
-            placeholder="请输入期望运费"
+            placeholder="请输入"
           />
         </template>
-        <template slot="endTime">
+        <template
+          slot="jobStartDate2"
+        >
           <el-time-select
             v-model="listQuery['jobStartDate2']"
             class="timeSelect"
             placeholder="起始时间"
+            prop="jobStartDate2"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00'
             }"
           />
-          <span style="padding:0 3px">-</span>
+        </template>
+        <template
+          slot="jobEndDate2"
+        >
+          <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
             v-model="listQuery['jobEndDate2']"
             class="timeSelect"
+            prop="jobEndDate2"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
@@ -84,22 +101,24 @@
             type="textarea"
             :rows="2"
             clearable
+            maxlength="20"
+            show-word-limit
             placeholder="请输入内容"
           />
           <div class="tags">
-            <el-radio-group
-              v-model="listQuery.remark"
+            <el-checkbox-group
+              v-model="listQuery.tags"
               size="mini"
             >
-              <el-radio
+              <el-checkbox
                 v-for="(item,index) in reasonLists"
                 :key="index"
                 border
                 :label="item.value"
               >
                 {{ item.label }}
-              </el-radio>
-            </el-radio-group>
+              </el-checkbox>
+            </el-checkbox-group>
           </div>
         </template>
       </self-form>
@@ -152,13 +171,10 @@ export default class extends Vue {
   private listQuery:IState = {
     prohibition1: '',
     prohibitionAddress: '',
-    address: '',
+    prohibitArea: [],
     prohibition2: '',
-    prohibitionRegion: {
-      address: [],
-      areas: []
-    },
-    area2: [],
+    prohibitionRegion: '',
+    limitArea: [],
     hard: '',
     complexity: [],
     period: '',
@@ -168,14 +184,39 @@ export default class extends Vue {
     stable: [],
     starting: '',
     detailed: '',
-    jobStartDate: null,
-    jobEndDate: null,
     jobStartDate2: null,
     jobEndDate2: null,
     distribution: '',
     detailed2: '',
     situation: '',
+    tags: [],
     remark: ''
+  }
+  @Watch('listQuery.prohibition1')
+  onlistQueryChanged(val: any, oldVal: any) {
+    this.formItem[1].hidden = !val
+    this.formItem[2].hidden = !val
+  }
+  @Watch('listQuery.prohibition2')
+  onlistQueryRegionChanged(val: any, oldVal: any) {
+    this.formItem[4].hidden = !val
+    this.formItem[5].hidden = !val
+  }
+  @Watch('listQuery.isWork')
+  onlistQueryWorkChanged(val: any, oldVal: any) {
+    this.formItem[12].hidden = !val
+    this.formItem[13].hidden = !val
+    this.formItem[14].hidden = !val
+    this.formItem[15].hidden = !val
+    this.formItem[16].hidden = !val
+    this.formItem[17].hidden = !val
+  }
+  @Watch('listQuery.tags')
+  onlistQuerytagsChanged(val: any, oldVal: any) {
+    if (val.length > 1) {
+      this.listQuery.tags.shift()
+    }
+    this.listQuery.remark = ''
   }
   private formItem:any[] = [
     {
@@ -189,24 +230,40 @@ export default class extends Vue {
       ]
     },
     {
-      type: 16,
+      type: 8,
+      hidden: false,
       key: 'prohibitionAddress',
       label: '可闯禁行区域',
-      col: 24,
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        multiple: true,
         props: {
           lazy: true,
           lazyLoad: getProviceCityData
         }
       },
-      countyOptions: [],
-      listeners(visible:boolean) {
-        if (!visible) {
-          _this.getCountryData('prohibitionAddress', 1)
+      listeners: {
+        'visible-change': (visible:boolean) => {
+          if (!visible) {
+            _this.getCountryData('prohibitionAddress', 2)
+          }
         }
       }
+    },
+    {
+      type: 2,
+      col: 14,
+      hidden: false,
+      key: 'prohibitArea',
+      label: '',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        multiple: true
+      },
+      options: []
     },
     {
       type: 4,
@@ -219,11 +276,11 @@ export default class extends Vue {
       ]
     },
     {
-      type: 16,
+      type: 8,
+      hidden: false,
       key: 'prohibitionRegion',
       label: '可闯限行区域',
-      col: 24,
-      value: [],
+      col: 10,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -233,12 +290,26 @@ export default class extends Vue {
           lazyLoad: getProviceCityData
         }
       },
-      countyOptions: [],
-      listeners(visible:boolean) {
-        if (!visible) {
-          _this.getCountryData('prohibitionRegion', 3)
+      listeners: {
+        'visible-change': (visible:boolean) => {
+          if (!visible) {
+            _this.getCountryData('prohibitionRegion', 5)
+          }
         }
       }
+    },
+    {
+      type: 2,
+      col: 14,
+      hidden: false,
+      key: 'limitArea',
+      label: '',
+      tagAttrs: {
+        placeholder: '请选择',
+        clearable: true,
+        multiple: true
+      },
+      options: []
     },
     {
       type: 4,
@@ -280,7 +351,7 @@ export default class extends Vue {
       slot: true,
       type: 'expected',
       tagAttrs: {
-        placeholder: '请输入期望运费',
+        placeholder: '请输入',
         clearable: true
       },
       style: {
@@ -308,13 +379,14 @@ export default class extends Vue {
       label: '外边是否有活',
       col: 24,
       options: [
-        { label: '没有', value: 0 },
-        { label: '有', value: 1 }
+        { label: '没有', value: false },
+        { label: '有', value: true }
       ]
     },
     {
       type: 8,
-      col: 10,
+      col: 12,
+      hidden: false,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -327,29 +399,33 @@ export default class extends Vue {
       key: 'starting'
     },
     {
-      type: 1,
-      w: '0px',
-      tagAttrs: {
-        placeholder: '请输入详细地址',
-        clearable: true
-      },
-      col: 6,
-      key: 'detailed'
-    },
-    {
       slot: true,
-      type: 'startTime',
+      hidden: false,
+      type: 'jobStartDate',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 8,
-      key: 'startTime'
+      col: 4,
+      key: 'jobStartDate'
+    },
+    {
+      slot: true,
+      hidden: false,
+      type: 'jobEndDate',
+      w: '0px',
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true
+      },
+      col: 4,
+      key: 'jobEndDate'
     },
     {
       type: 8,
-      col: 10,
+      col: 12,
+      hidden: false,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
@@ -362,25 +438,28 @@ export default class extends Vue {
       key: 'distribution'
     },
     {
-      type: 1,
-      w: '0px',
-      tagAttrs: {
-        placeholder: '请输入详细地址',
-        clearable: true
-      },
-      col: 6,
-      key: 'detailed2'
-    },
-    {
       slot: true,
-      type: 'endTime',
+      hidden: false,
+      type: 'jobStartDate2',
       w: '0px',
       tagAttrs: {
         placeholder: '请输入',
         clearable: true
       },
-      col: 8,
-      key: 'endTime'
+      col: 4,
+      key: 'jobStartDate2'
+    },
+    {
+      slot: true,
+      hidden: false,
+      type: 'jobEndDate2',
+      w: '0px',
+      tagAttrs: {
+        placeholder: '请输入',
+        clearable: true
+      },
+      col: 4,
+      key: 'jobEndDate2'
     },
     {
       type: 4,
@@ -388,57 +467,52 @@ export default class extends Vue {
       label: '司机情况',
       col: 24,
       options: [
-        { label: '着急试跑', value: 1 },
-        { label: '想跟跑', value: 2 },
-        { label: '考虑退费', value: 3 },
-        { label: '威胁司撮要退费', value: 4 },
-        { label: '铁了心要退费', value: 5 },
-        { label: '不要再给我打电话', value: 6 },
-        { label: '想请假', value: 7 }
+        { label: '着急试跑', value: '1' },
+        { label: '想跟跑', value: '2' },
+        { label: '考虑退费', value: '3' },
+        { label: '威胁司撮要退费', value: '4' },
+        { label: '铁了心要退费', value: '5' },
+        { label: '不要再给我打电话', value: '6' },
+        { label: '想请假', value: '7' }
       ]
     },
     {
       slot: true,
       type: 'remark',
       label: '备注:',
-      tagAttrs: {
-        placeholder: '请输入',
-        maxlength: 300,
-        type: 'textarea',
-        'show-word-limit': true,
-        rows: '5',
-        clearable: true
-      },
       key: 'remark'
     }
   ]
   private rules:IState = {
-    prohibition1: [
-      { required: true, message: '请选择是否闯禁行', trigger: 'change' }
+    prohibitionAddress: [
+      { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
-    prohibition2: [
-      { required: true, message: '请选择是否闯限行', trigger: 'change' }
+    prohibitArea: [
+      { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
-    hard: [
-      { required: true, message: '请选择装卸接受度', trigger: 'change' }
+    prohibitionRegion: [
+      { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
-    complexity: [
-      { required: true, message: '请选择配送复杂度', trigger: 'change' }
-    ],
-    expected: [
-      { required: true, message: '请输入期望的运费', trigger: 'blur' }
-    ],
-    isWork: [
-      { required: true, message: '请选择外边是否有活', trigger: 'change' }
+    limitArea: [
+      { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
     ],
+    jobStartDate: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobEndDate: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobStartDate2: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
+    jobEndDate2: [
+      { required: true, message: '请选择时间', trigger: 'change' }
+    ],
     distribution: [
       { required: true, message: '请选择配送点', trigger: 'change' }
-    ],
-    situation: [
-      { required: true, message: '请选择司机情况', trigger: 'change' }
     ]
   }
   // 确定按钮
@@ -454,6 +528,10 @@ export default class extends Vue {
       type: 'warning'
     }).then(() => {
       (this.$refs.setTagFrom as any).resetForm()
+      this.listQuery.prohibitionAddress = ''
+      this.listQuery.prohibitionRegion = ''
+      this.listQuery.starting = ''
+      this.listQuery.distribution = ''
       this.isShow = false
     }).catch(() => {
 
@@ -462,9 +540,15 @@ export default class extends Vue {
   private getCountryData(key:string, index:number) {
     setTimeout(async() => {
       if (!this.listQuery[key]) return false
-      let res = await getProvinceList(['100000', ...this.listQuery[key]])
-      this.$set(this.formItem[index], 'countyOptions', res)
-    }, 100)
+      console.log(this.listQuery[key])
+      let res:any = await getProvinceList(['100000', ...this.listQuery[key]])
+      if (key === 'prohibitionAddress') {
+        this.listQuery.prohibitArea = []
+      } else {
+        this.listQuery.limitArea = []
+      }
+      this.$set(this.formItem[index], 'options', res)
+    }, 10)
   }
 
   // 验证通过
@@ -495,25 +579,30 @@ export default class extends Vue {
     padding-right: 5px;
   }
 }
+::v-deep .el-form-item__content{
+    margin: 0 !important;
+}
 .tags{
   display: flex;
   position: absolute;
   top:5px;
   left: 5px;
   flex-wrap: wrap;
-  ::v-deep .el-radio{
+  ::v-deep .el-checkbox{
     margin: 0;
     margin-left: 0 !important;
     margin-right: 5px;
     padding: 0 10px 0 0;
 
   }
-  ::v-deep .el-radio__input{
+  ::v-deep .el-checkbox{
+    line-height: 26px;
+  }
+  ::v-deep .el-checkbox__input{
     display: none;
   }
 }
 .remark ::v-deep .el-textarea__inner{
-  padding-top: 50px;
-  padding-bottom: 10px;
+  padding-top: 40px;
 }
 </style>

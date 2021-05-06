@@ -351,12 +351,8 @@ export default class extends Vue {
   async getDriverInfo(keyWord: any = '') {
     try {
       this.keyWord = keyWord
-      let params = {
-        // workCity: this.listQuery.workCity[1] || '',
-        // busiType: this.listQuery.busiType,
-        // gmId: this.listQuery.joinManagerId || '',
-        key: ''
-      }
+      let params:IState = {}
+      this.listQuery.busiType !== null && (params.busiType = this.listQuery.busiType)
       keyWord !== '' && (params.key = keyWord)
       params = { ...params, ...this.driverPage }
       if (this.driverOver) {

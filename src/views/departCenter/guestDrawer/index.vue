@@ -6,7 +6,8 @@
   >
     <Scroll
       :on-reach-bottom="loadMoreHandle"
-      :distance-to-edge="0"
+      :stop-slide="disabled"
+      :distance-to-edge="20"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -19,7 +20,10 @@
         />
       </section>
       <!-- 撮合匹配的司机列表 -->
-      <MatchDriver ref="matchDriver" />
+      <MatchDriver
+        ref="matchDriver"
+        @on-end="disabled=true"
+      />
     </Scroll>
   </DrawerModel>
 </template>
@@ -48,6 +52,7 @@ export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
+  private disabled: boolean = false
   private lineTableData:IState[] = [] // 线路列表
   private listQueryLine:IState = {
     labelType: '',
@@ -97,7 +102,7 @@ export default class GuestDrawer extends Vue {
   } */
 }
 .departLine{
-  padding: 20px 30px;
+  padding: 1px 30px 20px;
   background: #fff;
   margin-bottom: 10px;
 }

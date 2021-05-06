@@ -14,8 +14,10 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column
+          v-if="listQuery.customerStatus!==''"
           type="selection"
-          width="80"
+          align="center"
+          width="40"
         />
         <el-table-column
           min-width="50"
@@ -28,7 +30,7 @@
         </el-table-column>
         <el-table-column
           label="基础信息"
-          min-width="220"
+          min-width="140"
           align="center"
         >
           <template slot-scope="{row}">
@@ -40,12 +42,6 @@
                 trigger="hover"
               >
                 <div class="text1">
-                  <!-- 这条线路是异常<el-button
-                  type="text"
-                  size="small"
-                >
-                  火爆
-                </el-button>,4.2厢货,场景简单,菜鸟也能干... -->
                   {{ row.basicInfo.introduce }}
                 </div>
                 <i
@@ -62,13 +58,16 @@
               {{ row.basicInfo.lineId }}
             </p>
             <p class="text">
-              窗口期:剩余{{ row.c }}天
+              窗口期:剩余{{ row.basicInfo.day }}天
+            </p>
+            <p class="text scale">
+              {{ row.basicInfo.createDate }}创建
             </p>
           </template>
         </el-table-column>
         <el-table-column
           label="车辆"
-          min-width="180"
+          min-width="130"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -86,7 +85,7 @@
         </el-table-column>
         <el-table-column
           label="配送信息"
-          min-width="180"
+          min-width="200"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -100,7 +99,7 @@
         </el-table-column>
         <el-table-column
           label="结算"
-          min-width="180"
+          min-width="150"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -120,7 +119,7 @@
         </el-table-column>
         <el-table-column
           label="线路特点"
-          min-width="220"
+          min-width="200"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -131,7 +130,7 @@
               装卸难度:{{ row.lineTrait.handlingDifficulty |difficultyFilter }}
             </p>
             <p class="text">
-              配送类型:{{ row.lineTrait.sendtype===1?'整车':'' }}
+              配送复杂度:{{ row.lineTrait.sendtype===1?'整车':'' }}
             </p>
             <p class="text">
               工作时间段:{{ row.lineTrait.time }}
@@ -140,7 +139,7 @@
         </el-table-column>
         <el-table-column
           label="标签"
-          min-width="180"
+          min-width="70"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -155,7 +154,7 @@
         </el-table-column>
         <el-table-column
           label="状态"
-          min-width="180"
+          min-width="110"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -219,7 +218,7 @@
         </el-table-column>
         <el-table-column
           label="操作"
-          min-width="180"
+          min-width="110"
           class-name="center"
         >
           <!-- <template slot-scope="{row}"> -->
@@ -231,7 +230,7 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleLaunchGuest"
+                @click.stop="handleLaunchGuest(row.id)"
               >
                 发起客邀
               </el-button>
@@ -243,7 +242,7 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelGuest"
+                @click.stop="handleCancelGuest(row.id)"
               >
                 取消客邀
               </el-button>
@@ -255,7 +254,7 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelTryRun"
+                @click.stop="handleCancelTryRun(row.id)"
               >
                 取消意向
               </el-button>
@@ -335,11 +334,15 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { getLineInfo } from '@/api/line'
+import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
 }
 @Component({
   name: 'Btable',
+  components: {
+    CancelGuest
+  },
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
@@ -398,12 +401,14 @@ export default class extends Vue {
             name: '京东传站',
             post: '李外线经理',
             lineId: 'XL202012300377',
-            introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...'
+            introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...',
+            createDate: '2021-04-15 12:00',
+            day: 3
           },
           carInfo: {
             type: '4.2米厢货',
             feature: '油车',
-            rules: ['能闯禁行', '能闯限行', '共享']
+            rules: ['能闯禁行', '能闯限行', '单肥']
           },
           warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
           sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
@@ -418,9 +423,9 @@ export default class extends Vue {
             handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
             sendtype: 1, // 1:整车
             settlementDays: 7,
-            time: '9:00~18:00'
+            time: '9:00~18:00 | 稳定 |2-4个月'
           },
-          label: ['爆款', '客急', '客邀线'],
+          label: ['爆款', '客急'],
           status: {
             city: ['天津', '北京'],
             isLocationInvite: 1, // 本城是否已客邀
@@ -480,35 +485,17 @@ export default class extends Vue {
       (this.$parent as any).listLoading = false
     }
   }
-
-  // 展开
-  // toogleExpand(row:IState) {
-  //   let $table:any = this.$refs.lineTable
-  //   for (let i = 0; i < this.tableData.length; i++) {
-  //     let item:IState = this.tableData[i]
-  //     if ((row.id !== item.id)) {
-  //       row.isOpen = false
-  //       $table.toggleRowExpansion(item, false)
-  //     } else if (row.isOpen) {
-  //       row.isOpen = false
-  //       $table.toggleRowExpansion(item, false)
-  //       return false
-  //     }
-  //     row.isOpen = true
-  //     $table.toggleRowExpansion(row)
-  //   }
-  // }
   // 取消客邀
-  handleCancelGuest() {
-    this.$emit('cancelGuest')
+  handleCancelGuest(id:number) {
+    this.$emit('cancelGuest', id)
   }
   // 发起客邀
-  handleLaunchGuest() {
-    this.$emit('launchGuest')
+  handleLaunchGuest(id:number) {
+    this.$emit('launchGuest', id)
   }
   // 取消意向
-  handleCancelTryRun() {
-    this.$emit('cancelTryRun')
+  handleCancelTryRun(id:number) {
+    this.$emit('cancelTryRun', id)
   }
   // 查看详情
   handleDetailClick(row:IState) {
@@ -533,7 +520,7 @@ export default class extends Vue {
   // 勾选
   handleSelectionChange(selection:[]) {
     console.log('勾选项', selection)
-    this.$emit('SelectionChange')
+    this.$emit('SelectionChange', selection)
   }
 }
 </script>
@@ -573,6 +560,12 @@ export default class extends Vue {
       color:#444444;
       font-size:12px;
       line-height: 20px;
+      &.scale {
+        margin-left: -50%;
+        width: 200%;
+        font-size:18px;
+        transform: scale(0.5);
+      }
       text-align: left;
     }
     .tip {

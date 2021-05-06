@@ -10,7 +10,7 @@
         :is-show-percent="true"
         :driver-table-data="driverTableData"
         :is-more="true"
-        :op-type="[-1,2,3,4,5]"
+        :op-type="[-1,3,4,5]"
         @call="setCallHandle"
         @tag="setTagHandle"
         @creatRun="creatRunHandle"
@@ -152,6 +152,9 @@ export default class DepartLine extends Vue {
         obj.id = ((this.pageSize - 1) * 3 + i + 1)
         this.driverTableData.push({ ...obj })
       }
+      if (this.pageSize > 3) {
+        this.$emit('on-end')
+      }
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
@@ -169,6 +172,7 @@ export default class DepartLine extends Vue {
   padding-bottom: 20px;
   h3{
     padding: 0 30px;
+    margin-top: 15px;
   }
   .lineTable{
     width:100%;

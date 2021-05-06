@@ -174,103 +174,107 @@
         fixed="right"
       >
         <template slot-scope="{row}">
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
-              style="paddingBottom:0"
-              @click.stop="handleCall(row)"
+          <section class="opBox">
+            <p class="text">
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handleCall(row)"
+              >
+                呼叫
+              </el-button>
+              <span class="phone">
+                18848885135
+              </span>
+            </p>
+            <p class="text">
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handleTag(row)"
+              >
+                打标签
+              </el-button>
+            </p>
+            <!-- type="1" -->
+            <p
+              v-if="opType.includes(1)"
+              class="text"
             >
-              呼叫
-            </el-button>
-            <section class="phone">
-              18848885135
-            </section>
-          </p>
-          <p class="text">
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handleTag(row)"
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handleDepart(row)"
+              >
+                匹配撮合
+              </el-button>
+            </p>
+            <!-- type="3" -->
+            <p
+              v-if="opType.includes(3)"
+              class="text"
             >
-              打标签
-            </el-button>
-          </p>
-          <!-- type="1" -->
-          <p
-            v-if="opType.includes(1)"
-            class="text"
-          >
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handleDepart(row)"
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handleCreatRun(row)"
+              >
+                创建试跑意向
+              </el-button>
+            </p>
+            <!-- type="4" -->
+            <p
+              v-if="opType.includes(4)"
+              class="text"
             >
-              匹配撮合
-            </el-button>
-          </p>
-          <!-- type="3" -->
-          <p
-            v-if="opType.includes(3)"
-            class="text"
-          >
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handleCreatRun(row)"
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handlePutLine(row)"
+              >
+                推线
+              </el-button>
+            </p>
+            <p
+              v-if="isMore"
+              class="text"
             >
-              创建试跑意向
-            </el-button>
-          </p>
-          <!-- type="4" -->
-          <p
-            v-if="opType.includes(4)"
-            class="text"
-          >
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handlePutLine(row)"
-            >
-              推线
-            </el-button>
-          </p>
-          <p
-            v-if="opType.includes(5)"
-            class="text"
-          >
-            <el-button
-              v-if="!opType.includes(-1)"
-              type="text"
-              size="small"
-              @click.stop="handleAllotSome(row)"
-            >
-              分配司撮
-            </el-button>
-          </p>
-          <p
-            v-if="opType.includes(6)"
-            class="text"
-          >
-            <el-button
-              type="text"
-              size="small"
-              @click.stop="handleChooseCity(row)"
-            >
-              更换工作城市
-            </el-button>
-          </p>
-          <p
-            v-if="isMore"
-            class="text"
-          >
-            <el-button
-              size="mini"
-              @click.stop="toogleExpand(row)"
-            >
-              {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
-            </el-button>
-          </p>
+              <el-button
+                size="mini"
+                class="showMoreBtn"
+                @click.stop="toogleExpand(row)"
+              >
+                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+              </el-button>
+            </p>
+            <template v-if="!isMore">
+              <p
+                v-if="opType.includes(5)"
+                class="text"
+              >
+                <el-button
+                  v-if="!opType.includes(-1)"
+                  type="text"
+                  size="small"
+                  @click.stop="handleAllotSome(row)"
+                >
+                  分配司撮
+                </el-button>
+              </p>
+              <p
+                v-if="opType.includes(6)"
+                class="text"
+              >
+                <el-button
+                  type="text"
+                  size="small"
+                  @click.stop="handleChooseCity(row)"
+                >
+                  更换工作城市
+                </el-button>
+              </p>
+            </template>
+          </section>
         </template>
       </el-table-column>
       <el-table-column
@@ -336,201 +340,227 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 const key = 'driver_row'
-  interface IState {
-    [key: string]: any;
+interface IState {
+  [key: string]: any;
+}
+@Component({
+  name: 'chauffeurTable',
+  components: {
+    MakeCall
+  },
+  filters: {
+    addZreo(val: string) {
+      return +val > 9 ? val : `0${val}`
+    }
   }
-  @Component({
-    name: 'chauffeurTable',
-    components: {
-      MakeCall
-    },
-    filters: {
-      addZreo(val: string) {
-        return +val > 9 ? val : `0${val}`
-      }
-    }
-  })
+})
 export default class extends Vue {
-    @Prop({ default: false }) isMore!: boolean;
-    @Prop({ default: false }) isShowPercent!: boolean;
-    @Prop({ default: () => {} }) listQuery!: IState;
-    @Prop({ default: () => [] }) opType!: number[];
-    @Prop({ default: () => [] }) driverTableData!: IState[];
-    private phone:string = ''
-    private callId:string|number = ''
+  @Prop({ default: false }) isMore!: boolean;
+  @Prop({ default: false }) isShowPercent!: boolean;
+  @Prop({ default: () => {} }) listQuery!: IState;
+  @Prop({ default: () => [] }) opType!: number[];
+  @Prop({ default: () => [] }) driverTableData!: IState[];
+  private phone: string = '';
+  private callId: string | number = '';
 
-    get _tableData() {
-      return this.driverTableData
-    }
-    set _tableData(val:IState[]) {
-      this.$emit('update:driverTableData', val)
-    }
-    handleSelectionChange(val: IState[]) {
-      this.$emit('checkData', val)
-    }
-    // 展开
-    toogleExpand(row: IState) {
-      let $table: any = this.$refs.chauffeurTable
-      for (let i = 0; i < this._tableData.length; i++) {
-        let item:IState = this._tableData[i]
-        if ((row.id === item.id) && row.isOpen) {
-          row.isOpen = false
-          $table.toggleRowExpansion(item, false)
-          return false
-        } else {
-          item.isOpen = false
-          $table.toggleRowExpansion(item, false)
-        }
-      }
-      row.isOpen = true
-      $table.toggleRowExpansion(row, true)
-    }
-    // 外呼
-    handleCall(row: IState) {
-      this.$emit('call', row)
-    }
-    // 调用外呼方法
-    callPhone(phone:string, callId:string|number) {
-      this.phone = phone
-      this.callId = callId
-      setTimeout(() => {
-        (this.$refs.driverCall as any).handleCallClick()
-      }, 20)
-    }
-    // 打标签
-    handleTag(row: IState) {
-      this.$emit('tag', row)
-    }
-    // 撮合
-    handleDepart(row: IState) {
-      sessionStorage.setItem(key, JSON.stringify(row))
-      this.$emit('depart', row)
-    }
-    // 查看详情
-    handleDetail(row: IState) {
-      this.$emit('detail', row)
-    }
-    // 创建试跑
-    handleCreatRun(data: any) {
-      this.$emit('creatRun', data)
-    }
-    // 推线
-    handlePutLine(row: IState) {
-      this.$emit('line', row)
-    }
-    // 分配司撮
-    handleAllotSome(val: IState) {
-      this.$emit('allotSome', val)
-    }
-    // 更换工作城市
-    handleChooseCity(val: IState) {
-      this.$emit('chooseCity', val)
-    }
-    // 抽屉内移出被匹配项(客邀列表是线路)的信息
-    removeTableInfo() {
-      sessionStorage.removeItem(key)
-    }
-    mounted() {
-      if (this.isMore && !this.isShowPercent) {
-        let str = sessionStorage.getItem(key) || ''
-        if (str) {
-          this._tableData = [JSON.parse(str)]
-        }
+  get _tableData() {
+    return this.driverTableData
+  }
+  set _tableData(val: IState[]) {
+    this.$emit('update:driverTableData', val)
+  }
+  handleSelectionChange(val: IState[]) {
+    this.$emit('checkData', val)
+  }
+  // 展开
+  toogleExpand(row: IState) {
+    let $table: any = this.$refs.chauffeurTable
+    for (let i = 0; i < this._tableData.length; i++) {
+      let item: IState = this._tableData[i]
+      if (row.id === item.id && row.isOpen) {
+        row.isOpen = false
+        $table.toggleRowExpansion(item, false)
+        return false
+      } else {
+        item.isOpen = false
+        $table.toggleRowExpansion(item, false)
       }
     }
+    row.isOpen = true
+    $table.toggleRowExpansion(row, true)
+  }
+  // 外呼
+  handleCall(row: IState) {
+    this.$emit('call', row)
+  }
+  // 调用外呼方法
+  callPhone(phone: string, callId: string | number) {
+    this.phone = phone
+    this.callId = callId
+    setTimeout(() => {
+      (this.$refs.driverCall as any).handleCallClick()
+    }, 20)
+  }
+  // 打标签
+  handleTag(row: IState) {
+    this.$emit('tag', row)
+  }
+  // 撮合
+  handleDepart(row: IState) {
+    sessionStorage.setItem(key, JSON.stringify(row))
+    this.$emit('depart', row)
+  }
+  // 查看详情
+  handleDetail(row: IState) {
+    this.$emit('detail', row)
+  }
+  // 创建试跑
+  handleCreatRun(data: any) {
+    this.$emit('creatRun', data)
+  }
+  // 推线
+  handlePutLine(row: IState) {
+    sessionStorage.setItem(key, JSON.stringify(row))
+    let routeUrl = this.$router.resolve({
+      path: '/depart/chauffeurList',
+      query: { id: row.driverId }
+    })
+    window.open(routeUrl.href, '_blank')
+  }
+  // 分配司撮
+  handleAllotSome(val: IState) {
+    this.$emit('allotSome', val)
+  }
+  // 更换工作城市
+  handleChooseCity(val: IState) {
+    this.$emit('chooseCity', val)
+  }
+  // 抽屉内移出被匹配项(客邀列表是线路)的信息
+  removeTableInfo() {
+    sessionStorage.removeItem(key)
+  }
+  mounted() {
+    if (this.isMore && !this.isShowPercent) {
+      let str = sessionStorage.getItem(key) || ''
+      if (str) {
+        this._tableData = [JSON.parse(str)]
+      }
+    }
+  }
 }
 </script>
 <style lang="scss" scoped>
-  .chauffeurTableContainer {
-    .arrow {
-      height: 0;
-      border-top: 30px solid #f5a821;
-      border-right: 30px solid transparent;
-      border-left: 30px solid transparent;
-      transform: rotate(135deg);
-      position: absolute;
-      top: -8px;
-      left: -21px;
+.chauffeurTableContainer {
+  .arrow {
+    height: 0;
+    border-top: 30px solid #f5a821;
+    border-right: 30px solid transparent;
+    border-left: 30px solid transparent;
+    transform: rotate(135deg);
+    position: absolute;
+    top: -8px;
+    left: -21px;
+  }
+  .arrow::after {
+    content: "司";
+    display: inline-block;
+    position: relative;
+    bottom: 30px;
+    left: 5px;
+    transform: rotate(-135deg);
+    color: white;
+  }
+  .cycleTag {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background-color: #649cee;
+  }
+  .percent {
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    left: 7px;
+    font-size: 12px;
+    color: #f5a821;
+    text-align: center;
+    width: 42px;
+    line-height: 16px;
+  }
+  .text {
+    margin: 0px;
+    color: #444444;
+    font-size: 12px;
+    line-height: 20px;
+    position: relative;
+  }
+  .phone {
+    position: absolute;
+    bottom: -4px;
+    color: #888585;
+    line-height: 12px;
+    font-size: 12px;
+    display: block;
+    width: 74px;
+    -webkit-transform: scale(0.8, 0.8);
+    -moz-transform: scale(0.8, 0.8);
+    transform: scale(0.8, 0.8);
+  }
+  .opBox {
+    display: flex;
+    flex-flow: column wrap;
+    align-content: space-around;
+    justify-items: flex-start;
+    max-height: 120px;
+    .text{
+      width: 74px;
     }
-    .arrow::after {
-      content: "司";
-      display: inline-block;
-      position: relative;
-      bottom: 30px;
-      left: 5px;
-      transform: rotate(-135deg);
-      color: white;
-    }
-    .cycleTag {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin-right: 6px;
-      border-radius: 50%;
-      background-color: #649cee;
-    }
-    .percent {
-      position: absolute;
-      top: 50%;
-      bottom: 50%;
-      left: 7px;
-      font-size: 12px;
-      color: #f5a821;
-      text-align: center;
-      width: 42px;
-      line-height: 16px;
-    }
-    .text {
-      margin: 0px;
-      color: #444444;
-      font-size: 12px;
-      line-height: 20px;
-      text-align: left;
-    }
-    .phone {
-      color: #888585;
-      line-height: 12px;
-    }
-    .tip {
-      margin: 0px;
-      font-size: 20px;
-      color: #999;
-      transform: scaleY(0.5);
-    }
-    .el-icon-s-custom,
-    .el-icon-chat-dot-round {
-      color: #dbdde1;
-      font-size: 14px;
-    }
-    .el-icon-chat-dot-round {
-      color: #acc4e2;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    .item {
-      margin-top: 10px;
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      .title {
-        margin-right: 20px;
-        color: #464646;
-        font-weight: bold;
-        font-size: 14px;
-      }
-      .btn {
-        background: #f7f7f7;
-        border-radius: 6px;
-      }
+    .showMoreBtn{
+      padding: 7px;
     }
   }
+  .tip {
+    margin: 0px;
+    font-size: 20px;
+    color: #999;
+    transform: scaleY(0.5);
+  }
+  .el-icon-s-custom,
+  .el-icon-chat-dot-round {
+    color: #dbdde1;
+    font-size: 14px;
+  }
+  .el-icon-chat-dot-round {
+    color: #acc4e2;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .item {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    .title {
+      margin-right: 20px;
+      color: #464646;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .btn {
+      background: #f7f7f7;
+      border-radius: 6px;
+    }
+  }
+}
 </style>
 
 <style scoped>
-  .text1 {
-    font-size: 12px;
-  }
-  .chauffeurTableContainer >>> .firstColumn {
-    overflow: hidden;
-  }
+.text1 {
+  font-size: 12px;
+}
+.chauffeurTableContainer >>> .firstColumn {
+  overflow: hidden;
+}
 </style>
