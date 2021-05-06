@@ -16,3 +16,17 @@ export function getLineSearch(data:any) {
     data
   })
 }
+// 发起客邀
+export const CreateLaunchGuests = (data: any) =>
+  request({
+    url: `mock/283/lines/startMatchCustInvite`,
+    method: 'post',
+    data
+  })
+  // 取消客邀
+export const cancelMatchCustInvite = (data: any) =>
+  request({
+    url: `mock/283/lines/cancelMatchCustInvite`,
+    method: 'post',
+    data
+  })
