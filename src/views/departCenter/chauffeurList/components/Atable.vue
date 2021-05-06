@@ -485,6 +485,7 @@ export default class extends Vue {
       color: #444444;
       font-size: 12px;
       line-height: 20px;
+      text-align: left;
     }
     .phone {
       color: #888585;
