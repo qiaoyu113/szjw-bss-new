@@ -67,7 +67,7 @@
         </el-table-column>
         <el-table-column
           label="车辆"
-          min-width="130"
+          min-width="150"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -75,11 +75,9 @@
               {{ row.carInfo.type }}/{{ row.carInfo.feature }}
             </p>
             <p
-              v-for="(item,index) in row.carInfo.rules"
-              :key="item.index"
               class="text"
             >
-              {{ item }}{{ index===row.carInfo.rules.length-1?'':'/' }}
+              {{ row.carInfo.rules.join('/') }}
             </p>
           </template>
         </el-table-column>
@@ -99,7 +97,7 @@
         </el-table-column>
         <el-table-column
           label="结算"
-          min-width="150"
+          min-width="190"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -119,7 +117,7 @@
         </el-table-column>
         <el-table-column
           label="线路特点"
-          min-width="200"
+          min-width="240"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -139,7 +137,7 @@
         </el-table-column>
         <el-table-column
           label="标签"
-          min-width="70"
+          min-width="60"
           class-name="center"
         >
           <template slot-scope="{row}">
@@ -221,7 +219,6 @@
           min-width="110"
           class-name="center"
         >
-          <!-- <template slot-scope="{row}"> -->
           <template slot-scope="{row}">
             <p
               v-if="row.status.isLocationInvite===0&&row.status.isInviteSuccess===0&&row.status.isAllowInvite===1"
@@ -271,60 +268,6 @@
                 查看线路详情
               </el-button>
             </p>
-          </template>
-        </el-table-column>
-        <el-table-column
-          v-if="isMore"
-          type="expand"
-          width="1"
-          class-name="expand"
-        >
-          <template slot-scope="{row}">
-            <div class="item">
-              <div class="title">
-                项目信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.arr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
-            <div class="item">
-              <div class="title">
-                配送信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.brr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
-            <div class="item">
-              <div class="title">
-                撮合信息:
-              </div>
-              <div class="content">
-                <el-button
-                  v-for="item in row.crr"
-                  :key="item"
-                  size="mini"
-                  class="btn"
-                >
-                  {{ item }}
-                </el-button>
-              </div>
-            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -423,7 +366,7 @@ export default class extends Vue {
             handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
             sendtype: 1, // 1:整车
             settlementDays: 7,
-            time: '9:00~18:00 | 稳定 |2-4个月'
+            time: '9:00~18:00/稳定/五个月'
           },
           label: ['爆款', '客急'],
           status: {
@@ -617,16 +560,6 @@ export default class extends Vue {
 .lineTableContainer >>> .firstColumn {
   overflow: hidden;
 }
-/* .lineTableContainer >>> .expand .cell */
-/* .lineTableContainer >>> .noP .cell {
-  padding: 0px!important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50px;
-  height: 100%;
-  text-align: right;
-} */
 </style>
 
 <style>

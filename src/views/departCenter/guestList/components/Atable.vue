@@ -136,7 +136,7 @@
       </el-table-column>
       <el-table-column
         label="线路特点"
-        min-width="220"
+        min-width="240"
         align="center"
       >
         <template slot-scope="{row}">
