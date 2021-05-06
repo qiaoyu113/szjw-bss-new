@@ -169,7 +169,7 @@
       </el-table-column>
       <el-table-column
         label="操作"
-        min-width="150"
+        min-width="170"
         align="center"
         fixed="right"
       >
@@ -498,12 +498,12 @@ export default class extends Vue {
   }
   .phone {
     position: absolute;
-    bottom: -4px;
+    bottom: -5px;
     color: #888585;
     line-height: 12px;
     font-size: 12px;
     display: block;
-    width: 74px;
+    width: 85px;
     -webkit-transform: scale(0.8, 0.8);
     -moz-transform: scale(0.8, 0.8);
     transform: scale(0.8, 0.8);
