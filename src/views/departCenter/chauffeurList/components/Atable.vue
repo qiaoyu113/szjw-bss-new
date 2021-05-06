@@ -17,9 +17,11 @@
         type="selection"
         width="55"
       />
+
       <el-table-column
+        label="基础信息"
+        min-width="150"
         align="center"
-        min-width="50"
         class-name="firstColumn"
       >
         <template slot-scope="scope">
@@ -33,28 +35,20 @@
           <template v-if="isShowPercent">
             {{ scope.$index + 1 | addZreo }}
           </template>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="基础信息"
-        min-width="100"
-        align="center"
-      >
-        <template slot-scope="{row}">
-          <div style="textAlign:center">
+          <div style="margin-left:50px;">
             <p class="text">
               <span class="cycleTag" />
               <span
                 :style="{fontWeight: (!isShowPercent ? 'bold' : 'normal')}"
-                v-text="row.driverName"
+                v-text="scope.row.driverName"
               />
             </p>
             <p
               class="text"
-              v-text="`(${row.manager})`"
+              v-text="`(${scope.row.manager})`"
             />
             <p class="text">
-              {{ row.driverId }}
+              {{ scope.row.driverId }}
             </p>
           </div>
         </template>
@@ -439,12 +433,11 @@ export default class extends Vue {
   removeTableInfo() {
     sessionStorage.removeItem(key)
   }
-  mounted() {
-    if (this.isMore && !this.isShowPercent) {
-      let str = sessionStorage.getItem(key) || ''
-      if (str) {
-        this._tableData = [JSON.parse(str)]
-      }
+  // 从缓存读取
+  getStorage() {
+    let str = sessionStorage.getItem(key) || ''
+    if (str) {
+      this._tableData = [JSON.parse(str)]
     }
   }
 }
@@ -495,6 +488,7 @@ export default class extends Vue {
     font-size: 12px;
     line-height: 20px;
     position: relative;
+    text-align: left;
   }
   .phone {
     position: absolute;

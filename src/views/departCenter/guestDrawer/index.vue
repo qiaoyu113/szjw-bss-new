@@ -82,6 +82,9 @@ export default class GuestDrawer extends Vue {
   }
   handleOpenClick() {
     AppModule.CloseSideBar(false)
+    setTimeout(() => {
+      (this.$refs.lineDrawer as any).getStorage()
+    }, 20)
   }
   loadMoreHandle() {
     (this.$refs.matchDriver as any).getLists()
