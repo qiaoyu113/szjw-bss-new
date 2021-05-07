@@ -33,9 +33,18 @@
                 placement="right"
                 width="200"
                 trigger="hover"
+                @show="handleHoverRemark(scope.row)"
               >
                 <div class="text1">
-                  {{ scope.row.remark }}
+                  <template v-if="scope.row.remark">
+                    {{ scope.row.remark }}
+                  </template>
+                  <template v-else>
+                    <i class="el-icon-loading" />
+                    <span class="loading-left">
+                      加载中...
+                    </span>
+                  </template>
                 </div>
                 <i
                   v-if="scope.row.isHot"
@@ -54,7 +63,6 @@
             </p>
             <p
               class="text"
-              :class="isMore && obj.c === scope.row.c ? 'blue text' : 'text'"
             >
               窗口期:剩余{{ _calcDay(scope.row) }}天
             </p>
@@ -72,15 +80,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && obj.carTypeValue === row.carType ? 'blue text' : 'text'"
           >
-            {{ row.carTypeValue }}/{{ row.oilElectricityRequirementValue }}
+            <span :class="isShowPercent && obj.carTypeValue === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
-            :class="isMore && row.labelTypeHit ? 'blue text' : 'text'"
           >
-            {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}/{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}/{{ row.labelTypeValue }}
+            <span :class="isShowPercent && row.isBehavior === obj.isBehavior ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && row.isRestriction === obj.isRestriction ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
           </p>
         </template>
       </el-table-column>
@@ -92,13 +98,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
           >
             仓库位置:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
           </p>
           <p
             class="text"
-            :class="isMore && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
           >
             配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
           </p>
@@ -112,13 +118,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && row.settlementCycleHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.settlementCycleHit ? 'blue text' : 'text'"
           >
             单趟运费:{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天
           </p>
           <p
             class="text"
-            :class="isMore && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
           >
             预计月运费:{{ row.shipperOffer }}元
           </p>
@@ -135,32 +141,35 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && row.cargoTypeHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.cargoTypeHit ? 'blue text' : 'text'"
           >
             货品:{{ row.cargoTypeValue }}
           </p>
-          <p :class="isMore && row.handlingDifficultyHit ? 'blue text' : 'text'">
+          <p :class="isShowPercent && row.handlingDifficultyHit ? 'blue text' : 'text'">
             装卸难度:{{ row.handlingDifficultyValue }}
           </p>
           <p
             class="text"
-            :class="isMore && row.distributionWayHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.distributionWayHit ? 'blue text' : 'text'"
           >
             配送复杂度:{{ row.distributionWayValue }}
           </p>
           <p
             class="text"
-            :class="isMore && row.workingHoursHit ? 'blue text' : 'text'"
           >
             工作时间段:<template v-if="row.workingHours&&row.workingHours.length >1">
-              {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+              <span :class="isShowPercent && row.workingHoursHit ? 'blue':''">
+                {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+              </span>
             </template>/
-            <template v-if="row.lineCategory ===1">
-              稳定/{{ row.stabilityRateValue }}
-            </template>
-            <template v-else>
-              临时/{{ row.waitDirveValidity }}
-            </template>
+            <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
+              <template v-if="row.lineCategory ===1">
+                稳定/{{ row.stabilityRateValue }}
+              </template>
+              <template v-else>
+                临时/{{ row.waitDirveValidity }}
+              </template>
+            </span>
           </p>
         </template>
       </el-table-column>
@@ -193,7 +202,7 @@
           <p
             class="text"
           >
-            <template v-if="row.inviteCitys && row.inviteCitys.length > 3">
+            <template v-if="row.inviteCitys && row.inviteCitys.length > 2">
               <el-popover
                 placement="top-start"
                 width="200"
@@ -212,7 +221,7 @@
             </template>
           </p>
           <p
-            v-if="row.currentCityInvite"
+            v-if="row.currentCityInvite ===1"
             class="text"
           >
             本城已客邀
@@ -279,9 +288,12 @@
             <div class="title">
               项目信息:
             </div>
-            <div class="content">
+            <div
+              v-if="row.projectInfo&&Array.isArray(row.projectInfo)"
+              class="content"
+            >
               <el-button
-                v-for="item in row.arr"
+                v-for="item in row.projectInfo"
                 :key="item"
                 size="mini"
                 class="btn"
@@ -294,9 +306,12 @@
             <div class="title">
               配送信息:
             </div>
-            <div class="content">
+            <div
+              v-if="row.distributionInfo&&Array.isArray(row.distributionInfo)"
+              class="content"
+            >
               <el-button
-                v-for="item in row.brr"
+                v-for="item in row.distributionInfo"
                 :key="item"
                 size="mini"
                 class="btn"
@@ -312,6 +327,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { getLineDetail } from '@/api/departCenter'
 const key = 'line_row'
 interface IState {
   [key: string]: any;
@@ -361,6 +377,7 @@ export default class extends Vue {
       }
     }
     row.isOpen = true
+    this.getLineDetailByLineId(row)
     $table.toggleRowExpansion(row, true)
   }
   // 匹配撮合
@@ -386,11 +403,64 @@ export default class extends Vue {
   removeTableInfo() {
     sessionStorage.removeItem(key)
   }
+  // 显示备注
+  handleHoverRemark(row:IState) {
+    if (!row.remark) {
+      setTimeout(() => {
+        this.$set(row, 'remark', '12121')
+      }, 1000)
+    }
+  }
   // 从缓存获取
   getStorage() {
     let str = sessionStorage.getItem(key) || ''
     if (str) {
       this._tableData = [JSON.parse(str)]
+    }
+  }
+  // 获取线路详情
+  async getLineDetailByLineId(row:IState) {
+    try {
+      let params:IState = {
+        lineId: row.lineId
+      }
+      let { data: res } = await getLineDetail(params)
+      if (res.success) {
+        let item:IState = res.data
+        let projectInfo = []
+        let distributionInfo = []
+        projectInfo.push(item.projectName)
+        projectInfo.push(`已创建${item.lineSumNum}条线路`)
+        projectInfo.push(`${item.lineRunNum}条线路在跑`)
+        projectInfo.push(`${item.lineRunOffShelfNum}条线路已掉线`)
+        projectInfo.push(`${item.lineFindNum}条线路在上架找车`)
+        distributionInfo.push(`${item.deliveryNum}个点`)
+        distributionInfo.push(`每日${item.dayNum}趟`)
+        distributionInfo.push(`每月${item.monthNum}天`)
+        distributionInfo.push(`每趟${item.distance}公里`)
+        if (item.runSpeed === 1) {
+          distributionInfo.push(`走高速`)
+        }
+        if (item.returnBill === 1) {
+          distributionInfo.push(`回单`)
+        }
+        if (item.lineType === 1) {
+          distributionInfo.push(`城配线`)
+        }
+        if (item.stabilityRate === 1) {
+          distributionInfo.push(`稳定`)
+        } else {
+          distributionInfo.push(`临时${item.deliveryStartDate}/${item.deliveryEndDate}`)
+        }
+        this.$set(row, 'projectInfo', projectInfo)
+        this.$set(row, 'distributionInfo', distributionInfo)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line detail:${err}`)
+    } finally {
+      //
     }
   }
 }
@@ -476,6 +546,9 @@ export default class extends Vue {
     }
     .orange {
       color:#f5a821;
+    }
+    .loading-left {
+      margin-left:5px;
     }
   }
 </style>

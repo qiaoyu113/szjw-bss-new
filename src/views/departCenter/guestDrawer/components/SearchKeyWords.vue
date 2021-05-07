@@ -37,23 +37,23 @@
         >
           <template slot="freight">
             <el-input
-              v-model="listQuery.f1"
+              v-model="listQuery.everyTripGuaranteedStart"
               v-only-number="{min: 0, max: 20000, precision: 0}"
               style="width:100px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
-              v-model="listQuery.f2"
+              v-model="listQuery.everyTripGuaranteedEnd"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              :disabled="!listQuery.f1"
+              :disabled="!listQuery.everyTripGuaranteedStart"
               style="width:100px"
               placeholder="请输入"
             />
           </template>
           <template slot="keyWords">
             <el-select
-              v-model="listQuery.keyWords"
+              v-model="listQuery.driverInfo"
               placeholder="选择/搜索司机姓名/编号"
               filterable
               clearable
@@ -116,7 +116,7 @@ interface IState {
   }
 })
 export default class SearchKeyWords extends Vue {
-  private keyWords: string = ''
+  private driverInfo: string = ''
   private shareScopeEnd:IState[] = []
   private citysArry: any[] = []
   private levelData: any = {}
@@ -155,16 +155,16 @@ export default class SearchKeyWords extends Vue {
   private listQuery:IState = {
     busiType: '', // 所属业务线
     carType: '', // 车类型
-    hard: '', // 装卸接受度
-    cycle: '', // 结算周期
-    hope: '', // 期望稳定/临时
-    expectType: '', // 期望货品类型
-    expectHard: '', // 期望配送难度
-    workTime: '',
-    f1: '',
-    f2: '',
+    handlingDifficulty: '', // 装卸接受度
+    settlementCycle: '', // 结算周期
+    lineCategory: '', // 期望稳定/临时
+    cargoType: '', // 期望货品类型
+    distributionWay: '', // 期望配送难度
+    workingHour: '',
+    start: '',
+    end: '',
     address: '',
-    keyWords: ''
+    driverInfo: ''
   }
   @Watch('listQuery.jobStartDate')
   onlistQueryChanged(val: any, oldVal: any) {
@@ -243,7 +243,7 @@ export default class SearchKeyWords extends Vue {
     {
       options: this.hardOptions,
       multiple: true,
-      key: 'hard',
+      key: 'handlingDifficulty',
       title: '装卸接受度'
     },
     {
@@ -258,18 +258,18 @@ export default class SearchKeyWords extends Vue {
         label: '临时'
       }],
       multiple: false,
-      key: 'hope',
+      key: 'lineCategory',
       title: '期望稳定/临时'
     },
     {
       options: this.cycleOptions,
       multiple: true,
-      key: 'cycle',
+      key: 'settlementCycle',
       title: '期望结算周期'
     },
     {
       options: this.expectOptions,
-      key: 'expectType',
+      key: 'cargoType',
       multiple: true,
       title: '期望货品类型'
     },
@@ -285,7 +285,7 @@ export default class SearchKeyWords extends Vue {
         label: '多点配'
       }],
       multiple: false,
-      key: 'expectHard',
+      key: 'distributionWay',
       title: '期望配送复杂度'
     },
     {
@@ -346,6 +346,7 @@ export default class SearchKeyWords extends Vue {
                 this.selectedData[index].optionIds.splice(1, 1, id)
                 this.selectedData[index].selected.splice(1, 1, command)
               }
+              this.listQuery.workingHour = this.selectedData[index].optionIds.join('-')
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
@@ -356,7 +357,6 @@ export default class SearchKeyWords extends Vue {
     } else {
       this.initSelectItem(id, command)
     }
-    console.log(this.selectedData)
   }
   initSelectItem(id: any, command: any) {
     const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
@@ -381,7 +381,6 @@ export default class SearchKeyWords extends Vue {
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
-        console.log(this.cycleOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -392,10 +391,10 @@ export default class SearchKeyWords extends Vue {
   searchHandle() {
     console.log(this.listQuery)
     // 单趟运费区间
-    if ((this.listQuery.f1 && !this.listQuery.f2) || (!this.listQuery.f1 && this.listQuery.f2)) {
+    if ((this.listQuery.everyTripGuaranteedStart && !this.listQuery.everyTripGuaranteedEnd) || (!this.listQuery.everyTripGuaranteedStart && this.listQuery.everyTripGuaranteedEnd)) {
       return this.$message.warning('单趟运费输入不完整')
     } else {
-      if (Number(this.listQuery.start) > Number(this.listQuery.end)) {
+      if (Number(this.listQuery.everyTripGuaranteedStart) > Number(this.listQuery.everyTripGuaranteedEnd)) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
     }
@@ -412,7 +411,11 @@ export default class SearchKeyWords extends Vue {
       this.listQuery[key] = val
     }
     this.levelData = {}
+    let provices:any = []
     this.listQuery[key].forEach((item:any) => {
+      if (provices.indexOf(item[0]) === -1) {
+        provices.push(item[0])
+      }
       if (!this.levelData[item[1]]) {
         this.levelData[item[1]] = []
       }
@@ -420,7 +423,13 @@ export default class SearchKeyWords extends Vue {
         this.levelData[item[1]].push(item[2])
       }
     })
-
+    if (provices.length >= 2) {
+      this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+        return item.indexOf(parseInt(changeItem[1])) === -1
+      })
+      return this.$message.error('只能选择同一省下的市，区')
+    }
+    console.log(this.levelData)
     let cityNum = 0
     for (let itemKey in this.levelData) {
       cityNum++

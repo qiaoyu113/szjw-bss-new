@@ -7,6 +7,7 @@
     width="500px"
     :destroy-on-close="false"
     @closed="handleDialogClosed"
+    @opened="handleDialogOpend"
   >
     <self-form
       ref="tryForm"
@@ -32,7 +33,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { CreateLntentionRun } from '@/api/departCenter'
+import { CreateLntentionRun, getLineDetailInfo } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -47,13 +48,15 @@ export default class extends Vue {
   @Prop({ default: () => {} }) obj!:IState
 
   // lineCategory:'' //线路分类 稳定线路、临时线路
-  // workingTimeStart:'06:10'   工作时间段的开始时间
   // driverId:'' //司机id
   // name:''//司机姓名
   // phone:''//司机手机号
   // lineName:''//线路名字
   // lineId:''//线路id
   // dutyManagerId:''//线路上客户维护经理
+  // matchType 撮合类型(1: 司推系、2：客邀系)
+  // matchStatus 撮合单状态
+  // matchId  撮合单编号
 
   private showDialog:boolean = false
   private workingTime:Date = new Date(new Date(Date.now() + 1 * 3600 * 24 * 1000).setHours(0, 0))
@@ -62,6 +65,7 @@ export default class extends Vue {
     otherReason: '',
     arrivalTime: ''
   }
+  private workingTimeStart = '00:00'
 
   private formItem:any[] = [
     {
@@ -126,7 +130,6 @@ export default class extends Vue {
       { required: true, message: '请选择时间', trigger: 'blur' }
     ]
   }
-  @Watch('obj.workingTimeStart', { immediate: true })
   handleWorkingTimeStartChange(val:string | null) {
     if (val) {
       let timearr = val.split(',')
@@ -134,6 +137,34 @@ export default class extends Vue {
       let hour = Number(dates[0])
       let min = Number(dates[1])
       this.listQuery.arrivalTime = new Date(new Date(this.workingTime.setHours(hour, min)))
+    }
+  }
+  // 弹框打开
+  handleDialogOpend() {
+    setTimeout(() => {
+      this.getLineDetail()
+    }, 20)
+  }
+  // 获取线路详情
+  async getLineDetail() {
+    try {
+      let params:IState = {
+        lineId: 'XL202104300001' || this.obj.lineId
+      }
+      let { data: res } = await getLineDetailInfo(params)
+      if (res.success) {
+        let times:IState[] = res.data.lineDeliveryInfoFORMS
+        if (Array.isArray(times) && times.length > 0) {
+          this.workingTimeStart = times[0].workingTimeStart
+        }
+        this.handleWorkingTimeStartChange(this.workingTimeStart)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line detail fail:${err}`)
+    } finally {
+      //
     }
   }
   // 确定按钮
@@ -161,7 +192,11 @@ export default class extends Vue {
         operateFlag: 'creatIntentionRun',
         intentionType: this.listQuery.intentionType,
         otherReason: this.listQuery.otherReason,
-        arrivalTime: new Date(this.listQuery.arrivalTime).getTime()
+        arrivalTime: new Date(this.listQuery.arrivalTime).getTime(),
+        matchType: this.obj.matchType, // 撮合类型(1: 司推系、2：客邀系)
+        matchStatus: this.obj.matchStatus, // 撮合单状态
+        matchId: this.obj.matchId, // 撮合单编号
+        createRunTestOrigin: 1 // 创建试跑意向来源（1：司撮、2：H5）
       }
       let { data: res } = await CreateLntentionRun(params)
       if (res.success) {

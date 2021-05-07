@@ -2,108 +2,118 @@
 <template>
   <div
     v-loading.body="listLoading"
-    class="LineList"
+    class="LineListBox"
     :class="{
       p15: isPC
     }"
   >
-    <div class="box">
-      <self-form
-        ref="selectForm"
-        :list-query="listQuery"
-        :form-item="formItem"
-        size="small"
-        :load-by-keyword="loadLineByKeyword"
-        label-width="110px"
-        class="p15 SuggestForm"
-        :pc-col="8"
-      >
-        <template slot="customerStatus">
-          <el-button
-            v-for="item in btns"
-            :key="item.text"
-            type="primary"
-            :plain="item.name !== listQuery.customerStatus"
-            margin-right="20px"
-            @click="() => {
-              listQuery.customerStatus = item.name
-              handleFilterClick()
-            }"
-          >
-            {{ item.text }}
-          </el-button>
-        </template>
-        <div
-          slot="mulBtn"
-          :class="isPC ? 'btnPc left' : 'mobile'"
+    <self-form
+      ref="selectForm"
+      :list-query="listQuery"
+      :form-item="formItem"
+      size="small"
+      :load-by-keyword="loadLineByKeyword"
+      label-width="110px"
+      class="p15 SuggestForm"
+      :pc-col="8"
+    >
+      <template slot="customerStatus">
+        <el-button
+          v-for="item in btns"
+          :key="item.text"
+          type="primary"
+          :plain="item.name !== listQuery.customerStatus"
+          margin-right="20px"
+          @click="() => {
+            listQuery.customerStatus = item.name
+            handleFilterClick()
+          }"
         >
-          <el-button
-            type="primary"
-            @click="batchLaunchGuest"
-          >
-            批量发起客邀
-          </el-button>
-          <el-button
-            type="primary"
-          >
-            批量取消客邀
-          </el-button>
+          {{ item.text }}
+        </el-button>
+      </template>
+      <div
+        slot="mulBtn"
+        :class="isPC ? 'btnPc left' : 'mobile'"
+      >
+        <el-button
+          type="primary"
+          @click="batchLaunchGuest"
+        >
+          批量发起客邀
+        </el-button>
+        <el-button
+          type="primary"
+          @click="batchCancelGuest"
+        >
+          批量取消客邀
+        </el-button>
 
-          <el-button
-            type="primary"
-            :class="isPC ? '' : 'btnMobile'"
-            @click="handleFilterClick"
-          >
-            查询
-          </el-button>
-          <el-button
-            :class="isPC ? '' : 'btnMobile'"
-            @click="handleResetClick"
-          >
-            重置
-          </el-button>
-        </div>
-        <template slot="freightSection">
-          <input-range
-            v-model="listQuery.freightSection"
-            v-only-number="{min: 1, max: 19999, precision: 0}"
-          />
-        </template>
-        <template slot="time">
-          <timeSelect
-            v-model="listQuery.time"
-          />
-        </template>
-      </self-form>
-      <div class="table_box">
-        <div class="middle">
-          <span>筛选结果：{{ 111 }}条</span>
-        </div>
-        <Btable
-          ref="listTable"
-          :list-query="listQuery"
-          :is-show-percent="true"
-          :obj="{}"
-          @launchGuest="handleLaunchGuest($event)"
-          @cancelGuest="handleCancelGuest($event)"
-          @cancelTryRun="handleCancelTryRun($event)"
-        />
-        <pagination
-          :operation-list="[]"
-          :total="page.total"
-          :page.sync="page.page"
-          :page-sizes="[10, 20, 30, 40, 50]"
-          :limit.sync="page.limit"
-          @pagination="handlePageSizeChange"
-        />
+        <el-button
+          type="primary"
+          :class="isPC ? '' : 'btnMobile'"
+          @click="handleFilterClick"
+        >
+          查询
+        </el-button>
+        <el-button
+          :class="isPC ? '' : 'btnMobile'"
+          @click="handleResetClick"
+        >
+          重置
+        </el-button>
       </div>
-      <launch-guest
-        ref="launchGuest"
-        :obj="obj"
+      <template slot="freightSection">
+        <input-range
+          v-model="listQuery.freightSection"
+          v-only-number="{min: 1, max: 19999, precision: 0}"
+        />
+      </template>
+      <template slot="time">
+        <timeSelect
+          v-model="listQuery.time"
+        />
+      </template>
+    </self-form>
+    <div
+      class="table_box"
+    >
+      <div class="middle">
+        <span>筛选结果：{{ 111 }}条</span>
+      </div>
+      <Btable
+        ref="listTable"
+        :list-query="listQuery"
+        :is-show-percent="true"
+        :obj="{}"
+        @launchGuest="handleLaunchGuest($event)"
+        @cancelGuest="handleCancelGuest($event)"
+        @cancelTryRun="handleCancelTryRun($event)"
+        @SelectionChange="checkOff($event)"
       />
-      <cancel-guest ref="cancelGuest" />
-      <cancel-tryRun ref="cancelTryRun" />
+      <pagination
+        :operation-list="[]"
+        :total="page.total"
+        :page.sync="page.page"
+        :page-sizes="[10, 20, 30, 40, 50]"
+        :limit.sync="page.limit"
+        @pagination="handlePageSizeChange"
+      />
     </div>
+    <launch-guest
+      :id="ids"
+      ref="launchGuest"
+      :launch-arguments="launchArguments"
+    />
+    <cancel-guest
+      :id="idss"
+      ref="cancelGuest"
+      :cust-invite-id="custInviteId"
+    />
+    <cancel-tryRun
+      ref="cancelTryRun"
+      :cancel-id="cancelId"
+    />
   </div>
 </template>
 
@@ -148,16 +158,16 @@ interface IState {
   }
 })
 export default class extends Vue {
-  private obj:IState = {}
   private listLoading:boolean = false
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private timeLists:IState[] = []
   private shareScopeEnd:IState[] = []
-  // private multipleSelection: any[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
+  private ids = []
+  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -329,6 +339,12 @@ export default class extends Vue {
       text: '已发起客邀'
     }
   ]
+  private custInviteId:string=''
+  private cancelId:string=''
+  private launchArguments:{}={
+    lineId: '',
+    matchId: ''
+  }
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -353,9 +369,6 @@ export default class extends Vue {
     }
     this.getList()
   }
-  // handleSelectionChange(val:any) {
-  //   this.multipleSelection = val
-  // }
   // 根据关键字查线路id
   async loadLineByKeyword(params:IState) {
     try {
@@ -380,9 +393,6 @@ export default class extends Vue {
       if (Number(moneyRange[0]) > Number(moneyRange[1])) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
-    }
-    if (Number(moneyRange[0] > 20000) || Number(moneyRange[1] > 20000)) {
-      return this.$message.warning('单趟运费输入在0-20000之间')
     }
     // 工作时间段
     const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
@@ -427,7 +437,7 @@ export default class extends Vue {
       // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
       setTimeout(() => {
         (this.$refs.listTable as any).getLists()
-      }, 1000)
+      }, 500)
       // console.log('listQuery', this.listQuery)
       // let { data: res } = await getLists(params)
     } catch (err) {
@@ -483,26 +493,45 @@ export default class extends Vue {
     this.shareScopeEnd = this.listQuery[key]
   }
   // 发起客邀
-  handleLaunchGuest(id:number) {
-    (this.$refs.launchGuest as any).showDialog = true
-    console.log('id', id)
+  handleLaunchGuest(data:{}) {
+    (this.$refs.launchGuest as any).showDialog = true;
+    (this.$refs.launchGuest as any).launchGuestState = 1
+    this.launchArguments = data
   }
   // 取消客邀
-  handleCancelGuest(id:number) {
-    (this.$refs.cancelGuest as any).showDialog = true
-    console.log('id', id)
-  }
-  // 批量发起客邀
-  private batchLaunchGuest() {
-    (this.$refs.launchGuest as any).showDialog = true
-    // (this.$refs.launchGuest as any).confirm()
-  }
-  // 取消创建试跑意向
-  handleCancelTryRun(id:number) {
-    (this.$refs.cancelTryRun as any).showDialog = true
-    console.log('id', id)
+  handleCancelGuest(custInviteId:string) {
+    (this.$refs.cancelGuest as any).showDialog = true;
+    (this.$refs.cancelGuest as any).cancelGuestState = 1;
+    (this.$refs.cancelGuest as any).getDictList()
+    this.custInviteId = custInviteId
   }
 
+  // 批量发起客邀
+  private batchLaunchGuest() {
+    (this.$refs.launchGuest as any).showDialog = true;
+    (this.$refs.launchGuest as any).launchGuestState = 2
+  }
+  // 批量取消客邀
+  private batchCancelGuest() {
+    (this.$refs.cancelGuest as any).showDialog = true;
+    (this.$refs.cancelGuest as any).cancelGuestState = 2
+  }
+  // 取消创建试跑意向
+  handleCancelTryRun(id:string) {
+    (this.$refs.cancelTryRun as any).showDialog = true
+    this.cancelId = id
+  }
+  private checkOff(id:any) {
+    this.ids = id.map((item:any) => {
+      return {
+        lineId: item.lineId,
+        matchId: item.matchId
+      }
+    })
+    this.idss = id.map((item:any) => {
+      return item.custInviteId
+    })
+  }
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
@@ -515,9 +544,10 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.LineList {
+.LineListBox {
    min-width: 860px;
-   height:100%;
+   height: 100%;
+   overflow: auto;
   .SuggestForm {
       width: 100%;
       background: #fff;
@@ -568,7 +598,7 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-.LineList >>> .end .el-form-item__label::before {
+.LineListBox >>> .end .el-form-item__label::before {
     content:'~';
     color: #9e9e9e;
   }

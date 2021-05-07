@@ -23,7 +23,7 @@
   </SelfDialog>
 </template>
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 interface IState {
@@ -37,6 +37,7 @@ interface IState {
   }
 })
 export default class extends Vue {
+   @Prop({ default: '123' }) cancelId!:string
   private showDialog:boolean = false
   private cancelOptions:IState[] = [] // 取消原因
   private listQuery:IState = {
@@ -63,6 +64,7 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.cancelForm as any).submitForm()
+    console.log('取消试跑意向接口参数', this.cancelId)
   }
   // 弹框关闭
   private handleDialogClosed() {

@@ -337,8 +337,13 @@ export default class extends Vue {
       return SettingsModule.isPC
     }
     // 根据关键字查线路id
-    async loadLineByKeyword(params:IState) {
+    async loadLineByKeyword(obj:IState) {
       try {
+        let params:IState = {
+          page: obj.page,
+          limit: obj.limit
+        }
+        obj.key && (params.keyWord = obj.key)
         let { data: res } = await getLineSearch(params)
         let result:any[] = res.data.map((item:any) => ({
           label: item.lineName,

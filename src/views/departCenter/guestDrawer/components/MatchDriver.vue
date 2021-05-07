@@ -37,7 +37,6 @@ import SetTag from './SetTag.vue'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
-
 interface IState {
   [key: string]: any;
 }
@@ -67,8 +66,10 @@ export default class DepartLine extends Vue {
     f1: '',
     f2: ''
   }
-  setTagHandle() {
+  setTagHandle(row:any) {
     (this.$refs.tagShow as any).isShow = true
+    this.rowData = row
+    console.log(row)
   }
   setCallHandle(data:any) {
     let phone = data.phoneNum
