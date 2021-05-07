@@ -3,7 +3,6 @@
     <SelfDialog
       :visible.sync="isShow"
       title="给司机打标签"
-      :confirm="confirm"
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
@@ -23,9 +22,9 @@
           slot="jobStartDate"
         >
           <el-time-select
-            v-model="listQuery['jobStartDate']"
+            v-model="listQuery['startingPointStartTime']"
             class="timeSelect"
-            prop="jobStartDate"
+            prop="startingPointStartTime"
             placeholder="起始时间"
             style="width:50px"
             :picker-options="{
@@ -40,22 +39,22 @@
         >
           <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
-            v-model="listQuery['jobEndDate']"
+            v-model="listQuery['startingPointEndTime']"
             class="timeSelect"
-            prop="jobEndDate"
+            prop="startingPointEndTime"
             style="width:50px"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['jobStartDate']
+              minTime: listQuery['startingPointStartTime']
             }"
           />
         </template>
         <template slot="expected">
           <el-input
-            v-model.trim="listQuery['expected']"
+            v-model.trim="listQuery['expectIncomeTrip']"
             v-only-number="{min: 0, max: 20000, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
@@ -66,10 +65,10 @@
           slot="jobStartDate2"
         >
           <el-time-select
-            v-model="listQuery['jobStartDate2']"
+            v-model="listQuery['deliveryPointStartTime']"
             class="timeSelect"
             placeholder="起始时间"
-            prop="jobStartDate2"
+            prop="deliveryPointStartTime"
             :picker-options="{
               start: '00:00',
               step: '01:00',
@@ -82,21 +81,21 @@
         >
           <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
-            v-model="listQuery['jobEndDate2']"
+            v-model="listQuery['deliveryPointEndTime']"
             class="timeSelect"
-            prop="jobEndDate2"
+            prop="deliveryPointEndTime"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['jobStartDate2']
+              minTime: listQuery['deliveryPointStartTime']
             }"
           />
         </template>
         <template slot="remark">
           <el-input
-            v-model="listQuery.remark"
+            v-model="listQuery.manuallyRemarks"
             class="remark"
             type="textarea"
             :rows="2"
@@ -107,7 +106,7 @@
           />
           <div class="tags">
             <el-checkbox-group
-              v-model="listQuery.tags"
+              v-model="listQuery.remarks"
               size="mini"
             >
               <el-checkbox
@@ -130,6 +129,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
+import { searchMatchDriverInfo, updateDriverTag } from '@/api/drawer-guest'
 interface IState {
   [key: string]: any;
 }
@@ -148,61 +148,60 @@ export default class extends Vue {
   private reasonLists:IState[] = [
     {
       label: '电话停机',
-      value: '电话停机'
+      value: '1'
     },
     {
       label: '电话长期打不通',
-      value: '电话长期打不通'
+      value: '2'
     },
     {
       label: '电话空号',
-      value: '电话空号'
+      value: '3'
     },
     {
       label: '电话号码错误',
-      value: '电话号码错误'
+      value: '4'
     },
     {
       label: '态度恶劣，无法沟通',
-      value: '态度恶劣，无法沟通'
+      value: '5'
     }
   ]
   private timeLists:IState[] = []
   private listQuery:IState = {
-    prohibition1: '',
-    prohibitionAddress: '',
-    prohibitArea: [],
-    prohibition2: '',
-    prohibitionRegion: '',
-    limitArea: [],
-    hard: '',
-    complexity: [],
-    period: '',
-    expected: '',
-    isWork: true,
-    chargingCode: 0,
-    stable: [],
-    starting: '',
-    detailed: '',
-    jobStartDate2: null,
-    jobEndDate2: null,
-    distribution: '',
-    detailed2: '',
-    situation: '',
-    tags: [],
-    remark: ''
+    canBreakingNodriving: '', // 能否闯禁行
+    prohibitionAddress: '', // 禁行省市
+    breakingNodrivingCounty: [], // 可跑禁行区域-区县
+    canBreakingTrafficRestriction: '', // 能否闯限行
+    prohibitionRegion: '', // 限行省市
+    breakingTrafficRestrictionCounty: [], // 可跑限行区域-区县
+    heavyLifting: '', // 装卸接受度
+    deliveryDifficulty: [], // 配送难度
+    expectAccountingPeriod: '', // 期望账期
+    expectIncomeTrip: '', // 期望运费（趟）
+    hasIncomeOutside: '', // 外面是否有活
+    expectStabilityTemporary: [], // 期望稳定/临时
+    starting: '', // 起始点
+    startingPointStartTime: null, // 起始点-开始时间
+    startingPointEndTime: null, // 起始点-结束时间
+    deliveryPointStartTime: null, // 配送点-开始时间
+    deliveryPointEndTime: null, // 配送点-结束时间
+    delivery: '', // 配送点
+    driverSituation: '', // 司机情况
+    remarks: [], // 司机备注
+    manuallyRemarks: '' // 手动备注
   }
-  @Watch('listQuery.prohibition1')
+  @Watch('listQuery.canBreakingNodriving')
   onlistQueryChanged(val: any, oldVal: any) {
     this.formItem[1].hidden = !val
     this.formItem[2].hidden = !val
   }
-  @Watch('listQuery.prohibition2')
+  @Watch('listQuery.canBreakingTrafficRestriction')
   onlistQueryRegionChanged(val: any, oldVal: any) {
     this.formItem[4].hidden = !val
     this.formItem[5].hidden = !val
   }
-  @Watch('listQuery.isWork')
+  @Watch('listQuery.hasIncomeOutside')
   onlistQueryWorkChanged(val: any, oldVal: any) {
     this.formItem[12].hidden = !val
     this.formItem[13].hidden = !val
@@ -211,17 +210,17 @@ export default class extends Vue {
     this.formItem[16].hidden = !val
     this.formItem[17].hidden = !val
   }
-  @Watch('listQuery.tags')
+  @Watch('listQuery.remarks')
   onlistQuerytagsChanged(val: any, oldVal: any) {
     if (val.length > 1) {
-      this.listQuery.tags.shift()
+      this.listQuery.remarks.shift()
     }
-    this.listQuery.remark = ''
+    this.listQuery.manuallyRemarks = ''
   }
   private formItem:any[] = [
     {
       type: 4,
-      key: 'prohibition1',
+      key: 'canBreakingNodriving',
       label: '能否闯禁行',
       col: 24,
       options: [
@@ -231,7 +230,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      hidden: false,
+      hidden: true,
       key: 'prohibitionAddress',
       label: '可闯禁行区域',
       col: 10,
@@ -255,8 +254,8 @@ export default class extends Vue {
     {
       type: 2,
       col: 14,
-      hidden: false,
-      key: 'prohibitArea',
+      hidden: true,
+      key: 'breakingNodrivingCounty',
       label: '',
       tagAttrs: {
         placeholder: '请选择',
@@ -267,7 +266,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'prohibition2',
+      key: 'canBreakingTrafficRestriction',
       label: '能否闯限行',
       col: 24,
       options: [
@@ -277,7 +276,7 @@ export default class extends Vue {
     },
     {
       type: 8,
-      hidden: false,
+      hidden: true,
       key: 'prohibitionRegion',
       label: '可闯限行区域',
       col: 10,
@@ -301,8 +300,8 @@ export default class extends Vue {
     {
       type: 2,
       col: 14,
-      hidden: false,
-      key: 'limitArea',
+      hidden: true,
+      key: 'breakingTrafficRestrictionCounty',
       label: '',
       tagAttrs: {
         placeholder: '请选择',
@@ -313,18 +312,18 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'hard',
+      key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
       options: [
-        { label: '不接受装卸', value: 0 },
+        { label: '不接受装卸', value: 2 },
         { label: '轻装卸', value: 1 },
-        { label: '重装卸', value: 2 }
+        { label: '重装卸', value: 0 }
       ]
     },
     {
       type: 5,
-      key: 'complexity',
+      key: 'deliveryDifficulty',
       label: '配送复杂度',
       tagAttrs: {
         placeholder: '请选择'
@@ -336,7 +335,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'period',
+      key: 'expectAccountingPeriod',
       label: '期望账期',
       col: 24,
       options: [
@@ -359,11 +358,11 @@ export default class extends Vue {
         width: '100px'
       },
       label: '期望运费（趟）',
-      key: 'expected'
+      key: 'expectIncomeTrip'
     },
     {
       type: 5,
-      key: 'stable',
+      key: 'expectStabilityTemporary',
       label: '期望稳定/临时',
       tagAttrs: {
         placeholder: '请选择'
@@ -375,7 +374,7 @@ export default class extends Vue {
     },
     {
       type: 4,
-      key: 'isWork',
+      key: 'hasIncomeOutside',
       label: '外边是否有活',
       col: 24,
       options: [
@@ -408,7 +407,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'jobStartDate'
+      key: 'startingPointStartTime'
     },
     {
       slot: true,
@@ -420,7 +419,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'jobEndDate'
+      key: 'startingPointEndTime'
     },
     {
       type: 8,
@@ -435,7 +434,7 @@ export default class extends Vue {
         }
       },
       label: '配送点',
-      key: 'distribution'
+      key: 'delivery'
     },
     {
       slot: true,
@@ -447,7 +446,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'jobStartDate2'
+      key: 'deliveryPointStartTime'
     },
     {
       slot: true,
@@ -459,11 +458,11 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'jobEndDate2'
+      key: 'deliveryPointEndTime'
     },
     {
       type: 4,
-      key: 'situation',
+      key: 'driverSituation',
       label: '司机情况',
       col: 24,
       options: [
@@ -480,45 +479,46 @@ export default class extends Vue {
       slot: true,
       type: 'remark',
       label: '备注:',
-      key: 'remark'
+      key: 'manuallyRemarks'
     }
   ]
   private rules:IState = {
     prohibitionAddress: [
       { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
-    prohibitArea: [
+    breakingNodrivingCounty: [
       { required: true, message: '请选择可闯禁行区域', trigger: 'change' }
     ],
     prohibitionRegion: [
       { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
-    limitArea: [
+    breakingTrafficRestrictionCounty: [
       { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
     starting: [
       { required: true, message: '请选择起始点', trigger: 'change' }
     ],
-    jobStartDate: [
+    startingPointStartTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
-    jobEndDate: [
+    startingPointEndTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
-    jobStartDate2: [
+    deliveryPointStartTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
-    jobEndDate2: [
+    deliveryPointEndTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
-    distribution: [
+    delivery: [
       { required: true, message: '请选择配送点', trigger: 'change' }
     ]
   }
-  // 确定按钮
-  private confirm() {
-    (this.$refs.setTagFrom as any).submitForm()
-    console.log(this.listQuery)
+  async initData() {
+    /* let res = await searchMatchDriverInfo('BJS201903301')
+    if (res.data.success) {
+      console.log(res)
+    } */
   }
   // 弹框关闭
   private handleDialogClosed() {
@@ -531,7 +531,7 @@ export default class extends Vue {
       this.listQuery.prohibitionAddress = ''
       this.listQuery.prohibitionRegion = ''
       this.listQuery.starting = ''
-      this.listQuery.distribution = ''
+      this.listQuery.delivery = ''
       this.isShow = false
     }).catch(() => {
 
@@ -543,9 +543,9 @@ export default class extends Vue {
       console.log(this.listQuery[key])
       let res:any = await getProvinceList(['100000', ...this.listQuery[key]])
       if (key === 'prohibitionAddress') {
-        this.listQuery.prohibitArea = []
+        this.listQuery.breakingNodrivingCounty = []
       } else {
-        this.listQuery.limitArea = []
+        this.listQuery.breakingTrafficRestrictionCounty = []
       }
       this.$set(this.formItem[index], 'options', res)
     }, 10)
@@ -553,9 +553,26 @@ export default class extends Vue {
 
   // 验证通过
   handlePassChange() {
-
+    console.log(this.listQuery)
+    if (this.listQuery.canBreakingNodriving) {
+      this.listQuery.breakingNodrivingCity = this.listQuery.prohibitionAddress[1] // 可跑禁行区域-市
+      this.listQuery.breakingNodrivingProvince = this.listQuery.prohibitionAddress[0] // 可跑禁行区域-省
+    }
+    if (this.listQuery.canBreakingTrafficRestriction) {
+      this.listQuery.breakingTrafficRestrictionProvince = this.listQuery.prohibitionRegion[0] // 可跑限行区域-省
+      this.listQuery.breakingTrafficRestrictionCity = this.listQuery.prohibitionRegion[1] // 可跑限行区域-市
+    }
+    if (this.listQuery.hasIncomeOutside) {
+      this.listQuery.startingPointCounty = this.listQuery.starting[2]
+      this.listQuery.startingPointCity = this.listQuery.starting[1]
+      this.listQuery.startingPointProvince = this.listQuery.starting[0]
+      this.listQuery.deliveryPointCity = this.listQuery.delivery[1]
+      this.listQuery.deliveryPointCounty = this.listQuery.delivery[2]
+      this.listQuery.deliveryPointProvince = this.listQuery.delivery[0]
+    }
   }
   created() {
+    this.initData()
     _this = this
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
