@@ -41,11 +41,10 @@ export default class extends Vue {
   @Prop({ default: () => ({ lineId: '', matchId: '' }) }) launchArguments !:IState
   @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
+  private matchCustInviteInfo: any[] = []
   private listQuery:IState = {
     city: 1,
-    remarks: '',
-    lineId: '',
-    matchId: ''
+    remarks: ''
   }
   private launchGuestState :number = 0
   private formItem:any[] = [
@@ -91,8 +90,8 @@ export default class extends Vue {
     if (this.launchGuestState === 1) {
       try {
         let params:IState = {
-          matchId: this.listQuery.matchId,
-          lineId: this.listQuery.lineId,
+          matchId: this.launchArguments.matchId,
+          lineId: this.launchArguments.lineId,
           city: this.listQuery.city,
           remarks: this.listQuery.remarks
         }
@@ -113,8 +112,6 @@ export default class extends Vue {
       try {
         let params:IState = {
           matchCustInviteInfos: this.id,
-          matchId: this.listQuery.matchId,
-          lineId: this.listQuery.lineId,
           city: this.listQuery.city,
           remarks: this.listQuery.remarks
         }
