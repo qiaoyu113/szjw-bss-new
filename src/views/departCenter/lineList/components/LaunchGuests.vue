@@ -25,7 +25,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { CreateLntentionRun } from '@/api/departCenter'
+import { CreateLaunchGuests } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -78,9 +78,6 @@ export default class extends Vue {
   private handleDialogClosed() {
     (this.$refs.tryForm as any).resetForm()
   }
-  private qqq() {
-    console.log(123)
-  }
   // 验证通过
   handlePassChange() {
     this.showDialog = false
@@ -93,7 +90,7 @@ export default class extends Vue {
         guestCity: this.listQuery.guestCity,
         otherReason: this.listQuery.otherReason
       }
-      let { data: res } = await CreateLntentionRun(params)
+      let { data: res } = await CreateLaunchGuests(params)
       if (res.success) {
         this.$message.success('操作成功')
         this.$emit('success')

@@ -24,6 +24,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import { cancelMatchCustInvite } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -61,6 +62,7 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.cancelForm as any).submitForm()
+    this.cancelGuest()
   }
   // 弹框关闭
   private handleDialogClosed() {
@@ -68,7 +70,27 @@ export default class extends Vue {
   }
   // 验证通过
   handlePassChange() {
-
+    this.showDialog = false
+  }
+  // 取消客邀
+  async cancelGuest() {
+    try {
+      let params:IState = {
+        custInviteId: this.listQuery.custInviteId,
+        cancelInviteReason: this.listQuery.cancelInviteReason
+      }
+      let { data: res } = await cancelMatchCustInvite(params)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.$emit('success')
+      } else {
+        // this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`launch guest fail:${err}`)
+    } finally {
+      //
+    }
   }
 }
 </script>

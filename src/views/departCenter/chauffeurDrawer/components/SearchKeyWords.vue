@@ -382,10 +382,12 @@ export default class SearchKeyWords extends Vue {
   }
 }
 </script>
-<style>
+<style lang="scss" >
   .el-dropdown-menu{
-      max-height: 300px;
-      overflow: auto;
+      max-height: 200px !important;
+      overflow: scroll;
+      margin-bottom: 0 !important;
+      margin-top: 0 !important;
   }
 </style>
 <style lang="scss" scoped>
