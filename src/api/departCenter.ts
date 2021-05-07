@@ -62,3 +62,11 @@ export function getLineSearch(data:any) {
     data
   })
 }
+// 获取线路详情
+export function getLineDetailInfo(params:any) {
+  return request({
+    url: `/line_center/v2/line/lineInfo/detail`,
+    method: 'get',
+    params
+  })
+}
