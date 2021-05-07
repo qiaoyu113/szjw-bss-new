@@ -295,7 +295,7 @@ export default class extends Vue {
       value: ''
     },
     {
-      label: '已成交',
+      label: '已成交待上岗',
       value: 1
     },
     {

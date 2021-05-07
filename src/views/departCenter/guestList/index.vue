@@ -47,15 +47,15 @@
           重置
         </el-button>
       </div>
-      <template slot="start">
+      <template slot="everyTripGuaranteed">
         <input-range
-          v-model="listQuery.start"
+          v-model="listQuery.everyTripGuaranteed"
           v-only-number="{min: 1, max: 19999, precision: 0}"
         />
       </template>
-      <template slot="time">
+      <template slot="workingHours">
         <timeSelect
-          v-model="listQuery.time"
+          v-model="listQuery.workingHours"
         />
       </template>
     </self-form>
@@ -96,10 +96,10 @@ import Pagination from '@/components/Pagination/index.vue'
 import GuestDrawer from '../guestDrawer/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch } from '@/api/departCenter'
+import { getLineSearch, getInvitedLines, getLineSuggest } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import TimeSelect from '../chauffeurList/components/timeSelect.vue'
-import { showWork } from '@/utils'
+import { showWork, HandlePages } from '@/utils'
   interface PageObj {
     page:number,
     limit:number,
@@ -128,22 +128,22 @@ export default class extends Vue {
     private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
     private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
     private listQuery:IState = {
+      cityCode: [],
+      carType: '',
+      handlingDifficulty: '',
       labelType: '',
       isBehavior: '',
-      loadDiff: '',
       isRestriction: '',
-      start: [],
-      f1: '',
-      f2: '',
-      key: '',
-      g: [],
-      workCity: [],
-      time: []
+      everyTripGuaranteed: [], // 单趟运费区间
+      workingHours: [], // 工作时间段
+      warehouse: [], // 仓库位置
+      area: [], // 配送区域
+      lineInfo: ''
     }
     private formItem:any[] = [
       {
         type: 8,
-        key: 'workCity',
+        key: 'cityCode',
         col: 8,
         label: '所属城市',
         tagAttrs: {
@@ -163,7 +163,7 @@ export default class extends Vue {
           filterable: true
         },
         label: '车型',
-        key: 'b',
+        key: 'carType',
         options: this.carLists
       },
       {
@@ -174,7 +174,7 @@ export default class extends Vue {
           filterable: true
         },
         label: '装卸难度',
-        key: 'loadDiff',
+        key: 'handlingDifficulty',
         options: this.loadDiffArr
       },
       {
@@ -237,15 +237,15 @@ export default class extends Vue {
         ]
       },
       {
-        type: 'start',
+        type: 'everyTripGuaranteed',
         label: '单趟运费区间',
-        key: 'start',
+        key: 'everyTripGuaranteed',
         w: '110px',
         slot: true
       },
       {
-        type: 'time',
-        key: 'time',
+        type: 'workingHours',
+        key: 'workingHours',
         label: '工作时间段',
         slot: true
       },
@@ -261,7 +261,7 @@ export default class extends Vue {
           }
         },
         label: '仓库位置',
-        key: 'g'
+        key: 'warehouse'
       },
 
       {
@@ -276,12 +276,12 @@ export default class extends Vue {
           }
         },
         label: '配送区域',
-        key: 'i'
+        key: 'area'
       },
       {
         type: 15,
         label: '线路名称/编号',
-        key: 'key',
+        key: 'lineInfo',
         slot: true,
         w: '110px',
         tagAttrs: {
@@ -337,9 +337,14 @@ export default class extends Vue {
       return SettingsModule.isPC
     }
     // 根据关键字查线路id
-    async loadLineByKeyword(params:IState) {
+    async loadLineByKeyword(obj:IState) {
       try {
-        let { data: res } = await getLineSearch(params)
+        let params:IState = {
+          page: obj.page,
+          limit: obj.limit
+        }
+        obj.key && (params.keyWord = obj.key)
+        let { data: res } = await getLineSuggest(params)
         let result:any[] = res.data.map((item:any) => ({
           label: item.lineName,
           value: item.lineId
@@ -371,47 +376,78 @@ export default class extends Vue {
     }
     // 重置
     handleResetClick() {
-      this.listQuery = {}
+      this.listQuery = {
+        cityCode: [],
+        carType: '',
+        handlingDifficulty: '',
+        labelType: '',
+        isBehavior: '',
+        isRestriction: '',
+        everyTripGuaranteed: [], // 单趟运费区间
+        workingHours: [], // 工作时间段
+        warehouse: [], // 仓库位置
+        area: [], // 配送区域
+        lineInfo: ''
+      }
     }
     // 获取列表数据
     async getLists() {
       try {
-        this.tableData = []
         this.listLoading = true
-        let num:number = 3
-        for (let i = 0; i < num; i++) {
-          let obj:IState = {
-            a: '京东传站',
-            b: '李外线经理',
-            lineId: 'XL202012300377',
-            c: '3',
-            d: '4.2米厢货',
-            e: '油车',
-            f: '能闯禁行',
-            g: '能闯限行',
-            h: '单肥',
-            p1: '湖南省',
-            c1: '长沙市',
-            c2: '短沙县',
-            m1: 500,
-            time: '9:00~18:00',
-            percent: 80,
-            id: 1,
-            arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-            brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-            crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-            createDate: '2021-04-15 12:00'
-          }
-          obj.isOpen = false
-          obj.id = (i + 1)
-          this.tableData.push({ ...obj })
+        let params:IState = {
+          page: this.page.page,
+          limit: this.page.limit,
+          thisCityInvite: 1
+        }
+        this.listQuery.carType && (params.carType = this.listQuery.carType)
+        this.listQuery.handlingDifficulty && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
+        this.listQuery.labelType && (params.labelType = this.listQuery.labelType)
+        this.listQuery.isBehavior && (params.isBehavior = this.listQuery.isBehavior)
+        this.listQuery.isRestriction && (params.isRestriction = this.listQuery.isRestriction)
+        this.listQuery.lineInfo && (params.lineInfo = this.listQuery.lineInfo)
+        if (this.listQuery.cityCode && this.listQuery.cityCode.length > 1) {
+          params.cityCode = +this.listQuery.cityCode[1]
+        }
+        // 单趟运费区间
+        if (this.listQuery.everyTripGuaranteed && this.listQuery.everyTripGuaranteed.length > 1) {
+          params.everyTripGuaranteedStart = +this.listQuery.everyTripGuaranteed[0]
+          params.everyTripGuaranteedEnd = +this.listQuery.everyTripGuaranteed[1]
+        }
+        // 工作时间段
+        if (this.listQuery.workingHours && this.listQuery.workingHours.length > 1) {
+          params.workingHourStart = this.listQuery.workingHours[0]
+          params.workingHourEnd = this.listQuery.workingHours[1]
+        }
+        // 仓库位置
+        if (this.listQuery.warehouse && this.listQuery.warehouse.length > 2) {
+          params.warehouseProvince = +this.listQuery.warehouse[0]
+          params.warehouseCity = +this.listQuery.warehouse[1]
+          params.warehouseCounty = +this.listQuery.warehouse[2]
+        } else if (this.listQuery.warehouse && this.listQuery.warehouse.length > 1) {
+          params.warehouseProvince = +this.listQuery.warehouse[0]
+          params.warehouseCity = +this.listQuery.warehouse[1]
+        }
+        // 配送区域
+        if (this.listQuery.area && this.listQuery.area.length > 2) {
+          params.provinceArea = +this.listQuery.area[0]
+          params.cityArea = +this.listQuery.area[1]
+          params.countyArea = +this.listQuery.area[2]
+        } else if (this.listQuery.area && this.listQuery.area.length > 1) {
+          params.provinceArea = +this.listQuery.area[0]
+          params.cityArea = +this.listQuery.area[1]
+        }
+        let { data: res } = await getInvitedLines(params)
+        if (res.success) {
+          this.tableData = res.data
+          let page = await HandlePages(res.page)
+          this.page.total = page.total
+        } else {
+          this.$message.error(res.errorMsg)
         }
       } catch (err) {
         console.log(`get list fail fail:${err}`)
       } finally {
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1000)
+        this.listLoading = false
       }
     }
     // 客邀状态变化
@@ -459,7 +495,6 @@ export default class extends Vue {
       this.getLists()
     }
     mounted() {
-      //
       this.init()
       this.getLists()
     }

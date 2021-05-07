@@ -11,8 +11,9 @@
       fit
     >
       <el-table-column
-        min-width="50"
-        label=""
+        label="基础信息"
+        min-width="190"
+        align="center"
         class-name="firstColumn"
       >
         <template slot-scope="scope">
@@ -23,52 +24,43 @@
           >
             {{ scope.$index + 1 | addZreo }}
           </div>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="基础信息"
-        min-width="140"
-        align="center"
-      >
-        <template slot-scope="{row}">
-          <p class="text">
-            {{ row.a }}
-            <el-popover
-              placement="right"
-              width="200"
-              trigger="hover"
+          <div style="margin-left:50px;">
+            <p
+              class="text"
             >
-              <div class="text1">
-                这条线路是异常<el-button
-                  type="text"
-                  size="small"
-                >
-                  火爆
-                </el-button>,4.2厢货,场景简单,菜鸟也能干...
-              </div>
-              <i
-                slot="reference"
-                class="el-icon-chat-dot-round"
-              />
-            </el-popover>
-          </p>
-          <p :class="obj.b === row.b ? 'blue text' : 'text'">
-            ({{ row.b }})
-          </p>
-          <p
-            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
-          >
-            {{ row.lineId }}
-          </p>
-          <p
-            class="text"
-            :class="obj.c === row.c ? 'blue text' : 'text'"
-          >
-            窗口期:剩余{{ row.c }}天
-          </p>
-          <p class="text scale">
-            {{ row.createDate }}创建
-          </p>
+              {{ scope.row.lineName }}
+              <el-popover
+                placement="right"
+                width="200"
+                trigger="hover"
+              >
+                <div class="text1">
+                  {{ scope.row.remark }}
+                </div>
+                <i
+                  v-if="scope.row.isHot"
+                  slot="reference"
+                  class="el-icon-chat-dot-round"
+                />
+              </el-popover>
+            </p>
+            <p :class="obj.lineSaleName === scope.row.lineSaleName ? 'blue text' : 'text'">
+              ({{ scope.row.lineSaleName }})
+            </p>
+            <p
+              :class="obj.lineId === scope.row.lineId ? 'blue text' : 'text'"
+            >
+              {{ scope.row.lineId }}
+            </p>
+            <p
+              class="text"
+            >
+              窗口期:剩余{{ _calcDay(scope.row) }}天
+            </p>
+            <p class="text scale">
+              {{ scope.row.lineCreateDate | formatDate('YYYY-MM-DD HH:mm') }}创建
+            </p>
+          </div>
         </template>
       </el-table-column>
       <el-table-column
@@ -79,15 +71,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="obj.d === row.d ? 'blue text' : 'text'"
           >
-            {{ row.d }}/{{ row.e }}
+            <span :class="isShowPercent && obj.carTypeValue === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
-            :class="obj.f === row.f ? 'blue text' : 'text'"
           >
-            {{ row.f }}/{{ row.g }}/{{ row.h }}
+            <span :class="isShowPercent && row.isBehavior === obj.isBehavior ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && row.isRestriction === obj.isRestriction ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
           </p>
         </template>
       </el-table-column>
@@ -99,15 +89,15 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="obj.p1 === row.p1 ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
           >
-            仓库位置:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            仓库位置:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
           </p>
           <p
             class="text"
-            :class="obj.c1 === row.c1 ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
           >
-            配送区域:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
           </p>
         </template>
       </el-table-column>
@@ -119,18 +109,18 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+            :class="isShowPercent && row.settlementCycleHit ? 'blue text' : 'text'"
           >
-            单趟运费:{{ row.m1 }}元/{{ row.m1 }}趟/{{ row.m1 }}天
+            单趟运费:{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天
           </p>
           <p
             class="text"
-            :class="obj.m1 === row.m1 ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
           >
-            预计月运费:{{ row.m1 }}元
+            预计月运费:{{ row.shipperOffer }}元
           </p>
           <p class="text">
-            结算周期/天数:周结/7天
+            结算周期/天数:{{ row.settlementCycleValue }}/{{ row.settlementDays }}天
           </p>
         </template>
       </el-table-column>
@@ -142,24 +132,35 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
+            :class="isShowPercent && row.cargoTypeHit ? 'blue text' : 'text'"
           >
-            货品:食品/团购
+            货品:{{ row.cargoTypeValue }}
           </p>
-          <p class="text">
-            装卸难度:只装不卸
-          </p>
-          <p
-            class="text"
-            :class="obj.lineId === row.lineId ? 'blue text' : 'text'"
-          >
-            配送复杂度:整车
+          <p :class="isShowPercent && row.handlingDifficultyHit ? 'blue text' : 'text'">
+            装卸难度:{{ row.handlingDifficultyValue }}
           </p>
           <p
             class="text"
-            :class="obj.time === row.time ? 'blue text' : 'text'"
+            :class="isShowPercent && row.distributionWayHit ? 'blue text' : 'text'"
           >
-            工作时间段:{{ row.time }}/稳定/五个月
+            配送复杂度:{{ row.distributionWayValue }}
+          </p>
+          <p
+            class="text"
+          >
+            工作时间段:<template v-if="row.workingHours&&row.workingHours.length >1">
+              <span :class="isShowPercent && row.workingHoursHit ? 'blue':''">
+                {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+              </span>
+            </template>/
+            <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
+              <template v-if="row.lineCategory ===1">
+                稳定/{{ row.stabilityRateValue }}
+              </template>
+              <template v-else>
+                临时/{{ row.waitDirveValidity }}
+              </template>
+            </span>
           </p>
         </template>
       </el-table-column>
@@ -170,12 +171,15 @@
       >
         <template slot-scope="{row}">
           <p
-            v-if="row.a"
+            v-if="row.isHot === 1"
             class="text"
           >
             爆款
           </p>
-          <p class="text">
+          <p
+            v-if="row.urgent"
+            class="text"
+          >
             客急
           </p>
         </template>
@@ -188,16 +192,29 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :a="row.a"
           >
-            <template v-if="true">
-              <span class="blue">3</span>个城市已客邀
+            <template v-if="row.inviteCitys && row.inviteCitys.length > 2">
+              <el-popover
+                placement="top-start"
+                width="200"
+                trigger="hover"
+              >
+                <div class="text">
+                  {{ (row.inviteCitys || []).join('、') }}
+                </div>
+                <template slot="reference">
+                  <span class="orange">{{ row.inviteCitys.length }}</span>个城市已客邀
+                </template>
+              </el-popover>
             </template>
             <template v-else>
-              天津已客邀
+              {{ (row.inviteCitys || []).join('、') }}已客邀
             </template>
           </p>
-          <p class="text">
+          <p
+            v-if="row.currentCityInvite ===1"
+            class="text"
+          >
             本城已客邀
           </p>
         </template>
@@ -319,6 +336,15 @@ export default class extends Vue {
   set _tableData(val:IState[]) {
     this.$emit('update:lineTableData', val)
   }
+  // 计算窗口期
+  private _calcDay(row:IState) {
+    let day = Number(row.recruitWindowPeriod)
+    if (row.lineCreateDate && day) {
+      return parseInt((new Date(row.lineCreateDate).getTime() + day * 3600 * 24 * 1000 - Date.now()) / (3600 * 24 * 1000) + '')
+    } else {
+      return 0
+    }
+  }
 
   // 展开
   toogleExpand(row:IState) {
@@ -360,12 +386,11 @@ export default class extends Vue {
   removeTableInfo() {
     sessionStorage.removeItem(key)
   }
-  mounted() {
-    if (this.isMore && !this.isShowPercent) {
-      let str = sessionStorage.getItem(key) || ''
-      if (str) {
-        this._tableData = [JSON.parse(str)]
-      }
+  // 从缓存获取
+  getStorage() {
+    let str = sessionStorage.getItem(key) || ''
+    if (str) {
+      this._tableData = [JSON.parse(str)]
     }
   }
 }
@@ -448,6 +473,9 @@ export default class extends Vue {
     }
     .blue {
       color:#639DEC
+    }
+    .orange {
+      color:#f5a821;
     }
   }
 </style>

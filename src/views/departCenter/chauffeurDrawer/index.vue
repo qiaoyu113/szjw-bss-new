@@ -160,6 +160,9 @@ export default class GuestDrawer extends Vue {
     }
     handleOpenClick() {
       AppModule.CloseSideBar(false)
+      setTimeout(() => {
+        (this.$refs.driverDrawer as any).getStorage()
+      }, 20)
     }
     onCreateTryRun(data:any) {
       (this.$refs.tryRunShow as any).showDialog = true
