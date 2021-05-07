@@ -45,6 +45,7 @@
           </el-button>
           <el-button
             type="primary"
+            @click="batchCancelGuest"
           >
             批量取消客邀
           </el-button>
@@ -87,6 +88,7 @@
           @launchGuest="handleLaunchGuest($event)"
           @cancelGuest="handleCancelGuest($event)"
           @cancelTryRun="handleCancelTryRun($event)"
+          @SelectionChange="checkOff($event)"
         />
         <pagination
           :operation-list="[]"
@@ -98,10 +100,13 @@
         />
       </div>
       <launch-guest
+        :id="ids"
         ref="launchGuest"
-        :obj="obj"
       />
-      <cancel-guest ref="cancelGuest" />
+      <cancel-guest
+        :id="ids"
+        ref="cancelGuest"
+      />
       <cancel-tryRun ref="cancelTryRun" />
     </div>
   </div>
@@ -148,16 +153,15 @@ interface IState {
   }
 })
 export default class extends Vue {
-  private obj:IState = {}
   private listLoading:boolean = false
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private timeLists:IState[] = []
   private shareScopeEnd:IState[] = []
-  // private multipleSelection: any[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
+  private ids = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -353,9 +357,6 @@ export default class extends Vue {
     }
     this.getList()
   }
-  // handleSelectionChange(val:any) {
-  //   this.multipleSelection = val
-  // }
   // 根据关键字查线路id
   async loadLineByKeyword(params:IState) {
     try {
@@ -380,9 +381,6 @@ export default class extends Vue {
       if (Number(moneyRange[0]) > Number(moneyRange[1])) {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
-    }
-    if (Number(moneyRange[0] > 20000) || Number(moneyRange[1] > 20000)) {
-      return this.$message.warning('单趟运费输入在0-20000之间')
     }
     // 工作时间段
     const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
@@ -484,25 +482,35 @@ export default class extends Vue {
   }
   // 发起客邀
   handleLaunchGuest(id:number) {
-    (this.$refs.launchGuest as any).showDialog = true
-    console.log('id', id)
+    (this.$refs.launchGuest as any).showDialog = true;
+    (this.$refs.launchGuest as any).launchGuestState = 1
   }
   // 取消客邀
   handleCancelGuest(id:number) {
-    (this.$refs.cancelGuest as any).showDialog = true
-    console.log('id', id)
+    (this.$refs.cancelGuest as any).showDialog = true;
+    (this.$refs.cancelGuest as any).cancelGuestState = 1;
+    (this.$refs.cancelGuest as any).getDictList()
   }
   // 批量发起客邀
   private batchLaunchGuest() {
-    (this.$refs.launchGuest as any).showDialog = true
-    // (this.$refs.launchGuest as any).confirm()
+    (this.$refs.launchGuest as any).showDialog = true;
+    (this.$refs.launchGuest as any).launchGuestState = 2
+  }
+  // 批量取消客邀
+  private batchCancelGuest() {
+    (this.$refs.cancelGuest as any).showDialog = true;
+    (this.$refs.cancelGuest as any).cancelGuestState = 2
   }
   // 取消创建试跑意向
   handleCancelTryRun(id:number) {
     (this.$refs.cancelTryRun as any).showDialog = true
     console.log('id', id)
   }
-
+  private checkOff(id:any) {
+    this.ids = id.map((item:any) => {
+      return item.id
+    })
+  }
   init() {
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()

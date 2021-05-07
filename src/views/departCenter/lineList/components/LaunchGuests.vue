@@ -25,7 +25,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { CreateLaunchGuests } from '@/api/departCenter'
+import { CreateLaunchGuests, CreateLaunchGuestsBatch } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -37,18 +37,20 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: () => {} }) obj!:IState
+  @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
   private listQuery:IState = {
-    guestCity: 1,
-    otherReason: ''
+    city: 1,
+    remarks: '',
+    lineId: '',
+    matchId: ''
   }
-
+  private launchGuestState :number = 0
   private formItem:any[] = [
     {
       type: 2,
       label: '客邀城市',
-      key: 'guestCity',
+      key: 'city',
       options: [
         {
           label: '北京',
@@ -59,7 +61,7 @@ export default class extends Vue {
     {
       type: 1,
       label: '备注',
-      key: 'otherReason',
+      key: 'remarks',
       tagAttrs: {
         type: 'textarea',
         placeholder: '选填,20字以内',
@@ -84,23 +86,48 @@ export default class extends Vue {
   }
   // 发起客邀
   async saveData() {
-    try {
-      let params:IState = {
-        operateFlag: 'creatIntentionRun',
-        guestCity: this.listQuery.guestCity,
-        otherReason: this.listQuery.otherReason
-      }
-      let { data: res } = await CreateLaunchGuests(params)
-      if (res.success) {
-        this.$message.success('操作成功')
-        this.$emit('success')
-      } else {
+    if (this.launchGuestState === 1) {
+      try {
+        let params:IState = {
+          matchId: this.listQuery.matchId,
+          lineId: this.listQuery.lineId,
+          city: this.listQuery.city,
+          remarks: this.listQuery.remarks
+        }
+        let { data: res } = await CreateLaunchGuests(params)
+        if (res.success) {
+          this.$message.success('操作成功')
+          this.$emit('success')
+        } else {
         // this.$message.error(res.errorMsg)
-      }
-    } catch (err) {
-      console.log(`launch guest fail:${err}`)
-    } finally {
+        }
+      } catch (err) {
+        console.log(`launch guest fail:${err}`)
+      } finally {
       //
+      }
+    }
+    if (this.launchGuestState === 2) {
+      try {
+        let params:IState = {
+          matchCustInviteInfos: this.id,
+          matchId: this.listQuery.matchId,
+          lineId: this.listQuery.lineId,
+          city: this.listQuery.city,
+          remarks: this.listQuery.remarks
+        }
+        let { data: res } = await CreateLaunchGuestsBatch(params)
+        if (res.success) {
+          this.$message.success('操作成功')
+          this.$emit('success')
+        } else {
+        // this.$message.error(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(`launch guest fail:${err}`)
+      } finally {
+      //
+      }
     }
   }
 }
