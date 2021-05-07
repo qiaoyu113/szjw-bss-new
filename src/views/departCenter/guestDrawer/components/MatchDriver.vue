@@ -67,8 +67,10 @@ export default class DepartLine extends Vue {
     f1: '',
     f2: ''
   }
-  setTagHandle() {
+  setTagHandle(row:any) {
     (this.$refs.tagShow as any).isShow = true
+    this.rowData = row
+    console.log(row)
   }
   setCallHandle(data:any) {
     let phone = data.phoneNum

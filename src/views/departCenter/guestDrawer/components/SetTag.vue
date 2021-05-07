@@ -179,7 +179,7 @@ export default class extends Vue {
     complexity: [],
     period: '',
     expected: '',
-    isWork: '',
+    isWork: true,
     chargingCode: 0,
     stable: [],
     starting: '',
