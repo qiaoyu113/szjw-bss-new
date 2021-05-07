@@ -7,6 +7,7 @@
     width="500px"
     :destroy-on-close="false"
     @closed="handleDialogClosed"
+    @opened="handleDialogOpend"
   >
     <self-form
       ref="tryForm"
@@ -32,7 +33,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { CreateLntentionRun } from '@/api/departCenter'
+import { CreateLntentionRun, getLineDetailInfo } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -47,7 +48,6 @@ export default class extends Vue {
   @Prop({ default: () => {} }) obj!:IState
 
   // lineCategory:'' //线路分类 稳定线路、临时线路
-  // workingTimeStart:'06:10'   工作时间段的开始时间
   // driverId:'' //司机id
   // name:''//司机姓名
   // phone:''//司机手机号
@@ -65,6 +65,7 @@ export default class extends Vue {
     otherReason: '',
     arrivalTime: ''
   }
+  private workingTimeStart = '00:00'
 
   private formItem:any[] = [
     {
@@ -129,7 +130,6 @@ export default class extends Vue {
       { required: true, message: '请选择时间', trigger: 'blur' }
     ]
   }
-  @Watch('obj.workingTimeStart', { immediate: true })
   handleWorkingTimeStartChange(val:string | null) {
     if (val) {
       let timearr = val.split(',')
@@ -137,6 +137,34 @@ export default class extends Vue {
       let hour = Number(dates[0])
       let min = Number(dates[1])
       this.listQuery.arrivalTime = new Date(new Date(this.workingTime.setHours(hour, min)))
+    }
+  }
+  // 弹框打开
+  handleDialogOpend() {
+    setTimeout(() => {
+      this.getLineDetail()
+    }, 20)
+  }
+  // 获取线路详情
+  async getLineDetail() {
+    try {
+      let params:IState = {
+        lineId: 'XL202104300001' || this.obj.lineId
+      }
+      let { data: res } = await getLineDetailInfo(params)
+      if (res.success) {
+        let times:IState[] = res.data.lineDeliveryInfoFORMS
+        if (Array.isArray(times) && times.length > 0) {
+          this.workingTimeStart = times[0].workingTimeStart
+        }
+        this.handleWorkingTimeStartChange(this.workingTimeStart)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line detail fail:${err}`)
+    } finally {
+      //
     }
   }
   // 确定按钮
