@@ -70,3 +70,11 @@ export function getLineDetailInfo(params:any) {
     params
   })
 }
+// 获取客邀列表详情
+export function getLineDetail(params:any) {
+  return request({
+    url: `${prefix}/v1/customer/invitation/line/detail`,
+    method: 'get',
+    params
+  })
+}
