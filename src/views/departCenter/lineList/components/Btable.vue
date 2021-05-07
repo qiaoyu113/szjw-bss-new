@@ -343,7 +343,7 @@ export default class extends Vue {
       let params = {}
       let { data: res } = await getLineInfo(params)
       console.log('res', res)
-      this.tableData.push({ ...res })
+      this.tableData = res
       console.log('this.tableData', this.tableData)
     } catch (err) {
       console.log('err', err)

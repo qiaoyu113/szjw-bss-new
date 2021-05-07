@@ -2,7 +2,8 @@
 <template>
   <div
     v-loading.body="listLoading"
-    class="LineList"
+    class="GuestListContainer"
+    style="overflow:hidden"
     :class="{
       p15: isPC
     }"
@@ -102,7 +103,6 @@
       <launch-guest
         :id="ids"
         ref="launchGuest"
-        :obj="obj"
         :launch-arguments="launchArguments"
       />
       <cancel-guest
