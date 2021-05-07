@@ -6,18 +6,11 @@ const prefix = `/mock/283`
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
-    url: `/waybill/v2/runtest/creatIntentionRun`,
+    url: `${prefix}/v2/runtest/creatIntentionRun`,
     method: 'post',
     data
   })
-// 模糊搜索线路编号、分页
-export function getLineSearch(data:any) {
-  return request({
-    url: `/line_center/v2/line/lineInfo/fuzzyCheck`,
-    method: 'post',
-    data
-  })
-}
+
 // 发起客邀
 export const CreateLaunchGuests = (data: any) =>
   request({
@@ -36,6 +29,14 @@ export const cancelMatchCustInvite = (data: any) =>
 export function getInvitedLines(data:any) {
   return request({
     url: `${prefix}/v1/matchLineInfo/queryInvitedLines`,
+    method: 'post',
+    data
+  })
+}
+// 获取线路suggest列表
+export function getLineSuggest(data:any) {
+  return request({
+    url: `${prefix}/v1/line/suggest`,
     method: 'post',
     data
   })
