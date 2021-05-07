@@ -228,7 +228,6 @@
           label="操作"
           min-width="110"
           class-name="center"
-          fixed="right"
         >
           <template slot-scope="{row}">
             <p
