@@ -212,7 +212,7 @@ export default class extends Vue {
             c1: '长沙市',
             c2: '短沙县',
             m1: 500,
-            time: '9:00~18:00',
+            time: i ? '9:00~12:00' : '9:00~12:00,16:00~20:00',
             percent: 80,
             id: 1,
             arr: [
