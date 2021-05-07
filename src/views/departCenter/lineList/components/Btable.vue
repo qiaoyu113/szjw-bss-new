@@ -197,37 +197,38 @@
                 >{{ row.inviteCitys.length }}<span style="color:#444">个城市已客邀</span></span>
               </el-popover>
             </p>
-            <!--
-              <p
-                v-show="row.status.isLocationInvite===1&&row.status.locationCitySuccess!==1&&row.status.isInviteSuccess!==1"
-                class="text"
-              >
-                本城已客邀
-              </p>
-              <p
-                v-show="row.status.isLocationInvite===0&&row.status.locationCitySuccess!==1&&row.status.isInviteSuccess!==1"
-                class="text"
-              >
-                本城未客邀
-              </p>
-              <p
-                v-show="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===1"
-                class="text"
-              >
-                本城客邀撮合成功
-              </p>
-              <p
-                v-show="row.status.isInviteSuccess===1&&row.status.locationCitySuccess===0"
-                class="text"
-              >
-                {{ row.status.city[0] }}客邀撮合成功
-              </p> -->
-            <!-- <p
-              v-else
+
+            <p
+              v-if="row.currentCityInvited&&!row.currentCitySuccess"
+              class="text"
+            >
+              本城已客邀
+            </p>
+            <p
+              v-if="!row.currentCityInvited"
+              class="text"
+            >
+              本城未客邀
+            </p>
+
+            <p
+              v-show="row.currentCitySuccess"
+              class="text"
+            >
+              本城客邀撮合成功
+            </p>
+            <p
+              v-show="row.successCity"
+              class="text"
+            >
+              {{ row.successCity }}客邀撮合成功
+            </p>
+            <p
+              v-if="row.matchStatus === 3"
               class="text"
             >
               不可发起客邀
-            </p> -->
+            </p>
           </template>
         </el-table-column>
         <el-table-column
@@ -238,17 +239,7 @@
         >
           <template slot-scope="{row}">
             <p
-              class="text"
-            >
-              <el-button
-                type="text"
-                size="small"
-                @click.stop="handleLaunchGuest(row)"
-              >
-                发起客邀
-              </el-button>
-            </p>
-            <p
+              v-if="row.currentCityInvited"
               class="text"
             >
               <el-button
@@ -260,17 +251,33 @@
               </el-button>
             </p>
             <p
+              v-else
               class="text"
             >
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelTryRun(row.id)"
+                @click.stop="handleLaunchGuest(row)"
               >
-                取消意向
+                发起客邀
               </el-button>
             </p>
             <p
+              v-if="row.currentCitySuccess"
+              class="text"
+            >
+              <!-- 本城客邀撮合成功时显示 -->
+              <el-button
+                type="text"
+                size="small"
+                @click.stop="handleCancelTryRun(row.id)"
+              >
+                取消试跑意向
+              </el-button>
+            </p>
+            <!-- 只有当本城客邀撮合成功时不展示 -->
+            <p
+              v-else
               class="text"
             >
               <el-button
@@ -330,7 +337,7 @@ export default class extends Vue {
 
   mounted() {
     console.log(this.listQuery)
-    this.init()
+    // this.init()
   }
 
   init() {
