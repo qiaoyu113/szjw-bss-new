@@ -330,6 +330,8 @@ export default class extends Vue {
 
   private multipleSelection:IState[] = []
 
+  private selection:[] = []
+
   mounted() {
     console.log(this.listQuery)
     // this.init()
@@ -356,17 +358,30 @@ export default class extends Vue {
   }
   // 取消客邀
   handleCancelGuest(custInviteId:string) {
-    this.$emit('cancelGuest', custInviteId)
+    console.log('selection', this.selection)
+    if (!this.selection.length) {
+      this.$emit('cancelGuest', custInviteId)
+    } else {
+      this.$message.error('请取消勾选项')
+    }
   }
   // 发起客邀
   handleLaunchGuest(row:any) {
     const { lineId, matchId } = row
     console.log('row', row)
-    this.$emit('launchGuest', { lineId, matchId })
+    if (!this.selection.length) {
+      this.$emit('launchGuest', { lineId, matchId })
+    } else {
+      this.$message.error('请取消勾选项')
+    }
   }
   // 取消意向
   handleCancelTryRun(id:number) {
-    this.$emit('cancelTryRun', id)
+    if (!this.selection.length) {
+      this.$emit('cancelTryRun', id)
+    } else {
+      this.$message.error('请取消勾选项')
+    }
   }
   // 查看详情
   handleDetailClick(row:IState) {
@@ -384,13 +399,8 @@ export default class extends Vue {
     console.log(selection, row)
   }
   // 勾选
-  selectHandle(selection:[]) {
-    console.log(selection)
-    this.$emit('select')
-  }
-  // 勾选
   handleSelectionChange(selection:[]) {
-    console.log('勾选项', selection)
+    this.selection = selection
     this.$emit('SelectionChange', selection)
   }
 }

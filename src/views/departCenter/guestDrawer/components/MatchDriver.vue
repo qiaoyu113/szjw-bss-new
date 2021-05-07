@@ -37,7 +37,6 @@ import SetTag from './SetTag.vue'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
-
 interface IState {
   [key: string]: any;
 }
