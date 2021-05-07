@@ -34,7 +34,7 @@ export function getInvitedLines(data:any) {
   })
 }
 // 获取线路suggest列表
-export function getLineSuggest(data:any) {
+export function getLineSearch(data:any) {
   return request({
     url: `${prefix}/v1/line/suggest`,
     method: 'post',
