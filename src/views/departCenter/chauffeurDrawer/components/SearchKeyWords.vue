@@ -117,6 +117,8 @@ import { GetDictionaryList } from '@/api/common'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { MatchDriverList } from '@/api/chauffeurList'
+
 interface IState {
   [key: string]: any;
 }
@@ -366,6 +368,7 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
+    MatchDriverList({})
   }
   mounted() {
     this.getOptions()
