@@ -54,7 +54,6 @@
             </p>
             <p
               class="text"
-              :class="isMore && obj.c === scope.row.c ? 'blue text' : 'text'"
             >
               窗口期:剩余{{ _calcDay(scope.row) }}天
             </p>
@@ -72,15 +71,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && obj.carTypeValue === row.carType ? 'blue text' : 'text'"
           >
-            {{ row.carTypeValue }}/{{ row.oilElectricityRequirementValue }}
+            <span :class="isShowPercent && obj.carTypeValue === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
-            :class="isMore && row.labelTypeHit ? 'blue text' : 'text'"
           >
-            {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}/{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}/{{ row.labelTypeValue }}
+            <span :class="isShowPercent && row.isBehavior === obj.isBehavior ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && row.isRestriction === obj.isRestriction ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
           </p>
         </template>
       </el-table-column>
@@ -92,13 +89,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
           >
             仓库位置:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
           </p>
           <p
             class="text"
-            :class="isMore && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
           >
             配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
           </p>
@@ -112,13 +109,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && row.settlementCycleHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.settlementCycleHit ? 'blue text' : 'text'"
           >
             单趟运费:{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天
           </p>
           <p
             class="text"
-            :class="isMore && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
+            :class="isShowPercent && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
           >
             预计月运费:{{ row.shipperOffer }}元
           </p>
@@ -135,32 +132,35 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isMore && row.cargoTypeHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.cargoTypeHit ? 'blue text' : 'text'"
           >
             货品:{{ row.cargoTypeValue }}
           </p>
-          <p :class="isMore && row.handlingDifficultyHit ? 'blue text' : 'text'">
+          <p :class="isShowPercent && row.handlingDifficultyHit ? 'blue text' : 'text'">
             装卸难度:{{ row.handlingDifficultyValue }}
           </p>
           <p
             class="text"
-            :class="isMore && row.distributionWayHit ? 'blue text' : 'text'"
+            :class="isShowPercent && row.distributionWayHit ? 'blue text' : 'text'"
           >
             配送复杂度:{{ row.distributionWayValue }}
           </p>
           <p
             class="text"
-            :class="isMore && row.workingHoursHit ? 'blue text' : 'text'"
           >
             工作时间段:<template v-if="row.workingHours&&row.workingHours.length >1">
-              {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+              <span :class="isShowPercent && row.workingHoursHit ? 'blue':''">
+                {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+              </span>
             </template>/
-            <template v-if="row.lineCategory ===1">
-              稳定/{{ row.stabilityRateValue }}
-            </template>
-            <template v-else>
-              临时/{{ row.waitDirveValidity }}
-            </template>
+            <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
+              <template v-if="row.lineCategory ===1">
+                稳定/{{ row.stabilityRateValue }}
+              </template>
+              <template v-else>
+                临时/{{ row.waitDirveValidity }}
+              </template>
+            </span>
           </p>
         </template>
       </el-table-column>
@@ -193,7 +193,7 @@
           <p
             class="text"
           >
-            <template v-if="row.inviteCitys && row.inviteCitys.length > 3">
+            <template v-if="row.inviteCitys && row.inviteCitys.length > 2">
               <el-popover
                 placement="top-start"
                 width="200"
@@ -212,7 +212,7 @@
             </template>
           </p>
           <p
-            v-if="row.currentCityInvite"
+            v-if="row.currentCityInvite ===1"
             class="text"
           >
             本城已客邀
