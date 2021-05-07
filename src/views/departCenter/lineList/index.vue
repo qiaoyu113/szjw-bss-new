@@ -102,7 +102,6 @@
       <launch-guest
         :id="ids"
         ref="launchGuest"
-        :obj="obj"
         :launch-arguments="launchArguments"
       />
       <cancel-guest
