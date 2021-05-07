@@ -102,7 +102,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ item.selected.join(item.key === 'workRange' ? '~' : ',') }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -117,7 +117,6 @@ import { GetDictionaryList } from '@/api/common'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { MatchDriverList } from '@/api/chauffeurList'
 
 interface IState {
   [key: string]: any;
@@ -318,15 +317,26 @@ export default class SearchKeyWords extends Vue {
               this.selectedData[index].selected.push(command)
             } else {
               if (this.key === 'start') {
-                this.selectedData[index].optionIds.splice(0, 1, id)
-                this.selectedData[index].selected.splice(0, 1, command)
+                if (typeof this.selectedData[index].optionIds === 'string') {
+                  this.selectedData.splice(index, 1)
+                  this.initSelectItem(id, command)
+                } else {
+                  this.selectedData[index].optionIds.splice(0, 1, id)
+                  this.selectedData[index].selected.splice(0, 1, command)
+                }
               } else {
-                this.selectedData[index].optionIds.splice(1, 1, id)
-                this.selectedData[index].selected.splice(1, 1, command)
+                if (typeof this.selectedData[index].optionIds === 'string') {
+                  this.selectedData.splice(index, 1)
+                  this.initSelectItem(id, command)
+                } else {
+                  this.selectedData[index].optionIds.splice(1, 1, id)
+                  this.selectedData[index].selected.splice(1, 1, command)
+                }
               }
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
+          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('~'))
         }
       } else {
         this.initSelectItem(id, command)
@@ -335,16 +345,28 @@ export default class SearchKeyWords extends Vue {
       this.initSelectItem(id, command)
     }
   }
-  initSelectItem(id: any, command: any) {
-    const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
-    let obj = {
-      type: isWorkRange ? '工作时间段' : this.selectTitle,
-      key: isWorkRange ? 'workRange' : this.key,
-      optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
-      selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+  initSelectItem(id: any, command: any, isInitWorkRange?: boolean) {
+    console.log(id, command)
+    if (isInitWorkRange) {
+      let obj = {
+        type: '工作时间段',
+        key: 'workRange',
+        optionIds: id,
+        selected: command
+      }
+      this.listQuery.workRange = id
+      this.selectedData.push(obj)
+    } else {
+      const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+      let obj = {
+        type: isWorkRange ? '工作时间段' : this.selectTitle,
+        key: isWorkRange ? 'workRange' : this.key,
+        optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+        selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+      }
+      this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+      this.selectedData.push(obj)
     }
-    this.listQuery[this.key] = this.multiple ? obj.optionIds : id
-    this.selectedData.push(obj)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
@@ -368,7 +390,7 @@ export default class SearchKeyWords extends Vue {
   }
   searchHandle() {
     console.log(this.listQuery)
-    MatchDriverList({})
+    this.$emit('query', this.listQuery)
   }
   mounted() {
     this.getOptions()
@@ -379,6 +401,9 @@ export default class SearchKeyWords extends Vue {
         value: count
       })
     }
+    const driverInfo = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
+    this.initSelectItem(driverInfo.time, driverInfo.time, true)
+    this.$emit('query', this.listQuery)
   }
 }
 </script>
