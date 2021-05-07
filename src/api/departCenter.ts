@@ -54,7 +54,6 @@ export function getInvitedLines(data:any) {
     data
   })
 }
-<<<<<<< HEAD
 // 查询线路列表表单信息
 export const getLineInfo = (params:any) =>
   request({
@@ -62,7 +61,6 @@ export const getLineInfo = (params:any) =>
     method: 'post',
     params
   })
-=======
 // 获取线路suggest列表
 export function getLineSuggest(data:any) {
   return request({
@@ -71,4 +69,3 @@ export function getLineSuggest(data:any) {
     data
   })
 }
->>>>>>> department
