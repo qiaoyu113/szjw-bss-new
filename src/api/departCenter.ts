@@ -40,3 +40,10 @@ export function getInvitedLines(data:any) {
     data
   })
 }
+// 查询线路列表表单信息
+export const getLineInfo = (params:any) =>
+  request({
+    url: `/mock/283/v1/line/search`,
+    method: 'post',
+    params
+  })

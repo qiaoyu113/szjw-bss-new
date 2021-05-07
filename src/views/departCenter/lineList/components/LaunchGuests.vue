@@ -38,6 +38,7 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: () => {} }) obj!:IState
+  @Prop({ default: () => ({ lineId: '', matchId: '' }) }) launchArguments !:IState
   private showDialog:boolean = false
   private listQuery:IState = {
     guestCity: 1,
@@ -84,6 +85,7 @@ export default class extends Vue {
   }
   // 发起客邀
   async saveData() {
+    console.log('发起客邀接口传参', this.launchArguments)
     try {
       let params:IState = {
         operateFlag: 'creatIntentionRun',

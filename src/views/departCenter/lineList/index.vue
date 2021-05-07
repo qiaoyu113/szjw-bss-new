@@ -100,9 +100,16 @@
       <launch-guest
         ref="launchGuest"
         :obj="obj"
+        :launch-arguments="launchArguments"
       />
-      <cancel-guest ref="cancelGuest" />
-      <cancel-tryRun ref="cancelTryRun" />
+      <cancel-guest
+        ref="cancelGuest"
+        :cust-invite-id="custInviteId"
+      />
+      <cancel-tryRun
+        ref="cancelTryRun"
+        :cancel-id="cancelId"
+      />
     </div>
   </div>
 </template>
@@ -329,6 +336,12 @@ export default class extends Vue {
       text: '已发起客邀'
     }
   ]
+  private custInviteId:string=''
+  private cancelId:string=''
+  private launchArguments:{}={
+    lineId: '',
+    matchId: ''
+  }
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
@@ -483,14 +496,14 @@ export default class extends Vue {
     this.shareScopeEnd = this.listQuery[key]
   }
   // 发起客邀
-  handleLaunchGuest(id:number) {
+  handleLaunchGuest(data:{}) {
     (this.$refs.launchGuest as any).showDialog = true
-    console.log('id', id)
+    this.launchArguments = data
   }
   // 取消客邀
-  handleCancelGuest(id:number) {
+  handleCancelGuest(custInviteId:string) {
     (this.$refs.cancelGuest as any).showDialog = true
-    console.log('id', id)
+    this.custInviteId = custInviteId
   }
   // 批量发起客邀
   private batchLaunchGuest() {
@@ -498,9 +511,9 @@ export default class extends Vue {
     // (this.$refs.launchGuest as any).confirm()
   }
   // 取消创建试跑意向
-  handleCancelTryRun(id:number) {
+  handleCancelTryRun(id:string) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    console.log('id', id)
+    this.cancelId = id
   }
 
   init() {

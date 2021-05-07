@@ -197,7 +197,7 @@
               本城已客邀
             </p>
             <p
-              v-if="!row.currentCityInvited"
+              v-if="!row.currentCityInvited&&!row.currentCitySuccess"
               class="text"
             >
               本城未客邀
@@ -231,19 +231,19 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.currentCityInvited"
+              v-if="row.currentCityInvited && !row.currentCitySuccess"
               class="text"
             >
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelGuest(row.id)"
+                @click.stop="handleCancelGuest(row.custInviteId)"
               >
                 取消客邀
               </el-button>
             </p>
             <p
-              v-else
+              v-if="!row.currentCityInvited && !row.currentCitySuccess"
               class="text"
             >
               <el-button
@@ -288,7 +288,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineInfo } from '@/api/lineList'
+import { getLineInfo } from '@/api/departCenter'
 import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
@@ -350,116 +350,16 @@ export default class extends Vue {
     } finally {
       (this.$parent as any).listLoading = false
     }
-    // try {
-    //   let num:number = 10
-    //   if (this.isMore) {
-    //     num = 1
-    //   }
-    //   this.tableData = []
-    //   for (let i = 0; i < num; i++) {
-    //     let obj:IState = {
-    //       percent: 80,
-    //       id: 1,
-    //       arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-    //       brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-    //       crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-    //       isOpen: false,
-    //       basicInfo: {
-    //         name: '京东传站',
-    //         post: '李外线经理',
-    //         lineId: 'XL202012300377',
-    //         introduce: '这条线路是异常火爆,4.2厢货,场景简单,菜鸟也能干...',
-    //         createDate: '2021-04-15 12:00',
-    //         day: 3
-    //       },
-    //       carInfo: {
-    //         type: '4.2米厢货',
-    //         feature: '油车',
-    //         rules: ['能闯禁行', '能闯限行', '单肥']
-    //       },
-    //       warehouseSite: { province: '湖南省', city: '长沙市', town: '短沙县' },
-    //       sendArear: { province: '湖南省', city: '长沙市', town: '短沙县' },
-    //       Settlement: {
-    //         onceFreight: 500,
-    //         monthFreight: 500,
-    //         period: 1,
-    //         days: 7
-    //       },
-    //       lineTrait: {
-    //         product: '食品/团购',
-    //         handlingDifficulty: 2, // 1:不装卸,2:只装不卸（轻）,3:只卸不装（轻）,4:只装不卸（重）,5:只卸不装（重）,6:重装卸（重）
-    //         sendtype: 1, // 1:整车
-    //         settlementDays: 7,
-    //         time: '9:00~18:00/稳定/五个月'
-    //       },
-    //       label: ['爆款', '客急'],
-    //       status: {
-    //         city: ['天津', '北京'],
-    //         isLocationInvite: 1, // 本城是否已客邀
-    //         isAllowInvite: 1, // 是否可发起客邀
-    //         isInviteSuccess: 0, // 是否客邀撮合成功
-    //         locationCitySuccess: 0// 本城客邀撮合成功
-    //       }
-    //     }
-    //     obj.id = (i + 1)
-    //     this.tableData.push({ ...obj })
-    //   }
-    //   this.tableData[1].status = {
-    //     city: ['天津'],
-    //     isLocationInvite: 1, // 本城是否已客邀
-    //     isAllowInvite: 1, // 是否可发起客邀
-    //     isInviteSuccess: 0, // 是否客邀撮合成功
-    //     locationCitySuccess: 0// 本城客邀撮合成功
-    //   }
-    //   this.tableData[2].status = {
-    //     city: ['天津', '北京', '上海', '南京'],
-    //     isLocationInvite: 0, // 本城是否已客邀
-    //     isAllowInvite: 1, // 是否可发起客邀
-    //     isInviteSuccess: 0, // 是否客邀撮合成功
-    //     locationCitySuccess: 0// 本城客邀撮合成功
-    //   }
-    //   this.tableData[3].status = {
-    //     city: [],
-    //     isLocationInvite: 0, // 本城是否已客邀
-    //     isAllowInvite: 1, // 是否可发起客邀
-    //     isInviteSuccess: 1, // 是否客邀撮合成功
-    //     locationCitySuccess: 1// 本城客邀撮合成功
-    //   }
-    //   this.tableData[4].status = {
-    //     city: ['天津'],
-    //     isLocationInvite: 0, // 本城是否已客邀
-    //     isAllowInvite: 1, // 是否可发起客邀
-    //     isInviteSuccess: 1, // 是否客邀撮合成功
-    //     locationCitySuccess: 0// 本城客邀撮合成功
-    //   }
-    //   this.tableData[4].status = {
-    //     city: ['天津'],
-    //     isLocationInvite: 0, // 本城是否已客邀
-    //     isAllowInvite: 0, // 是否可发起客邀
-    //     isInviteSuccess: 0, // 是否客邀撮合成功
-    //     locationCitySuccess: 0// 本城客邀撮合成功
-    //   }
-    //   this.tableData[5].status = {
-    //     city: ['天津'],
-    //     isLocationInvite: 0, // 本城是否已客邀
-    //     isAllowInvite: 1, // 是否可发起客邀
-    //     isInviteSuccess: 1, // 是否客邀撮合成功
-    //     locationCitySuccess: 0// 本城客邀撮合成功
-    //   }
-    // } catch (err) {
-    //   console.log(`get list fail fail:${err}`)
-    // } finally {
-    //   (this.$parent as any).listLoading = false
-    // }
   }
   // 取消客邀
-  handleCancelGuest(id:number) {
-    this.$emit('cancelGuest', id)
+  handleCancelGuest(custInviteId:string) {
+    this.$emit('cancelGuest', custInviteId)
   }
   // 发起客邀
-  handleLaunchGuest(row:{}) {
+  handleLaunchGuest(row:any) {
+    const { lineId, matchId } = row
     console.log('row', row)
-    this.$emit('launchGuest')
+    this.$emit('launchGuest', { lineId, matchId })
   }
   // 取消意向
   handleCancelTryRun(id:number) {
