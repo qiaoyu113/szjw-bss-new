@@ -2,118 +2,117 @@
 <template>
   <div
     v-loading.body="listLoading"
-    class="LineList"
+    class="LineListBox"
     :class="{
       p15: isPC
     }"
   >
-    <div class="box">
-      <self-form
-        ref="selectForm"
-        :list-query="listQuery"
-        :form-item="formItem"
-        size="small"
-        :load-by-keyword="loadLineByKeyword"
-        label-width="110px"
-        class="p15 SuggestForm"
-        :pc-col="8"
-      >
-        <template slot="customerStatus">
-          <el-button
-            v-for="item in btns"
-            :key="item.text"
-            type="primary"
-            :plain="item.name !== listQuery.customerStatus"
-            margin-right="20px"
-            @click="() => {
-              listQuery.customerStatus = item.name
-              handleFilterClick()
-            }"
-          >
-            {{ item.text }}
-          </el-button>
-        </template>
-        <div
-          slot="mulBtn"
-          :class="isPC ? 'btnPc left' : 'mobile'"
+    <self-form
+      ref="selectForm"
+      :list-query="listQuery"
+      :form-item="formItem"
+      size="small"
+      :load-by-keyword="loadLineByKeyword"
+      label-width="110px"
+      class="p15 SuggestForm"
+      :pc-col="8"
+    >
+      <template slot="customerStatus">
+        <el-button
+          v-for="item in btns"
+          :key="item.text"
+          type="primary"
+          :plain="item.name !== listQuery.customerStatus"
+          margin-right="20px"
+          @click="() => {
+            listQuery.customerStatus = item.name
+            handleFilterClick()
+          }"
         >
-          <el-button
-            type="primary"
-            @click="batchLaunchGuest"
-          >
-            批量发起客邀
-          </el-button>
-          <el-button
-            type="primary"
-            @click="batchCancelGuest"
-          >
-            批量取消客邀
-          </el-button>
+          {{ item.text }}
+        </el-button>
+      </template>
+      <div
+        slot="mulBtn"
+        :class="isPC ? 'btnPc left' : 'mobile'"
+      >
+        <el-button
+          type="primary"
+          @click="batchLaunchGuest"
+        >
+          批量发起客邀
+        </el-button>
+        <el-button
+          type="primary"
+          @click="batchCancelGuest"
+        >
+          批量取消客邀
+        </el-button>
 
-          <el-button
-            type="primary"
-            :class="isPC ? '' : 'btnMobile'"
-            @click="handleFilterClick"
-          >
-            查询
-          </el-button>
-          <el-button
-            :class="isPC ? '' : 'btnMobile'"
-            @click="handleResetClick"
-          >
-            重置
-          </el-button>
-        </div>
-        <template slot="freightSection">
-          <input-range
-            v-model="listQuery.freightSection"
-            v-only-number="{min: 1, max: 19999, precision: 0}"
-          />
-        </template>
-        <template slot="time">
-          <timeSelect
-            v-model="listQuery.time"
-          />
-        </template>
-      </self-form>
-      <div class="table_box">
-        <div class="middle">
-          <span>筛选结果：{{ 111 }}条</span>
-        </div>
-        <Btable
-          ref="listTable"
-          :list-query="listQuery"
-          :is-show-percent="true"
-          :obj="{}"
-          @launchGuest="handleLaunchGuest($event)"
-          @cancelGuest="handleCancelGuest($event)"
-          @cancelTryRun="handleCancelTryRun($event)"
-          @SelectionChange="checkOff($event)"
-        />
-        <pagination
-          :operation-list="[]"
-          :total="page.total"
-          :page.sync="page.page"
-          :page-sizes="[10, 20, 30, 40, 50]"
-          :limit.sync="page.limit"
-          @pagination="handlePageSizeChange"
-        />
+        <el-button
+          type="primary"
+          :class="isPC ? '' : 'btnMobile'"
+          @click="handleFilterClick"
+        >
+          查询
+        </el-button>
+        <el-button
+          :class="isPC ? '' : 'btnMobile'"
+          @click="handleResetClick"
+        >
+          重置
+        </el-button>
       </div>
-      <launch-guest
-        :id="ids"
-        ref="launchGuest"
-        :obj="obj"
-        :launch-arguments="launchArguments"
+      <template slot="freightSection">
+        <input-range
+          v-model="listQuery.freightSection"
+          v-only-number="{min: 1, max: 19999, precision: 0}"
+        />
+      </template>
+      <template slot="time">
+        <timeSelect
+          v-model="listQuery.time"
+        />
+      </template>
+    </self-form>
+    <div
+      class="table_box"
+    >
+      <div class="middle">
+        <span>筛选结果：{{ 111 }}条</span>
+      </div>
+      <Btable
+        ref="listTable"
+        :list-query="listQuery"
+        :is-show-percent="true"
+        :obj="{}"
+        @launchGuest="handleLaunchGuest($event)"
+        @cancelGuest="handleCancelGuest($event)"
+        @cancelTryRun="handleCancelTryRun($event)"
+        @SelectionChange="checkOff($event)"
       />
-      <cancel-guest
-        ref="cancelGuest"
-        :cust-invite-id="custInviteId"
-      />
-      <cancel-tryRun
-        ref="cancelTryRun"
-        :cancel-id="cancelId"
+      <pagination
+        :operation-list="[]"
+        :total="page.total"
+        :page.sync="page.page"
+        :page-sizes="[10, 20, 30, 40, 50]"
+        :limit.sync="page.limit"
+        @pagination="handlePageSizeChange"
       />
     </div>
+    <launch-guest
+      :id="ids"
+      ref="launchGuest"
+      :launch-arguments="launchArguments"
+    />
+    <cancel-guest
+      ref="cancelGuest"
+      :cust-invite-id="custInviteId"
+    />
+    <cancel-tryRun
+      ref="cancelTryRun"
+      :cancel-id="cancelId"
+    />
   </div>
 </template>
 
@@ -436,7 +435,7 @@ export default class extends Vue {
       // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
       setTimeout(() => {
         (this.$refs.listTable as any).getLists()
-      }, 1000)
+      }, 500)
       // console.log('listQuery', this.listQuery)
       // let { data: res } = await getLists(params)
     } catch (err) {
@@ -537,9 +536,10 @@ export default class extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.LineList {
+.LineListBox {
    min-width: 860px;
-   height:100%;
+   height: 100%;
+   overflow: auto;
   .SuggestForm {
       width: 100%;
       background: #fff;
@@ -590,7 +590,7 @@ export default class extends Vue {
 </style>
 
 <style scoped>
-.LineList >>> .end .el-form-item__label::before {
+.LineListBox >>> .end .el-form-item__label::before {
     content:'~';
     color: #9e9e9e;
   }

@@ -25,7 +25,7 @@ export const cancelMatchCustInvite = (data: any) =>
     method: 'post',
     data
   })
-  // 发起客邀
+  // 批量发起客邀
 export const CreateLaunchGuestsBatch = (data: any) =>
   request({
     url: `mock/283/lines/startMatchCustInviteBatch`,
