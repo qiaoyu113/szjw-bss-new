@@ -106,6 +106,7 @@
       :launch-arguments="launchArguments"
     />
     <cancel-guest
+      :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
     />
@@ -166,6 +167,7 @@ export default class extends Vue {
   private showDialog: boolean = false
   private tableData:any[] = []
   private ids = []
+  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -521,7 +523,13 @@ export default class extends Vue {
   }
   private checkOff(id:any) {
     this.ids = id.map((item:any) => {
-      return item.id
+      return {
+        lineId: item.lineId,
+        matchId: item.matchId
+      }
+    })
+    this.idss = id.map((item:any) => {
+      return item.custInviteId
     })
   }
   init() {
