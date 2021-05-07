@@ -8,7 +8,7 @@
  */
 // Set utils function parseTime to filter
 import store from '@/store'
-export { parseTime, Timestamp, TimestampYMD, DataIsNull } from '@/utils'
+export { parseTime, Timestamp, TimestampYMD, DataIsNull, formatDate } from '@/utils'
 
 // Filter for article status
 export const articleStatusFilter = (status: string) => {

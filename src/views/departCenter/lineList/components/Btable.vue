@@ -20,18 +20,10 @@
           width="40"
         />
         <el-table-column
-          min-width="50"
-          label=""
-          class-name="firstColumn"
-        >
-          <template>
-            <div class="arrow" />
-          </template>
-        </el-table-column>
-        <el-table-column
           label="基础信息"
-          min-width="140"
+          min-width="190"
           align="center"
+          class-name="firstColumn"
         >
           <template slot-scope="{row}">
             <p class="text">
@@ -575,6 +567,12 @@ export default class extends Vue {
         background: #F7F7F7;
         border-radius:6px;
       }
+    }
+    .blue {
+      color:#639DEC
+    }
+    .orange {
+      color:#f5a821;
     }
   }
 </style>

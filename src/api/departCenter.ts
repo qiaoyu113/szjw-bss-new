@@ -1,6 +1,8 @@
 import request from '@/utils/request'
 const base = '/base_center'
 
+const prefix = `/mock/283`
+
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
@@ -30,3 +32,11 @@ export const cancelMatchCustInvite = (data: any) =>
     method: 'post',
     data
   })
+// 获取客邀列表
+export function getInvitedLines(data:any) {
+  return request({
+    url: `${prefix}/v1/matchLineInfo/queryInvitedLines`,
+    method: 'post',
+    data
+  })
+}
