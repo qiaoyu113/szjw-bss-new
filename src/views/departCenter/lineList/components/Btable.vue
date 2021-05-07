@@ -26,35 +26,38 @@
           class-name="firstColumn"
         >
           <template slot-scope="{row}">
-            <p class="text">
-              {{ row.lineName }}
-              <el-popover
-                placement="right"
-                min-width="200"
-                trigger="hover"
-              >
-                <div class="text1">
-                  {{ row.lineName }}
-                </div>
-                <i
-                  slot="reference"
-                  class="el-icon-chat-dot-round"
-                />
-              </el-popover>
-            </p>
+            <div class="arrow" />
+            <div style="margin-left:50px;">
+              <p class="text">
+                {{ row.lineName }}
+                <el-popover
+                  placement="right"
+                  min-width="200"
+                  trigger="hover"
+                >
+                  <div class="text1">
+                    {{ row.lineName }}
+                  </div>
+                  <i
+                    slot="reference"
+                    class="el-icon-chat-dot-round"
+                  />
+                </el-popover>
+              </p>
 
-            <p class="text">
-              ({{ row.lineSaleName }})
-            </p>
-            <p class="text">
-              {{ row.lineSaleId }}
-            </p>
-            <p class="text">
-              窗口期:剩余{{ row.dayNum }}天
-            </p>
-            <p class="text scale">
-              {{ row.lineCreateDate }}创建
-            </p>
+              <p class="text">
+                ({{ row.lineSaleName }})
+              </p>
+              <p class="text">
+                {{ row.lineSaleId }}
+              </p>
+              <p class="text">
+                窗口期:剩余{{ row.dayNum }}天
+              </p>
+              <p class="text scale">
+                {{ row.lineCreateDate }}创建
+              </p>
+            </div>
           </template>
         </el-table-column>
         <el-table-column
