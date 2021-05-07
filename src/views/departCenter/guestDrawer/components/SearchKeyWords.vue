@@ -54,7 +54,7 @@
           <template slot="keyWords">
             <el-select
               v-model="listQuery.keyWords"
-              placeholder="选择/搜索线路名称/编号"
+              placeholder="选择/搜索司机姓名/编号"
               filterable
               clearable
               :options="lineList"
@@ -148,8 +148,8 @@ export default class SearchKeyWords extends Vue {
     { label: '全部', value: '' }
   ];
   private lineList: any = [
-    { label: '线路1', value: 'line1' },
-    { label: '线路2', value: 'line2' }
+    { label: '司机1', value: 'line1' },
+    { label: '司机2', value: 'line2' }
   ]
   private timeLists:IState[] = []
   private listQuery:IState = {
@@ -452,10 +452,12 @@ export default class SearchKeyWords extends Vue {
   }
 }
 </script>
-<style>
+<style lang="scss" >
   .el-dropdown-menu{
-      max-height: 250px;
-      overflow: auto;
+      max-height: 200px !important;
+      overflow: scroll;
+      margin-bottom: 0 !important;
+      margin-top: 0 !important;
   }
 </style>
 <style lang="scss" scoped>
