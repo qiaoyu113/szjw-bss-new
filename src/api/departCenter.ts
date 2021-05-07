@@ -6,7 +6,7 @@ const prefix = `/mock/283`
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
-    url: `/waybill/v2/runtest/creatIntentionRun`,
+    url: `${prefix}/v2/runtest/creatIntentionRun`,
     method: 'post',
     data
   })
@@ -32,6 +32,20 @@ export const cancelMatchCustInvite = (data: any) =>
     method: 'post',
     data
   })
+  // 发起客邀
+export const CreateLaunchGuestsBatch = (data: any) =>
+  request({
+    url: `mock/283/lines/startMatchCustInviteBatch`,
+    method: 'post',
+    data
+  })
+// 批量取消客邀
+export const cancelMatchCustInviteBatch = (data: any) =>
+  request({
+    url: `mock/283/lines/cancelMatchCustInviteBatch`,
+    method: 'post',
+    data
+  })
 // 获取客邀列表
 export function getInvitedLines(data:any) {
   return request({
@@ -40,6 +54,7 @@ export function getInvitedLines(data:any) {
     data
   })
 }
+<<<<<<< HEAD
 // 查询线路列表表单信息
 export const getLineInfo = (params:any) =>
   request({
@@ -47,3 +62,13 @@ export const getLineInfo = (params:any) =>
     method: 'post',
     params
   })
+=======
+// 获取线路suggest列表
+export function getLineSuggest(data:any) {
+  return request({
+    url: `${prefix}/v1/line/suggest`,
+    method: 'post',
+    data
+  })
+}
+>>>>>>> department

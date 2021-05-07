@@ -96,7 +96,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import GuestDrawer from '../guestDrawer/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch, getInvitedLines } from '@/api/departCenter'
+import { getLineSearch, getInvitedLines, getLineSuggest } from '@/api/departCenter'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import TimeSelect from '../chauffeurList/components/timeSelect.vue'
 import { showWork, HandlePages } from '@/utils'
@@ -337,9 +337,14 @@ export default class extends Vue {
       return SettingsModule.isPC
     }
     // 根据关键字查线路id
-    async loadLineByKeyword(params:IState) {
+    async loadLineByKeyword(obj:IState) {
       try {
-        let { data: res } = await getLineSearch(params)
+        let params:IState = {
+          page: obj.page,
+          limit: obj.limit
+        }
+        obj.key && (params.keyWord = obj.key)
+        let { data: res } = await getLineSuggest(params)
         let result:any[] = res.data.map((item:any) => ({
           label: item.lineName,
           value: item.lineId

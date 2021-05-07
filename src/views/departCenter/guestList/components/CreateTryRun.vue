@@ -54,6 +54,9 @@ export default class extends Vue {
   // lineName:''//线路名字
   // lineId:''//线路id
   // dutyManagerId:''//线路上客户维护经理
+  // matchType 撮合类型(1: 司推系、2：客邀系)
+  // matchStatus 撮合单状态
+  // matchId  撮合单编号
 
   private showDialog:boolean = false
   private workingTime:Date = new Date(new Date(Date.now() + 1 * 3600 * 24 * 1000).setHours(0, 0))
@@ -161,7 +164,11 @@ export default class extends Vue {
         operateFlag: 'creatIntentionRun',
         intentionType: this.listQuery.intentionType,
         otherReason: this.listQuery.otherReason,
-        arrivalTime: new Date(this.listQuery.arrivalTime).getTime()
+        arrivalTime: new Date(this.listQuery.arrivalTime).getTime(),
+        matchType: this.obj.matchType, // 撮合类型(1: 司推系、2：客邀系)
+        matchStatus: this.obj.matchStatus, // 撮合单状态
+        matchId: this.obj.matchId, // 撮合单编号
+        createRunTestOrigin: 1 // 创建试跑意向来源（1：司撮、2：H5）
       }
       let { data: res } = await CreateLntentionRun(params)
       if (res.success) {

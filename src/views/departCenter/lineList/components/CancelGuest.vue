@@ -24,7 +24,9 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { cancelMatchCustInvite } from '@/api/departCenter'
+import { GetDictionaryList } from '@/api/common'
+import { mapDictData } from '../../js/index'
+import { cancelMatchCustInvite, cancelMatchCustInviteBatch } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -37,11 +39,14 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: '123' }) custInviteId!:string
+  @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
   private cancelOptions:IState[] = [] // 取消原因
   private listQuery:IState = {
-    a: ''
+    custInviteId: '',
+    cancelInviteReason: ''
   }
+  private cancelGuestState :number = 0
   private formItem:any[] = [
     {
       type: 2,
@@ -51,12 +56,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '取消客邀的原因?',
-      key: 'a',
+      key: 'cancelInviteReason',
       options: this.cancelOptions
     }
   ]
   private rules:IState = {
-    a: [
+    cancelInviteReason: [
       { required: true, message: '请选择取消客邀的原因', trigger: 'blur' }
     ]
   }
@@ -75,21 +80,57 @@ export default class extends Vue {
   }
   // 取消客邀
   async cancelGuest() {
-    console.log('取消客邀接口参数', this.custInviteId)
-    try {
-      let params:IState = {
-        custInviteId: this.listQuery.custInviteId,
-        cancelInviteReason: this.listQuery.cancelInviteReason
-      }
-      let { data: res } = await cancelMatchCustInvite(params)
-      if (res.success) {
-        this.$message.success('操作成功')
-        this.$emit('success')
-      } else {
+    if (this.cancelGuestState === 1) {
+      try {
+        let params:IState = {
+          custInviteId: this.listQuery.custInviteId,
+          cancelInviteReason: this.listQuery.cancelInviteReason
+        }
+        let { data: res } = await cancelMatchCustInvite(params)
+        if (res.success) {
+          this.$message.success('操作成功')
+          this.$emit('success')
+        } else {
         // this.$message.error(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(`launch guest fail:${err}`)
+      } finally {
+      //
+      }
+    }
+    if (this.cancelGuestState === 2) {
+      try {
+        let params:IState = {
+          custInviteIds: this.id,
+          cancelInviteReason: this.listQuery.cancelInviteReason
+        }
+        let { data: res } = await cancelMatchCustInviteBatch(params)
+        if (res.success) {
+          this.$message.success('操作成功')
+          this.$emit('success')
+        } else {
+        // this.$message.error(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(`launch guest fail:${err}`)
+      } finally {
+      //
+      }
+    }
+  }
+  // 获取字典列表
+  async getDictList() {
+    try {
+      let params:string[] = ['cancel_custinvite_reason']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.cancelOptions.push(...mapDictData(res.data.cancel_custinvite_reason || []))
+      } else {
+        this.$message.error(res.errorMsg)
       }
     } catch (err) {
-      console.log(`launch guest fail:${err}`)
+      console.log(`get dict list fail:${err}`)
     } finally {
       //
     }
