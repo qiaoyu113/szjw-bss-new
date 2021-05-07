@@ -30,3 +30,17 @@ export const cancelMatchCustInvite = (data: any) =>
     method: 'post',
     data
   })
+  // 发起客邀
+export const CreateLaunchGuestsBatch = (data: any) =>
+  request({
+    url: `mock/283/lines/startMatchCustInviteBatch`,
+    method: 'post',
+    data
+  })
+// 批量取消客邀
+export const cancelMatchCustInviteBatch = (data: any) =>
+  request({
+    url: `mock/283/lines/cancelMatchCustInviteBatch`,
+    method: 'post',
+    data
+  })
