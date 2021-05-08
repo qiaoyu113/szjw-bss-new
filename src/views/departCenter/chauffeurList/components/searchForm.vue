@@ -123,20 +123,20 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!: IState;
  private busiOptions: IState[] = [
-   { label: '全部', value: '' },
-   { label: '专车', value: 0 },
-   { label: '共享', value: 1 }
+   { label: '全部', value: 0 },
+   { label: '专车', value: 1 },
+   { label: '共享', value: 2 }
  ];
   private carKindOptions: IState[] = [
-    { label: '全部', value: '' },
+    { label: '全部', value: 0 },
     { label: '油车', value: 1 },
     { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: 0 }
   ];
   private cycleOptions: IState[] = [
-    { label: '全部', value: '' }
+    { label: '全部', value: 0 }
   ];
   private driverOptions: IState[] = [];
   private timeLists: IState[] = [];
@@ -180,7 +180,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '电油分类',
-      key: 'carKind',
+      key: 'isNewEnergy',
       options: this.carKindOptions
     },
     {
@@ -205,7 +205,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '装卸接受度',
-      key: 'hard',
+      key: 'heavyLifting',
       options: this.hardOptions
     },
     {
@@ -216,9 +216,9 @@ export default class extends Vue {
         filterable: true
       },
       label: '期望稳定/临时',
-      key: 'hope',
+      key: 'expectStabilityTemporary',
       options: [
-        { label: '全部', value: '' },
+        { label: '全部', value: 0 },
         { label: '稳定', value: 1 },
         { label: '临时', value: 2 }
       ]
@@ -231,7 +231,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '期望结算周期',
-      key: 'cycle',
+      key: 'expectAccountingPeriod',
       options: this.cycleOptions
     },
     {
@@ -260,7 +260,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '司撮经理',
-      key: 'hard212',
+      key: 'driverMatchManagerId',
       options: this.hardOptions
     },
     {
@@ -271,8 +271,8 @@ export default class extends Vue {
         filterable: true
       },
       label: '司机是否分配司撮',
-      key: 'hard2121',
-      options: [{ label: '是', value: 1 }, { label: '否', value: 1 }]
+      key: 'hasDriverMatchManager',
+      options: [{ label: '是', value: 1 }, { label: '否', value: 2 }]
     },
     {
       type: 'status',
@@ -292,7 +292,7 @@ export default class extends Vue {
   private statusLists: IState[] = [
     {
       label: '全部',
-      value: ''
+      value: 0
     },
     {
       label: '已成交待上岗',
