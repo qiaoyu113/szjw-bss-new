@@ -34,6 +34,9 @@
               label-width="120px"
               label-suffix=" :"
             >
+              <!-- <template slot="behaviorArea">
+                <span>{{ listQuery.breakingNodrivingProvinceName }}-{{ listQuery.breakingNodrivingCityName }}-{{ listQuery.breakingNodrivingCounty }}</span>
+              </template> -->
               <template slot="startArea">
                 <span class="area">北京市-北京市-顺义区-南法信镇</span>
                 <span>10:00</span>
@@ -82,7 +85,7 @@ import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import { getCallDetail, getRunDetail } from '@/api/departCenter'
+import { getCallDetail, getRunDetail, getDriverDetail } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -99,7 +102,6 @@ export default class extends Vue {
   @Prop({ default: '' }) driverId!: String;
   @PropSync('actived', { type: String }) active!: string
   @PropSync('dialogTableVisible', { type: Boolean }) show!: Boolean
-
   private listQuery: any = {
     carTypeName: '',
     isBehavior: '',
@@ -111,19 +113,22 @@ export default class extends Vue {
     state: '', // 状态
     orderId: '', // 订单编号
     contractState: '', // 合同状态
-    driverBehavior: '', // 是否可以闯禁行
-    behaviorArea: '', // 可闯禁行区域
-    driverRestriction: '', // 是否可以闯限行
+    canBreakingNodriving: '', // 是否可以闯禁行
+    // behaviorArea: '', // 可闯禁行区域
+    breakingNodrivingProvinceName: '',
+    breakingNodrivingCityName: '',
+    breakingNodrivingCounty: '',
+    canBreakingTrafficRestriction: '', // 是否可以闯限行
     restrictionArea: '', // 可闯限行区域
-    acceptDegree: '', // 装卸接收程度
-    distributionComplex: '', // 配送复杂度
-    settlementCycleName: '', // 期望账期
-    everyTripGuaranteed: '', // 期望运费
-    lineCategory: '', // 期望稳定/临时
-    isOtherWork: '', // 外面是否有活
+    heavyLifting: '', // 装卸接收程度
+    deliveryDifficulty: '', // 配送复杂度
+    expectAccountingPeriod: '', // 期望账期
+    expectIncomeTrip: '', // 期望运费
+    expectStabilityTemporary: '', // 期望稳定/临时
+    hasIncomeOutside: '', // 外面是否有活
     startArea: '', // 起始点
     lineArea: '', // 配送点
-    dirverDeatil: '', // 司机情况
+    driverSituation: '', // 司机情况
     remak: '' // 备注
   };
   private formItem: any[] = [
@@ -191,7 +196,7 @@ export default class extends Vue {
   private formItem1: any[] = [
     {
       type: 7,
-      key: 'driverBehavior',
+      key: 'canBreakingNodriving',
       label: '是否可以闯禁行',
       col: 24
     },
@@ -199,11 +204,12 @@ export default class extends Vue {
       type: 7,
       key: 'behaviorArea',
       label: '可闯禁行区域',
+      slot: true,
       col: 24
     },
     {
       type: 7,
-      key: 'driverRestriction',
+      key: 'canBreakingTrafficRestriction',
       label: '是否可以闯限行',
       col: 24
     },
@@ -215,37 +221,37 @@ export default class extends Vue {
     },
     {
       type: 7,
-      key: 'acceptDegree',
+      key: 'heavyLifting',
       label: '装卸接收程度',
       col: 24
     },
     {
       type: 7,
-      key: 'distributionComplex',
+      key: 'deliveryDifficulty',
       label: '配送复杂度',
       col: 24
     },
     {
       type: 7,
-      key: 'settlementCycleName',
+      key: 'expectAccountingPeriod',
       label: '期望账期',
       col: 24
     },
     {
       type: 7,
-      key: 'everyTripGuaranteed',
+      key: 'expectIncomeTrip',
       label: '期望运费',
       col: 24
     },
     {
       type: 7,
-      key: 'lineCategory',
+      key: 'expectStabilityTemporary',
       label: '期望稳定/临时',
       col: 24
     },
     {
       type: 7,
-      key: 'isOtherWork',
+      key: 'hasIncomeOutside',
       label: '外面是否有活',
       col: 24
     },
@@ -265,13 +271,13 @@ export default class extends Vue {
     },
     {
       type: 7,
-      key: 'dirverDeatil',
+      key: 'driverSituation',
       label: '司机情况',
       col: 24
     },
     {
       type: 7,
-      key: 'remak',
+      key: 'manuallyRemarks',
       label: '备注',
       col: 24
     }
@@ -389,6 +395,7 @@ export default class extends Vue {
     console.log(index, 'get')
     this.getCallRecord()
     this.getRunInfor()
+    this.getDriverLabel()
   }
   // 外呼记录
   async getCallRecord() {
@@ -418,6 +425,28 @@ export default class extends Vue {
       }
     } catch {
       console.log('12121')
+    }
+  }
+  async getDriverLabel() {
+    try {
+      let parmas:any = {
+        driverId: 'BJS201903301'
+      }
+      let { data: res } = await getDriverDetail(parmas)
+      if (res.success) {
+        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving
+        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction
+        this.listQuery.heavyLifting = res.data.heavyLifting
+        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
+        this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
+        this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
+        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
+        this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
+        this.listQuery.driverSituation = res.data.driverSituation
+        this.listQuery.manuallyRemarks = res.data.manuallyRemarks
+      }
+    } catch {
+      console.log('xxxx')
     }
   }
 }
