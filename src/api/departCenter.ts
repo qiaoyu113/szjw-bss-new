@@ -95,3 +95,12 @@ export function getLineRemarks(data:any) {
     data
   })
 }
+
+// 取消试跑意向
+export function cancelIntention(data:any) {
+  return request({
+    url: `${prefix}/v2/runtest/intention/cancel`,
+    method: 'post',
+    data
+  })
+}

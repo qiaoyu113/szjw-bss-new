@@ -26,6 +26,7 @@
           margin-right="20px"
           @click="() => {
             listQuery.customerStatus = item.name
+            showInviteCityHandle(item)
             handleFilterClick()
           }"
         >
@@ -69,6 +70,23 @@
           v-only-number="{min: 1, max: 19999, precision: 0}"
         />
       </template>
+      <!-- <span v-if="listQuery.customerStatus ===2"> -->
+      <template
+        slot="guestCity"
+      >
+        <el-select
+          v-model="listQuery.guestCity"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in cityList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+      <!-- </span> -->
       <template slot="time">
         <timeSelect
           v-model="listQuery.time"
@@ -106,13 +124,12 @@
       :launch-arguments="launchArguments"
     />
     <cancel-guest
-      :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
     />
     <cancel-tryRun
       ref="cancelTryRun"
-      :cancel-id="cancelId"
+      :cancel-data="cancelData"
     />
   </div>
 </template>
@@ -123,7 +140,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList } from '@/api/common'
+import { GetDictionaryList, GetDictionaryCity } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
@@ -134,6 +151,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { showWork } from '@/utils'
+import { cloneDeep } from 'lodash'
 interface PageObj {
   page:number,
   limit:number,
@@ -162,17 +180,18 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
+  private cityList:IState[] = []; // 城市列表
   private timeLists:IState[] = []
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
   private ids = []
-  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
     lineFineness: '',
     handlingDifficulty: '',
+    guestCity: '',
     freightSection: [],
     time: [],
     warehouseLocation: '',
@@ -226,6 +245,12 @@ export default class extends Vue {
       },
       options: this.loadDiffArr
     },
+    // {
+    //   type: 'guestCity',
+    //   label: '客邀城市',
+    //   key: 'guestCity',
+    //   slot: true
+    // },
     {
       type: 'freightSection',
       label: '单趟运费区间',
@@ -340,7 +365,7 @@ export default class extends Vue {
     }
   ]
   private custInviteId:string=''
-  private cancelId:string=''
+  private cancelData:{}={}
   private launchArguments:{}={
     lineId: '',
     matchId: ''
@@ -408,13 +433,14 @@ export default class extends Vue {
       carType: '',
       lineFineness: '',
       handlingDifficulty: '',
+      guestCity: '',
       freightSection: [],
       time: [],
       warehouseLocation: '',
       distributionArea: '',
       stabilityTemporary: '',
       lineName: '',
-      status: ''
+      customerStatus: ''
     }
   }
   // 获取列表
@@ -462,6 +488,23 @@ export default class extends Vue {
       console.log(`get dict list fail:${err}`)
     } finally {
       //
+    }
+  }
+  // 根据大区获取城市列表
+  async cityDetail() {
+    this.cityList.push({
+      value: 0,
+      label: '全部城市'
+    })
+    let { data: city } = await GetDictionaryCity()
+    if (city.success) {
+      const nodes = city.data.map(function(item: any) {
+        return {
+          value: +item.code,
+          label: item.name
+        }
+      })
+      this.cityList.push(...nodes)
     }
   }
   // 级联框变化
@@ -517,22 +560,34 @@ export default class extends Vue {
     (this.$refs.cancelGuest as any).cancelGuestState = 2
   }
   // 取消创建试跑意向
-  handleCancelTryRun(id:string) {
+  handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    this.cancelId = id
+    const { lineId, matchId, matchStatus, runTestId, status } = row
+    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    this.cancelData = cancelData
   }
   private checkOff(id:any) {
     this.ids = id.map((item:any) => {
-      return {
-        lineId: item.lineId,
-        matchId: item.matchId
-      }
-    })
-    this.idss = id.map((item:any) => {
-      return item.custInviteId
+      return item.id
     })
   }
+
+  // 控制客邀城市显示
+  showInviteCityHandle(item:any) {
+    const values = {
+      type: 'guestCity',
+      label: '客邀城市',
+      key: 'guestCity',
+      slot: true
+    }
+    if (item.name !== '2') {
+      if (this.formItem[4].key === 'guestCity') { this.formItem.splice(4, 1) }
+    } else {
+      this.formItem.splice(4, 0, values)
+    }
+  }
   init() {
+    this.cityDetail()
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
   }
