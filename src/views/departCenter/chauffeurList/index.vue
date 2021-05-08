@@ -191,6 +191,7 @@ export default class extends Vue {
     // 获取列表数据
     async getLists() {
       try {
+        this.listLoading = true
         this.pageSize++
         let num:number = 3
         // this.tableData = []
@@ -246,12 +247,15 @@ export default class extends Vue {
       } catch (err) {
         console.log(`get list fail fail:${err}`)
       } finally {
-        console.log('')
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1000)
       }
     }
     // 客邀状态变化
     handleStatusChange(val: string | number) {
       console.log('xxx:', val)
+      this.getLists()
     }
     // 线路名称/编号 模糊搜索
     querySearch(queryString: string, cb: Function) {
