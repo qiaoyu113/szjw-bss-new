@@ -54,16 +54,6 @@ export default class GuestDrawer extends Vue {
   private rowData:object = {}
   private disabled: boolean = false
   private lineTableData:IState[] = [] // 线路列表
-  private listQueryLine:IState = {
-    labelType: '',
-    isBehavior: '',
-    isRestriction: '',
-    status: '',
-    start: '',
-    end: '',
-    f1: '',
-    f2: ''
-  }
   $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {

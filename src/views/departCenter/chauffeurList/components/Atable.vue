@@ -56,10 +56,9 @@
                 />
               </el-tooltip>
             </p>
-            <p
-              class="text"
-              v-text="`(${scope.row.manager})`"
-            />
+            <p class="text">
+              {{ scope.row.joinManagerName }}{{ scope.row.driverMatchManagerName }}
+            </p>
             <p class="text">
               {{ scope.row.driverId }}
             </p>
@@ -73,10 +72,10 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            {{ row.d }}/{{ row.e }}
+            {{ row.carTypeName }}/{{ row.isNewEnergy?'电车':'油车' }}
           </p>
           <p class="text">
-            {{ row.f }}/{{ row.g }}/{{ row.h }}
+            {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}/{{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}/{{ row.busiTypeName }}
           </p>
         </template>
       </el-table-column>
@@ -87,13 +86,13 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            现居住地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            现居住地址:{{ row.liveAddressProvinceName }}-{{ row.liveAddressCityName }}-{{ row.liveAddressCountyName }}
           </p>
           <p class="text">
-            其他活仓地址:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            其他活仓地址:{{ row.startingPointProvinceName }}-{{ row.startingPointCityName }}-{{ row.startingPointCountyName }}
           </p>
           <p class="text">
-            其他活配送点:{{ row.p1 }}-{{ row.c1 }}-{{ row.c2 }}
+            其他活配送点:{{ row.deliveryPointProvinceName }}-{{ row.deliveryPointCityName }}-{{ row.deliveryPointCountyName }}
           </p>
         </template>
       </el-table-column>
@@ -104,13 +103,13 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            运费趟:{{ row.m1 }}元
+            运费趟:{{ row.expectedFreightMonth }}元
           </p>
           <p class="text">
-            期望月:{{ row.m1 }}元
+            期望月:{{ row.expectedFreightTrip }}元
           </p>
           <p class="text">
-            期望账期:现结/周结
+            期望账期:{{ row.expectAccountingPeriodName }}
           </p>
         </template>
       </el-table-column>
@@ -121,16 +120,19 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            期望货品:食品/团购
+            期望货品:{{ row.intentCargoTypeName }}
           </p>
           <p class="text">
-            期望装卸难度:只装不卸
+            期望装卸难度:{{ row.heavyLiftingName }}
           </p>
           <p class="text">
-            期望类型:整车
+            期望类型:{{ row.deliveryDifficultyNames }}
           </p>
           <p class="text">
-            工作时间段:{{ row.time }}
+            工作时间段:{{ row.workHours.join(",") }}
+          </p>
+          <p class="text">
+            期望稳定/临时:{{ row.expectStabilityTemporaryNames }}
           </p>
         </template>
       </el-table-column>
@@ -144,13 +146,13 @@
             class="text"
             :a="row"
           >
-            着急试跑
+            {{ row.driverSituationName }}
           </p>
           <p class="text">
-            本月首岗
+            {{ row.newDealName }}
           </p>
           <p class="text">
-            小白司机
+            {{ row.isNoviceName }}
           </p>
         </template>
       </el-table-column>
@@ -164,13 +166,13 @@
             class="text"
             :a="row"
           >
-            已上岗
+            {{ row.driverStatusName }}
           </p>
           <p class="text">
-            在跟车一个
+            在跟车{{ row.followCarNum }}个
           </p>
           <p class="text">
-            在试跑一个
+            在试跑{{ row.tryRunNum }}个
           </p>
         </template>
       </el-table-column>
@@ -299,7 +301,7 @@
               基础信息:
             </div>
             <div class="content">
-              40岁/A1本/5年货运经验/58同城/成交：2020-01-01
+              {{ row.age }}岁/{{ row.drivingLicenceTypeName }}本/{{ row.drivingExperience }}年货运经验/{{ row.sourceChannelName }}/成交：{{ row.driverPassTime }}
             </div>
           </div>
           <div class="item">
@@ -321,7 +323,7 @@
               司机状态:
             </div>
             <div class="content">
-              着急试跑
+              {{ row.driverSituationName }}
             </div>
           </div>
           <div class="item">
@@ -329,7 +331,7 @@
               备注信息:
             </div>
             <div class="content">
-              司机有贷款压力，不怕累活，不是稳定活不接受
+              {{ row.driverMatchRemarksName }},{{ row.driverMatchManuallyRemarks }}
             </div>
           </div>
         </template>
