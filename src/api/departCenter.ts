@@ -78,3 +78,12 @@ export function getLineDetail(params:any) {
     params
   })
 }
+
+// 通过线路id和当前城市获取备注
+export function getLineRemarks(data:any) {
+  return request({
+    url: `${prefix}/v1/matchCustInvite/queryRemarks`,
+    method: 'post',
+    data
+  })
+}
