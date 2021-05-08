@@ -26,6 +26,7 @@
           margin-right="20px"
           @click="() => {
             listQuery.customerStatus = item.name
+            showInviteCityHandle(item)
             handleFilterClick()
           }"
         >
@@ -70,7 +71,9 @@
         />
       </template>
       <!-- <span v-if="listQuery.customerStatus ===2"> -->
-      <template slot="guestCity">
+      <template
+        slot="guestCity"
+      >
         <el-select
           v-model="listQuery.guestCity"
           placeholder="请选择"
@@ -148,6 +151,7 @@ import Pagination from '@/components/Pagination/index.vue'
 import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { showWork } from '@/utils'
+import { cloneDeep } from 'lodash'
 interface PageObj {
   page:number,
   limit:number,
@@ -241,12 +245,12 @@ export default class extends Vue {
       },
       options: this.loadDiffArr
     },
-    {
-      type: 'guestCity',
-      label: '客邀城市',
-      key: 'guestCity',
-      slot: true
-    },
+    // {
+    //   type: 'guestCity',
+    //   label: '客邀城市',
+    //   key: 'guestCity',
+    //   slot: true
+    // },
     {
       type: 'freightSection',
       label: '单趟运费区间',
@@ -566,6 +570,21 @@ export default class extends Vue {
     this.ids = id.map((item:any) => {
       return item.id
     })
+  }
+
+  // 控制客邀城市显示
+  showInviteCityHandle(item:any) {
+    const values = {
+      type: 'guestCity',
+      label: '客邀城市',
+      key: 'guestCity',
+      slot: true
+    }
+    if (item.name !== '2') {
+      if (this.formItem[4].key === 'guestCity') { this.formItem.splice(4, 1) }
+    } else {
+      this.formItem.splice(4, 0, values)
+    }
   }
   init() {
     this.cityDetail()

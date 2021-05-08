@@ -337,7 +337,6 @@ export default class extends Vue {
   private remarks:string = ''
 
   mounted() {
-    console.log(this.listQuery)
     // this.init()
   }
 
@@ -351,9 +350,7 @@ export default class extends Vue {
     // 调用查询接口
       let params = {}
       let { data: res } = await getLineInfo(params)
-      console.log('res', res)
       this.tableData = res
-      console.log('this.tableData', this.tableData)
     } catch (err) {
       console.log('err', err)
     } finally {
@@ -362,7 +359,6 @@ export default class extends Vue {
   }
   // 取消客邀
   handleCancelGuest(custInviteId:string) {
-    console.log('selection', this.selection)
     if (!this.selection.length) {
       this.$emit('cancelGuest', custInviteId)
     } else {
@@ -372,7 +368,6 @@ export default class extends Vue {
   // 发起客邀
   handleLaunchGuest(row:any) {
     const { lineId, matchId } = row
-    console.log('row', row)
     if (!this.selection.length) {
       this.$emit('launchGuest', { lineId, matchId })
     } else {
