@@ -33,9 +33,18 @@
                 placement="right"
                 width="200"
                 trigger="hover"
+                @show="handleHoverRemark(scope.row)"
               >
                 <div class="text1">
-                  {{ scope.row.remark }}
+                  <template v-if="scope.row.remark">
+                    {{ scope.row.remark }}
+                  </template>
+                  <template v-else>
+                    <i class="el-icon-loading" />
+                    <span class="loading-left">
+                      加载中...
+                    </span>
+                  </template>
                 </div>
                 <i
                   v-if="scope.row.isHot"
@@ -279,9 +288,12 @@
             <div class="title">
               项目信息:
             </div>
-            <div class="content">
+            <div
+              v-if="row.projectInfo&&Array.isArray(row.projectInfo)"
+              class="content"
+            >
               <el-button
-                v-for="item in row.arr"
+                v-for="item in row.projectInfo"
                 :key="item"
                 size="mini"
                 class="btn"
@@ -294,9 +306,12 @@
             <div class="title">
               配送信息:
             </div>
-            <div class="content">
+            <div
+              v-if="row.distributionInfo&&Array.isArray(row.distributionInfo)"
+              class="content"
+            >
               <el-button
-                v-for="item in row.brr"
+                v-for="item in row.distributionInfo"
                 :key="item"
                 size="mini"
                 class="btn"
@@ -312,6 +327,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { getLineDetail, getLineRemarks } from '@/api/departCenter'
 const key = 'line_row'
 interface IState {
   [key: string]: any;
@@ -347,7 +363,7 @@ export default class extends Vue {
   }
 
   // 展开
-  toogleExpand(row:IState) {
+  async toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item:IState = this._tableData[i]
@@ -361,6 +377,7 @@ export default class extends Vue {
       }
     }
     row.isOpen = true
+    await this.getLineDetailByLineId(row)
     $table.toggleRowExpansion(row, true)
   }
   // 匹配撮合
@@ -386,11 +403,81 @@ export default class extends Vue {
   removeTableInfo() {
     sessionStorage.removeItem(key)
   }
+  // 显示备注
+  handleHoverRemark(row:IState) {
+    if (!row.remark) {
+      this.getLineRemark(row)
+    }
+  }
+  // 获取线路备注
+  async getLineRemark(row:IState) {
+    try {
+      let params:IState = {
+        lineId: row.lineId,
+        city: row.currentCityCode
+      }
+      let { data: res } = await getLineRemarks(params)
+      if (res.success) {
+        this.$set(row, 'remark', res.data.remarks)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line remark fail:${err}`)
+    } finally {
+      //
+    }
+  }
   // 从缓存获取
   getStorage() {
     let str = sessionStorage.getItem(key) || ''
     if (str) {
       this._tableData = [JSON.parse(str)]
+    }
+  }
+  // 获取线路详情
+  async getLineDetailByLineId(row:IState) {
+    try {
+      let params:IState = {
+        lineId: row.lineId
+      }
+      let { data: res } = await getLineDetail(params)
+      if (res.success) {
+        let item:IState = res.data
+        let projectInfo = []
+        let distributionInfo = []
+        projectInfo.push(item.projectName)
+        projectInfo.push(`已创建${item.lineSumNum}条线路`)
+        projectInfo.push(`${item.lineRunNum}条线路在跑`)
+        projectInfo.push(`${item.lineRunOffShelfNum}条线路已掉线`)
+        projectInfo.push(`${item.lineFindNum}条线路在上架找车`)
+        distributionInfo.push(`${item.deliveryNum}个点`)
+        distributionInfo.push(`每日${item.dayNum}趟`)
+        distributionInfo.push(`每月${item.monthNum}天`)
+        distributionInfo.push(`每趟${item.distance}公里`)
+        if (item.runSpeed === 1) {
+          distributionInfo.push(`走高速`)
+        }
+        if (item.returnBill === 1) {
+          distributionInfo.push(`回单`)
+        }
+        if (item.lineType === 1) {
+          distributionInfo.push(`城配线`)
+        }
+        if (item.stabilityRate === 1) {
+          distributionInfo.push(`稳定`)
+        } else {
+          distributionInfo.push(`临时${item.deliveryStartDate}/${item.deliveryEndDate}`)
+        }
+        this.$set(row, 'projectInfo', projectInfo)
+        this.$set(row, 'distributionInfo', distributionInfo)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line detail:${err}`)
+    } finally {
+      //
     }
   }
 }
@@ -476,6 +563,9 @@ export default class extends Vue {
     }
     .orange {
       color:#f5a821;
+    }
+    .loading-left {
+      margin-left:5px;
     }
   }
 </style>

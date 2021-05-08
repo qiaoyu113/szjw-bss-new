@@ -36,7 +36,7 @@
       <!-- 撮合匹配的司机列表 -->
       <section class="matchDriver">
         <!-- 搜索项 -->
-        <SearchKeyWords />
+        <SearchKeyWords @query="onQuery" />
         <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
           司机匹配线路
         </div>
@@ -76,6 +76,7 @@ import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from './components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
+import { MatchLineListForDriver } from '@/api/departCenter'
   interface IState {
     [key: string]: any;
   }
@@ -101,6 +102,7 @@ export default class GuestDrawer extends Vue {
     private rowData:object = {}
     private lineTableData:IState[] = [] // 线路列表
     private driverTableData:IState[] = [] // 司机列表
+    private params: object = {}
     private listQueryLine:IState = {
       labelType: '',
       isBehavior: '',
@@ -207,11 +209,27 @@ export default class GuestDrawer extends Vue {
         console.log('')
       }
     }
+    onQuery(params: any) {
+      this.params = params
+      this.queryData()
+    }
     loadMoreHandle() {
-      this.getLists()
+      MatchLineListForDriver(Object.assign({}, this.params)).then((res: any) => {
+        console.log(res)
+      }) // todo  /*, this.pageInfo */
+    }
+    queryData() {
+      MatchLineListForDriver(this.params).then((res: any) => {
+        res = res.data || {}
+        console.log(res)
+        if (res.success) {
+          this.lineTableData = res.data || []
+        } else {
+          console.log(res.errorMsg)
+        }
+      })
     }
     mounted() {
-      this.getLists()
     }
 }
 </script>
