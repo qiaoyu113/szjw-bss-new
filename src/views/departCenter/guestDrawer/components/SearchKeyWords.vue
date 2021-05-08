@@ -53,18 +53,23 @@
           </template>
           <template slot="keyWords">
             <el-select
-              v-model="listQuery.driverInfo"
+              v-model.trim="listQuery.driverInfo"
+              v-loadmore="loadQueryDriverByKeyword"
               placeholder="选择/搜索司机姓名/编号"
-              filterable
+              reserve-keyword
+              :default-first-option="true"
               clearable
-              :options="lineList"
-              size="mini"
+              filterable
+              remote
+              style="width:250px"
+              :remote-method="querySearchByKeyword"
+              @clear="handleClearQueryDriver"
             >
               <el-option
-                v-for="it in lineList"
-                :key="it.value"
-                :value="it.value"
-                :label="it.label"
+                v-for="item in driverOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
               />
             </el-select>
           </template>
@@ -92,7 +97,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ item.selected.join(item.key === 'workRange' ? '~' : ',') }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -104,6 +109,7 @@
 
 <script lang="ts">
 import { GetDictionaryList } from '@/api/common'
+import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
@@ -117,6 +123,7 @@ interface IState {
 })
 export default class SearchKeyWords extends Vue {
   private driverInfo: string = ''
+  private driverOptions:IState[] = []
   private shareScopeEnd:IState[] = []
   private citysArry: any[] = []
   private levelData: any = {}
@@ -126,18 +133,16 @@ export default class SearchKeyWords extends Vue {
       label: '全部'
     }
   ] // 车型列表
+  private searchKeyword:string = ''
   private multiple: boolean = true // 当前选项是否是多选
   private key: string = '' // 当前选项是否是多选
   private curSelecteds: [] = []
   private selectTitle: string = ''
-  private selectedData: any[] = [
-    {
-      key: 'workRange',
-      type: '工作时间段',
-      optionIds: ['09:00', '18:00'],
-      selected: ['09:00', '18:00']
-    }
-  ];
+  private selectedData: any[] = [];
+  private queryPage:any = {
+    page: 0,
+    limit: 10
+  }
   private expectOptions: IState[] = [ // 期望货品类型
     { label: '全部', value: '' }
   ];
@@ -165,12 +170,6 @@ export default class SearchKeyWords extends Vue {
     end: '',
     address: '',
     driverInfo: ''
-  }
-  @Watch('listQuery.jobStartDate')
-  onlistQueryChanged(val: any, oldVal: any) {
-    if (this.selectedData[0].type === '工作时间段') {
-      this.selectedData.splice(0, 1)
-    }
   }
   private formItem:any[] = [
     {
@@ -206,16 +205,7 @@ export default class SearchKeyWords extends Vue {
     {
       slot: true,
       label: '',
-      type: 'keyWords',
-      tagAttrs: {
-        placeholder: '请输入司机姓名/编号',
-        clearable: true,
-        'suffix-icon': 'el-icon-search'
-      },
-      style: {
-        width: '200px',
-        marginLeft: '10px'
-      }
+      type: 'keyWords'
     }
   ]
   private selectList: IState[] = [
@@ -340,17 +330,28 @@ export default class SearchKeyWords extends Vue {
               this.selectedData[index].selected.push(command)
             } else {
               if (this.key === 'start') {
-                this.selectedData[index].optionIds.splice(0, 1, id)
-                this.selectedData[index].selected.splice(0, 1, command)
+                if (typeof this.selectedData[index].optionIds === 'string') {
+                  this.selectedData.splice(index, 1)
+                  this.initSelectItem(id, command)
+                } else {
+                  this.selectedData[index].optionIds.splice(0, 1, id)
+                  this.selectedData[index].selected.splice(0, 1, command)
+                }
               } else {
-                this.selectedData[index].optionIds.splice(1, 1, id)
-                this.selectedData[index].selected.splice(1, 1, command)
+                if (typeof this.selectedData[index].optionIds === 'string') {
+                  this.selectedData.splice(index, 1)
+                  this.initSelectItem(id, command)
+                } else {
+                  this.selectedData[index].optionIds.splice(1, 1, id)
+                  this.selectedData[index].selected.splice(1, 1, command)
+                }
               }
-              this.listQuery.workingHour = this.selectedData[index].optionIds.join('-')
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
+          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('~'))
         }
+        console.log(this.selectedData)
       } else {
         this.initSelectItem(id, command)
       }
@@ -358,16 +359,28 @@ export default class SearchKeyWords extends Vue {
       this.initSelectItem(id, command)
     }
   }
-  initSelectItem(id: any, command: any) {
-    const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
-    let obj = {
-      type: isWorkRange ? '工作时间段' : this.selectTitle,
-      key: isWorkRange ? 'workRange' : this.key,
-      optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
-      selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+  initSelectItem(id: any, command: any, isInitWorkRange?: boolean) {
+    console.log(id, command)
+    if (isInitWorkRange) {
+      let obj = {
+        type: '工作时间段',
+        key: 'workRange',
+        optionIds: id,
+        selected: command
+      }
+      this.listQuery.workRange = id
+      this.selectedData.push(obj)
+    } else {
+      const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+      let obj = {
+        type: isWorkRange ? '工作时间段' : this.selectTitle,
+        key: isWorkRange ? 'workRange' : this.key,
+        optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+        selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
+      }
+      this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+      this.selectedData.push(obj)
     }
-    this.listQuery[this.key] = this.multiple ? obj.optionIds : id
-    this.selectedData.push(obj)
   }
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
@@ -398,6 +411,7 @@ export default class SearchKeyWords extends Vue {
         return this.$message.warning('单趟运费起始金额不能大于终止金额')
       }
     }
+    this.$emit('on-search', this.listQuery)
   }
   getArrDifference(arr1:any, arr2:any) {
     return arr1.concat(arr2).filter(function(v:any, i:number, arr:IState[]) {
@@ -449,6 +463,87 @@ export default class SearchKeyWords extends Vue {
     }
     this.shareScopeEnd = this.listQuery[key]
   }
+  // 获取司机列表接口
+  async loadDriverByKeyword(params:IState) {
+    try {
+      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
+        params.workCity = this.listQuery.workCity[1]
+      }
+      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
+      this.listQuery.joinManagerId !== '' && (params.gmId = this.listQuery.joinManagerId)
+      let { data: res } = await getDriverNoAndNameList(params, {
+        url: '/v2/wt-driver-account/refund/queryDriverList'
+      })
+      let result:any[] = res.data.map((item:any) => ({
+        label: `${item.name}/${item.phone}`,
+        value: item.driverId
+      }))
+      return result
+    } catch (err) {
+      console.log(`get driver list fail:${err}`)
+      return []
+    }
+  }
+  // 获取更多司机
+  async loadQueryDriverByKeyword(val?:string) {
+    val = this.searchKeyword
+    this.queryPage.page++
+    let params:IState = {
+      page: this.queryPage.page,
+      limit: this.queryPage.limit
+    }
+    val !== '' && (params.key = val)
+
+    try {
+      let result:IState[] = await this.loadDriverByKeyword(params)
+      this.driverOptions.push(...result)
+    } finally {
+      console.log('finally')
+    }
+  }
+  // 搜索司机
+  querySearchByKeyword(val:string) {
+    this.queryPage.page = 0
+    this.resetDriver()
+    this.searchKeyword = val
+    this.loadQueryDriverByKeyword(val)
+  }
+  // 清除司机
+  handleClearQueryDriver() {
+    this.searchKeyword = ''
+    this.resetDriver()
+    this.loadQueryDriverByKeyword()
+  }
+  // 重置司机
+  resetDriver() {
+    this.listQuery.driverInfo = ''
+    this.searchKeyword = ''
+    let len:number = this.driverOptions.length
+    if (len > 0) {
+      this.queryPage.page = 0
+      this.driverOptions.splice(0, len)
+    }
+  }
+  // 回显业务线
+  getBusiType(data:any) {
+    let specialArr = ['超肥', '单肥', '次肥', '中瘦', '极瘦']
+    let shareArr = ['次肥', '中瘦', '极瘦']
+    let busiType:any = {
+      key: 'busiType',
+      optionIds: [],
+      selected: [],
+      type: '业务线'
+    }
+    if (shareArr.indexOf(data.labelTypeValue) > -1) {
+      busiType.optionIds.push('0')
+      busiType.selected.push('共享')
+    }
+    if (specialArr.indexOf(data.labelTypeValue) > -1) {
+      busiType.optionIds.push('1')
+      busiType.selected.push('专车')
+    }
+    this.selectedData.push(busiType)
+  }
   mounted() {
     this.getOptions()
     for (let i = 0; i < 24; i++) {
@@ -458,6 +553,8 @@ export default class SearchKeyWords extends Vue {
         value: count
       })
     }
+    this.loadQueryDriverByKeyword()
+    this.initSelectItem('9:00~12:00,16:00~20:00', '9:00~12:00,16:00~20:00', true)
   }
 }
 </script>

@@ -57,7 +57,7 @@ export const getLineInfo = (params:any) =>
 // 获取线路suggest列表
 export function getLineSearch(data:any) {
   return request({
-    url: `${prefix}/v1/line/suggest`,
+    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })
@@ -91,6 +91,15 @@ export function MatchLineListForDriver(data: any) {
 export function getLineRemarks(data:any) {
   return request({
     url: `${prefix}/v1/matchCustInvite/queryRemarks`,
+    method: 'post',
+    data
+  })
+}
+
+// 取消试跑意向
+export function cancelIntention(data:any) {
+  return request({
+    url: `${prefix}/v2/runtest/intention/cancel`,
     method: 'post',
     data
   })
