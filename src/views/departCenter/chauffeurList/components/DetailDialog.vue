@@ -82,7 +82,7 @@ import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
-import { getCallDetail, getRunDetail } from '@/api/departCenter'
+import { getCallDetail, getRunDetail, getBasicDetail } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -101,16 +101,16 @@ export default class extends Vue {
   @PropSync('dialogTableVisible', { type: Boolean }) show!: Boolean
 
   private listQuery: any = {
-    carTypeName: '',
-    isBehavior: '',
-    isRestriction: '',
-    carNumber: '', // 车牌号
-    businessLines: '', // 业务线
-    address: '', // 居住地址
-    old: '', // 年龄
-    state: '', // 状态
+    currentCarTypeName: '',
+    canBreakingNodriving: '',
+    canBreakingTrafficRestriction: '',
+    plateNo: '', // 车牌号
+    busiTypeName: '', // 业务线
+    liveDistrict: '', // 居住地址
+    age: '', // 年龄
+    statusName: '', // 状态
     orderId: '', // 订单编号
-    contractState: '', // 合同状态
+    contractStatusName: '', // 合同状态
     driverBehavior: '', // 是否可以闯禁行
     behaviorArea: '', // 可闯禁行区域
     driverRestriction: '', // 是否可以闯限行
@@ -129,49 +129,49 @@ export default class extends Vue {
   private formItem: any[] = [
     {
       type: 7,
-      key: 'carTypeName',
+      key: 'currentCarTypeName',
       label: '车型',
       col: 24
     },
     {
       type: 7,
-      key: 'isBehavior',
+      key: 'canBreakingNodriving',
       label: '能否闯禁行',
       col: 24
     },
     {
       type: 7,
-      key: 'isRestriction',
+      key: 'canBreakingTrafficRestriction',
       label: '能否闯限行',
       col: 24
     },
     {
       type: 7,
-      key: 'carNumber',
+      key: 'plateNo',
       label: '车牌号',
       col: 24
     },
     {
       type: 7,
-      key: 'businessLines',
+      key: 'busiTypeName',
       label: '业务线',
       col: 24
     },
     {
       type: 7,
-      key: 'address',
+      key: 'liveDistrict',
       label: '现居住地址',
       col: 24
     },
     {
       type: 7,
-      key: 'old',
+      key: 'age',
       label: '司机年龄',
       col: 24
     },
     {
       type: 7,
-      key: 'state',
+      key: 'statusName',
       label: '司机状态',
       col: 24
     },
@@ -183,7 +183,7 @@ export default class extends Vue {
     },
     {
       type: 7,
-      key: 'contractState',
+      key: 'contractStatusName',
       label: '合同状态',
       col: 24
     }
@@ -191,7 +191,7 @@ export default class extends Vue {
   private formItem1: any[] = [
     {
       type: 7,
-      key: 'driverBehavior',
+      key: 'canBreakingNodriving',
       label: '是否可以闯禁行',
       col: 24
     },
@@ -389,6 +389,7 @@ export default class extends Vue {
     console.log(index, 'get')
     this.getCallRecord()
     this.getRunInfor()
+    this.getBasicsInfor()
   }
   // 外呼记录
   async getCallRecord() {
@@ -402,7 +403,6 @@ export default class extends Vue {
       if (res.success) {
         this.tableDataDetailRecord = res.data
       }
-      console.log(res.data)
     } catch {
       console.log('1212')
     }
@@ -418,6 +418,28 @@ export default class extends Vue {
       }
     } catch {
       console.log('12121')
+    }
+  }
+  async getBasicsInfor() {
+    try {
+      let parmas:any = {
+        driverId: 2
+      }
+      let { data: res } = await getBasicDetail(parmas)
+      if (res.data.success) {
+        this.listQuery.currentCarTypeName = res.data.DriverMatchVO.currentCarTypeName
+        this.listQuery.canBreakingNodriving = res.data.DriverMatchVO.canBreakingNodriving
+        this.listQuery.canBreakingTrafficRestriction = res.data.DriverMatchVO.canBreakingTrafficRestriction
+        this.listQuery.plateNo = res.data.DriverMatchVO.plateNo
+        this.listQuery.busiTypeName = res.data.DriverMatchVO.busiTypeName
+        this.listQuery.liveDistrict = res.data.DriverMatchVO.liveDistrict
+        this.listQuery.age = res.data.DriverMatchVO.age
+        this.listQuery.statusName = res.data.DriverMatchVO.statusName
+        this.listQuery.orderId = res.data.DriverMatchVO.orderId
+        this.listQuery.contractStatusName = res.data.DriverMatchVO.contractStatusName
+      }
+    } catch {
+      console.log('121')
     }
   }
 }

@@ -96,3 +96,11 @@ export function getRunDetail(params:any) {
     params
   })
 }
+// 获取弹框司机详情-基础信息
+export function getBasicDetail(params:any) {
+  return request({
+    url: `${prefix}/v1/matchDriverInfo/getDriverMatchByDriverId`,
+    method: 'get',
+    params
+  })
+}
