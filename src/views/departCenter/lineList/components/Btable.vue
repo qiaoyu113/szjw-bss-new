@@ -27,16 +27,19 @@
         >
           <template slot-scope="{row}">
             <div class="arrow" />
-            <div style="margin-left:50px;">
+            <div
+              style="margin-left:50px;"
+            >
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-show="row.inviteMark"
                   placement="right"
                   min-width="200"
                   trigger="hover"
                 >
                   <div class="text1">
-                    {{ row.lineName }}
+                    {{ row.inviteMark }}
                   </div>
                   <i
                     slot="reference"
@@ -331,6 +334,7 @@ export default class extends Vue {
   private multipleSelection:IState[] = []
 
   private selection:[] = []
+  private remarks:string = ''
 
   mounted() {
     console.log(this.listQuery)
