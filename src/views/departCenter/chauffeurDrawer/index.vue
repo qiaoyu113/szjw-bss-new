@@ -76,7 +76,7 @@ import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from './components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
-import { MatchDriverList } from '@/api/chauffeurList'
+import { MatchLineListForDriver } from '@/api/departCenter'
   interface IState {
     [key: string]: any;
   }
@@ -214,12 +214,20 @@ export default class GuestDrawer extends Vue {
       this.queryData()
     }
     loadMoreHandle() {
-      this.getLists()
-      // MatchDriverList(Object.assign({}, this.params, this.pageInfo) // todo
+      MatchLineListForDriver(Object.assign({}, this.params)).then((res: any) => {
+        console.log(res)
+      }) // todo  /*, this.pageInfo */
     }
     queryData() {
-      this.getLists()
-      // MatchDriverList(this.params) // todo
+      MatchLineListForDriver(this.params).then((res: any) => {
+        res = res.data || {}
+        console.log(res)
+        if (res.success) {
+          this.lineTableData = res.data || []
+        } else {
+          console.log(res.errorMsg)
+        }
+      })
     }
     mounted() {
     }
