@@ -14,28 +14,28 @@ export const CreateLntentionRun = (data: any) =>
 // 发起客邀
 export const CreateLaunchGuests = (data: any) =>
   request({
-    url: `mock/283/lines/startMatchCustInvite`,
+    url: `mock/283/v1/matchCustInvite/startMatchCustInvite`,
     method: 'post',
     data
   })
   // 取消客邀
 export const cancelMatchCustInvite = (data: any) =>
   request({
-    url: `mock/283/lines/cancelMatchCustInvite`,
+    url: `mock/283/v1/matchCustInvite/cancelMatchCustInvite`,
     method: 'post',
     data
   })
   // 批量发起客邀
 export const CreateLaunchGuestsBatch = (data: any) =>
   request({
-    url: `mock/283/lines/startMatchCustInviteBatch`,
+    url: `mock/283/v1/matchCustInvite/startMatchCustInviteBatch`,
     method: 'post',
     data
   })
 // 批量取消客邀
 export const cancelMatchCustInviteBatch = (data: any) =>
   request({
-    url: `mock/283/lines/cancelMatchCustInviteBatch`,
+    url: `mock/283/v1/matchCustInvite/cancelMatchCustInviteBatch`,
     method: 'post',
     data
   })
