@@ -122,7 +122,7 @@ export default class extends Vue {
       clueId: '',
       phone: ''
     };
-    private detailDio:Boolean = false
+    private detailDio:Boolean = true
     private cityDio:Boolean = false
     private allotDialog:Boolean = false
     private allotTitle:string = ''

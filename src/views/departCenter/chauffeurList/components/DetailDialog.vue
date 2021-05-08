@@ -52,7 +52,11 @@
               :columns="columns"
               :index="false"
               :table-data="tableDataDetailInfor"
-            />
+            >
+              <template v-slot:distributionTime="scope">
+                <span> {{ scope.row.deliveryStartDate }}-{{ scope.row.deliveryEndDate }}</span>
+              </template>
+            </SelfTable>
           </el-tab-pane>
           <el-tab-pane
             label="外呼记录"
@@ -63,8 +67,8 @@
               :index="false"
               :table-data="tableDataDetailRecord"
             >
-              <template v-slot:phonefile="scope">
-                <span>{{ scope.row.phonefile }}</span>
+              <template v-slot:recordFileAddress="scope">
+                <span> Mp4 </span>
               </template>
             </SelfTable>
           </el-tab-pane>
@@ -78,6 +82,7 @@ import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
+import { getCallDetail, getRunDetail } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -90,7 +95,7 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: false }) dialogTableVisible!: boolean; // 弹框显示
+  @Prop({ default: true }) dialogTableVisible!: boolean; // 弹框显示
   @Prop({ default: '' }) driverId!: String;
   @PropSync('actived', { type: String }) active!: string
   @PropSync('dialogTableVisible', { type: Boolean }) show!: Boolean
@@ -300,15 +305,15 @@ export default class extends Vue {
   ];
   private columns: IState = [
     {
-      key: 'createTime',
+      key: 'createDate',
       label: '创建意向时间'
     },
     {
-      key: 'runStartTime',
+      key: 'startDate',
       label: '试跑开始时间'
     },
     {
-      key: 'runEndTime',
+      key: 'endDate',
       label: '试跑结束时间'
     },
     {
@@ -316,58 +321,59 @@ export default class extends Vue {
       label: '线路名称'
     },
     {
-      key: 'warehouseArea',
+      key: 'warehouseAreaName',
       label: '仓库位置'
     },
     {
-      key: 'distributionArea',
+      key: 'deliveryAreaName',
       label: '主要配送区域'
     },
     {
       key: 'distributionTime',
-      label: '配送时间'
+      label: '配送时间',
+      slot: true
     },
     {
-      key: 'distributionNum',
+      key: 'deliveryCount',
       label: '配送次数'
     },
     {
-      key: 'offLineReason',
+      key: 'droppedReason',
       label: '掉线原因'
     },
     {
-      key: 'dutyManagerIdName',
+      key: 'driverMatchManager',
       label: '司机撮合经理'
     }
   ];
   private columns1: IState = [
     {
-      key: 'phoneName',
+      key: 'inviteName',
       label: '拨打人'
     },
     {
-      key: 'phoneState',
+      key: 'callStatusName',
       label: '拨打状态'
     },
     {
-      key: 'phoneTime',
+      key: 'callDuration',
       label: '拨打时长'
     },
     {
-      key: 'outboundTime',
+      key: 'beginTime',
       label: '外呼时间'
     },
     {
-      key: 'hangUpTime',
+      key: 'endTime',
       label: '挂断时间'
     },
     {
-      key: 'phonefile',
+      key: 'recordFileAddress',
       label: '通话录音文件',
       slot: true
     },
     {
-      key: 'createInterval',
+      key: 'intentionIntervalTime',
       label: '创建试跑意向间隔时间'
     }
   ];
@@ -381,6 +387,38 @@ export default class extends Vue {
   }
   getData(index:string) {
     console.log(index, 'get')
+    this.getCallRecord()
+    this.getRunInfor()
+  }
+  // 外呼记录
+  async getCallRecord() {
+    try {
+      let params:any = {
+        limit: 1,
+        page: 1,
+        businessId: '12121212'
+      }
+      let { data: res } = await getCallDetail(params)
+      if (res.success) {
+        this.tableDataDetailRecord = res.data
+      }
+      console.log(res.data)
+    } catch {
+      console.log('1212')
+    }
+  }
+  async getRunInfor() {
+    try {
+      let parmas:any = {
+        driverId: 2
+      }
+      let { data: res } = await getRunDetail(parmas)
+      if (res.success) {
+        this.tableDataDetailInfor = res.data
+      }
+    } catch {
+      console.log('12121')
+    }
   }
 }
 </script>

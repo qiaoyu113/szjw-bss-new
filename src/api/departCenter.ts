@@ -78,3 +78,21 @@ export function getLineDetail(params:any) {
     params
   })
 }
+
+// 获取弹框司机详情-外呼记录
+export function getCallDetail(data:any) {
+  return request({
+    url: `${prefix}/v2/outboundCall/getListByBusinessId`,
+    method: 'post',
+    data
+  })
+}
+
+// 获取弹框司机详情-试跑信息
+export function getRunDetail(params:any) {
+  return request({
+    url: `/mock/291/v2/runtest/getRunTestInfoByDriverId`,
+    method: 'get',
+    params
+  })
+}
