@@ -1,7 +1,7 @@
 <template>
   <section class="matchDriver">
     <!-- 搜索项 -->
-    <SearchKeyWords />
+    <SearchKeyWords @on-search="searchData" />
     <h3>司机匹配线路</h3>
     <div class="lineTable">
       <AtableDriver
@@ -52,6 +52,7 @@ interface IState {
 export default class DepartLine extends Vue {
   private tryRunShow:boolean = false
   private rowData:object = {}
+  private listQueryLine:IState = {}
   private driverTableData:IState[] = [] // 司机列表
   private detailDialog:Boolean = false
   private detailId:string = ''
@@ -103,51 +104,45 @@ export default class DepartLine extends Vue {
       // this.driverTableData = []
       for (let i = 0; i < num; i++) {
         let obj:IState = {
-          driverName: '张道松',
-          manager: '李加盟经理',
+          driverName: '张三',
+          joinManagerName: '李四',
+          driverMatchManagerName: '加盟经理',
           driverId: 'SJ20210415',
-          phoneNum: '132000000000',
-          a: '京东传站',
-          b: '李外线经理',
-          lineId: 'XL202012300377',
-          c: '3',
-          d: '4.2米厢货',
-          e: '油车',
-          f: '能闯禁行',
-          g: '能闯限行行',
-          h: '共享',
-          p1: '湖南省',
-          c1: '长沙市',
-          c2: '短沙县',
-          m1: 500,
-          time: '9:00~18:00',
-          percent: 80,
-          id: (this.pageSize - 1) * 3 + i,
-          arr: [
-            '商贸信息',
-            '已创建30条线路',
-            '15条在跑',
-            '5条线路已掉线',
-            '3条线路在上架找车'
-          ],
-          brr: [
-            '1个点',
-            '每日1趟',
-            '每月12天',
-            '每趟120公里',
-            '走高速',
-            '回单',
-            '城配线',
-            '稳定(2个月)'
-          ],
-          crr: [
-            '已发起3次客邀',
-            '已创建意向3次',
-            '试跑失败2次',
-            '司机爽约1次',
-            '扭头就走1次',
-            '掉线1次'
-          ]
+          carTypeName: '4.2米厢货',
+          isNewEnergy: true,
+          canBreakingNodriving: true,
+          canBreakingTrafficRestriction: false,
+          busiTypeName: '共享',
+          liveAddressProvinceName: '北京市',
+          liveAddressCityName: '北京市',
+          liveAddressCountyName: '朝阳区',
+          startingPointProvinceName: '湖南省',
+          startingPointCityName: '长沙市',
+          startingPointCountyName: '芙蓉区',
+          deliveryPointProvinceName: '山东省',
+          deliveryPointCityName: '济南市',
+          deliveryPointCountyName: '历下区',
+          expectedFreightMonth: 600,
+          expectedFreightTrip: 500,
+          expectAccountingPeriodName: '现结',
+          intentCargoTypeName: '团购',
+          heavyLiftingName: '只装不卸',
+          deliveryDifficultyNames: '整车',
+          workHours: ['9:00-12:00', '13:00-18:00'],
+          expectStabilityTemporaryNames: '稳定',
+          driverSituationName: '着急试跑',
+          driverStatusName: '已上岗',
+          newDealName: '当月新成交',
+          isNoviceName: '小白司机',
+          tryRunNum: 2,
+          followCarNum: 1,
+          age: 40,
+          drivingLicenceTypeName: 'A1',
+          drivingExperience: 2,
+          sourceChannelName: '58同城',
+          driverPassTime: '2020-11-20',
+          driverMatchRemarksName: '不怕累活',
+          driverMatchManuallyRemarks: '什么活都可以干'
         }
         obj.isOpen = false
         obj.id = ((this.pageSize - 1) * 3 + i + 1)
@@ -161,6 +156,9 @@ export default class DepartLine extends Vue {
     } finally {
       console.log('')
     }
+  }
+  searchData(data:any) {
+    this.listQueryLine = data
   }
   mounted() {
     this.getLists()

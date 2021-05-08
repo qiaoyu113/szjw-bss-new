@@ -26,6 +26,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { CreateLaunchGuests, CreateLaunchGuestsBatch } from '@/api/departCenter'
+import { GetDictionaryCity } from '@/api/common'
 interface IState {
   [key: string]: any;
 }
@@ -41,9 +42,10 @@ export default class extends Vue {
   @Prop({ default: () => ({ lineId: '', matchId: '' }) }) launchArguments !:IState
   @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
+  private cityList:IState[] = []; // 城市列表
   private matchCustInviteInfo: any[] = []
   private listQuery:IState = {
-    city: 1,
+    city: '',
     remarks: ''
   }
   private launchGuestState :number = 0
@@ -52,12 +54,7 @@ export default class extends Vue {
       type: 2,
       label: '客邀城市',
       key: 'city',
-      options: [
-        {
-          label: '北京',
-          value: 1
-        }
-      ]
+      options: this.cityList
     },
     {
       type: 1,
@@ -84,6 +81,23 @@ export default class extends Vue {
   // 验证通过
   handlePassChange() {
     this.showDialog = false
+  }
+  // 根据大区获取城市列表
+  async cityDetail() {
+    this.cityList.push({
+      value: 0,
+      label: '全部城市'
+    })
+    let { data: city } = await GetDictionaryCity()
+    if (city.success) {
+      const nodes = city.data.map(function(item: any) {
+        return {
+          value: +item.code,
+          label: item.name
+        }
+      })
+      this.cityList.push(...nodes)
+    }
   }
   // 发起客邀
   async saveData() {
@@ -128,6 +142,12 @@ export default class extends Vue {
       //
       }
     }
+  }
+  init() {
+    this.cityDetail()
+  }
+  mounted() {
+    this.init()
   }
 }
 </script>

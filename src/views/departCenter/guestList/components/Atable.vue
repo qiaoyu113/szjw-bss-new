@@ -81,7 +81,7 @@
           <p
             class="text"
           >
-            <span :class="isShowPercent && obj.carTypeValue === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
+            <span :class="isShowPercent && obj.carType === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
@@ -98,15 +98,13 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isShowPercent && obj.provinceArea === row.warehouseCity ? 'blue text' : 'text'"
           >
-            仓库位置:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
+            仓库位置:<span :class="isShowPercent && obj.warehouseCityCode === row.warehouseCityCode ? 'blue' : ''">{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}</span>
           </p>
           <p
             class="text"
-            :class="isShowPercent && obj.provinceArea === row.cityArea ? 'blue text' : 'text'"
           >
-            配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
+            配送区域:<span :class="isShowPercent && obj.cityAreaCode === row.cityAreaCode ? 'blue' : ''">{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}</span>
           </p>
         </template>
       </el-table-column>
@@ -118,18 +116,16 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isShowPercent && row.settlementCycleHit ? 'blue text' : 'text'"
           >
-            单趟运费:{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天
+            单趟运费:<span :class="isShowPercent && row.settlementCycleHit ? 'blue' : ''">{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天</span>
           </p>
           <p
             class="text"
-            :class="isShowPercent && obj.m1 === row.shipperOffer ? 'blue text' : 'text'"
           >
-            预计月运费:{{ row.shipperOffer }}元
+            预计月运费:<span :class="isShowPercent && obj.m1 === row.shipperOffer ? 'blue' : ''">{{ row.shipperOffer }}元</span>
           </p>
           <p class="text">
-            结算周期/天数:{{ row.settlementCycleValue }}/{{ row.settlementDays }}天
+            结算周期/天数:<span :class="isShowPercent && row.settlementCycleHit ? 'blue' : ''">{{ row.settlementCycleValue }}/{{ row.settlementDays }}天</span>
           </p>
         </template>
       </el-table-column>
@@ -141,18 +137,16 @@
         <template slot-scope="{row}">
           <p
             class="text"
-            :class="isShowPercent && row.cargoTypeHit ? 'blue text' : 'text'"
           >
-            货品:{{ row.cargoTypeValue }}
+            货品:<span :class="isShowPercent && row.cargoTypeHit ? 'blue' : ''">{{ row.cargoTypeValue }}</span>
           </p>
-          <p :class="isShowPercent && row.handlingDifficultyHit ? 'blue text' : 'text'">
-            装卸难度:{{ row.handlingDifficultyValue }}
+          <p class="text">
+            装卸难度:<span :class="isShowPercent && row.handlingDifficultyHit ? 'blue' : ''">{{ row.handlingDifficultyValue }}</span>
           </p>
           <p
             class="text"
-            :class="isShowPercent && row.distributionWayHit ? 'blue text' : 'text'"
           >
-            配送复杂度:{{ row.distributionWayValue }}
+            配送复杂度:<span :class="isShowPercent && row.distributionWayHit ? 'blue' : ''">{{ row.distributionWayValue }}</span>
           </p>
           <p
             class="text"
@@ -327,8 +321,9 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineDetail } from '@/api/departCenter'
-const key = 'line_row'
+import { getLineDetail, getLineRemarks } from '@/api/departCenter'
+const lineKey = 'line_row'
+const driverKey = 'driver_row'
 interface IState {
   [key: string]: any;
 }
@@ -343,7 +338,6 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
-  @Prop({ default: () => {} }) obj!:IState
   @Prop({ default: () => [] }) lineTableData!:IState[]
 
   get _tableData() {
@@ -352,6 +346,7 @@ export default class extends Vue {
   set _tableData(val:IState[]) {
     this.$emit('update:lineTableData', val)
   }
+  private obj:IState = {}
   // 计算窗口期
   private _calcDay(row:IState) {
     let day = Number(row.recruitWindowPeriod)
@@ -363,7 +358,7 @@ export default class extends Vue {
   }
 
   // 展开
-  toogleExpand(row:IState) {
+  async toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item:IState = this._tableData[i]
@@ -377,12 +372,12 @@ export default class extends Vue {
       }
     }
     row.isOpen = true
-    this.getLineDetailByLineId(row)
+    await this.getLineDetailByLineId(row)
     $table.toggleRowExpansion(row, true)
   }
   // 匹配撮合
   handleMatchClick(row:IState) {
-    sessionStorage.setItem(key, JSON.stringify(row))
+    sessionStorage.setItem(lineKey, JSON.stringify(row))
     this.$emit('match', row)
   }
   // 创建试跑意向
@@ -394,28 +389,53 @@ export default class extends Vue {
     let { href } = this.$router.resolve({
       path: `/lineshelf/linedetail`,
       query: {
-        id: 'XL202104250009'
+        id: row.lineId
       }
     })
     window.open(href, '_blank')
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
   removeTableInfo() {
-    sessionStorage.removeItem(key)
+    sessionStorage.removeItem(lineKey)
   }
   // 显示备注
   handleHoverRemark(row:IState) {
     if (!row.remark) {
-      setTimeout(() => {
-        this.$set(row, 'remark', '12121')
-      }, 1000)
+      this.getLineRemark(row)
+    }
+  }
+  // 获取线路备注
+  async getLineRemark(row:IState) {
+    try {
+      let params:IState = {
+        lineId: row.lineId,
+        city: row.currentCityCode
+      }
+      let { data: res } = await getLineRemarks(params)
+      if (res.success) {
+        this.$set(row, 'remark', res.data.remarks)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line remark fail:${err}`)
+    } finally {
+      //
     }
   }
   // 从缓存获取
   getStorage() {
-    let str = sessionStorage.getItem(key) || ''
+    let str = sessionStorage.getItem(lineKey) || ''
     if (str) {
       this._tableData = [JSON.parse(str)]
+    }
+  }
+  // 从缓存获取司机信息
+  getDriverInfoFromStorage() {
+    let str = sessionStorage.getItem(driverKey) || ''
+    if (str) {
+      let obj:IState = JSON.parse(str) || {}
+      this.obj = obj
     }
   }
   // 获取线路详情
@@ -440,13 +460,16 @@ export default class extends Vue {
         distributionInfo.push(`每趟${item.distance}公里`)
         if (item.runSpeed === 1) {
           distributionInfo.push(`走高速`)
+        } else {
+          distributionInfo.push(`不需要走高速`)
         }
         if (item.returnBill === 1) {
           distributionInfo.push(`回单`)
+        } else {
+          distributionInfo.push(`不需要回单`)
         }
-        if (item.lineType === 1) {
-          distributionInfo.push(`城配线`)
-        }
+        distributionInfo.push(item.lineTypeName)
+
         if (item.stabilityRate === 1) {
           distributionInfo.push(`稳定`)
         } else {

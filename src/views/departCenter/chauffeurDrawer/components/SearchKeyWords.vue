@@ -250,7 +250,11 @@ export default class SearchKeyWords extends Vue {
       this.listQuery[key] = val
     }
     this.levelData = {}
+    let provices:any = []
     this.listQuery[key].forEach((item:any) => {
+      if (provices.indexOf(item[0]) === -1) {
+        provices.push(item[0])
+      }
       if (!this.levelData[item[1]]) {
         this.levelData[item[1]] = []
       }
@@ -258,7 +262,12 @@ export default class SearchKeyWords extends Vue {
         this.levelData[item[1]].push(item[2])
       }
     })
-
+    if (provices.length >= 2) {
+      this.listQuery[key] = this.listQuery[key].filter((item:any) => {
+        return item.indexOf(parseInt(changeItem[1])) === -1
+      })
+      return this.$message.error('只能选择同一省下的市，区')
+    }
     let cityNum = 0
     for (let itemKey in this.levelData) {
       cityNum++

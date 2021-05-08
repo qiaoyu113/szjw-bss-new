@@ -343,7 +343,7 @@ export default class extends Vue {
           page: obj.page,
           limit: obj.limit
         }
-        obj.key && (params.keyWord = obj.key)
+        obj.key && (params.key = obj.key)
         let { data: res } = await getLineSearch(params)
         let result:any[] = res.data.map((item:any) => ({
           label: item.lineName,
