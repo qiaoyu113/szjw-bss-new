@@ -327,7 +327,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineDetail } from '@/api/departCenter'
+import { getLineDetail, getLineRemarks } from '@/api/departCenter'
 const key = 'line_row'
 interface IState {
   [key: string]: any;
@@ -363,7 +363,7 @@ export default class extends Vue {
   }
 
   // 展开
-  toogleExpand(row:IState) {
+  async toogleExpand(row:IState) {
     let $table:any = this.$refs.lineTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item:IState = this._tableData[i]
@@ -377,7 +377,7 @@ export default class extends Vue {
       }
     }
     row.isOpen = true
-    this.getLineDetailByLineId(row)
+    await this.getLineDetailByLineId(row)
     $table.toggleRowExpansion(row, true)
   }
   // 匹配撮合
@@ -406,9 +406,26 @@ export default class extends Vue {
   // 显示备注
   handleHoverRemark(row:IState) {
     if (!row.remark) {
-      setTimeout(() => {
-        this.$set(row, 'remark', '12121')
-      }, 1000)
+      this.getLineRemark(row)
+    }
+  }
+  // 获取线路备注
+  async getLineRemark(row:IState) {
+    try {
+      let params:IState = {
+        lineId: row.lineId,
+        city: row.currentCityCode
+      }
+      let { data: res } = await getLineRemarks(params)
+      if (res.success) {
+        this.$set(row, 'remark', res.data.remarks)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line remark fail:${err}`)
+    } finally {
+      //
     }
   }
   // 从缓存获取
