@@ -102,7 +102,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : ((item.selected || []).join(item.key === 'workRange' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -406,7 +406,9 @@ export default class SearchKeyWords extends Vue {
   initQuery() {
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
     this.listQuery.driverId = driver.driverId || driver.id
-    this.initSelectItem(driver.time, driver.time, true)
+    if (driver.workHours.length) {
+      this.initSelectItem((driver.workHours || []).join(','), (driver.workHours || []).join(','), true)
+    }
     if (driver.heavyLifting) {
       this.key = 'loadDifficulty'
       this.initSelectItem(driver.heavyLifting.split(','), driver.heavyLiftingName.split(','))
