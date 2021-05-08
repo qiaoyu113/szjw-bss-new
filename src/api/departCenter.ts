@@ -96,6 +96,14 @@ export function getRunDetail(params:any) {
     params
   })
 }
+// 获取弹框司机详情-司机标签
+export function getDriverDetail(params:any) {
+  return request({
+    url: `/mock/283/v1/matchDriverLabel/getMatchDriverLabel/{driverId}`,
+    method: 'get',
+    params
+  })
+}
 // 获取弹框司机详情-基础信息
 export function getBasicDetail(params:any) {
   return request({
