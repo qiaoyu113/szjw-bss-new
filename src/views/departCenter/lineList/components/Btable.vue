@@ -268,7 +268,7 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelTryRun(row.id)"
+                @click.stop="handleCancelTryRun(row)"
               >
                 取消试跑意向
               </el-button>
@@ -380,9 +380,9 @@ export default class extends Vue {
     }
   }
   // 取消意向
-  handleCancelTryRun(id:number) {
+  handleCancelTryRun(row:any) {
     if (!this.selection.length) {
-      this.$emit('cancelTryRun', id)
+      this.$emit('cancelTryRun', row)
     } else {
       this.$message.error('请取消勾选项')
     }

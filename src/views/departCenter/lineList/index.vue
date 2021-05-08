@@ -106,13 +106,12 @@
       :launch-arguments="launchArguments"
     />
     <cancel-guest
-      :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
     />
     <cancel-tryRun
       ref="cancelTryRun"
-      :cancel-id="cancelId"
+      :cancel-data="cancelData"
     />
   </div>
 </template>
@@ -167,7 +166,6 @@ export default class extends Vue {
   private showDialog: boolean = false
   private tableData:any[] = []
   private ids = []
-  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -340,7 +338,7 @@ export default class extends Vue {
     }
   ]
   private custInviteId:string=''
-  private cancelId:string=''
+  private cancelData:{}={}
   private launchArguments:{}={
     lineId: '',
     matchId: ''
@@ -517,19 +515,15 @@ export default class extends Vue {
     (this.$refs.cancelGuest as any).cancelGuestState = 2
   }
   // 取消创建试跑意向
-  handleCancelTryRun(id:string) {
+  handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    this.cancelId = id
+    const { lineId, matchId, matchStatus, runTestId, status } = row
+    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    this.cancelData = cancelData
   }
   private checkOff(id:any) {
     this.ids = id.map((item:any) => {
-      return {
-        lineId: item.lineId,
-        matchId: item.matchId
-      }
-    })
-    this.idss = id.map((item:any) => {
-      return item.custInviteId
+      return item.id
     })
   }
   init() {
