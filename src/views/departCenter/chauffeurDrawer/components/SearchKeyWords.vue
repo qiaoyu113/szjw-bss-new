@@ -147,6 +147,7 @@ export default class SearchKeyWords extends Vue {
   ];
   private timeLists:IState[] = []
   private listQuery:IState = {
+    driverId: '', // 司机ID
     lineQuality: '', // 线路肥瘦
     model: '', // 车型
     loadDifficulty: '', // 装卸难易度
@@ -367,8 +368,9 @@ export default class SearchKeyWords extends Vue {
       this.selectedData.push(obj)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
+      const title = (this.selectList.find((v: any) => v.key === this.key) || {}).title
       let obj = {
-        type: isWorkRange ? '工作时间段' : this.selectTitle,
+        type: isWorkRange ? '工作时间段' : (this.selectTitle || title),
         key: isWorkRange ? 'workRange' : this.key,
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
@@ -401,6 +403,30 @@ export default class SearchKeyWords extends Vue {
     console.log(this.listQuery)
     this.$emit('query', this.listQuery)
   }
+  initQuery() {
+    const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
+    this.listQuery.driverId = driver.driverId || driver.id
+    if (driver.workHours.length) {
+      this.initSelectItem((driver.workHours || []).join(','), (driver.workHours || []).join(','), true)
+    }
+    if (driver.heavyLifting) {
+      this.key = 'loadDifficulty'
+      this.initSelectItem(driver.heavyLifting.split(','), driver.heavyLiftingName.split(','))
+    }
+    if (driver.carType) {
+      this.key = 'model'
+      this.initSelectItem(driver.carType.split(','), driver.heavyLiftingName.split(','))
+    }
+    if (driver.intentCargoType) {
+      this.key = 'cargoType'
+      this.initSelectItem(driver.intentCargoType.split(','), driver.intentCargoTypeName.split(','))
+    }
+    if ((driver.liveAddressCity && driver.liveAddressProvince) || process.env.NODE_ENV === 'development') {
+      this.listQuery.repoLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
+      this.listQuery.distLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
+    }
+    this.$emit('query', this.listQuery)
+  }
   mounted() {
     this.getOptions()
     for (let i = 0; i < 24; i++) {
@@ -410,9 +436,7 @@ export default class SearchKeyWords extends Vue {
         value: count
       })
     }
-    const driverInfo = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
-    this.initSelectItem(driverInfo.time, driverInfo.time, true)
-    this.$emit('query', this.listQuery)
+    this.initQuery()
   }
 }
 </script>
