@@ -104,3 +104,12 @@ export function cancelIntention(data:any) {
     data
   })
 }
+
+// 客邀撮合【抽屉】-展开司机详情
+
+export function unfoldDriverInfo(params:any) {
+  return request({
+    url: `${prefix}/v1/customerInviteDrawer/driverInfo/${params}`,
+    method: 'get'
+  })
+}

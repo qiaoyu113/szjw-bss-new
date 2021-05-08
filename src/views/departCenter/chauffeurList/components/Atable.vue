@@ -290,46 +290,50 @@
         width="1"
         class-name="expand"
       >
-        <template slot-scope="{row}">
-          <div
-            class="item"
-            :a="row"
-          >
-            <div class="title">
-              基础信息:
+        <template
+          slot-scope="{row}"
+        >
+          <div v-loading="listLoading">
+            <div
+              class="item"
+              :a="row"
+            >
+              <div class="title">
+                基础信息:
+              </div>
+              <div class="content">
+                {{ `${unfoldData.age}岁/${unfoldData.drivingLicenceTypeName}本/${unfoldData.drivingExperience}年货运经验/${unfoldData.sourceChannelName}/成交:${unfoldData.driverPassTime}` }}
+              </div>
             </div>
-            <div class="content">
-              40岁/A1本/5年货运经验/58同城/成交：2020-01-01
+            <div class="item">
+              <div class="title">
+                试跑信息:
+              </div>
+              <div class="content">
+                <el-button
+                  size="mini"
+                  type="text"
+                  @click.stop="handleDetail(row)"
+                >
+                  立即查看
+                </el-button>
+              </div>
             </div>
-          </div>
-          <div class="item">
-            <div class="title">
-              试跑信息:
+            <div class="item">
+              <div class="title">
+                司机状态:
+              </div>
+              <div class="content">
+                {{ unfoldData.driverSituation }}
+              </div>
             </div>
-            <div class="content">
-              <el-button
-                size="mini"
-                type="text"
-                @click.stop="handleDetail(row)"
-              >
-                立即查看
-              </el-button>
-            </div>
-          </div>
-          <div class="item">
-            <div class="title">
-              司机状态:
-            </div>
-            <div class="content">
-              着急试跑
-            </div>
-          </div>
-          <div class="item">
-            <div class="title">
-              备注信息:
-            </div>
-            <div class="content">
-              司机有贷款压力，不怕累活，不是稳定活不接受
+            <div class="item">
+              <div class="title">
+                备注信息:
+              </div>
+              <div class="content">
+                {{ unfoldData.driverMatchManuallyRemarks }}
+              </div>
             </div>
           </div>
         </template>
@@ -346,6 +350,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
+import { unfoldDriverInfo } from '@/api/departCenter'
 const key = 'driver_row'
 interface IState {
   [key: string]: any;
@@ -367,8 +372,11 @@ export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!: IState;
   @Prop({ default: () => [] }) opType!: number[];
   @Prop({ default: () => [] }) driverTableData!: IState[];
+
   private phone: string = '';
   private callId: string | number = '';
+  private unfoldData :{}= {}
+  private listLoading:boolean = true
 
   get _tableData() {
     return this.driverTableData
@@ -381,6 +389,7 @@ export default class extends Vue {
   }
   // 展开
   toogleExpand(row: IState) {
+    console.log('row', row)
     let $table: any = this.$refs.chauffeurTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item: IState = this._tableData[i]
@@ -395,6 +404,21 @@ export default class extends Vue {
     }
     row.isOpen = true
     $table.toggleRowExpansion(row, true)
+    this.unfoldInfo(row.driverId)
+  }
+  async unfoldInfo(driverId:string) {
+    try {
+      this.listLoading = true
+      let params = driverId
+      let { data: res } = await unfoldDriverInfo(params)
+      this.unfoldData = res.data
+      this.listLoading = false
+    } catch (err) {
+      this.listLoading = false
+      console.log(err)
+    } finally {
+      this.listLoading = false
+    }
   }
   // 外呼
   handleCall(row: IState) {
