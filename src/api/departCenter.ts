@@ -57,7 +57,7 @@ export const getLineInfo = (params:any) =>
 // 获取线路suggest列表
 export function getLineSearch(data:any) {
   return request({
-    url: `${prefix}/v1/line/suggest`,
+    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })
@@ -102,5 +102,14 @@ export function cancelIntention(data:any) {
     url: `${prefix}/v2/runtest/intention/cancel`,
     method: 'post',
     data
+  })
+}
+
+// 客邀撮合【抽屉】-展开司机详情
+
+export function unfoldDriverInfo(params:any) {
+  return request({
+    url: `${prefix}/v1/customerInviteDrawer/driverInfo/${params}`,
+    method: 'get'
   })
 }
