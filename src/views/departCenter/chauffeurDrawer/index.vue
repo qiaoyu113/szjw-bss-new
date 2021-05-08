@@ -163,51 +163,14 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
       setTimeout(() => {
-        (this.$refs.driverDrawer as any).getStorage()
+        (this.$refs.driverDrawer as any).getStorage();
+        (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
       }, 20)
+      this.queryData()
     }
     onCreateTryRun(data:any) {
       (this.$refs.tryRunShow as any).showDialog = true
       this.rowData = data
-    }
-    // 获取列表数据
-    async getLists() {
-      try {
-        // this.lineTableData = []
-        this.pageSize++
-        let num:number = 3
-        for (let i = 0; i < num; i++) {
-          let obj:IState = {
-            a: '京东传站',
-            b: '李外线经理',
-            lineId: 'XL202012300377',
-            c: '3',
-            d: '4.2米厢货',
-            e: '油车',
-            f: '能闯禁行',
-            g: '能闯限行',
-            h: '单肥',
-            p1: '湖南省',
-            c1: '长沙市',
-            c2: '短沙县',
-            m1: 500,
-            time: '9:00~18:00',
-            percent: 80,
-            id: (this.pageSize - 1) * 3 + i,
-            arr: ['商贸信息', '已创建30条线路', '15条在跑', '5条线路已掉线', '3条线路在上架找车'],
-            brr: ['1个点', '每日1趟', '每月12天', '每趟120公里', '走高速', '回单', '城配线', '稳定(2个月)'],
-            crr: ['已发起3次客邀', '已创建意向3次', '试跑失败2次', '司机爽约1次', '扭头就走1次', '掉线1次'],
-            createDate: '2021-04-15 12:00'
-          }
-          obj.isOpen = false
-          obj.id = ((this.pageSize - 1) * 3 + i + 1)
-          this.lineTableData.push({ ...obj })
-        }
-      } catch (err) {
-        console.log(`get list fail fail:${err}`)
-      } finally {
-        console.log('')
-      }
     }
     onQuery(params: any) {
       this.params = params

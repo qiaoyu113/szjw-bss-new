@@ -346,7 +346,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
-const key = 'driver_row'
+const driverKey = 'driver_row'
+const lineKey = 'line_row'
 interface IState {
   [key: string]: any;
 }
@@ -369,6 +370,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) driverTableData!: IState[];
   private phone: string = '';
   private callId: string | number = '';
+  private obj:IState = {}
 
   get _tableData() {
     return this.driverTableData
@@ -414,7 +416,7 @@ export default class extends Vue {
   }
   // 撮合
   handleDepart(row: IState) {
-    sessionStorage.setItem(key, JSON.stringify(row))
+    sessionStorage.setItem(driverKey, JSON.stringify(row))
     this.$emit('depart', row)
   }
   // 查看详情
@@ -427,7 +429,7 @@ export default class extends Vue {
   }
   // 推线
   handlePutLine(row: IState) {
-    sessionStorage.setItem(key, JSON.stringify(row))
+    sessionStorage.setItem(driverKey, JSON.stringify(row))
     let routeUrl = this.$router.resolve({
       path: '/depart/chauffeurList',
       query: { id: row.driverId }
@@ -444,13 +446,23 @@ export default class extends Vue {
   }
   // 抽屉内移出被匹配项(客邀列表是线路)的信息
   removeTableInfo() {
-    sessionStorage.removeItem(key)
+    sessionStorage.removeItem(driverKey)
   }
   // 从缓存读取
   getStorage() {
-    let str = sessionStorage.getItem(key) || ''
+    let str = sessionStorage.getItem(driverKey) || ''
     if (str) {
-      this._tableData = [JSON.parse(str)]
+      let obj = JSON.parse(str) || {}
+      this._tableData = [obj]
+      this.obj = obj
+    }
+  }
+  // 从缓存获取线路信息
+  getLineInfoFromStorage() {
+    let str = sessionStorage.getItem(lineKey) || ''
+    if (str) {
+      let obj:IState = JSON.parse(str) || {}
+      this.obj = obj
     }
   }
 }
