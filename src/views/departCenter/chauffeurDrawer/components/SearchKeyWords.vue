@@ -102,7 +102,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : ((item.selected || []).join(item.key === 'workRange' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
