@@ -69,6 +69,21 @@
           v-only-number="{min: 1, max: 19999, precision: 0}"
         />
       </template>
+      <!-- <span v-if="listQuery.customerStatus ===2"> -->
+      <template slot="guestCity">
+        <el-select
+          v-model="listQuery.guestCity"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in cityList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </template>
+      <!-- </span> -->
       <template slot="time">
         <timeSelect
           v-model="listQuery.time"
@@ -122,7 +137,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList } from '@/api/common'
+import { GetDictionaryList, GetDictionaryCity } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
 import { getLineSearch } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
@@ -161,6 +176,7 @@ export default class extends Vue {
   private carLists:IState[] = [] // 车型列表
   private labelTypeArr:IState[] = [{ label: '全部', value: '' }] // 线路肥瘦
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
+  private cityList:IState[] = []; // 城市列表
   private timeLists:IState[] = []
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
@@ -171,6 +187,7 @@ export default class extends Vue {
     carType: '',
     lineFineness: '',
     handlingDifficulty: '',
+    guestCity: '',
     freightSection: [],
     time: [],
     warehouseLocation: '',
@@ -223,6 +240,12 @@ export default class extends Vue {
         clearable: true
       },
       options: this.loadDiffArr
+    },
+    {
+      type: 'guestCity',
+      label: '客邀城市',
+      key: 'guestCity',
+      slot: true
     },
     {
       type: 'freightSection',
@@ -406,13 +429,14 @@ export default class extends Vue {
       carType: '',
       lineFineness: '',
       handlingDifficulty: '',
+      guestCity: '',
       freightSection: [],
       time: [],
       warehouseLocation: '',
       distributionArea: '',
       stabilityTemporary: '',
       lineName: '',
-      status: ''
+      customerStatus: ''
     }
   }
   // 获取列表
@@ -460,6 +484,23 @@ export default class extends Vue {
       console.log(`get dict list fail:${err}`)
     } finally {
       //
+    }
+  }
+  // 根据大区获取城市列表
+  async cityDetail() {
+    this.cityList.push({
+      value: 0,
+      label: '全部城市'
+    })
+    let { data: city } = await GetDictionaryCity()
+    if (city.success) {
+      const nodes = city.data.map(function(item: any) {
+        return {
+          value: +item.code,
+          label: item.name
+        }
+      })
+      this.cityList.push(...nodes)
     }
   }
   // 级联框变化
@@ -527,6 +568,7 @@ export default class extends Vue {
     })
   }
   init() {
+    this.cityDetail()
     this.getDictList();
     (this.$refs.selectForm as any).loadQueryLineByKeyword()
   }
