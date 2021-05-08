@@ -81,12 +81,12 @@
           <p
             class="text"
           >
-            <span :class="isShowPercent && obj.carType === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && obj.oilElectricityRequirement === row.oilElectricityRequirement ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
+            <span :class="isShowPercent && obj.carType === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && ((obj.oilElectricityRequirement === row.oilElectricityRequirement) || Number(row.oilElectricityRequirement) === 3) ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
           >
-            <span :class="isShowPercent && row.isBehavior === obj.isBehavior ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && row.isRestriction === obj.isRestriction ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
+            <span :class="isShowPercent && ((row.isBehavior === 1) === obj.canBreakingNodriving) ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && ((row.isRestriction ===1) === obj.canBreakingTrafficRestriction) ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
           </p>
         </template>
       </el-table-column>
