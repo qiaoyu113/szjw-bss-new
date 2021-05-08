@@ -34,6 +34,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { CreateLntentionRun, getLineDetailInfo } from '@/api/departCenter'
+import { lock } from '@/utils/index'
 interface IState {
   [key: string]: any;
 }
@@ -177,9 +178,10 @@ export default class extends Vue {
   }
   // 验证通过
   handlePassChange() {
-    this.showDialog = false
+    this.saveData()
   }
   // 创建试跑意向
+  @lock
   async saveData() {
     try {
       let params:IState = {
@@ -202,6 +204,7 @@ export default class extends Vue {
       if (res.success) {
         this.$message.success('操作成功')
         this.$emit('success')
+        this.showDialog = false
       } else {
         this.$message.error(res.errorMsg)
       }
