@@ -3,6 +3,7 @@
     <SelfDialog
       :visible.sync="isShow"
       title="给司机打标签"
+      :confirm="confirm"
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
@@ -550,9 +551,15 @@ export default class extends Vue {
       this.$set(this.formItem[index], 'options', res)
     }, 10)
   }
+  // 确定按钮
+  private confirm() {
+    (this.$refs.setTagFrom as any).submitForm()
+    console.log(this.listQuery)
+  }
 
   // 验证通过
   handlePassChange() {
+    (this.$refs.setTagFrom as any).submitForm()
     console.log(this.listQuery)
     if (this.listQuery.canBreakingNodriving) {
       this.listQuery.breakingNodrivingCity = this.listQuery.prohibitionAddress[1] // 可跑禁行区域-市

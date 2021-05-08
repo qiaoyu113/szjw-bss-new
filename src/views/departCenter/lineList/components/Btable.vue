@@ -27,16 +27,19 @@
         >
           <template slot-scope="{row}">
             <div class="arrow" />
-            <div style="margin-left:50px;">
+            <div
+              style="margin-left:50px;"
+            >
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-show="row.inviteMark"
                   placement="right"
                   min-width="200"
                   trigger="hover"
                 >
                   <div class="text1">
-                    {{ row.lineName }}
+                    {{ row.inviteMark }}
                   </div>
                   <i
                     slot="reference"
@@ -265,7 +268,7 @@
               <el-button
                 type="text"
                 size="small"
-                @click.stop="handleCancelTryRun(row.id)"
+                @click.stop="handleCancelTryRun(row)"
               >
                 取消试跑意向
               </el-button>
@@ -331,9 +334,9 @@ export default class extends Vue {
   private multipleSelection:IState[] = []
 
   private selection:[] = []
+  private remarks:string = ''
 
   mounted() {
-    console.log(this.listQuery)
     // this.init()
   }
 
@@ -347,9 +350,7 @@ export default class extends Vue {
     // 调用查询接口
       let params = {}
       let { data: res } = await getLineInfo(params)
-      console.log('res', res)
       this.tableData = res
-      console.log('this.tableData', this.tableData)
     } catch (err) {
       console.log('err', err)
     } finally {
@@ -358,7 +359,6 @@ export default class extends Vue {
   }
   // 取消客邀
   handleCancelGuest(custInviteId:string) {
-    console.log('selection', this.selection)
     if (!this.selection.length) {
       this.$emit('cancelGuest', custInviteId)
     } else {
@@ -368,7 +368,6 @@ export default class extends Vue {
   // 发起客邀
   handleLaunchGuest(row:any) {
     const { lineId, matchId } = row
-    console.log('row', row)
     if (!this.selection.length) {
       this.$emit('launchGuest', { lineId, matchId })
     } else {
@@ -376,9 +375,9 @@ export default class extends Vue {
     }
   }
   // 取消意向
-  handleCancelTryRun(id:number) {
+  handleCancelTryRun(row:any) {
     if (!this.selection.length) {
-      this.$emit('cancelTryRun', id)
+      this.$emit('cancelTryRun', row)
     } else {
       this.$message.error('请取消勾选项')
     }

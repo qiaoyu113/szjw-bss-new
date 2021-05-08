@@ -138,7 +138,8 @@ export default class extends Vue {
       workingHours: [], // 工作时间段
       warehouse: [], // 仓库位置
       area: [], // 配送区域
-      lineInfo: ''
+      lineId: '',
+      lineCategory: ''
     }
     private formItem:any[] = [
       {
@@ -281,8 +282,7 @@ export default class extends Vue {
       {
         type: 15,
         label: '线路名称/编号',
-        key: 'lineInfo',
-        slot: true,
+        key: 'lineId',
         w: '110px',
         tagAttrs: {
           placeholder: '请选择',
@@ -296,7 +296,7 @@ export default class extends Vue {
           clearable: true
         },
         label: '稳定/临时',
-        key: 'j',
+        key: 'lineCategory',
         options: [
           {
             label: '全部',
@@ -343,7 +343,7 @@ export default class extends Vue {
           page: obj.page,
           limit: obj.limit
         }
-        obj.key && (params.keyWord = obj.key)
+        obj.key && (params.key = obj.key)
         let { data: res } = await getLineSearch(params)
         let result:any[] = res.data.map((item:any) => ({
           label: item.lineName,
@@ -387,7 +387,8 @@ export default class extends Vue {
         workingHours: [], // 工作时间段
         warehouse: [], // 仓库位置
         area: [], // 配送区域
-        lineInfo: ''
+        lineId: '',
+        lineCategory: ''
       }
     }
     // 获取列表数据
@@ -404,7 +405,8 @@ export default class extends Vue {
         this.listQuery.labelType && (params.labelType = this.listQuery.labelType)
         this.listQuery.isBehavior && (params.isBehavior = this.listQuery.isBehavior)
         this.listQuery.isRestriction && (params.isRestriction = this.listQuery.isRestriction)
-        this.listQuery.lineInfo && (params.lineInfo = this.listQuery.lineInfo)
+        this.listQuery.lineId && (params.lineId = this.listQuery.lineId)
+        this.listQuery.lineCategory && (params.lineCategory = this.listQuery.lineCategory)
         if (this.listQuery.cityCode && this.listQuery.cityCode.length > 1) {
           params.cityCode = +this.listQuery.cityCode[1]
         }
@@ -415,8 +417,8 @@ export default class extends Vue {
         }
         // 工作时间段
         if (this.listQuery.workingHours && this.listQuery.workingHours.length > 1) {
-          params.workingHourStart = this.listQuery.workingHours[0]
-          params.workingHourEnd = this.listQuery.workingHours[1]
+          params.workingHourStart = Number(this.listQuery.workingHours[0])
+          params.workingHourEnd = Number(this.listQuery.workingHours[1])
         }
         // 仓库位置
         if (this.listQuery.warehouse && this.listQuery.warehouse.length > 2) {
@@ -455,12 +457,12 @@ export default class extends Vue {
       console.log('xxx:', val)
     }
     // 分页
-    handlePageSizeChange(page:number, limit:number) {
-      if (page) {
-        this.page.page = page
+    handlePageSizeChange(page: PageObj) {
+      if (page.page) {
+        this.page.page = page.page
       }
-      if (limit) {
-        this.page.limit = limit
+      if (page.limit) {
+        this.page.limit = page.limit
       }
       this.getLists()
     }

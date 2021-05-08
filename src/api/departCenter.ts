@@ -14,28 +14,28 @@ export const CreateLntentionRun = (data: any) =>
 // 发起客邀
 export const CreateLaunchGuests = (data: any) =>
   request({
-    url: `mock/283/lines/startMatchCustInvite`,
+    url: `mock/283/v1/matchCustInvite/startMatchCustInvite`,
     method: 'post',
     data
   })
   // 取消客邀
 export const cancelMatchCustInvite = (data: any) =>
   request({
-    url: `mock/283/lines/cancelMatchCustInvite`,
+    url: `mock/283/v1/matchCustInvite/cancelMatchCustInvite`,
     method: 'post',
     data
   })
   // 批量发起客邀
 export const CreateLaunchGuestsBatch = (data: any) =>
   request({
-    url: `mock/283/lines/startMatchCustInviteBatch`,
+    url: `mock/283/v1/matchCustInvite/startMatchCustInviteBatch`,
     method: 'post',
     data
   })
 // 批量取消客邀
 export const cancelMatchCustInviteBatch = (data: any) =>
   request({
-    url: `mock/283/lines/cancelMatchCustInviteBatch`,
+    url: `mock/283/v1/matchCustInvite/cancelMatchCustInviteBatch`,
     method: 'post',
     data
   })
@@ -57,7 +57,7 @@ export const getLineInfo = (params:any) =>
 // 获取线路suggest列表
 export function getLineSearch(data:any) {
   return request({
-    url: `${prefix}/v1/line/suggest`,
+    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })
@@ -76,6 +76,41 @@ export function getLineDetail(params:any) {
     url: `${prefix}/v1/customer/invitation/line/detail`,
     method: 'get',
     params
+  })
+}
+// 司推：司机匹配线路
+export function MatchLineListForDriver(data: any) {
+  return request({
+    url: `${prefix}/v1/matchDriverInfo/queryMatchLineForMatchDriver`,
+    method: 'post',
+    data
+  })
+}
+
+// 通过线路id和当前城市获取备注
+export function getLineRemarks(data:any) {
+  return request({
+    url: `${prefix}/v1/matchCustInvite/queryRemarks`,
+    method: 'post',
+    data
+  })
+}
+
+// 取消试跑意向
+export function cancelIntention(data:any) {
+  return request({
+    url: `${prefix}/v2/runtest/intention/cancel`,
+    method: 'post',
+    data
+  })
+}
+
+// 客邀撮合【抽屉】-展开司机详情
+
+export function unfoldDriverInfo(params:any) {
+  return request({
+    url: `${prefix}/v1/customerInviteDrawer/driverInfo/${params}`,
+    method: 'get'
   })
 }
 
