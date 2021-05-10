@@ -206,9 +206,9 @@ export default class extends Vue {
       type: 8,
       key: 'workCity',
       col: 8,
-      label: '所属城市',
+      label: '城市',
       tagAttrs: {
-        placeholder: '请选择所属城市',
+        placeholder: '请选择',
         clearable: true,
         props: {
           lazy: true,

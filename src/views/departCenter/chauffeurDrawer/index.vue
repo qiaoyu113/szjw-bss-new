@@ -173,7 +173,23 @@ export default class GuestDrawer extends Vue {
       this.rowData = data
     }
     onQuery(params: any) {
-      this.params = params
+      console.log(params)
+      const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
+      this.params = {
+        carTypeList: model,
+        cargoTypeList: cargoType,
+        // todo 省市区
+        expectAccountingPeriodList: clearCycle,
+        expectStabilityTemporaryList: stability,
+        expectedFreightTripStart: f1,
+        expectedFreightTripEnd: f2,
+        heavyLiftingList: loadDifficulty,
+        labelTypeList: lineQuality,
+        lineId: keyWords,
+        driverId,
+        workHours: workRange // todo confirm
+        // todo 分页
+      }
       this.queryData()
     }
     loadMoreHandle() {
