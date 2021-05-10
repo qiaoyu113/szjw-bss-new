@@ -69,7 +69,6 @@ export default class extends Vue {
   private confirm() {
     (this.$refs.cancelForm as any).submitForm()
     console.log('取消试跑意向接口参数', this.cancelData)
-    this.$emit('success')
   }
   // 弹框关闭
   private handleDialogClosed() {
