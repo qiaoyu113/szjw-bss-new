@@ -63,7 +63,9 @@
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import { matchDriverInfo } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
+import { showWork, HandlePages } from '@/utils'
 import CallPhone from '@/views/clue/components/CallPhone/index.vue'
 import DetailDialog from './components/DetailDialog.vue'
 import Pagination from '@/components/Pagination/index.vue'
@@ -98,19 +100,20 @@ import chooseCity from './components/chooseCity.vue'
   })
 export default class extends Vue {
     private tableData:IState[] = [];
-    private pageSize:number = 1
     private listQuery: IState = {
-      busiType: null,
+      busiType: 0,
       carType: '',
-      carKind: null,
+      isNewEnergy: 0,
       driverId: '',
-      address: '',
-      hard: null,
-      hope: null,
-      cycle: null,
+      address: [],
+      heavyLifting: 0,
+      expectStabilityTemporary: 0,
+      expectAccountingPeriod: 0,
       rents: [],
       time: [],
-      status: ''
+      status: 0,
+      driverMatchManagerId: '',
+      hasDriverMatchManager: ''
     };
     private listLoading: boolean = false;
     private callPhoneDio: boolean = false;
@@ -188,68 +191,54 @@ export default class extends Vue {
       (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
     }
 
+    dealParams(listQuery:IState) {
+      let params:IState = {
+        page: this.page.page,
+        limit: this.page.limit
+      }
+      listQuery.busiType !== 0 && (params.busiType = listQuery.busiType)
+      listQuery.carType !== '' && (params.carType = listQuery.carType)
+      listQuery.isNewEnergy !== 0 && (params.isNewEnergy = listQuery.isNewEnergy)
+      listQuery.driverId !== '' && (params.driverId = listQuery.driverId)
+      listQuery.heavyLifting !== 0 && (params.heavyLifting = listQuery.heavyLifting)
+      listQuery.expectStabilityTemporary !== 0 && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)
+      listQuery.expectAccountingPeriod !== 0 && (params.expectAccountingPeriod = listQuery.expectAccountingPeriod)
+      if (listQuery.address.length > 1) {
+        params.liveAddressProvince = listQuery.address[0]
+        params.liveAddressCity = listQuery.address[1]
+        listQuery.address[2] && (params.liveAddressCounty = listQuery.address[2])
+      }
+      if (listQuery.rents.length > 1) {
+        params.expectedFreightTripStart = listQuery.rents[0]
+        params.expectedFreightTripEnd = listQuery.rents[1]
+      }
+      if (listQuery.time.length > 1) {
+        params.workHourStart = listQuery.time[0]
+        params.workHourEnd = listQuery.time[1]
+      }
+      listQuery.driverMatchManagerId !== '' && (params.driverMatchManagerId = listQuery.driverMatchManagerId)
+      listQuery.hasDriverMatchManager !== '' && (params.hasDriverMatchManager = listQuery.hasDriverMatchManager)
+      params.driverStatus = listQuery.status
+      return params
+    }
+
     // 获取列表数据
     async getLists() {
       try {
         this.listLoading = true
-        this.pageSize++
-        let num:number = 3
-        // this.tableData = []
-        for (let i = 0; i < num; i++) {
-          let obj:IState = {
-            driverName: '张三' + (i + 1),
-            joinManagerName: '李四',
-            driverMatchManagerName: '加盟经理',
-            driverId: 'SJ20210415',
-            carTypeName: '4.2米厢货',
-            isNewEnergy: true,
-            canBreakingNodriving: true,
-            canBreakingTrafficRestriction: false,
-            busiTypeName: '共享',
-            liveAddressProvinceName: '北京市',
-            liveAddressCityName: '北京市',
-            liveAddressCountyName: '朝阳区',
-            startingPointProvinceName: '湖南省',
-            startingPointCityName: '长沙市',
-            startingPointCountyName: '芙蓉区',
-            deliveryPointProvinceName: '山东省',
-            deliveryPointCityName: '济南市',
-            deliveryPointCountyName: '历下区',
-            expectedFreightMonth: 600,
-            expectedFreightTrip: 500,
-            expectAccountingPeriodName: '现结',
-            intentCargoTypeName: '团购',
-            heavyLiftingName: '只装不卸',
-            deliveryDifficultyNames: '整车',
-            workHours: i ? ['9:00-12:00', '13:00-18:00'] : ['9:00-18:00'],
-            expectStabilityTemporaryNames: '稳定',
-            driverSituationName: '着急试跑',
-            driverStatusName: '已上岗',
-            newDealName: '当月新成交',
-            isNoviceName: '小白司机',
-            tryRunNum: 2,
-            followCarNum: 1,
-            age: 40,
-            drivingLicenceTypeName: 'A1',
-            drivingExperience: 2,
-            sourceChannelName: '58同城',
-            driverPassTime: '2020-11-20',
-            driverMatchRemarksName: '不怕累活',
-            driverMatchManuallyRemarks: '什么活都可以干'
-          }
-          obj.isOpen = false
-          obj.id = ((this.pageSize - 1) * 3 + i + 1)
-          this.tableData.push({ ...obj })
-        }
-        if (this.pageSize > 3) {
-          this.$emit('on-end')
+        const params = this.dealParams(this.listQuery)
+        let { data: res } = await matchDriverInfo(params)
+        if (res.success) {
+          this.tableData = [res.data]
+          let page = await HandlePages(res.page)
+          this.page.total = page.total
+        } else {
+          this.$message.error(res.errorMsg)
         }
       } catch (err) {
         console.log(`get list fail fail:${err}`)
       } finally {
-        setTimeout(() => {
-          this.listLoading = false
-        }, 1000)
+        this.listLoading = false
       }
     }
     // 客邀状态变化
@@ -263,12 +252,12 @@ export default class extends Vue {
       cb([])
     }
     // 分页
-    handlePageSizeChange(page: number, limit: number) {
-      if (page) {
-        this.page.page = page
+    handlePageSizeChange(page:PageObj) {
+      if (page.page) {
+        this.page.page = page.page
       }
-      if (limit) {
-        this.page.limit = limit
+      if (page.limit) {
+        this.page.limit = page.limit
       }
       this.getLists()
     }
