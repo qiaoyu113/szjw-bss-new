@@ -123,7 +123,7 @@ interface IState {
   }
 })
 export default class SearchKeyWords extends Vue {
-  private rowData:object = {}
+  private rowData:any = {}
   private driverInfo: string = ''
   private driverOptions:IState[] = []
   private shareScopeEnd:IState[] = []
@@ -551,45 +551,30 @@ export default class SearchKeyWords extends Vue {
   getCargoType(data:any) {
     let cargoType:any = {
       key: 'cargoType',
-      optionIds: [],
-      selected: [],
+      optionIds: [data.cargoType],
+      selected: [data.cargoTypeValue],
       type: '货品类型'
     }
-    let obj:any = this.expectOptions.filter(item => {
-      return item.value === data.cargoType
-    })
-    cargoType.optionIds.push(obj.value)
-    cargoType.selected.push(obj.lable)
     this.selectedData.push(cargoType)
   }
   // 回显装卸难度
   getHandlingDifficulty(data:any) {
     let handlingDifficulty:any = {
       key: 'handlingDifficulty',
-      optionIds: [],
-      selected: [],
+      optionIds: [data.handlingDifficulty],
+      selected: [data.handlingDifficultyValue],
       type: '装卸难度'
     }
-    let obj:any = this.hardOptions.filter(item => {
-      return item.value === data.cargoType
-    })
-    handlingDifficulty.optionIds.push(obj.value)
-    handlingDifficulty.selected.push(obj.lable)
     this.selectedData.push(handlingDifficulty)
   }
   // 回显配送车型
   getCarType(data:any) {
     let carType:any = {
       key: 'carType',
-      optionIds: [],
-      selected: [],
+      optionIds: [data.carType],
+      selected: [data.carTypeValue],
       type: '配送车型'
     }
-    let obj:any = this.carLists.filter(item => {
-      return item.value === data.cargoType
-    })
-    carType.optionIds.push(obj.value)
-    carType.selected.push(obj.lable)
     this.selectedData.push(carType)
   }
 
@@ -614,10 +599,10 @@ export default class SearchKeyWords extends Vue {
     this.loadQueryDriverByKeyword()
     this.getLineInfoFromStorage()
     this.getBusiType(this.rowData)
-    /* this.getCargoType(this.rowData)
+    this.getCargoType(this.rowData)
     this.getHandlingDifficulty(this.rowData)
-    this.getCarType(this.rowData) */
-    this.initSelectItem('9:00~12:00,16:00~20:00', '9:00~12:00,16:00~20:00', true)
+    this.getCarType(this.rowData)
+    this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
   }
 }
 </script>
