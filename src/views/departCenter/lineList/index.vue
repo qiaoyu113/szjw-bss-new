@@ -130,6 +130,7 @@
     <cancel-tryRun
       ref="cancelTryRun"
       :cancel-data="cancelData"
+      @success="ctrSuccessHandle"
     />
   </div>
 </template>
@@ -585,6 +586,11 @@ export default class extends Vue {
     } else {
       this.formItem.splice(4, 0, values)
     }
+  }
+
+  // 取消试跑成功后刷新列表
+  ctrSuccessHandle() {
+    (this.$refs.listTable as any).refreshList()
   }
   init() {
     this.cityDetail()
