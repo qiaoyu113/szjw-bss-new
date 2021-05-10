@@ -50,11 +50,11 @@ export default class extends Vue {
   private formItem:any[] = [
     {
       type: 2,
-      tagAttrs: {
-        placeholder: '请选择',
-        clearable: true,
-        filterable: true
-      },
+      // tagAttrs: {
+      //   placeholder: '请选择',
+      //   clearable: true,
+      //   filterable: true
+      // },
       label: '取消客邀的原因?',
       key: 'cancelInviteReason',
       options: this.cancelOptions
@@ -134,6 +134,12 @@ export default class extends Vue {
     } finally {
       //
     }
+  }
+  init() {
+    this.getDictList()
+  }
+  mounted() {
+    this.init()
   }
 }
 </script>

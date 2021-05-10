@@ -12,6 +12,7 @@
         ref="tryForm"
         :list-query="listQuery"
         :form-item="formItem"
+        :rules="rules"
         size="small"
         label-width="140px"
         class="p15 SuggestForm"
@@ -74,6 +75,11 @@ export default class extends Vue {
     (this.$refs.tryForm as any).submitForm()
     this.saveData()
   }
+  private rules:IState = {
+    city: [
+      { required: true, message: '请选择客邀城市', trigger: 'blur' }
+    ]
+  }
   // 弹框关闭
   private handleDialogClosed() {
     (this.$refs.tryForm as any).resetForm()
@@ -84,10 +90,10 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    this.cityList.push({
-      value: 0,
-      label: '全部城市'
-    })
+    // this.cityList.push({
+    //   value: 0,
+    //   label: ''
+    // })
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
