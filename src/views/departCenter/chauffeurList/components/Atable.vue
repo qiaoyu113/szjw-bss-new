@@ -40,9 +40,12 @@
           </div>
           <div style="margin-left:50px;">
             <p class="text">
-              <span class="cycleTag" />
               <span
-                :style="{fontWeight: (!isShowPercent ? 'bold' : 'normal')}"
+                v-if="scope.row.needDone"
+                class="cycleTag"
+              />
+              <span
+                :style="{fontWeight: (scope.row.needDone ? 'bold' : 'normal')}"
                 v-text="scope.row.driverName"
               />
               <span style="margin:0px 3px;">(北京)</span>
@@ -55,7 +58,8 @@
               </el-tooltip>
             </p>
             <p class="text">
-              {{ scope.row.joinManagerName }}{{ scope.row.driverMatchManagerName }}
+              ({{ scope.row.joinManagerName }})
+              ({{ scope.row.driverMatchManagerName }})
             </p>
             <p class="text">
               {{ scope.row.driverId }}
@@ -134,7 +138,7 @@
             期望类型:{{ row.deliveryDifficultyNames }}
           </p>
           <p class="text">
-            <!-- 工作时间段:{{ row.workHours.join(",") }} -->
+            工作时间段:{{ row.workHours.join(",") }}
           </p>
           <p class="text">
             期望稳定/临时:{{ row.expectStabilityTemporaryNames }}
@@ -156,8 +160,11 @@
           <p class="text">
             {{ row.newDealName }}
           </p>
-          <p class="text">
-            {{ row.isNoviceName }}
+          <p
+            v-if="row.isNovice"
+            class="text"
+          >
+            小白司机
           </p>
         </template>
       </el-table-column>
@@ -198,7 +205,7 @@
                 呼叫
               </el-button>
               <span class="phone">
-                18848885135
+                {{ row.phone }}
               </span>
             </p>
             <p class="text">
@@ -532,6 +539,7 @@ export default class extends Vue {
     height: 12px;
     margin-right: 6px;
     border-radius: 50%;
+    line-height: 20px;
     background-color: #649cee;
   }
   .percent {
