@@ -195,6 +195,7 @@ export default {
     lineShelf: '线路货架维护',
     complete: '已完成',
     agent: '待办',
+    exportVisit: '项目拜访记录导出',
     detail: '详情',
     lineSnapshot: '线路快照',
     RandomlyAssigned: '随机分配policy设置',
