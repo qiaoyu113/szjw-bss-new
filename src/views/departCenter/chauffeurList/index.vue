@@ -197,7 +197,7 @@ export default class extends Vue {
         // this.tableData = []
         for (let i = 0; i < num; i++) {
           let obj:IState = {
-            driverName: '张三',
+            driverName: '张三' + (i + 1),
             joinManagerName: '李四',
             driverMatchManagerName: '加盟经理',
             driverId: 'SJ20210415',
@@ -221,7 +221,7 @@ export default class extends Vue {
             intentCargoTypeName: '团购',
             heavyLiftingName: '只装不卸',
             deliveryDifficultyNames: '整车',
-            workHours: ['9:00-12:00', '13:00-18:00'],
+            workHours: i ? ['9:00-12:00', '13:00-18:00'] : ['9:00-18:00'],
             expectStabilityTemporaryNames: '稳定',
             driverSituationName: '着急试跑',
             driverStatusName: '已上岗',
