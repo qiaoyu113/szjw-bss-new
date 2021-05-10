@@ -403,6 +403,12 @@ export default class extends Vue {
     this.selection = selection
     this.$emit('SelectionChange', selection)
   }
+
+  // 更新列表
+  refreshList() {
+    console.log('刷新列表')
+    this.getLists()
+  }
 }
 </script>
 <style lang="scss" scoped>
