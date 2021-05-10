@@ -360,10 +360,9 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { unfoldDriverInfo } from '@/api/departCenter'
-const key = 'driver_row'
 const driverKey = 'driver_row'
 const lineKey = 'line_row'
 interface IState {
@@ -385,7 +384,7 @@ export default class extends Vue {
   @Prop({ default: false }) isShowPercent!: boolean;
   @Prop({ default: () => {} }) listQuery!: IState;
   @Prop({ default: () => [] }) opType!: number[];
-  @Prop({ default: () => [] }) driverTableData!: IState[];
+  @PropSync('driverTableData', { default: () => [] }) _tableData!: IState[];
 
   private phone: string = '';
   private callId: string | number = '';
@@ -393,20 +392,13 @@ export default class extends Vue {
   private listLoading: boolean = true;
   private obj: IState = {};
 
-  get _tableData() {
-    return this.driverTableData
-  }
-  set _tableData(val: IState[]) {
-    this.$emit('update:driverTableData', val)
-  }
   handleSelectionChange(val: IState[]) {
     this.$emit('checkData', val)
   }
 
   addClass(labelclass: string, rowData: string) {
     if (this.isShowPercent) {
-      console.log(labelclass, this.obj[labelclass], rowData)
-      return this.obj[labelclass] === rowData ? 'blue' : ''
+      return this.obj[labelclass] === rowData ? 'orange' : ''
     } else {
       return ''
     }
