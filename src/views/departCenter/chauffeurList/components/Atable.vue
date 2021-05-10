@@ -363,7 +363,6 @@
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { unfoldDriverInfo } from '@/api/departCenter'
-const key = 'driver_row'
 const driverKey = 'driver_row'
 const lineKey = 'line_row'
 interface IState {
@@ -399,8 +398,7 @@ export default class extends Vue {
 
   addClass(labelclass: string, rowData: string) {
     if (this.isShowPercent) {
-      console.log(labelclass, this.obj[labelclass], rowData)
-      return this.obj[labelclass] === rowData ? 'blue' : ''
+      return this.obj[labelclass] === rowData ? 'orange' : ''
     } else {
       return ''
     }
