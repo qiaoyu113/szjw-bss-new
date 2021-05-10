@@ -38,12 +38,14 @@
         :class="isPC ? 'btnPc left' : 'mobile'"
       >
         <el-button
+          v-if="listQuery.customerStatus === '1'"
           type="primary"
           @click="batchLaunchGuest"
         >
           批量发起客邀
         </el-button>
         <el-button
+          v-if="listQuery.customerStatus === '2'"
           type="primary"
           @click="batchCancelGuest"
         >
@@ -70,7 +72,6 @@
           v-only-number="{min: 1, max: 19999, precision: 0}"
         />
       </template>
-      <!-- <span v-if="listQuery.customerStatus ===2"> -->
       <template
         slot="guestCity"
       >
@@ -86,7 +87,6 @@
           />
         </el-select>
       </template>
-      <!-- </span> -->
       <template slot="time">
         <timeSelect
           v-model="listQuery.time"
