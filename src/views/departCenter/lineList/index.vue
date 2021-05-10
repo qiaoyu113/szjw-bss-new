@@ -493,10 +493,10 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    this.cityList.push({
-      value: 0,
-      label: '全部城市'
-    })
+    // this.cityList.push({
+    //   value: 0,
+    //   label: '全部城市'
+    // })
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
@@ -545,8 +545,8 @@ export default class extends Vue {
   // 取消客邀
   handleCancelGuest(custInviteId:string) {
     (this.$refs.cancelGuest as any).showDialog = true;
-    (this.$refs.cancelGuest as any).cancelGuestState = 1;
-    (this.$refs.cancelGuest as any).getDictList()
+    (this.$refs.cancelGuest as any).cancelGuestState = 1
+    // (this.$refs.cancelGuest as any).getDictList()
     this.custInviteId = custInviteId
   }
 
