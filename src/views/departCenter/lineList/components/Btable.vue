@@ -96,7 +96,7 @@
               仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
+              配送区域:{{ row.provinceArea }}-{{ row.deliveryCity }}-{{ row.deliveryCounty }}
             </p>
           </template>
         </el-table-column>
@@ -346,6 +346,7 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
+    console.log('listQuery', this.listQuery)
     try {
     // 调用查询接口
       let params = {}
