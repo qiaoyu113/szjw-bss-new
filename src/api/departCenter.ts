@@ -124,11 +124,11 @@ export function getCallDetail(data:any) {
 }
 
 // 获取弹框司机详情-试跑信息
-export function getRunDetail(params:any) {
+export function getRunDetail(data:any) {
   return request({
     url: `/mock/291/v2/runtest/getRunTestInfoByDriverId`,
-    method: 'get',
-    params
+    method: 'post',
+    data
   })
 }
 // 获取弹框司机详情-司机标签

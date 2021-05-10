@@ -34,16 +34,20 @@
               label-width="120px"
               label-suffix=" :"
             >
-              <!-- <template slot="behaviorArea">
-                <span>{{ listQuery.breakingNodrivingProvinceName }}-{{ listQuery.breakingNodrivingCityName }}-{{ listQuery.breakingNodrivingCounty }}</span>
-              </template> -->
+              <template slot="behaviorArea">
+                <span>{{ listQuery.breakingNodrivingProvinceName }}-{{ listQuery.breakingNodrivingCityName }}-{{ listQuery.breakingNodrivingCountyName }}</span>
+              </template>
+              <template slot="restrictionArea">
+                <span>{{ listQuery.breakingTrafficRestrictionProvinceName }}-{{ listQuery.breakingTrafficRestrictionCityName }}-{{ listQuery.breakingTrafficRestrictionCountyName }}</span>
+              </template>
+
               <template slot="startArea">
-                <span class="area">北京市-北京市-顺义区-南法信镇</span>
-                <span>10:00</span>
+                <span class="area">{{ listQuery.startingPointProvinceName }}-{{ listQuery.startingPointCityName }}-{{ listQuery.startingPointCountyName }}</span>
+                <span>{{ listQuery.startingPointStartTime }}-{{ listQuery.startingPointEndTime }}</span>
               </template>
               <template slot="lineArea">
-                <span class="area">北京市-北京市-顺义区</span>
-                <span>10:00</span>
+                <span class="area">{{ listQuery.deliveryPointProvinceName }}-{{ listQuery.deliveryPointCityName }}-{{ listQuery.deliveryPointCountyName }}</span>
+                <span>{{ listQuery.deliveryPointStartTime }}-{{ listQuery.deliveryPointEndTime }}</span>
               </template>
             </SelfForm>
           </el-tab-pane>
@@ -55,6 +59,9 @@
               :columns="columns"
               :index="false"
               :table-data="tableDataDetailInfor"
+              :operation-list="[]"
+              :page="page"
+              @onPageSize="handlePageSize"
             >
               <template v-slot:distributionTime="scope">
                 <span> {{ scope.row.deliveryStartDate }}-{{ scope.row.deliveryEndDate }}</span>
@@ -69,8 +76,11 @@
               :columns="columns1"
               :index="false"
               :table-data="tableDataDetailRecord"
+              :operation-list="[]"
+              :page="page"
+              @onPageSize="handlePageSize1"
             >
-              <template v-slot:recordFileAddress="scope">
+              <template v-slot:recordFileAddress>
                 <span> Mp4 </span>
               </template>
             </SelfTable>
@@ -86,9 +96,15 @@ import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { getCallDetail, getRunDetail, getDriverDetail, getBasicDetail } from '@/api/departCenter'
+import { logout } from '@/api/users'
 interface IState {
   [key: string]: any;
 }
+  interface PageObj {
+    page:number,
+    limit:number,
+    total?:number
+  }
 @Component({
   name: 'DetailDialog',
   components: {
@@ -98,11 +114,15 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: true }) dialogTableVisible!: boolean; // 弹框显示
+  @Prop({ default: false }) dialogTableVisible!: boolean; // 弹框显示
   @Prop({ default: '' }) driverId!: String;
   @PropSync('actived', { type: String }) active!: string
   @PropSync('dialogTableVisible', { type: Boolean }) show!: Boolean
-
+  private page :PageObj= {
+    page: 1,
+    limit: 10,
+    total: 1
+  }
   private listQuery: any = {
     currentCarTypeName: '',
     canBreakingNodriving: '',
@@ -114,7 +134,7 @@ export default class extends Vue {
     statusName: '', // 状态
     orderId: '', // 订单编号
     contractState: '', // 合同状态
-    // behaviorArea: '', // 可闯禁行区域
+    behaviorArea: '', // 可闯禁行区域
     breakingNodrivingProvinceName: '',
     breakingNodrivingCityName: '',
     breakingNodrivingCounty: '',
@@ -200,7 +220,7 @@ export default class extends Vue {
       col: 24
     },
     {
-      type: 7,
+      type: 'behaviorArea',
       key: 'behaviorArea',
       label: '可闯禁行区域',
       slot: true,
@@ -213,9 +233,10 @@ export default class extends Vue {
       col: 24
     },
     {
-      type: 7,
+      type: 'restrictionArea',
       key: 'restrictionArea',
       label: '可闯限行区域',
+      slot: true,
       col: 24
     },
     {
@@ -281,6 +302,96 @@ export default class extends Vue {
       col: 24
     }
   ];
+   private formItem2: any[] = [
+     {
+       type: 7,
+       key: 'canBreakingNodriving',
+       label: '是否可以闯禁行',
+       col: 24
+     },
+     {
+       type: 'behaviorArea',
+       key: 'behaviorArea',
+       label: '可闯禁行区域',
+       slot: true,
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'canBreakingTrafficRestriction',
+       label: '是否可以闯限行',
+       col: 24
+     },
+     {
+       type: 'restrictionArea',
+       key: 'restrictionArea',
+       label: '可闯限行区域',
+       slot: true,
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'heavyLifting',
+       label: '装卸接收程度',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'deliveryDifficulty',
+       label: '配送复杂度',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'expectAccountingPeriod',
+       label: '期望账期',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'expectIncomeTrip',
+       label: '期望运费',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'expectStabilityTemporary',
+       label: '期望稳定/临时',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'hasIncomeOutside',
+       label: '外面是否有活',
+       col: 24
+     },
+     {
+       type: 'startArea',
+       key: 'startArea',
+       label: '起始点 (4级)',
+       col: 24,
+       slot: true
+     },
+     {
+       type: 'lineArea',
+       key: 'lineArea',
+       label: '配送点 (4级)',
+       col: 24,
+       slot: true
+     },
+     {
+       type: 7,
+       key: 'driverSituation',
+       label: '司机情况',
+       col: 24
+     },
+     {
+       type: 7,
+       key: 'manuallyRemarks',
+       label: '备注',
+       col: 24
+     }
+   ];
 
   // 详情弹框外呼记录表格
   private tableDataDetailRecord: IState = [
@@ -391,6 +502,8 @@ export default class extends Vue {
     this.getData(tab.name)
   }
   getData(index:string) {
+    this.page.page = 1
+    this.page.limit = 10
     console.log(index, 'get')
     this.getCallRecord()
     this.getRunInfor()
@@ -401,30 +514,35 @@ export default class extends Vue {
   async getCallRecord() {
     try {
       let params:any = {
-        limit: 1,
-        page: 1,
-        businessId: '12121212'
+        limit: this.page.limit,
+        page: this.page.page,
+        businessId: this.driverId
       }
       let { data: res } = await getCallDetail(params)
+
       if (res.success) {
         this.tableDataDetailRecord = res.data
+        this.page.total = res.page.total
       }
-      console.log(res.data)
-    } catch {
-      console.log('1212')
+    } catch (err) {
+      console.log(err)
     }
   }
   async getRunInfor() {
     try {
       let parmas:any = {
-        driverId: 2
+        limit: this.page.limit,
+        page: this.page.page,
+        driverId: this.driverId
       }
       let { data: res } = await getRunDetail(parmas)
       if (res.success) {
+        console.log(res.data)
         this.tableDataDetailInfor = res.data
+        this.page.total = res.page.total
       }
-    } catch {
-      console.log('12121')
+    } catch (err) {
+      console.log(err)
     }
   }
   async getDriverLabel() {
@@ -434,31 +552,65 @@ export default class extends Vue {
       }
       let { data: res } = await getDriverDetail(parmas)
       if (res.success) {
-        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving
-        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction
-        this.listQuery.heavyLifting = res.data.heavyLifting
-        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
-        this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
+        this.formItem1 = this.formItem2
+        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving ? '是' : '否'
+        if (!res.data.canBreakingNodriving) {
+          this.formItem1 = this.formItem1.filter((item:any, index:any) => {
+            return item.key !== 'behaviorArea'
+          })
+        }
+        // 禁行区域
+        this.listQuery.breakingNodrivingProvinceName = res.data.breakingNodrivingProvinceName
+        this.listQuery.breakingNodrivingCityName = res.data.breakingNodrivingCityName
+        this.listQuery.breakingTrafficRestrictionProvinceName = res.data.breakingTrafficRestrictionProvinceName
+        this.listQuery.breakingTrafficRestrictionCityName = res.data.breakingTrafficRestrictionCityName
+        this.listQuery.breakingNodrivingCountyName = res.data.breakingNodrivingCountyName
+        this.listQuery.breakingNodrivingCountyName = this.listQuery.breakingNodrivingCountyName.join(' ')
+        this.listQuery.breakingTrafficRestrictionCountyName = res.data.breakingTrafficRestrictionCountyName
+        this.listQuery.breakingTrafficRestrictionCountyName = this.listQuery.breakingTrafficRestrictionCountyName.join(' ')
+        // 起始点
+        this.listQuery.startingPointProvinceName = res.data.startingPointProvinceName
+        this.listQuery.startingPointCityName = res.data.startingPointCityName
+        this.listQuery.startingPointCountyName = res.data.startingPointCountyName
+        this.listQuery.startingPointStartTime = res.data.startingPointStartTime
+        this.listQuery.startingPointEndTime = res.data.startingPointEndTime
+        // 配送点
+        this.listQuery.deliveryPointProvinceName = res.data.deliveryPointProvinceName
+        this.listQuery.deliveryPointCityName = res.data.deliveryPointCityName
+        this.listQuery.deliveryPointCountyName = res.data.deliveryPointCountyName
+        this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime
+        this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime
+        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction ? '是' : '否'
+        if (!res.data.canBreakingTrafficRestriction) {
+          this.formItem1 = this.formItem1.filter((item:any, index:any) => {
+            return item.key !== 'restrictionArea'
+          })
+        }
+        this.listQuery.heavyLifting = res.data.heavyLiftingName
+        this.listQuery.deliveryDifficulty = res.data.deliveryDifficultyName // 数组
+        this.listQuery.deliveryDifficulty = this.listQuery.deliveryDifficulty.join('、') // 数组
+        this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriodName
         this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
-        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
-        this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
-        this.listQuery.driverSituation = res.data.driverSituation
-        this.listQuery.manuallyRemarks = res.data.manuallyRemarks
+        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporaryName // 数组
+        this.listQuery.expectStabilityTemporary = this.listQuery.expectStabilityTemporary.join('、')
+        this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside ? '是' : '否'
+        this.listQuery.driverSituation = res.data.driverSituationName
+        this.listQuery.manuallyRemarks = res.data.manuallyRemarksName
       }
-    } catch {
-      console.log('xxxx')
+    } catch (err) {
+      console.log(err)
     }
   }
   async getBasicsInfor() {
     try {
       let parmas:any = {
-        driverId: 2
+        driverId: this.driverId
       }
       let { data: res } = await getBasicDetail(parmas)
       if (res.data.success) {
         this.listQuery.currentCarTypeName = res.data.DriverMatchVO.currentCarTypeName
-        this.listQuery.canBreakingNodriving = res.data.DriverMatchVO.canBreakingNodriving
-        this.listQuery.canBreakingTrafficRestriction = res.data.DriverMatchVO.canBreakingTrafficRestriction
+        this.listQuery.canBreakingNodriving = res.data.DriverMatchVO.canBreakingNodriving ? '是' : '否'
+        this.listQuery.canBreakingTrafficRestriction = res.data.DriverMatchVO.canBreakingTrafficRestriction ? '是' : '否'
         this.listQuery.plateNo = res.data.DriverMatchVO.plateNo
         this.listQuery.busiTypeName = res.data.DriverMatchVO.busiTypeName
         this.listQuery.liveDistrict = res.data.DriverMatchVO.liveDistrict
@@ -467,9 +619,19 @@ export default class extends Vue {
         this.listQuery.orderId = res.data.DriverMatchVO.orderId
         this.listQuery.contractStatusName = res.data.DriverMatchVO.contractStatusName
       }
-    } catch {
-      console.log('121')
+    } catch (err) {
+      console.log(err)
     }
+  }
+  handlePageSize(page: any) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    this.getRunInfor()
+  }
+  handlePageSize1(page: any) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    this.getCallRecord()
   }
 }
 </script>
