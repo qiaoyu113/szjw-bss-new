@@ -113,3 +113,12 @@ export function unfoldDriverInfo(params:any) {
     method: 'get'
   })
 }
+
+// 获取司推列表
+export function matchDriverInfo(data:any) {
+  return request({
+    url: `${prefix}/v1/matchDriverInfo/list`,
+    method: 'post',
+    data
+  })
+}

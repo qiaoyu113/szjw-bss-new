@@ -109,6 +109,7 @@ export default class DepartLine extends Vue {
           driverMatchManagerName: '加盟经理',
           driverId: 'SJ20210415',
           carTypeName: '4.2米厢货',
+          carType: 10,
           isNewEnergy: true,
           canBreakingNodriving: true,
           canBreakingTrafficRestriction: false,
