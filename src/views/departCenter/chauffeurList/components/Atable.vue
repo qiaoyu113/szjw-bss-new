@@ -40,9 +40,12 @@
           </div>
           <div style="margin-left:50px;">
             <p class="text">
-              <span class="cycleTag" />
               <span
-                :style="{fontWeight: (!isShowPercent ? 'bold' : 'normal')}"
+                v-if="scope.row.needDone"
+                class="cycleTag"
+              />
+              <span
+                :style="{fontWeight: (scope.row.needDone ? 'bold' : 'normal')}"
                 v-text="scope.row.driverName"
               />
               <span style="margin:0px 3px;">(北京)</span>
@@ -51,13 +54,12 @@
                 content="由长沙更换至北京"
                 placement="top"
               >
-                <i
-                  class="el-icon-refresh"
-                />
+                <i class="el-icon-refresh" />
               </el-tooltip>
             </p>
             <p class="text">
-              {{ scope.row.joinManagerName }}{{ scope.row.driverMatchManagerName }}
+              ({{ scope.row.joinManagerName }})
+              ({{ scope.row.driverMatchManagerName }})
             </p>
             <p class="text">
               {{ scope.row.driverId }}
@@ -72,7 +74,14 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            {{ row.carTypeName }}/{{ row.isNewEnergy?'电车':'油车' }}
+            <span
+              :class="addClass('carType',row.carType)"
+              v-text="row.carTypeName"
+            />/
+            <span
+              :class="addClass('isNewEnergy')"
+              v-text="row.isNewEnergy?'电车':'油车'"
+            />
           </p>
           <p class="text">
             {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}/{{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}/{{ row.busiTypeName }}
@@ -81,7 +90,7 @@
       </el-table-column>
       <el-table-column
         label="地址信息"
-        min-width="220"
+        min-width="200"
         align="center"
       >
         <template slot-scope="{row}">
@@ -115,7 +124,7 @@
       </el-table-column>
       <el-table-column
         label="线路忍耐度"
-        min-width="160"
+        min-width="180"
         align="center"
       >
         <template slot-scope="{row}">
@@ -151,8 +160,11 @@
           <p class="text">
             {{ row.newDealName }}
           </p>
-          <p class="text">
-            {{ row.isNoviceName }}
+          <p
+            v-if="row.isNovice"
+            class="text"
+          >
+            小白司机
           </p>
         </template>
       </el-table-column>
@@ -193,7 +205,7 @@
                 呼叫
               </el-button>
               <span class="phone">
-                18848885135
+                {{ row.phone }}
               </span>
             </p>
             <p class="text">
@@ -292,9 +304,7 @@
         width="1"
         class-name="expand"
       >
-        <template
-          slot-scope="{row}"
-        >
+        <template slot-scope="{row}">
           <div v-loading="listLoading">
             <div
               class="item"
@@ -379,16 +389,24 @@ export default class extends Vue {
 
   private phone: string = '';
   private callId: string | number = '';
-  private unfoldData :{}= {}
-  private listLoading:boolean = true
-  private obj:IState = {}
+  private unfoldData: {} = {};
+  private listLoading: boolean = true;
+  private obj: IState = {};
 
   handleSelectionChange(val: IState[]) {
     this.$emit('checkData', val)
   }
+
+  addClass(labelclass: string, rowData: string) {
+    if (this.isShowPercent) {
+      console.log(labelclass, this.obj[labelclass], rowData)
+      return this.obj[labelclass] === rowData ? 'blue' : ''
+    } else {
+      return ''
+    }
+  }
   // 展开
   toogleExpand(row: IState) {
-    console.log('row', row)
     let $table: any = this.$refs.chauffeurTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item: IState = this._tableData[i]
@@ -405,7 +423,7 @@ export default class extends Vue {
     $table.toggleRowExpansion(row, true)
     this.unfoldInfo(row.driverId)
   }
-  async unfoldInfo(driverId:string) {
+  async unfoldInfo(driverId: string) {
     try {
       this.listLoading = true
       let params = driverId
@@ -482,7 +500,7 @@ export default class extends Vue {
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
     if (str) {
-      let obj:IState = JSON.parse(str) || {}
+      let obj: IState = JSON.parse(str) || {}
       this.obj = obj
     }
   }
@@ -515,6 +533,7 @@ export default class extends Vue {
     height: 12px;
     margin-right: 6px;
     border-radius: 50%;
+    line-height: 20px;
     background-color: #649cee;
   }
   .percent {
@@ -539,7 +558,7 @@ export default class extends Vue {
   .phone {
     position: absolute;
     bottom: -5px;
-    left:-8px;
+    left: -8px;
     color: #888585;
     line-height: 12px;
     font-size: 12px;
@@ -555,10 +574,10 @@ export default class extends Vue {
     align-content: space-around;
     justify-items: flex-start;
     max-height: 120px;
-    .text{
+    .text {
       width: 74px;
     }
-    .showMoreBtn{
+    .showMoreBtn {
       padding: 7px;
     }
   }
@@ -595,9 +614,15 @@ export default class extends Vue {
     }
   }
   .el-icon-refresh {
-    color:red;
-    font-size:14px;
+    color: red;
+    font-size: 14px;
     vertical-align: middle;
+  }
+  .blue {
+    color: #639dec;
+  }
+  .orange {
+    color: #f5a821;
   }
 }
 </style>

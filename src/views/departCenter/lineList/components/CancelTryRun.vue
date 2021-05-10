@@ -69,6 +69,7 @@ export default class extends Vue {
   private confirm() {
     (this.$refs.cancelForm as any).submitForm()
     console.log('取消试跑意向接口参数', this.cancelData)
+    this.$emit('success')
   }
   // 弹框关闭
   private handleDialogClosed() {
@@ -76,9 +77,22 @@ export default class extends Vue {
   }
   // 验证通过
   handlePassChange() {
-
+    this.cancel()
   }
 
+  async cancel() {
+    try {
+      let params:IState = { ...this.cancelData }
+      console.log('params', params)
+      let { data: res } = await cancelIntention(params)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.$emit('success')
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
   mounted() {
     this.init()
   }
