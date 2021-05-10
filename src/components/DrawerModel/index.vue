@@ -7,10 +7,11 @@
     size="100%"
     top="84px"
     :modal="false"
+    :destroy-on-close="true"
     @close="closeHandle"
     @open="handleOpenClick"
   >
-    <div class="">
+    <div class="drawerContent">
       <slot />
     </div>
     <a
@@ -32,7 +33,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
    * @property  {boolean}    value           true:显示  false:隐藏
    */
 export default class DrawerModel extends Vue {
-  @Prop({ default: false }) private value !: boolean
+  @Prop({ default: true }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
