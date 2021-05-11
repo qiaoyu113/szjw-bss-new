@@ -3,6 +3,8 @@ const base = '/base_center'
 const departCenter = `match`
 const prefix = `/mock/283`
 
+const departfix = 'match'
+
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
@@ -101,6 +103,15 @@ export function MatchLineListForDriver(data: any) {
   })
 }
 
+// 司推：线路ID/名称列表
+export function getLineListForSearch(data: any) {
+  return request({
+    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    method: 'post',
+    data
+  })
+}
+
 // 通过线路id和当前城市获取备注
 export function getLineRemarks(data:any) {
   return request({
@@ -132,6 +143,33 @@ export function unfoldDriverInfo(params:any) {
 export function matchDriverInfo(data:any) {
   return request({
     url: `${prefix}/v1/matchDriverInfo/list`,
+    method: 'post',
+    data
+  })
+}
+
+// 获取司机变更城市
+export function getDriverWorkCity(data:any) {
+  return request({
+    url: `${prefix}/v2/driver/getDriverWorkCity`,
+    method: 'post',
+    data
+  })
+}
+
+// 更改工作城市
+export function updateDriverWorkCityByDriverId(data:any) {
+  return request({
+    url: `${prefix}/v2/driver/updateDriverWorkCityByDriverId`,
+    method: 'post',
+    data
+  })
+}
+
+// 批量修改司撮
+export function updateDriverDmBatch(data:any) {
+  return request({
+    url: `${prefix}/v2/driver/updateDriverDmBatch`,
     method: 'post',
     data
   })
