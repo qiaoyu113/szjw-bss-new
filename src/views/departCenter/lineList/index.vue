@@ -1,6 +1,7 @@
 
 <template>
   <div
+    ref="linebox"
     v-loading.body="listLoading"
     class="LineListBox"
     :class="{
@@ -103,7 +104,7 @@
         ref="listTable"
         :list-query="listQuery"
         :is-show-percent="true"
-        :obj="{}"
+        :pageobj="page"
         @launchGuest="handleLaunchGuest($event)"
         @cancelGuest="handleCancelGuest($event)"
         @cancelTryRun="handleCancelTryRun($event)"
@@ -153,6 +154,7 @@ import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { showWork } from '@/utils'
 import { cloneDeep } from 'lodash'
+import { clueGetCityGroup } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -186,7 +188,9 @@ export default class extends Vue {
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
+  private hashScrollTop:string = ''
   private ids = []
+  private tableScroll:string =''
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -386,13 +390,10 @@ export default class extends Vue {
   //   this.page.limit = page.limit
   // }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:PageObj) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    console.log(this.page)
     this.getList()
   }
   // 根据关键字查线路id
@@ -563,8 +564,8 @@ export default class extends Vue {
   // 取消创建试跑意向
   handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    const { lineId, matchId, matchStatus, runTestId, status } = row
-    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    const { lineId, matchId, runTestId } = row
+    const cancelData = { lineId, matchId, runTestId, cancelRunTestOrigin: 1, type: 1, remark: '' }
     this.cancelData = cancelData
   }
   private checkOff(id:any) {
@@ -590,7 +591,18 @@ export default class extends Vue {
 
   // 取消试跑成功后刷新列表
   ctrSuccessHandle() {
-    (this.$refs.listTable as any).refreshList()
+    console.log('记录当前scrollTop', this.tableScroll)
+    this.hashScrollTop = this.tableScroll;
+    (this.$refs.cancelTryRun as any).showDialog = false;
+    (this.$refs.listTable as any).getLists().then(() => {
+      // this.$refs.linebox.scrollTop = this.hashScrollTop
+    })
+  }
+
+  handleScroll() {
+    this.$refs.linebox.addEventListener('scroll', () => {
+      this.tableScroll = this.$refs.linebox.scrollTop
+    }, false)
   }
   init() {
     this.cityDetail()
@@ -600,6 +612,7 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getList()
+    this.handleScroll()
   }
 }
 </script>

@@ -227,6 +227,12 @@
             >
               不可发起客邀
             </p>
+            <p
+              v-if="row.matchStatus === 2"
+              class="text"
+            >
+              {{ row.driverName }}
+            </p>
           </template>
         </el-table-column>
         <el-table-column
@@ -237,7 +243,7 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.currentCityInvited && !row.currentCitySuccess"
+              v-if="row.matchStatus===1 && row.currentCityInvited"
               class="text"
             >
               <el-button
@@ -249,7 +255,7 @@
               </el-button>
             </p>
             <p
-              v-if="!row.currentCityInvited && !row.currentCitySuccess"
+              v-if="!row.currentCityInvited && row.matchStatus===1"
               class="text"
             >
               <el-button
@@ -295,15 +301,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { getLineInfo } from '@/api/departCenter'
-import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
 }
 @Component({
   name: 'Btable',
-  components: {
-    CancelGuest
-  },
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
@@ -329,12 +331,15 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
+  @Prop({ default: () => {} }) pageobj!:IState
   private tableData:IState[] = []
 
   private multipleSelection:IState[] = []
 
   private selection:[] = []
   private remarks:string = ''
+  private page:number = 1
+  private limit:number = 30
 
   mounted() {
     // this.init()
@@ -349,7 +354,8 @@ export default class extends Vue {
     console.log('listQuery', this.listQuery)
     try {
     // 调用查询接口
-      let params = {}
+      let params = { ...this.listQuery, ...this.pageobj }
+      console.log('params', params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res
     } catch (err) {
@@ -358,7 +364,7 @@ export default class extends Vue {
       (this.$parent as any).listLoading = false
     }
   }
-  // 取消客邀
+  // 取消客邀(撮合单待撮合状态，)
   handleCancelGuest(custInviteId:string) {
     if (!this.selection.length) {
       this.$emit('cancelGuest', custInviteId)
