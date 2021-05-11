@@ -17,7 +17,6 @@
         label-width="130px"
         class="p15 SuggestForm"
         :pc-col="24"
-        @onPass="handlePassChange"
       >
         <template
           slot="jobStartDate"
@@ -94,9 +93,9 @@
             }"
           />
         </template>
-        <template slot="remark">
+        <template slot="manuallyRemarks">
           <el-input
-            v-model="listQuery.manuallyRemarks"
+            v-model="listQuery['manuallyRemarks']"
             class="remark"
             type="textarea"
             :rows="2"
@@ -107,8 +106,9 @@
           />
           <div class="tags">
             <el-checkbox-group
-              v-model="listQuery.remarks"
+              v-model="listQuery['remarks']"
               size="mini"
+              @change="listQuery.manuallyRemarks=''"
             >
               <el-checkbox
                 v-for="(item,index) in reasonLists"
@@ -149,23 +149,23 @@ export default class extends Vue {
   private reasonLists:IState[] = [
     {
       label: '电话停机',
-      value: '1'
+      value: 1
     },
     {
       label: '电话长期打不通',
-      value: '2'
+      value: 2
     },
     {
       label: '电话空号',
-      value: '3'
+      value: 3
     },
     {
       label: '电话号码错误',
-      value: '4'
+      value: 4
     },
     {
       label: '态度恶劣，无法沟通',
-      value: '5'
+      value: 5
     }
   ]
   private timeLists:IState[] = []
@@ -192,6 +192,12 @@ export default class extends Vue {
     remarks: [], // 司机备注
     manuallyRemarks: '' // 手动备注
   }
+  @Watch('isShow')
+  onisShowChanged(val: any, oldVal: any) {
+    if (val) {
+      this.initData()
+    }
+  }
   @Watch('listQuery.canBreakingNodriving')
   onlistQueryChanged(val: any, oldVal: any) {
     this.formItem[1].hidden = !val
@@ -216,7 +222,7 @@ export default class extends Vue {
     if (val.length > 1) {
       this.listQuery.remarks.shift()
     }
-    this.listQuery.manuallyRemarks = ''
+    // this.listQuery.manuallyRemarks = ''
   }
   private formItem:any[] = [
     {
@@ -467,18 +473,18 @@ export default class extends Vue {
       label: '司机情况',
       col: 24,
       options: [
-        { label: '着急试跑', value: '1' },
-        { label: '想跟跑', value: '2' },
-        { label: '考虑退费', value: '3' },
-        { label: '威胁司撮要退费', value: '4' },
-        { label: '铁了心要退费', value: '5' },
-        { label: '不要再给我打电话', value: '6' },
-        { label: '想请假', value: '7' }
+        { label: '着急试跑', value: 1 },
+        { label: '想跟跑', value: 2 },
+        { label: '考虑退费', value: 3 },
+        { label: '威胁司撮要退费', value: 4 },
+        { label: '铁了心要退费', value: 5 },
+        { label: '不要再给我打电话', value: 6 },
+        { label: '想请假', value: 7 }
       ]
     },
     {
       slot: true,
-      type: 'remark',
+      type: 'manuallyRemarks',
       label: '备注:',
       key: 'manuallyRemarks'
     }
@@ -516,10 +522,29 @@ export default class extends Vue {
     ]
   }
   async initData() {
-    /* let res = await searchMatchDriverInfo('BJS201903301')
-    if (res.data.success) {
+    let { data: res } = await searchMatchDriverInfo('BJS201903301')
+    if (res.success) {
       console.log(res)
-    } */
+      this.listQuery.heavyLifting = res.data.heavyLifting
+      this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
+      this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
+      this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
+      this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
+      this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
+      this.listQuery.startingPointStartTime = res.data.startingPointStartTime
+      this.listQuery.startingPointEndTime = res.data.startingPointEndTime
+      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime
+      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime
+      this.listQuery.driverSituation = res.data.driverSituation
+      this.listQuery.remarks = [res.data.remarks]
+      this.listQuery.manuallyRemarks = res.data.manuallyRemarks
+      if (res.data.hasIncomeOutside) {
+        this.listQuery.starting = [res.data.startingPointProvince, res.data.startingPointCity, res.data.startingPointCounty]
+        this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
+      }
+    } else {
+      this.$message.error(res.errorMsg)
+    }
   }
   // 弹框关闭
   private handleDialogClosed() {
@@ -528,15 +553,19 @@ export default class extends Vue {
       cancelButtonText: '取消',
       type: 'warning'
     }).then(() => {
-      (this.$refs.setTagFrom as any).resetForm()
-      this.listQuery.prohibitionAddress = ''
-      this.listQuery.prohibitionRegion = ''
-      this.listQuery.starting = ''
-      this.listQuery.delivery = ''
-      this.isShow = false
+      this.resetFrom()
     }).catch(() => {
 
     })
+  }
+  resetFrom() {
+    (this.$refs.setTagFrom as any).resetForm()
+    this.listQuery.prohibitionAddress = ''
+    this.listQuery.prohibitionRegion = ''
+    this.listQuery.starting = ''
+    this.listQuery.delivery = ''
+    this.listQuery.driverSituation = []
+    this.isShow = false
   }
   private getCountryData(key:string, index:number) {
     setTimeout(async() => {
@@ -554,13 +583,11 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.setTagFrom as any).submitForm()
-    console.log(this.listQuery)
+    this.handlePassChange()
   }
 
   // 验证通过
-  handlePassChange() {
-    (this.$refs.setTagFrom as any).submitForm()
-    console.log(this.listQuery)
+  async handlePassChange() {
     if (this.listQuery.canBreakingNodriving) {
       this.listQuery.breakingNodrivingCity = this.listQuery.prohibitionAddress[1] // 可跑禁行区域-市
       this.listQuery.breakingNodrivingProvince = this.listQuery.prohibitionAddress[0] // 可跑禁行区域-省
@@ -577,9 +604,17 @@ export default class extends Vue {
       this.listQuery.deliveryPointCounty = this.listQuery.delivery[2]
       this.listQuery.deliveryPointProvince = this.listQuery.delivery[0]
     }
+    console.log(this.listQuery)
+    let { data: res } = await updateDriverTag(this.listQuery)
+    console.log(res)
+    if (res.success) {
+      this.resetFrom()
+      this.$emit('on-success')
+    } else {
+      this.$message.error(res.errorMsg)
+    }
   }
-  created() {
-    this.initData()
+  mounted() {
     _this = this
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`

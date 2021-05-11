@@ -36,7 +36,10 @@
       <!-- 撮合匹配的司机列表 -->
       <section class="matchDriver">
         <!-- 搜索项 -->
-        <SearchKeyWords @query="onQuery" />
+        <SearchKeyWords
+          ref="searchKeyWords"
+          @query="onQuery"
+        />
         <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
           司机匹配线路
         </div>
@@ -77,6 +80,13 @@ import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from './components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
+import { cloneDeep } from 'lodash'
+
+const pageInfo = {
+  limit: 30,
+  page: 1
+}
+
   interface IState {
     [key: string]: any;
   }
@@ -102,17 +112,9 @@ export default class GuestDrawer extends Vue {
     private rowData:object = {}
     private lineTableData:IState[] = [] // 线路列表
     private driverTableData:IState[] = [] // 司机列表
-    private params: object = {}
-    private listQueryLine:IState = {
-      labelType: '',
-      isBehavior: '',
-      isRestriction: '',
-      status: '',
-      start: '',
-      end: '',
-      f1: '',
-      f2: ''
-    }
+    private params: object = {} // 来自SearchKeyWords 组件的查询数据
+    private pageInfo: any = { ...pageInfo } // 分页数据
+    private total: number = 0 // 总数据量
     private listQueryDriver:IState = {
       labelType: '',
       isBehavior: '',
@@ -165,8 +167,8 @@ export default class GuestDrawer extends Vue {
       setTimeout(() => {
         (this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
+        ;(this.$refs.searchKeyWords as any).initQuery()
       }, 20)
-      this.queryData()
     }
     onCreateTryRun(data:any) {
       (this.$refs.tryRunShow as any).showDialog = true
@@ -184,6 +186,7 @@ export default class GuestDrawer extends Vue {
         expectedFreightTripStart: f1,
         expectedFreightTripEnd: f2,
         heavyLiftingList: loadDifficulty,
+        deliveryDifficulty: deliverComplexity,
         labelTypeList: lineQuality,
         lineId: keyWords,
         driverId,
@@ -193,16 +196,19 @@ export default class GuestDrawer extends Vue {
       this.queryData()
     }
     loadMoreHandle() {
-      MatchLineListForDriver(Object.assign({}, this.params)).then((res: any) => {
-        console.log(res)
-      }) // todo  /*, this.pageInfo */
+      this.queryData(true)
     }
-    queryData() {
-      MatchLineListForDriver(this.params).then((res: any) => {
+    queryData(append?: boolean) {
+      if (append) {
+        this.pageInfo.page += 1
+      } else {
+        this.pageInfo = { ...pageInfo }
+      }
+      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
         res = res.data || {}
-        console.log(res)
         if (res.success) {
-          this.lineTableData = res.data || []
+          this.lineTableData = append ? this.lineTableData.concat(res.data || []) : (res.data || [])
+          this.total = (res.page || {}).total
         } else {
           console.log(res.errorMsg)
         }

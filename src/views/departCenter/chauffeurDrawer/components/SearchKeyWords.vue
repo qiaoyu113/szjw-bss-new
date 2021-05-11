@@ -118,6 +118,24 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
+const formData = {
+  driverId: '', // 司机ID
+  lineQuality: '', // 线路肥瘦
+  model: '', // 车型
+  loadDifficulty: '', // 装卸难易度
+  stability: '', // 稳定/临时
+  clearCycle: '', // 结算周期
+  cargoType: '', // 货品类型
+  deliverComplexity: '', // 配送类型/复杂度
+  start: '',
+  end: '',
+  f1: '',
+  f2: '',
+  repoLoc: '',
+  distLoc: '',
+  keyWords: ''
+}
+
 interface IState {
   [key: string]: any;
 }
@@ -127,7 +145,6 @@ interface IState {
   }
 })
 export default class SearchKeyWords extends Vue {
-  private keyWords: string = ''
   private carLists:IState[] = [
     {
       value: '',
@@ -146,23 +163,7 @@ export default class SearchKeyWords extends Vue {
     { label: '全部', value: '' }
   ];
   private timeLists:IState[] = []
-  private listQuery:IState = {
-    driverId: '', // 司机ID
-    lineQuality: '', // 线路肥瘦
-    model: '', // 车型
-    loadDifficulty: '', // 装卸难易度
-    stability: '', // 稳定/临时
-    clearCycle: '', // 结算周期
-    cargoType: '', // 货品类型
-    deliverComplexity: '', // 配送类型/复杂度
-    start: '',
-    end: '',
-    f1: '',
-    f2: '',
-    repoLoc: '',
-    distLoc: '',
-    keyWords: ''
-  };
+  private listQuery:IState = { ...formData }
   private lineQualities: any[] = [
     { label: '全部', value: '' }
   ];
@@ -239,6 +240,14 @@ export default class SearchKeyWords extends Vue {
       options: this.timeLists
     }
   ]
+  reset() {
+    this.curSelecteds = []
+    this.selectTitle = ''
+    this.selectedData = []
+    this.listQuery = { ...formData }
+    this.shareScopeEnd = []
+    this.levelData = {}
+  }
   getArrDifference(arr1:any, arr2:any) {
     return arr1.concat(arr2).filter(function(v:any, i:number, arr:IState[]) {
       return arr.indexOf(v) === arr.lastIndexOf(v)
@@ -356,7 +365,6 @@ export default class SearchKeyWords extends Vue {
     }
   }
   initSelectItem(id: any, command: any, isInitWorkRange?: boolean) {
-    console.log(id, command)
     if (isInitWorkRange) {
       let obj = {
         type: '工作时间段',
@@ -400,10 +408,10 @@ export default class SearchKeyWords extends Vue {
     }
   }
   searchHandle() {
-    console.log(this.listQuery)
     this.$emit('query', this.listQuery)
   }
   initQuery() {
+    this.reset()
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
     this.listQuery.driverId = driver.driverId || driver.id
     if (driver.workHours.length) {
@@ -411,15 +419,15 @@ export default class SearchKeyWords extends Vue {
     }
     if (driver.heavyLifting) {
       this.key = 'loadDifficulty'
-      this.initSelectItem(driver.heavyLifting.split(','), driver.heavyLiftingName.split(','))
+      this.initSelectItem((driver.heavyLifting + '').split(','), driver.heavyLiftingName.split(','))
     }
     if (driver.carType) {
       this.key = 'model'
-      this.initSelectItem(driver.carType.split(','), driver.heavyLiftingName.split(','))
+      this.initSelectItem((driver.carType + '').split(','), driver.heavyLiftingName.split(','))
     }
     if (driver.intentCargoType) {
       this.key = 'cargoType'
-      this.initSelectItem(driver.intentCargoType.split(','), driver.intentCargoTypeName.split(','))
+      this.initSelectItem((driver.intentCargoType + '').split(','), driver.intentCargoTypeName.split(','))
     }
     if ((driver.liveAddressCity && driver.liveAddressProvince) || process.env.NODE_ENV === 'development') {
       this.listQuery.repoLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
@@ -436,7 +444,6 @@ export default class SearchKeyWords extends Vue {
         value: count
       })
     }
-    this.initQuery()
   }
 }
 </script>

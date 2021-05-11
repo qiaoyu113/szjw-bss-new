@@ -113,6 +113,7 @@ import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+const lineKey = 'line_row'
 interface IState {
   [key: string]: any;
 }
@@ -122,6 +123,7 @@ interface IState {
   }
 })
 export default class SearchKeyWords extends Vue {
+  private rowData:any = {}
   private driverInfo: string = ''
   private driverOptions:IState[] = []
   private shareScopeEnd:IState[] = []
@@ -165,7 +167,6 @@ export default class SearchKeyWords extends Vue {
     lineCategory: '', // 期望稳定/临时
     cargoType: '', // 期望货品类型
     distributionWay: '', // 期望配送难度
-    workingHour: '',
     start: '',
     end: '',
     address: '',
@@ -402,7 +403,6 @@ export default class SearchKeyWords extends Vue {
     }
   }
   searchHandle() {
-    console.log(this.listQuery)
     // 单趟运费区间
     if ((this.listQuery.everyTripGuaranteedStart && !this.listQuery.everyTripGuaranteedEnd) || (!this.listQuery.everyTripGuaranteedStart && this.listQuery.everyTripGuaranteedEnd)) {
       return this.$message.warning('单趟运费输入不完整')
@@ -535,14 +535,65 @@ export default class SearchKeyWords extends Vue {
       type: '业务线'
     }
     if (shareArr.indexOf(data.labelTypeValue) > -1) {
+      this.selectedData = []
       busiType.optionIds.push('0')
       busiType.selected.push('共享')
+      this.selectedData.push(busiType)
     }
     if (specialArr.indexOf(data.labelTypeValue) > -1) {
       busiType.optionIds.push('1')
       busiType.selected.push('专车')
+      this.selectedData = []
+      this.selectedData.push(busiType)
     }
-    this.selectedData.push(busiType)
+  }
+  // 回显货品类型
+  getCargoType(data:any) {
+    let cargoType:any = {
+      key: 'cargoType',
+      optionIds: [data.cargoType],
+      selected: [data.cargoTypeValue],
+      type: '货品类型'
+    }
+    this.selectedData.push(cargoType)
+  }
+  // 回显装卸难度
+  getHandlingDifficulty(data:any) {
+    let handlingDifficulty:any = {
+      key: 'handlingDifficulty',
+      optionIds: [data.handlingDifficulty],
+      selected: [data.handlingDifficultyValue],
+      type: '装卸难度'
+    }
+    this.selectedData.push(handlingDifficulty)
+  }
+  // 回显配送车型
+  getCarType(data:any) {
+    let carType:any = {
+      key: 'carType',
+      optionIds: [data.carType],
+      selected: [data.carTypeValue],
+      type: '配送车型'
+    }
+    this.selectedData.push(carType)
+  }
+  // 从缓存获取线路信息
+  getLineInfoFromStorage() {
+    let str = sessionStorage.getItem(lineKey) || ''
+    if (str) {
+      let obj:IState = JSON.parse(str) || {}
+      this.rowData = obj
+      console.log(this.rowData)
+    }
+  }
+  // 初始化筛选项数据
+  initData() {
+    this.getLineInfoFromStorage()
+    this.getBusiType(this.rowData)
+    this.getCargoType(this.rowData)
+    this.getHandlingDifficulty(this.rowData)
+    this.getCarType(this.rowData)
+    this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
   }
   mounted() {
     this.getOptions()
@@ -554,7 +605,6 @@ export default class SearchKeyWords extends Vue {
       })
     }
     this.loadQueryDriverByKeyword()
-    this.initSelectItem('9:00~12:00,16:00~20:00', '9:00~12:00,16:00~20:00', true)
   }
 }
 </script>

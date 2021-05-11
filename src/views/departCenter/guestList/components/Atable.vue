@@ -320,7 +320,7 @@
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import { getLineDetail, getLineRemarks } from '@/api/departCenter'
 const lineKey = 'line_row'
 const driverKey = 'driver_row'
@@ -338,14 +338,8 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
-  @Prop({ default: () => [] }) lineTableData!:IState[]
+  @PropSync('lineTableData', { default: () => [] }) _tableData!:IState[]
 
-  get _tableData() {
-    return this.lineTableData
-  }
-  set _tableData(val:IState[]) {
-    this.$emit('update:lineTableData', val)
-  }
   private obj:IState = {}
   // 计算窗口期
   private _calcDay(row:IState) {

@@ -1,11 +1,6 @@
 import request from '@/utils/request'
 
-const payFix = '/mock/112'
-const prefix = '/bill'
-const driverFix = '/business_center'
-const billFix = '/bill_center'
-const wayBillFix = '/waybill'
-let prefix2 = '/mock/25'
+const prefix = `/mock/283`
 
 /**
  * 给司机打标签-查询接口
@@ -22,5 +17,14 @@ export const updateDriverTag = (data:any) =>
   request({
     url: `${prefix}/v3/updateDriverTag`,
     method: 'put',
+    data
+  })
+/**
+ * 司机匹配线路查询接口
+ */
+export const queryMatchDriverForMatchLine = (data: any) =>
+  request({
+    url: `${prefix}/v1/matchDriverInfo/queryMatchDriverForMatchLine`,
+    method: 'post',
     data
   })

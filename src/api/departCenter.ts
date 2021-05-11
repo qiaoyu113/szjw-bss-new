@@ -147,3 +147,12 @@ export function getBasicDetail(params:any) {
     params
   })
 }
+
+// 获取司推列表
+export function matchDriverInfo(data:any) {
+  return request({
+    url: `${prefix}/v1/matchDriverInfo/list`,
+    method: 'post',
+    data
+  })
+}

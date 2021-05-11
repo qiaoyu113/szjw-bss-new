@@ -1,7 +1,10 @@
 <template>
   <section class="matchDriver">
     <!-- 搜索项 -->
-    <SearchKeyWords @on-search="searchData" />
+    <SearchKeyWords
+      ref="searchKeyWords"
+      @on-search="searchData"
+    />
     <h3>司机匹配线路</h3>
     <div class="lineTable">
       <AtableDriver
@@ -11,6 +14,7 @@
         :driver-table-data="driverTableData"
         :is-more="true"
         :op-type="[-1,3,4,5]"
+        @on-success="initData"
         @call="setCallHandle"
         @tag="setTagHandle"
         @creatRun="creatRunHandle"
@@ -34,9 +38,11 @@
 import SearchKeyWords from './SearchKeyWords.vue'
 import AtableDriver from '../../chauffeurList/components/Atable.vue'
 import SetTag from './SetTag.vue'
+import { queryMatchDriverForMatchLine } from '@/api/drawer-guest'
 import CreateTryRun from '../../guestList/components/CreateTryRun.vue'
 import DetailDialog from '../../chauffeurList/components/DetailDialog.vue'
 import { Vue, Component, Prop } from 'vue-property-decorator'
+const lineKey = 'line_row'
 interface IState {
   [key: string]: any;
 }
@@ -57,16 +63,7 @@ export default class DepartLine extends Vue {
   private detailDialog:Boolean = false
   private detailId:string = ''
   private pageSize:number = 1
-  private listQuery:IState = {
-    labelType: '',
-    isBehavior: '',
-    isRestriction: '',
-    status: '',
-    start: '',
-    end: '',
-    f1: '',
-    f2: ''
-  }
+  private listQuery:IState = {}
   setTagHandle(row:any) {
     (this.$refs.tagShow as any).isShow = true
     this.rowData = row
@@ -109,6 +106,7 @@ export default class DepartLine extends Vue {
           driverMatchManagerName: '加盟经理',
           driverId: 'SJ20210415',
           carTypeName: '4.2米厢货',
+          carType: 10,
           isNewEnergy: true,
           canBreakingNodriving: true,
           canBreakingTrafficRestriction: false,
@@ -157,11 +155,39 @@ export default class DepartLine extends Vue {
       console.log('')
     }
   }
+  // 获取列表数据
   searchData(data:any) {
     this.listQueryLine = data
+    this.getLists()
+    console.log(data)
+  }
+  /*  async initData() {
+    let { data: res } = await queryMatchDriverForMatchLine(this.listQueryLine)
+    if (res.success) {
+      this.driverTableData = res.data
+      console.log(this.driverTableData)
+    } else {
+      this.$message.error(res.errorMsg)
+    }
+  } */
+
+  // 从缓存获取线路信息
+  getLineInfoFromStorage() {
+    let str = sessionStorage.getItem(lineKey) || ''
+    if (str) {
+      let obj:IState = JSON.parse(str) || {}
+      this.rowData = obj
+      console.log(obj)
+    }
+  }
+  // 初始化数据
+  initData() {
+    this.pageSize = 0
+    this.driverTableData = []
+    this.getLists()
   }
   mounted() {
-    this.getLists()
+    this.getLineInfoFromStorage()
   }
 }
 </script>

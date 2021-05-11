@@ -38,12 +38,14 @@
         :class="isPC ? 'btnPc left' : 'mobile'"
       >
         <el-button
+          v-if="listQuery.customerStatus === '1'"
           type="primary"
           @click="batchLaunchGuest"
         >
           批量发起客邀
         </el-button>
         <el-button
+          v-if="listQuery.customerStatus === '2'"
           type="primary"
           @click="batchCancelGuest"
         >
@@ -70,7 +72,6 @@
           v-only-number="{min: 1, max: 19999, precision: 0}"
         />
       </template>
-      <!-- <span v-if="listQuery.customerStatus ===2"> -->
       <template
         slot="guestCity"
       >
@@ -86,7 +87,6 @@
           />
         </el-select>
       </template>
-      <!-- </span> -->
       <template slot="time">
         <timeSelect
           v-model="listQuery.time"
@@ -130,6 +130,7 @@
     <cancel-tryRun
       ref="cancelTryRun"
       :cancel-data="cancelData"
+      @success="ctrSuccessHandle"
     />
   </div>
 </template>
@@ -492,10 +493,10 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    this.cityList.push({
-      value: 0,
-      label: '全部城市'
-    })
+    // this.cityList.push({
+    //   value: 0,
+    //   label: '全部城市'
+    // })
     let { data: city } = await GetDictionaryCity()
     if (city.success) {
       const nodes = city.data.map(function(item: any) {
@@ -544,8 +545,8 @@ export default class extends Vue {
   // 取消客邀
   handleCancelGuest(custInviteId:string) {
     (this.$refs.cancelGuest as any).showDialog = true;
-    (this.$refs.cancelGuest as any).cancelGuestState = 1;
-    (this.$refs.cancelGuest as any).getDictList()
+    (this.$refs.cancelGuest as any).cancelGuestState = 1
+    // (this.$refs.cancelGuest as any).getDictList()
     this.custInviteId = custInviteId
   }
 
@@ -585,6 +586,11 @@ export default class extends Vue {
     } else {
       this.formItem.splice(4, 0, values)
     }
+  }
+
+  // 取消试跑成功后刷新列表
+  ctrSuccessHandle() {
+    (this.$refs.listTable as any).refreshList()
   }
   init() {
     this.cityDetail()

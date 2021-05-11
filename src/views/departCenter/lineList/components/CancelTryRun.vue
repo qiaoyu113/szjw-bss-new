@@ -76,9 +76,22 @@ export default class extends Vue {
   }
   // 验证通过
   handlePassChange() {
-
+    this.cancel()
   }
 
+  async cancel() {
+    try {
+      let params:IState = { ...this.cancelData }
+      console.log('params', params)
+      let { data: res } = await cancelIntention(params)
+      if (res.success) {
+        this.$message.success('操作成功')
+        this.$emit('success')
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
   mounted() {
     this.init()
   }
