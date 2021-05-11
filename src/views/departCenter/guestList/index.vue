@@ -464,7 +464,9 @@ export default class extends Vue {
       if (page.limit) {
         this.page.limit = page.limit
       }
-      this.getLists()
+      setTimeout(() => {
+        this.getLists()
+      }, 20)
     }
     // 匹配撮合
     handleMatchTryRun() {

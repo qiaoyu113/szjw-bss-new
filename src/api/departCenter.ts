@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 const base = '/base_center'
-
+const departCenter = `match`
 const prefix = `/mock/283`
 
 const departfix = 'match_center'
@@ -16,14 +16,16 @@ export const CreateLntentionRun = (data: any) =>
 // 发起客邀
 export const CreateLaunchGuests = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/startMatchCustInvite`,
+    // url: `mock/283/v1/matchCustInvite/startMatchCustInvite`,
+    url: `${departCenter}/v1/matchCustInvite/startMatchCustInvite`,
     method: 'post',
     data
   })
   // 取消客邀
 export const cancelMatchCustInvite = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/cancelMatchCustInvite`,
+    // url: `mock/283/v1/matchCustInvite/cancelMatchCustInvite`,
+    url: `${departCenter}/v1/matchCustInvite/cancelMatchCustInvite`,
     method: 'post',
     data
   })
@@ -40,6 +42,18 @@ export const cancelMatchCustInviteBatch = (data: any) =>
     url: `mock/283/v1/matchCustInvite/cancelMatchCustInviteBatch`,
     method: 'post',
     data
+  })
+  // 客邀城市列表
+export const GetcustInviteCitys = () =>
+  request({
+    url: `${departCenter}/v1/matchCustInvite/custInviteCitys`,
+    method: 'post'
+  })
+  // 发起客邀城市
+export const GetstartCustInviteCity = () =>
+  request({
+    url: `${departCenter}/v1/matchCustInvite/startCustInviteCity`,
+    method: 'post'
   })
 // 获取客邀列表
 export function getInvitedLines(data:any) {
@@ -101,7 +115,7 @@ export function getLineRemarks(data:any) {
 // 取消试跑意向
 export function cancelIntention(data:any) {
   return request({
-    url: `${prefix}/v2/runtest/intention/cancel`,
+    url: `waybill/v2/runtest/intention/cancel`,
     method: 'post',
     data
   })

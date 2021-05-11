@@ -2,6 +2,7 @@
   <section class="matchDriver">
     <!-- 搜索项 -->
     <SearchKeyWords
+      ref="searchKeyWords"
       @on-search="searchData"
     />
     <h3>司机匹配线路</h3>
@@ -160,7 +161,7 @@ export default class DepartLine extends Vue {
     this.getLists()
     console.log(data)
   }
-  async initData() {
+  /*  async initData() {
     let { data: res } = await queryMatchDriverForMatchLine(this.listQueryLine)
     if (res.success) {
       this.driverTableData = res.data
@@ -168,7 +169,8 @@ export default class DepartLine extends Vue {
     } else {
       this.$message.error(res.errorMsg)
     }
-  }
+  } */
+
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
@@ -178,8 +180,13 @@ export default class DepartLine extends Vue {
       console.log(obj)
     }
   }
-  mounted() {
+  // 初始化数据
+  initData() {
+    this.pageSize = 0
+    this.driverTableData = []
     this.getLists()
+  }
+  mounted() {
     this.getLineInfoFromStorage()
   }
 }
