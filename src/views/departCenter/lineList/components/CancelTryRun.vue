@@ -2,7 +2,6 @@
   <SelfDialog
     :visible.sync="showDialog"
     title="取消试跑意向"
-    append-to-body
     :confirm="confirm"
     width="500px"
     custom-class="a1111"
