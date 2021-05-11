@@ -83,7 +83,8 @@ export default class extends Vue {
     if (this.cancelGuestState === 1) {
       try {
         let params:IState = {
-          custInviteId: this.custInviteId,
+          // custInviteId: this.custInviteId,
+          custInviteId: 'afda9',
           cancelInviteReason: this.listQuery.cancelInviteReason
         }
         let { data: res } = await cancelMatchCustInvite(params)

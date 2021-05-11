@@ -141,9 +141,9 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList, GetDictionaryCity } from '@/api/common'
+import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch } from '@/api/departCenter'
+import { getLineSearch, GetcustInviteCitys } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
@@ -493,15 +493,11 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    // this.cityList.push({
-    //   value: 0,
-    //   label: '全部城市'
-    // })
-    let { data: city } = await GetDictionaryCity()
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
+    let { data: res } = await GetcustInviteCitys()
+    if (res.success) {
+      const nodes = res.data.map(function(item: any) {
         return {
-          value: +item.code,
+          value: item.id,
           label: item.name
         }
       })
