@@ -87,6 +87,15 @@ export function MatchLineListForDriver(data: any) {
   })
 }
 
+// 司推：线路ID/名称列表
+export function getLineListForSearch(data: any) {
+  return request({
+    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    method: 'post',
+    data
+  })
+}
+
 // 通过线路id和当前城市获取备注
 export function getLineRemarks(data:any) {
   return request({
