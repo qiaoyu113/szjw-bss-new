@@ -261,7 +261,7 @@ export default class extends Vue {
         const params = this.dealParams(this.listQuery)
         let { data: res } = await matchDriverInfo(params)
         if (res.success) {
-          this.tableData = [res.data]
+          this.tableData = res.data
           let page = await HandlePages(res.page)
           this.page.total = page.total
         } else {
