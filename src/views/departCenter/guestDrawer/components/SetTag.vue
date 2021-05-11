@@ -531,10 +531,10 @@ export default class extends Vue {
       this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
       this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
       this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
-      this.listQuery.startingPointStartTime = res.data.startingPointStartTime
-      this.listQuery.startingPointEndTime = res.data.startingPointEndTime
-      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime
-      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime
+      this.listQuery.startingPointStartTime = res.data.startingPointStartTime + ':00'
+      this.listQuery.startingPointEndTime = res.data.startingPointEndTime + ':00'
+      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime + ':00'
+      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime + ':00'
       this.listQuery.driverSituation = res.data.driverSituation
       this.listQuery.remarks = [res.data.remarks]
       this.listQuery.manuallyRemarks = res.data.manuallyRemarks
