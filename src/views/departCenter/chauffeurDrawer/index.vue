@@ -54,7 +54,10 @@
           />
         </div>
       </section>
-      <SetTag ref="tagShow" />
+      <SetTag
+        ref="tagShow"
+        :driver-id="driverId"
+      />
     </Scroll>
     <CreateTryRun
       ref="tryRunShow"
@@ -62,7 +65,7 @@
     />
     <DetailDialog
       actived="third"
-      :driver-id="detailId"
+      :driver-id="driverId"
       :dialog-table-visible.sync="detailDio"
     />
   </DrawerModel>
@@ -104,6 +107,7 @@ const pageInfo = {
 export default class GuestDrawer extends Vue {
     @Prop({ default: false }) private value !: boolean
     private visible : boolean = false // 抽屉显示隐藏
+    private driverId: string = ''
     private tagShow:boolean = false
     private pageSize:number = 1
     private tryRunShow:boolean = false
@@ -125,7 +129,6 @@ export default class GuestDrawer extends Vue {
       f2: ''
     }
     private detailDio:Boolean = false
-    private detailId:string = ''
     $eventBus: any
     @Watch('value')
     onValueChanged(val: boolean, oldVal: boolean) {
@@ -164,7 +167,8 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
       setTimeout(() => {
-        (this.$refs.driverDrawer as any).getStorage();
+        this.driverId = JSON.parse(sessionStorage.getItem('driver_row') || '{}').driverId || ''
+        ;(this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
         ;(this.$refs.searchKeyWords as any).initQuery()
       }, 20)

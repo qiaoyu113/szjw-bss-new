@@ -185,7 +185,7 @@
             <span>{{ row.deliveryDifficultyNames }}</span>
           </p>
           <p class="text">
-            工作时间段:{{ row.workHours.join(",") }}
+            工作时间段:{{ (row.workHours || []).join(",") }}
           </p>
           <p class="text">
             期望稳定/临时:

@@ -67,15 +67,18 @@
           v-model="listQuery.keyWords"
           placeholder="选择/搜索线路名称/编号"
           filterable
+          remote
           clearable
-          :options="lineList"
+          :remote-method="getLineListForSearch"
           size="mini"
+          :loading="isLoading"
+          @clear="onClearInput"
         >
           <el-option
             v-for="it in lineList"
-            :key="it.value"
-            :value="it.value"
-            :label="it.label"
+            :key="it.lineId"
+            :value="it.lineId"
+            :label="it.lineName"
           />
         </el-select>
         <div>&nbsp;</div>
@@ -114,6 +117,7 @@
 
 <script lang="ts">
 import { GetDictionaryList } from '@/api/common'
+import { getLineListForSearch } from '@/api/departCenter'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
@@ -170,10 +174,8 @@ export default class SearchKeyWords extends Vue {
   private goodsTypes: any[] = [
     { label: '全部', value: '' }
   ];
-  private lineList: any = [
-    { label: '线路1', value: 'line1' },
-    { label: '线路2', value: 'line2' }
-  ]
+  private isLoading: boolean = false;
+  private lineList: any = []
   private getProviceCityCountryData = getProviceCityCountryData;
   private formItemWidth: number = 160;
   private shareScopeEnd:IState[] = [];
@@ -390,6 +392,9 @@ export default class SearchKeyWords extends Vue {
   clearSelect(i: number) {
     this.selectedData.splice(i, 1)
   }
+  onClearInput() {
+    this.lineList = []
+  }
   async getOptions() {
     try {
       let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'line_label', 'type_of_goods']
@@ -414,7 +419,7 @@ export default class SearchKeyWords extends Vue {
     this.reset()
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
     this.listQuery.driverId = driver.driverId || driver.id
-    if (driver.workHours.length) {
+    if ((driver.workHours || []).length) {
       this.initSelectItem((driver.workHours || []).join(','), (driver.workHours || []).join(','), true)
     }
     if (driver.heavyLifting) {
@@ -434,6 +439,23 @@ export default class SearchKeyWords extends Vue {
       this.listQuery.distLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
     }
     this.$emit('query', this.listQuery)
+  }
+  getLineListForSearch(input: string) {
+    if (input) {
+      this.isLoading = true
+      getLineListForSearch({ key: input, limit: 8, page: 1 }).then(res => {
+        const data = res.data || {}
+        if (data.success) {
+          this.lineList = data.data || []
+        }
+      }).catch(err => {
+        console.log(err)
+      }).finally(() => {
+        this.isLoading = false
+      })
+    } else {
+      this.lineList = []
+    }
   }
   mounted() {
     this.getOptions()
