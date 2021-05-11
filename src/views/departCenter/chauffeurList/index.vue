@@ -259,7 +259,9 @@ export default class extends Vue {
       if (page.limit) {
         this.page.limit = page.limit
       }
-      this.getLists()
+      setTimeout(() => {
+        this.getLists()
+      }, 20)
     }
     init() {
       let id:any = this.$route.query.id

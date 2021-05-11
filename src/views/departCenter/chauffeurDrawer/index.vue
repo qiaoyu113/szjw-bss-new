@@ -77,10 +77,9 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
-import SetTag from './components/SetTag.vue'
+import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
-import { cloneDeep } from 'lodash'
 
 const pageInfo = {
   limit: 30,
@@ -191,7 +190,6 @@ export default class GuestDrawer extends Vue {
         lineId: keyWords,
         driverId,
         workHours: workRange // todo confirm
-        // todo 分页
       }
       this.queryData()
     }
