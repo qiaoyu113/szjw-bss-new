@@ -26,6 +26,7 @@
 import { Vue, Component, Prop, PropSync, Emit } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
+import { updateDriverWorkCityByDriverId } from '@/api/departCenter'
 
 interface IState {
   [key: string]: any;
@@ -39,10 +40,11 @@ interface IState {
 })
 export default class extends Vue {
   @Prop({ default: false }) dialogVisible!: boolean; // 弹框显示
+  @Prop({ default: [] }) options!: []; // 弹框显示
+  @Prop({ default: () => {} }) obj!: IState; // row data
   @PropSync('dialogVisible', { type: Boolean }) show!: Boolean;
-  private cityList: IState[] = [];
   private listQuery: IState = {
-    a: ''
+    workCity: ''
   };
   private formItem: any[] = [
     {
@@ -53,12 +55,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '新工作城市',
-      key: 'a',
-      options: this.cityList
+      key: 'workCity',
+      options: this.options
     }
   ];
   private rules: IState = {
-    a: [
+    workCity: [
       {
         required: true,
         message: '请选择新工作城市',
@@ -69,15 +71,32 @@ export default class extends Vue {
 
   private close() {
     (this.$refs.cityForm as any).resetForm()
+    let length = (this.$parent as any).cityOptions.length;
+    (this.$parent as any).cityOptions.splice(0, length)
   }
   // 确定按钮
   private confirm() {
     (this.$refs.cityForm as any).submitForm()
   }
   // 验证通过
-  handlePassChange() {
-    this.$message.success('“由XX更换至XX”')
-    // (this.$parent as any).getLists()
+  async handlePassChange() {
+    try {
+      let params = {
+        driverId: this.obj.driverId,
+        workCity: this.listQuery.workCity,
+        dmId: this.obj.joinManagerId
+      }
+      let { data: res } = await updateDriverWorkCityByDriverId({ ChangeDriverWorkCityDTO: params })
+      if (res.success) {
+        this.show = false
+        this.$message.success('操作成功');
+        (this.$parent as any).getLists()
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
   }
 }
 </script>
