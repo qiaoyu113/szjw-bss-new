@@ -393,7 +393,9 @@ export default class extends Vue {
     if (limit) {
       this.page.limit = limit
     }
-    this.getList()
+    setTimeout(() => {
+      this.getList()
+    }, 20)
   }
   // 根据关键字查线路id
   async loadLineByKeyword(params:IState) {

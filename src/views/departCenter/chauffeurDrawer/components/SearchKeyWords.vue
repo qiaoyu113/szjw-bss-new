@@ -423,7 +423,7 @@ export default class SearchKeyWords extends Vue {
     }
     if (driver.carType) {
       this.key = 'model'
-      this.initSelectItem((driver.carType + '').split(','), driver.heavyLiftingName.split(','))
+      this.initSelectItem((driver.carType + '').split(','), driver.carTypeName.split(','))
     }
     if (driver.intentCargoType) {
       this.key = 'cargoType'
