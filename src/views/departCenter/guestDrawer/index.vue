@@ -74,7 +74,9 @@ export default class GuestDrawer extends Vue {
     AppModule.CloseSideBar(false)
     setTimeout(() => {
       (this.$refs.lineDrawer as any).getStorage();
-      ((this.$refs.matchDriver as any).$refs.tableDriver as any).getLineInfoFromStorage()
+      ((this.$refs.matchDriver as any).$refs.tableDriver as any).getLineInfoFromStorage();
+      ((this.$refs.matchDriver as any).$refs.searchKeyWords as any).initData();
+      (this.$refs.matchDriver as any).initData()
     }, 20)
   }
   loadMoreHandle() {

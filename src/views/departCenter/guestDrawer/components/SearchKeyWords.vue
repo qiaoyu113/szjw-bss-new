@@ -577,7 +577,6 @@ export default class SearchKeyWords extends Vue {
     }
     this.selectedData.push(carType)
   }
-
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
@@ -586,6 +585,16 @@ export default class SearchKeyWords extends Vue {
       this.rowData = obj
       console.log(this.rowData)
     }
+  }
+  // 初始化筛选项数据
+  initData() {
+    this.getLineInfoFromStorage()
+    this.getBusiType(this.rowData)
+    this.getCarType(this.rowData)
+    this.getCargoType(this.rowData)
+    this.getHandlingDifficulty(this.rowData)
+    this.getCarType(this.rowData)
+    this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
   }
   mounted() {
     this.getOptions()
@@ -597,12 +606,6 @@ export default class SearchKeyWords extends Vue {
       })
     }
     this.loadQueryDriverByKeyword()
-    this.getLineInfoFromStorage()
-    this.getBusiType(this.rowData)
-    this.getCargoType(this.rowData)
-    this.getHandlingDifficulty(this.rowData)
-    this.getCarType(this.rowData)
-    this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
   }
 }
 </script>
