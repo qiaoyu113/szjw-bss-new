@@ -577,16 +577,6 @@ export default class SearchKeyWords extends Vue {
     }
     this.selectedData.push(carType)
   }
-  // 回显配送复杂度
-  getDistributionWay(data:any) {
-    let distributionWay:any = {
-      key: 'distributionWay',
-      optionIds: [data.distributionWay],
-      selected: [data.distributionWayValue],
-      type: '期望配送复杂度'
-    }
-    this.selectedData.push(distributionWay)
-  }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
@@ -600,10 +590,10 @@ export default class SearchKeyWords extends Vue {
   initData() {
     this.getLineInfoFromStorage()
     this.getBusiType(this.rowData)
+    this.getCarType(this.rowData)
     this.getCargoType(this.rowData)
     this.getHandlingDifficulty(this.rowData)
     this.getCarType(this.rowData)
-    this.getDistributionWay(this.rowData)
     this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
   }
   mounted() {
