@@ -3,7 +3,7 @@ const base = '/base_center'
 const departCenter = `match`
 const prefix = `/mock/283`
 
-const departfix = 'match'
+const departfix = 'match_center'
 
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
@@ -32,14 +32,14 @@ export const cancelMatchCustInvite = (data: any) =>
   // 批量发起客邀
 export const CreateLaunchGuestsBatch = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/startMatchCustInviteBatch`,
+    url: `${departCenter}/v1/matchCustInvite/startMatchCustInviteBatch`,
     method: 'post',
     data
   })
 // 批量取消客邀
 export const cancelMatchCustInviteBatch = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/cancelMatchCustInviteBatch`,
+    url: `${departCenter}/v1/matchCustInvite/cancelMatchCustInviteBatch`,
     method: 'post',
     data
   })
@@ -142,7 +142,7 @@ export function unfoldDriverInfo(params:any) {
 // 获取司推列表
 export function matchDriverInfo(data:any) {
   return request({
-    url: `${prefix}/v1/matchDriverInfo/list`,
+    url: `${departfix}/v1/matchDriverInfo/list`,
     method: 'post',
     data
   })
