@@ -14,14 +14,16 @@
         :driver-table-data="driverTableData"
         :is-more="true"
         :op-type="[-1,3,4,5]"
-        @on-success="initData"
         @call="setCallHandle"
         @tag="setTagHandle"
         @creatRun="creatRunHandle"
         @detail="detailHandle"
       />
     </div>
-    <SetTag ref="tagShow" />
+    <SetTag
+      ref="tagShow"
+      @on-success="setSuccess"
+    />
     <CreateTryRun
       ref="tryRunShow"
       :obj="rowData"
@@ -62,8 +64,21 @@ export default class DepartLine extends Vue {
   private driverTableData:IState[] = [] // 司机列表
   private detailDialog:Boolean = false
   private detailId:string = ''
-  private pageSize:number = 1
+  private pageSize:number = 0
   private listQuery:IState = {}
+  params(params:any) {
+    let ret:any = {}
+    // 过滤空值数据
+    for (let prop in params) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (!params.hasOwnProperty(prop)) continue
+      let value = params[prop]
+      // eslint-disable-next-line no-undefined
+      if (value !== '' && value !== undefined && value !== null && value !== 'null') ret[prop] = value
+    }
+    console.log(ret)
+    return ret
+  }
   setTagHandle(row:any) {
     (this.$refs.tagShow as any).isShow = true
     this.rowData = row
@@ -94,7 +109,7 @@ export default class DepartLine extends Vue {
     this.detailDialog = true
   }
   // 获取列表数据
-  async getLists() {
+  /* async getLists() {
     try {
       this.pageSize++
       let num:number = 3
@@ -154,23 +169,30 @@ export default class DepartLine extends Vue {
     } finally {
       console.log('')
     }
-  }
+  } */
   // 获取列表数据
   searchData(data:any) {
+    this.pageSize = 1
+    this.driverTableData = []
     this.listQueryLine = data
     this.getLists()
     console.log(data)
   }
-  /*  async initData() {
-    let { data: res } = await queryMatchDriverForMatchLine(this.listQueryLine)
+  async getLists() {
+    this.listQueryLine.lineId = 'XL202111070005'
+    this.listQueryLine.page = this.pageSize
+    this.listQueryLine.limit = 10
+    let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
     if (res.success) {
-      this.driverTableData = res.data
+      this.driverTableData = [...this.driverTableData, ...res.data]
+      if (res.data.length < 10) {
+        this.$emit('on-end')
+      }
       console.log(this.driverTableData)
     } else {
       this.$message.error(res.errorMsg)
     }
-  } */
-
+  }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
@@ -180,11 +202,33 @@ export default class DepartLine extends Vue {
       console.log(obj)
     }
   }
+  // 瀑布流加载
+  getMoreData() {
+    this.pageSize++
+    this.getLists()
+  }
   // 初始化数据
   initData() {
-    this.pageSize = 0
+    this.pageSize = 1
     this.driverTableData = []
     this.getLists()
+  }
+  // 打标签成功
+  setSuccess(data:any, driverId:string) {
+    let index = this.driverTableData.findIndex((item:any) => {
+      return item.driverId === driverId
+    })
+    this.driverTableData[index].canBreakingNodriving = data.canBreakingNodriving // 司机能否闯禁行
+    this.driverTableData[index].canBreakingTrafficRestriction = data.canBreakingTrafficRestriction // 司机能否闯限行
+    this.driverTableData[index].expectAccountingPeriod = data.expectAccountingPeriod // 结算周期
+    this.driverTableData[index].expectAccountingPeriodName = data.expectAccountingPeriodName // 结算周期
+    this.driverTableData[index].deliveryDifficulty = data.deliveryDifficulty // 配送复杂度
+    this.driverTableData[index].deliveryDifficultyNames = data.deliveryDifficultyNames // 配送复杂度
+    this.driverTableData[index].expectStabilityTemporary = data.expectStabilityTemporary // 稳定/临时
+    this.driverTableData[index].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
+    this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
+    this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
+    console.log(this.driverTableData)
   }
   mounted() {
     this.getLineInfoFromStorage()

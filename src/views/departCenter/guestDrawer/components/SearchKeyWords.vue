@@ -97,7 +97,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workingHours' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -160,17 +160,17 @@ export default class SearchKeyWords extends Vue {
   ]
   private timeLists:IState[] = []
   private listQuery:IState = {
-    busiType: '', // 所属业务线
-    carType: '', // 车类型
-    handlingDifficulty: '', // 装卸接受度
-    settlementCycle: '', // 结算周期
-    lineCategory: '', // 期望稳定/临时
-    cargoType: '', // 期望货品类型
-    distributionWay: '', // 期望配送难度
-    start: '',
-    end: '',
-    address: '',
-    driverInfo: ''
+    busiType: null, // 所属业务线
+    carType: null, // 车类型
+    handlingDifficulty: null, // 装卸接受度
+    settlementCycle: null, // 结算周期
+    lineCategory: null, // 期望稳定/临时
+    cargoType: null, // 期望货品类型
+    distributionWay: null, // 期望配送难度
+    start: null,
+    end: null,
+    address: null,
+    driverInfo: null
   }
   private formItem:any[] = [
     {
@@ -212,13 +212,13 @@ export default class SearchKeyWords extends Vue {
   private selectList: IState[] = [
     {
       options: [{
-        value: '',
+        value: '2',
         label: '全部'
       }, {
-        value: 0,
+        value: 1,
         label: '共享'
       }, {
-        value: 1,
+        value: 0,
         label: '专车'
       }],
       key: 'busiType',
@@ -308,7 +308,7 @@ export default class SearchKeyWords extends Vue {
     let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
-        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workRange'))
+        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workingHours'))
       })
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
@@ -350,7 +350,7 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
-          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('~'))
+          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('~'))
         }
         console.log(this.selectedData)
       } else {
@@ -365,17 +365,17 @@ export default class SearchKeyWords extends Vue {
     if (isInitWorkRange) {
       let obj = {
         type: '工作时间段',
-        key: 'workRange',
+        key: 'workingHours',
         optionIds: id,
         selected: command
       }
-      this.listQuery.workRange = id
+      this.listQuery.workingHours = id
       this.selectedData.push(obj)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
       let obj = {
         type: isWorkRange ? '工作时间段' : this.selectTitle,
-        key: isWorkRange ? 'workRange' : this.key,
+        key: isWorkRange ? 'workingHours' : this.key,
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }

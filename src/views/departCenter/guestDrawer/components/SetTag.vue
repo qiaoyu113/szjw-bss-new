@@ -17,14 +17,15 @@
         label-width="130px"
         class="p15 SuggestForm"
         :pc-col="24"
+        @onPass="handlePassChange"
       >
         <template
           slot="jobStartDate"
         >
           <el-time-select
-            v-model="listQuery['startingPointStartTime']"
+            v-model="listQuery['startPointStartTime']"
             class="timeSelect"
-            prop="startingPointStartTime"
+            prop="startPointStartTime"
             placeholder="起始时间"
             style="width:50px"
             :picker-options="{
@@ -39,16 +40,16 @@
         >
           <span style="margin-left:-20px;padding: 0 3px;">-</span>
           <el-time-select
-            v-model="listQuery['startingPointEndTime']"
+            v-model="listQuery['startPointEndTime']"
             class="timeSelect"
-            prop="startingPointEndTime"
+            prop="startPointEndTime"
             style="width:50px"
             placeholder="结束时间"
             :picker-options="{
               start: '00:00',
               step: '01:00',
               end: '23:00',
-              minTime: listQuery['startingPointStartTime']
+              minTime: listQuery['startPointStartTime']
             }"
           />
         </template>
@@ -126,10 +127,11 @@
   </div>
 </template>
 <script lang="ts">
+import { GetDictionaryList } from '@/api/common'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
+import { mapDictData, getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
 import { searchMatchDriverInfo, updateDriverTag } from '@/api/drawer-guest'
 interface IState {
   [key: string]: any;
@@ -143,6 +145,7 @@ var _this:any = {}
   }
 })
 export default class extends Vue {
+  @Prop({ default: 'BJS201912281010' }) driverId!:''
   private isShow : boolean = false // 抽屉显示隐藏
   private countyOptions:IState[] = []
   private cancelOptions:IState[] = [] // 取消原因
@@ -168,6 +171,9 @@ export default class extends Vue {
       value: 5
     }
   ]
+  private expectOptions: IState[] = [];// 期望货品类型
+  private hardOptions: IState[] = [];// 装卸接受度
+  private cycleOptions: IState[] = []; // 期望结算周期
   private timeLists:IState[] = []
   private listQuery:IState = {
     canBreakingNodriving: '', // 能否闯禁行
@@ -182,9 +188,9 @@ export default class extends Vue {
     expectIncomeTrip: '', // 期望运费（趟）
     hasIncomeOutside: '', // 外面是否有活
     expectStabilityTemporary: [], // 期望稳定/临时
-    starting: '', // 起始点
-    startingPointStartTime: null, // 起始点-开始时间
-    startingPointEndTime: null, // 起始点-结束时间
+    start: '', // 起始点
+    startPointStartTime: null, // 起始点-开始时间
+    startPointEndTime: null, // 起始点-结束时间
     deliveryPointStartTime: null, // 配送点-开始时间
     deliveryPointEndTime: null, // 配送点-结束时间
     delivery: '', // 配送点
@@ -322,11 +328,7 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: [
-        { label: '不接受装卸', value: 2 },
-        { label: '轻装卸', value: 1 },
-        { label: '重装卸', value: 0 }
-      ]
+      options: this.hardOptions
     },
     {
       type: 5,
@@ -345,13 +347,7 @@ export default class extends Vue {
       key: 'expectAccountingPeriod',
       label: '期望账期',
       col: 24,
-      options: [
-        { label: '现结', value: 0 },
-        { label: '周结', value: 1 },
-        { label: '半月结', value: 2 },
-        { label: '月结', value: 3 },
-        { label: '季度结', value: 4 }
-      ]
+      options: this.cycleOptions
     },
     {
       slot: true,
@@ -402,7 +398,7 @@ export default class extends Vue {
         }
       },
       label: '起始点',
-      key: 'starting'
+      key: 'start'
     },
     {
       slot: true,
@@ -414,7 +410,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'startingPointStartTime'
+      key: 'startPointStartTime'
     },
     {
       slot: true,
@@ -426,7 +422,7 @@ export default class extends Vue {
         clearable: true
       },
       col: 4,
-      key: 'startingPointEndTime'
+      key: 'startPointEndTime'
     },
     {
       type: 8,
@@ -502,13 +498,13 @@ export default class extends Vue {
     breakingTrafficRestrictionCounty: [
       { required: true, message: '请选择可闯限行区域', trigger: 'change' }
     ],
-    starting: [
+    start: [
       { required: true, message: '请选择起始点', trigger: 'change' }
     ],
-    startingPointStartTime: [
+    startPointStartTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
-    startingPointEndTime: [
+    startPointEndTime: [
       { required: true, message: '请选择时间', trigger: 'change' }
     ],
     deliveryPointStartTime: [
@@ -522,7 +518,7 @@ export default class extends Vue {
     ]
   }
   async initData() {
-    let { data: res } = await searchMatchDriverInfo('BJS201903301')
+    let { data: res } = await searchMatchDriverInfo(this.driverId)
     if (res.success) {
       console.log(res)
       this.listQuery.heavyLifting = res.data.heavyLifting
@@ -531,15 +527,15 @@ export default class extends Vue {
       this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
       this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
       this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
-      this.listQuery.startingPointStartTime = res.data.startingPointStartTime + ':00'
-      this.listQuery.startingPointEndTime = res.data.startingPointEndTime + ':00'
-      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime + ':00'
-      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime + ':00'
+      this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
+      this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
+      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime ? ((res.data.deliveryPointStartTime > 9 ? res.data.deliveryPointStartTime : ('0' + res.data.deliveryPointStartTime)) + ':00') : null
+      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime ? ((res.data.deliveryPointEndTime > 9 ? res.data.deliveryPointEndTime : ('0' + res.data.deliveryPointEndTime)) + ':00') : null
       this.listQuery.driverSituation = res.data.driverSituation
       this.listQuery.remarks = [res.data.remarks]
       this.listQuery.manuallyRemarks = res.data.manuallyRemarks
       if (res.data.hasIncomeOutside) {
-        this.listQuery.starting = [res.data.startingPointProvince, res.data.startingPointCity, res.data.startingPointCounty]
+        this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
         this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
       }
     } else {
@@ -558,11 +554,26 @@ export default class extends Vue {
 
     })
   }
+  async getOptions() {
+    try {
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
+      let { data: res } = await GetDictionaryList(params)
+      if (res.success) {
+        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
+        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get base info fail:${err}`)
+    }
+  }
   resetFrom() {
     (this.$refs.setTagFrom as any).resetForm()
     this.listQuery.prohibitionAddress = ''
     this.listQuery.prohibitionRegion = ''
-    this.listQuery.starting = ''
+    this.listQuery.start = ''
     this.listQuery.delivery = ''
     this.listQuery.driverSituation = []
     this.isShow = false
@@ -583,9 +594,17 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.setTagFrom as any).submitForm()
-    this.handlePassChange()
   }
-
+  getOptionType(options:any, selects:any, id:string) {
+    let arr:any = []
+    selects.forEach((item:any) => {
+      let obj = options.filter((option:any) => {
+        return option.value === id
+      })
+      arr.push(obj.label)
+    })
+    return arr
+  }
   // 验证通过
   async handlePassChange() {
     if (this.listQuery.canBreakingNodriving) {
@@ -597,19 +616,47 @@ export default class extends Vue {
       this.listQuery.breakingTrafficRestrictionCity = this.listQuery.prohibitionRegion[1] // 可跑限行区域-市
     }
     if (this.listQuery.hasIncomeOutside) {
-      this.listQuery.startingPointCounty = this.listQuery.starting[2]
-      this.listQuery.startingPointCity = this.listQuery.starting[1]
-      this.listQuery.startingPointProvince = this.listQuery.starting[0]
+      this.listQuery.startPointCounty = this.listQuery.start[2]
+      this.listQuery.startPointCity = this.listQuery.start[1]
+      this.listQuery.startPointProvince = this.listQuery.start[0]
       this.listQuery.deliveryPointCity = this.listQuery.delivery[1]
       this.listQuery.deliveryPointCounty = this.listQuery.delivery[2]
       this.listQuery.deliveryPointProvince = this.listQuery.delivery[0]
     }
-    console.log(this.listQuery)
-    let { data: res } = await updateDriverTag(this.listQuery)
-    console.log(res)
+    /*
+    canBreakingNodriving // 司机能否闯禁行
+    canBreakingTrafficRestriction // 司机能否闯限行
+    expectAccountingPeriod // 结算周期
+    deliveryDifficulty // 配送复杂度
+    expectStabilityTemporary // 稳定/临时
+    heavyLifting //装卸难度
+    */
+    let emitData:any = {
+      canBreakingNodriving: this.listQuery.canBreakingNodriving,
+      canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
+      expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
+      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
+      deliveryDifficulty: this.listQuery.deliveryDifficulty > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty,
+      expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
+      expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
+        return item.value === this.listQuery.expectAccountingPeriod
+      })[0].label : null,
+      heavyLifting: this.listQuery.heavyLifting,
+      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
+        return item.value === this.listQuery.heavyLifting
+      })[0].label : null
+    }
+    let params = { ...this.listQuery }
+    params.startPointStartTime = params.startPointStartTime ? parseInt((params.startPointStartTime.split(':')[0])) : null
+    params.startPointEndTime = params.startPointEndTime ? parseInt((params.startPointEndTime.split(':')[0])) : null
+    params.deliveryPointStartTime = params.deliveryPointStartTime ? parseInt((params.deliveryPointStartTime.split(':')[0])) : null
+    params.deliveryPointEndTime = params.deliveryPointEndTime ? parseInt((params.deliveryPointEndTime.split(':')[0])) : null
+    params.remarks = params.remarks.length > 0 ? params.remarks[0] : null
+    let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
-      this.$emit('on-success')
+      this.$emit('on-success', emitData, this.driverId)
     } else {
       this.$message.error(res.errorMsg)
     }
@@ -623,6 +670,7 @@ export default class extends Vue {
         value: count
       })
     }
+    this.getOptions()
   }
 }
 </script>

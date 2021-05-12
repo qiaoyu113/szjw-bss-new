@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
-const prefix = `/mock/283`
-// matchCenter/v1
+// const prefix = `/mock/283`
+const prefix = 'match_center'
 /**
  * 给司机打标签-查询接口
  */
@@ -15,8 +15,8 @@ export const searchMatchDriverInfo = (driverId: any) =>
  */
 export const updateDriverTag = (data:any) =>
   request({
-    url: `${prefix}/v3/updateDriverTag`,
-    method: 'put',
+    url: `${prefix}/v1/matchDriverLabel/updateMatchDriverLabel`,
+    method: 'post',
     data
   })
 /**
@@ -24,7 +24,7 @@ export const updateDriverTag = (data:any) =>
  */
 export const queryMatchDriverForMatchLine = (data: any) =>
   request({
-    url: `${prefix}/v1/matchDriverInfo/queryMatchDriverForMatchLine`,
+    url: `${prefix}/v1/customerInviteDrawer/queryMatchDriver`,
     method: 'post',
     data
   })
