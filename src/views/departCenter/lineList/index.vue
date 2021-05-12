@@ -591,18 +591,15 @@ export default class extends Vue {
     this.hashScrollTop = this.tableScroll;
     (this.$refs.cancelTryRun as any).showDialog = false;
     (this.$refs.listTable as any).getLists().then(() => {
-      if ((this.$refs.lineboxas as any)['scrollTop']) {
-        (this.$refs.lineboxas as any)['scrollTop'] = this.hashScrollTop
-      }
+      (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
+      console.log('改变scrollTop', (this.$refs.linebox as any)['scrollTop'])
     })
   }
 
   handleScroll() {
     (this.$refs.linebox as any)['addEventListener']('scroll', () => {
-      if ((this.$refs.lineboxas as any)['scrollTop']) {
-        this.tableScroll = (this.$refs.lineboxas as any)['scrollTop']
-      }
-    }, false)
+      this.tableScroll = (this.$refs.linebox as any)['scrollTop']
+    })
   }
   init() {
     this.cityDetail()
