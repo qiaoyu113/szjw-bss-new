@@ -57,13 +57,15 @@
                 effect="dark"
                 :content="scope.row.workCityChangeLog"
                 placement="top"
+                class="changeCity"
               >
                 <i class="el-icon-refresh" />
               </el-tooltip>
             </p>
             <p class="text">
-              <span>({{ scope.row.joinManagerName }})</span>
-              <span v-if="!isMore">({{ scope.row.driverMatchManagerName }})</span>
+              <span>({{ `${scope.row.joinManagerName}加盟经理` }})</span>
+              <br>
+              <span v-if="!isMore">({{ `${scope.row.driverMatchManagerName}司撮经理` }})</span>
             </p>
             <p class="text">
               {{ scope.row.driverId }}
@@ -181,15 +183,15 @@
             <span :class="addClass(obj.handlingDifficultyHit,row.heavyLifting)">{{ row.heavyLiftingName }}</span>
           </p>
           <p class="text">
-            期望类型:
-            <span>{{ row.deliveryDifficultyNames }}</span>
+            期望配送复杂度:
+            <span>{{ (row.deliveryDifficultyNames || []).toString() }}</span>
           </p>
           <p class="text">
-            工作时间段:{{ (row.workHours || []).join(",") }}
+            工作时间段:{{ row.workHoursStr }}
           </p>
           <p class="text">
             期望稳定/临时:
-            <span :class="addClass(obj.lineCategory === 1,row.canBreakingTrafficRestriction)">{{ row.expectStabilityTemporaryNames }}</span>
+            <span :class="addClass(obj.lineCategory === 1,row.canBreakingTrafficRestriction)">{{ (row.expectStabilityTemporaryNames || []).toString() }}</span>
           </p>
         </template>
       </el-table-column>
@@ -593,6 +595,13 @@ export default class extends Vue {
     border-radius: 50%;
     line-height: 20px;
     background-color: #649cee;
+    position: relative;
+    top: 1px;
+  }
+  .changeCity{
+    position: relative;
+    bottom: 5px;
+    right: 2px;
   }
   .percent {
     position: absolute;
