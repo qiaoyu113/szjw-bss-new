@@ -253,7 +253,7 @@
                 呼叫
               </el-button>
               <span class="phone">
-                {{ row.phone }}
+                {{ row.driverPhone }}
               </span>
             </p>
             <p class="text">
@@ -402,7 +402,7 @@
     <make-call
       ref="driverCall"
       :is-show-op="false"
-      :phone="phone"
+      :phone="driverPhone"
       :call-id="callId"
     />
   </div>
@@ -434,7 +434,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) opType!: number[];
   @PropSync('driverTableData', { default: () => [] }) _tableData!: IState[];
 
-  private phone: string = '';
+  private driverPhone: string = '';
   private callId: string | number = '';
   private unfoldData: {} = {};
   private listLoading: boolean = true;
@@ -501,10 +501,10 @@ export default class extends Vue {
   }
   // 调用外呼方法
   callPhone(phone: string, callId: string | number) {
-    this.phone = phone
+    this.driverPhone = phone
     this.callId = callId
     setTimeout(() => {
-      (this.$refs.driverCall as any).handleCallClick()
+      (this.$refs.driverCall as any).handleCallClick('match', 'driver_push')
     }, 20)
   }
   // 打标签

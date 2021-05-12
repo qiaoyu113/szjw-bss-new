@@ -24,7 +24,9 @@
           >
             {{ scope.$index + 1 | addZreo }}
           </div>
-          <div style="margin-left:50px;">
+          <div
+            style="margin-left:50px;"
+          >
             <p
               class="text"
             >

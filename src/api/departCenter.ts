@@ -3,7 +3,7 @@ const base = '/base_center'
 const departCenter = `match`
 const prefix = `/mock/283`
 
-const departfix = 'match'
+const departfix = 'match_center'
 
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
@@ -86,10 +86,10 @@ export function getLineDetailInfo(params:any) {
     params
   })
 }
-// 获取客邀列表详情
+// 获取客邀列表线路详情
 export function getLineDetail(params:any) {
   return request({
-    url: `${prefix}/v1/customer/invitation/line/detail`,
+    url: `/line/v1/customer/invitation/line/detail`,
     method: 'get',
     params
   })
@@ -142,7 +142,7 @@ export function unfoldDriverInfo(params:any) {
 // 获取司推列表
 export function matchDriverInfo(data:any) {
   return request({
-    url: `${prefix}/v1/matchDriverInfo/list`,
+    url: `${departfix}/v1/matchDriverInfo/list`,
     method: 'post',
     data
   })

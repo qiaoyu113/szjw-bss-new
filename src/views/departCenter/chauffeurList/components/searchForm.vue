@@ -123,20 +123,20 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!: IState;
  private busiOptions: IState[] = [
-   { label: '全部', value: 0 },
+   { label: '全部', value: '' },
    { label: '专车', value: 1 },
    { label: '共享', value: 2 }
  ];
   private carKindOptions: IState[] = [
-    { label: '全部', value: 0 },
+    { label: '全部', value: '' },
     { label: '油车', value: 1 },
     { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
-    { label: '全部', value: 0 }
+    { label: '全部', value: '' }
   ];
   private cycleOptions: IState[] = [
-    { label: '全部', value: 0 }
+    { label: '全部', value: '' }
   ];
   private driverOptions: IState[] = [];
   private timeLists: IState[] = [];
@@ -219,7 +219,7 @@ export default class extends Vue {
       label: '期望稳定/临时',
       key: 'expectStabilityTemporary',
       options: [
-        { label: '全部', value: 0 },
+        { label: '全部', value: '' },
         { label: '稳定', value: 1 },
         { label: '临时', value: 2 }
       ]
