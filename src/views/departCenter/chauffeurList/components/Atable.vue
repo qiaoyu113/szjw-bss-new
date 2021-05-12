@@ -504,7 +504,7 @@ export default class extends Vue {
     this.driverPhone = phone
     this.callId = callId
     setTimeout(() => {
-      (this.$refs.driverCall as any).handleCallClick()
+      (this.$refs.driverCall as any).handleCallClick('match', 'driver_push')
     }, 20)
   }
   // 打标签
