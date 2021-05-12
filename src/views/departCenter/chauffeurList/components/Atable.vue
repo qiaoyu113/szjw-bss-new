@@ -41,25 +41,31 @@
           <div style="margin-left:50px;">
             <p class="text">
               <span
-                v-if="scope.row.needDone"
+                v-if="scope.row.needDone && !isMore"
                 class="cycleTag"
               />
               <span
-                :style="{fontWeight: (scope.row.needDone ? 'bold' : 'normal')}"
+                :style="{fontWeight: (scope.row.needDone && !isMore ? 'bold' : 'normal')}"
                 v-text="scope.row.driverName"
               />
-              <span style="margin:0px 3px;">(北京)</span>
+              <span
+                style="margin:0px 3px;"
+                v-text="scope.row.workCityName"
+              />
               <el-tooltip
+                v-if="scope.row.workCityChangeLog && !isMore"
                 effect="dark"
-                content="由长沙更换至北京"
+                :content="scope.row.workCityChangeLog"
                 placement="top"
+                class="changeCity"
               >
                 <i class="el-icon-refresh" />
               </el-tooltip>
             </p>
             <p class="text">
-              ({{ scope.row.joinManagerName }})
-              ({{ scope.row.driverMatchManagerName }})
+              <span>({{ `${scope.row.joinManagerName}加盟经理` }})</span>
+              <br>
+              <span v-if="!isMore">({{ `${scope.row.driverMatchManagerName}司撮经理` }})</span>
             </p>
             <p class="text">
               {{ scope.row.driverId }}
@@ -75,16 +81,26 @@
         <template slot-scope="{row}">
           <p class="text">
             <span
-              :class="addClass('carType',row.carType)"
+              :class="addClass(obj.carType,row.carType)"
               v-text="row.carTypeName"
             />/
             <span
-              :class="addClass('isNewEnergy')"
-              v-text="row.isNewEnergy?'电车':'油车'"
+              :class="addClass(obj.oilElectricityRequirementValue,row.isNewEnergy ? '电车' : '油车',3)"
+              v-text="row.isNewEnergy ? '电车' : '油车'"
             />
           </p>
           <p class="text">
-            {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}/{{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}/{{ row.busiTypeName }}
+            <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving)">
+              {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}
+            </span>
+            /
+            <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction)">
+              {{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}
+            </span>
+            /
+            <span :class="busiTypeClass(obj.labelTypeHit,row.carType)">
+              {{ row.busiTypeName }}
+            </span>
           </p>
         </template>
       </el-table-column>
@@ -95,13 +111,40 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            现居住地址:{{ row.liveAddressProvinceName }}-{{ row.liveAddressCityName }}-{{ row.liveAddressCountyName }}
+            现居住地址:
+            <span :class="addClass('canBreakingTrafficRestriction',row.canBreakingTrafficRestriction)">
+              {{ row.liveAddressProvinceName }}
+            </span> -
+            <span>
+              {{ row.liveAddressCityName }}
+            </span> -
+            <span>
+              {{ row.liveAddressCountyName }}
+            </span>
           </p>
           <p class="text">
-            其他活仓地址:{{ row.startingPointProvinceName }}-{{ row.startingPointCityName }}-{{ row.startingPointCountyName }}
+            其他活仓地址:
+            <span>
+              {{ row.startingPointProvinceName }}
+            </span> -
+            <span>
+              {{ row.startingPointCityName }}
+            </span> -
+            <span>
+              {{ row.startingPointCountyName }}
+            </span>
           </p>
           <p class="text">
-            其他活配送点:{{ row.deliveryPointProvinceName }}-{{ row.deliveryPointCityName }}-{{ row.deliveryPointCountyName }}
+            其他活配送点:
+            <span>
+              {{ row.deliveryPointProvinceName }}
+            </span> -
+            <span>
+              {{ row.deliveryPointCityName }}
+            </span> -
+            <span>
+              {{ row.deliveryPointCountyName }}
+            </span>
           </p>
         </template>
       </el-table-column>
@@ -112,13 +155,16 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            运费趟:{{ row.expectedFreightMonth }}元
+            运费趟:
+            <span>{{ row.expectedFreightMonth }}元</span>
           </p>
           <p class="text">
-            期望月:{{ row.expectedFreightTrip }}元
+            期望月:
+            <span>{{ row.expectedFreightTrip }}元</span>
           </p>
           <p class="text">
-            期望账期:{{ row.expectAccountingPeriodName }}
+            期望账期:
+            <span>{{ row.expectAccountingPeriodName }}</span>
           </p>
         </template>
       </el-table-column>
@@ -129,19 +175,23 @@
       >
         <template slot-scope="{row}">
           <p class="text">
-            期望货品:{{ row.intentCargoTypeName }}
+            期望货品:
+            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ row.intentCargoTypeName }}</span>
           </p>
           <p class="text">
-            期望装卸难度:{{ row.heavyLiftingName }}
+            期望装卸难度:
+            <span :class="addClass(obj.handlingDifficultyHit,row.heavyLifting)">{{ row.heavyLiftingName }}</span>
           </p>
           <p class="text">
-            期望类型:{{ row.deliveryDifficultyNames }}
+            期望配送复杂度:
+            <span>{{ (row.deliveryDifficultyNames || []).toString() }}</span>
           </p>
           <p class="text">
-            工作时间段:{{ row.workHours.join(",") }}
+            工作时间段:{{ row.workHoursStr }}
           </p>
           <p class="text">
-            期望稳定/临时:{{ row.expectStabilityTemporaryNames }}
+            期望稳定/临时:
+            <span :class="addClass(obj.lineCategory === 1,row.canBreakingTrafficRestriction)">{{ (row.expectStabilityTemporaryNames || []).toString() }}</span>
           </p>
         </template>
       </el-table-column>
@@ -205,7 +255,7 @@
                 呼叫
               </el-button>
               <span class="phone">
-                {{ row.phone }}
+                {{ row.driverPhone }}
               </span>
             </p>
             <p class="text">
@@ -354,7 +404,7 @@
     <make-call
       ref="driverCall"
       :is-show-op="false"
-      :phone="phone"
+      :phone="driverPhone"
       :call-id="callId"
     />
   </div>
@@ -386,7 +436,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) opType!: number[];
   @PropSync('driverTableData', { default: () => [] }) _tableData!: IState[];
 
-  private phone: string = '';
+  private driverPhone: string = '';
   private callId: string | number = '';
   private unfoldData: {} = {};
   private listLoading: boolean = true;
@@ -396,9 +446,21 @@ export default class extends Vue {
     this.$emit('checkData', val)
   }
 
-  addClass(labelclass: string, rowData: string) {
+  addClass(objData: any, rowData: any, otherData?:any) {
     if (this.isShowPercent) {
-      return this.obj[labelclass] === rowData ? 'orange' : ''
+      return (objData === rowData || otherData === rowData) ? 'orange' : ''
+    } else {
+      return ''
+    }
+  }
+  busiTypeClass(objData: any, rowData: any) {
+    // <!-- 1:超肥 2:单肥 3:次肥 4:中瘦 5极瘦 -->
+    if (this.isShowPercent) {
+      if (rowData === 1) {
+        return [3, 4, 5].includes(objData) ? 'orange' : ''
+      } else if (rowData === 1) {
+        return [1, 2, 3, 4, 5].includes(objData) ? 'orange' : ''
+      }
     } else {
       return ''
     }
@@ -441,10 +503,10 @@ export default class extends Vue {
   }
   // 调用外呼方法
   callPhone(phone: string, callId: string | number) {
-    this.phone = phone
+    this.driverPhone = phone
     this.callId = callId
     setTimeout(() => {
-      (this.$refs.driverCall as any).handleCallClick()
+      (this.$refs.driverCall as any).handleCallClick('match', 'driver_push')
     }, 20)
   }
   // 打标签
@@ -533,6 +595,13 @@ export default class extends Vue {
     border-radius: 50%;
     line-height: 20px;
     background-color: #649cee;
+    position: relative;
+    top: 1px;
+  }
+  .changeCity{
+    position: relative;
+    bottom: 5px;
+    right: 2px;
   }
   .percent {
     position: absolute;

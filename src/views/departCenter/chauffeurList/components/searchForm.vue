@@ -100,7 +100,7 @@ import { SettingsModule } from '@/store/modules/settings'
 import { getDriverNoAndNameList } from '@/api/driver'
 import doubleInput from './doubleInput.vue'
 import timeSelect from './timeSelect.vue'
-import { GetDictionaryList } from '@/api/common'
+import { GetDictionaryList, GetSpecifiedLowerUserListByCondition } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../../js'
 interface PageObj {
   page: number;
@@ -123,20 +123,20 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!: IState;
  private busiOptions: IState[] = [
-   { label: '全部', value: 0 },
+   { label: '全部', value: '' },
    { label: '专车', value: 1 },
    { label: '共享', value: 2 }
  ];
   private carKindOptions: IState[] = [
-    { label: '全部', value: 0 },
+    { label: '全部', value: '' },
     { label: '油车', value: 1 },
     { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
-    { label: '全部', value: 0 }
+    { label: '全部', value: '' }
   ];
   private cycleOptions: IState[] = [
-    { label: '全部', value: 0 }
+    { label: '全部', value: '' }
   ];
   private driverOptions: IState[] = [];
   private timeLists: IState[] = [];
@@ -145,6 +145,7 @@ export default class extends Vue {
   private driverOver: Boolean = false;
   private keyWord: String = '';
   private driverOtions: any[] = [];
+  private matchManIdOptions:IState[] = [];
   private driverPage: any = {
     page: 1,
     limit: 20
@@ -218,7 +219,7 @@ export default class extends Vue {
       label: '期望稳定/临时',
       key: 'expectStabilityTemporary',
       options: [
-        { label: '全部', value: 0 },
+        { label: '全部', value: '' },
         { label: '稳定', value: 1 },
         { label: '临时', value: 2 }
       ]
@@ -261,7 +262,7 @@ export default class extends Vue {
       },
       label: '司撮经理',
       key: 'driverMatchManagerId',
-      options: this.hardOptions
+      options: this.matchManIdOptions
     },
     {
       type: 2,
@@ -340,6 +341,7 @@ export default class extends Vue {
     const length = (this.$parent as any).allotData.length
     if (length > 0) {
       (this.$parent as any).allotTitle = '批量分配司撮';
+      (this.$parent as any).driverIdList = (this.$parent as any).allotData.map((item:IState) => item.driverId);
       (this.$parent as any).allotDialog = true
     } else {
       this.$message.warning('请选择需要分配的司机')
@@ -397,6 +399,31 @@ export default class extends Vue {
   async init() {
     await this.getDriverInfo()
   }
+  async getManager() {
+    try {
+      let params = {
+        roleTypes: [15],
+        uri: '/driverGmInfo/role'
+      }
+      let { data: res } = await GetSpecifiedLowerUserListByCondition(params)
+      if (res.success) {
+        let length = this.matchManIdOptions.length
+        if (length > 0) {
+          this.matchManIdOptions.splice(0, length)
+        }
+        if (res.data.length && res.data.length > 0) {
+          let arr = res.data.map((item:IState) => {
+            return { label: `${item.name}(${item.mobile})`, value: item.id }
+          })
+          this.matchManIdOptions.push(...arr)
+        }
+      } else {
+        this.$message.warning(res.errMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
+  }
   async getOptions() {
     try {
       // let carLen:number = this.carOptions.length
@@ -423,6 +450,7 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getOptions()
+    this.getManager()
   }
 }
 </script>

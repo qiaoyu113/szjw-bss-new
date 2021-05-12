@@ -33,13 +33,13 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-show="row.inviteMark"
+                  v-show="row.inviteReMark"
                   placement="right"
                   min-width="200"
                   trigger="hover"
                 >
                   <div class="text1">
-                    {{ row.inviteMark }}
+                    {{ row.inviteReMark }}
                   </div>
                   <i
                     slot="reference"
@@ -55,7 +55,7 @@
                 {{ row.lineSaleId }}
               </p>
               <p class="text">
-                窗口期:剩余{{ row.dayNum }}天
+                窗口期:剩余{{ row.recruitWindowPeriod }}天
               </p>
               <p class="text scale">
                 {{ row.lineCreateDate }}创建
@@ -70,7 +70,7 @@
         >
           <template slot-scope="{row}">
             <p class="text">
-              {{ row.carType }}/{{ row.cargoType }}
+              {{ row.carType }}/{{ row.oilElectricityRequirement }}
             </p>
             <p
               v-if="row.isBehavior===1"
@@ -84,6 +84,11 @@
             >
               能闯限行
             </p>
+            <p
+              class="text"
+            >
+              {{ row.labelType | labelFilter }}
+            </p>
           </template>
         </el-table-column>
         <el-table-column
@@ -96,7 +101,7 @@
               仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.provinceArea }}-{{ row.deliveryCity }}-{{ row.deliveryCounty }}
+              配送区域:{{ row.deliveryProvince }}-{{ row.deliveryCity }}-{{ row.deliveryCounty }}
             </p>
           </template>
         </el-table-column>
@@ -110,7 +115,7 @@
               单趟运费:{{ row.everyTripGuaranteed }}元
             </p>
             <p class="text">
-              每日{{ row.everyTripGuaranteed }}趟/{{ row.monthNum }}天(元)
+              每日{{ row.dayNum }}趟/{{ row.monthNum }}天(元)
             </p>
             <p class="text">
               预计月运费:{{ row.shipperOffer }}元
@@ -227,6 +232,12 @@
             >
               不可发起客邀
             </p>
+            <p
+              v-if="row.matchStatus === 2"
+              class="text"
+            >
+              {{ row.driverName }}
+            </p>
           </template>
         </el-table-column>
         <el-table-column
@@ -237,7 +248,7 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.currentCityInvited && !row.currentCitySuccess"
+              v-if="row.matchStatus===1 && row.currentCityInvited"
               class="text"
             >
               <el-button
@@ -249,7 +260,7 @@
               </el-button>
             </p>
             <p
-              v-if="!row.currentCityInvited && !row.currentCitySuccess"
+              v-if="!row.currentCityInvited && row.matchStatus===1"
               class="text"
             >
               <el-button
@@ -261,7 +272,7 @@
               </el-button>
             </p>
             <p
-              v-if="row.currentCitySuccess"
+              v-if="row.currentCitySuccess&&listQuery.customerStatus===''"
               class="text"
             >
               <!-- 本城客邀撮合成功时显示 -->
@@ -275,7 +286,7 @@
             </p>
             <!-- 只有当本城客邀撮合成功时不展示 -->
             <p
-              v-else
+              v-if="!row.currentCitySuccess"
               class="text"
             >
               <el-button
@@ -295,15 +306,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { getLineInfo } from '@/api/departCenter'
-import CancelGuest from './CancelGuest.vue'
 interface IState {
   [key: string]: any;
 }
 @Component({
   name: 'Btable',
-  components: {
-    CancelGuest
-  },
   filters: {
     difficultyFilter(value:number) {
       switch (value) {
@@ -322,6 +329,15 @@ interface IState {
       })
       str = str.slice(0, str.length - 1)
       return str
+    },
+    labelFilter(value:number) {
+      switch (value) {
+        case 1: return '超肥'
+        case 2: return '单肥'
+        case 3: return '次肥'
+        case 4: return '中瘦'
+        case 5: return '极瘦'
+      }
     }
   }
 })
@@ -329,27 +345,24 @@ export default class extends Vue {
   @Prop({ default: false }) isMore!:boolean
   @Prop({ default: false }) isShowPercent!:boolean
   @Prop({ default: () => {} }) listQuery!:IState
+  @Prop({ default: () => {} }) pageobj!:IState
   private tableData:IState[] = []
 
   private multipleSelection:IState[] = []
 
   private selection:[] = []
   private remarks:string = ''
+  private page:number = 1
+  private limit:number = 30
 
-  mounted() {
-    // this.init()
-  }
-
-  init() {
-    this.getLists()
-  }
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
     console.log('listQuery', this.listQuery)
     try {
     // 调用查询接口
-      let params = {}
+      let params = { ...this.listQuery, ...this.pageobj }
+      console.log('params', params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res
     } catch (err) {
@@ -358,7 +371,7 @@ export default class extends Vue {
       (this.$parent as any).listLoading = false
     }
   }
-  // 取消客邀
+  // 取消客邀(撮合单待撮合状态，)
   handleCancelGuest(custInviteId:string) {
     if (!this.selection.length) {
       this.$emit('cancelGuest', custInviteId)
@@ -388,15 +401,10 @@ export default class extends Vue {
     let { href } = this.$router.resolve({
       path: `/lineshelf/linedetail`,
       query: {
-        id: 'XL202104250009'
+        id: row.lineId
       }
     })
     window.open(href, '_blank')
-  }
-
-  // 选择事件
-  handleSelect(selection:[], row:{}) {
-    console.log(selection, row)
   }
   // 勾选
   handleSelectionChange(selection:[]) {

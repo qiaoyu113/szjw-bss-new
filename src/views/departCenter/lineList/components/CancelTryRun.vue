@@ -2,7 +2,6 @@
   <SelfDialog
     :visible.sync="showDialog"
     title="取消试跑意向"
-    append-to-body
     :confirm="confirm"
     width="500px"
     custom-class="a1111"
@@ -44,7 +43,7 @@ export default class extends Vue {
   private showDialog:boolean = false
   private cancelOptions:IState[] = [] // 取消原因
   private listQuery:IState = {
-    a: ''
+    dictValue: ''
   }
   private reasonList:IState[] = []
   private formItem:any[] = [
@@ -56,12 +55,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '取消创建试跑意向的原因?',
-      key: 'a',
+      key: 'dictValue',
       options: this.cancelOptions
     }
   ]
   private rules:IState = {
-    a: [
+    dictValue: [
       { required: true, message: '请选择取消创建试跑意向的原因', trigger: 'blur' }
     ]
   }
@@ -76,17 +75,23 @@ export default class extends Vue {
   }
   // 验证通过
   handlePassChange() {
+    console.log('验证通过')
     this.cancel()
   }
 
   async cancel() {
     try {
-      let params:IState = { ...this.cancelData }
+      let params:IState = { ...this.cancelData, matchCode: this.listQuery.dictValue }
       console.log('params', params)
       let { data: res } = await cancelIntention(params)
       if (res.success) {
         this.$message.success('操作成功')
+        this.$emit('success');
+        (this.$refs.cancelForm as any).resetForm()
+      } else {
         this.$emit('success')
+        this.$message.error(res.errorMsg);
+        (this.$refs.cancelForm as any).resetForm()
       }
     } catch (err) {
       console.log(err)
@@ -104,7 +109,7 @@ export default class extends Vue {
       let params:string[] = ['match_intention_failure_reason']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.rules.push(...mapDictData(res.data.match_intention_failure_reason || []))
+        this.cancelOptions.push(...mapDictData(res.data.match_intention_failure_reason || []))
       } else {
         this.$message.error(res.errorMsg)
       }
