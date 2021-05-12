@@ -121,7 +121,7 @@ export default class extends Vue {
       if (value) {
         this.$nextTick(() => {
           try {
-            (this.$refs['callPhone'] as any).handleCallClick()
+            (this.$refs['callPhone'] as any).handleCallClick('driver', 'driver_clue')
           } catch (err) {
             console.log('打电话失败')
           } finally {
