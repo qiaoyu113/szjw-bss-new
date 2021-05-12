@@ -40,6 +40,7 @@
         <el-button
           v-if="listQuery.customerStatus === '1'"
           type="primary"
+          :disabled="selection.length > 0 ? false :true"
           @click="batchLaunchGuest"
         >
           批量发起客邀
@@ -47,6 +48,7 @@
         <el-button
           v-if="listQuery.customerStatus === '2'"
           type="primary"
+          :disabled="selection.length > 0 ? false :true"
           @click="batchCancelGuest"
         >
           批量取消客邀
@@ -124,6 +126,7 @@
       :launch-arguments="launchArguments"
     />
     <cancel-guest
+      :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
     />
@@ -143,7 +146,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch, GetcustInviteCitys } from '@/api/departCenter'
+import { getLineSearch, GetcustInviteCitys, getLineInfo } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
@@ -183,10 +186,13 @@ export default class extends Vue {
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private cityList:IState[] = []; // 城市列表
   private timeLists:IState[] = []
+  private selection: any[] = [];
+  private rows: IState[] = []; // 弹框选中的数据
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
   private ids = []
+  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -450,25 +456,9 @@ export default class extends Vue {
   private async getList() {
     try {
       this.listLoading = true
-      // let params: IState = {
-      //   page: this.page.page,
-      //   limit: this.page.limit
-      // }
-      // if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
-      //   params.workCity = this.listQuery.workCity[1]
-      // }
-      // this.listQuery.carType !== '' && (params.carType = this.listQuery.carTpe)
-      // this.listQuery.lineFineness !== '' && (params.lineFineness = this.listQuery.lineFineness)
-      // this.listQuery.handlingDifficulty !== '' && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
-      // this.listQuery.freightSection !== '' && (params.freightSection = this.listQuery.freightSection)
-      // this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
-      // this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
-      // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
       setTimeout(() => {
         (this.$refs.listTable as any).getLists()
       }, 500)
-      // console.log('listQuery', this.listQuery)
-      // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
     } finally {
@@ -552,11 +542,13 @@ export default class extends Vue {
   private batchLaunchGuest() {
     (this.$refs.launchGuest as any).showDialog = true;
     (this.$refs.launchGuest as any).launchGuestState = 2
+    this.rows.push(...this.selection)
   }
   // 批量取消客邀
   private batchCancelGuest() {
     (this.$refs.cancelGuest as any).showDialog = true;
     (this.$refs.cancelGuest as any).cancelGuestState = 2
+    this.rows.push(...this.selection)
   }
   // 取消创建试跑意向
   handleCancelTryRun(row:any) {
@@ -567,8 +559,15 @@ export default class extends Vue {
   }
   private checkOff(id:any) {
     this.ids = id.map((item:any) => {
-      return item.id
+      return {
+        lineId: item.lineId,
+        matchId: item.matchId
+      }
     })
+    this.idss = id.map((item:any) => {
+      return item.custInviteId
+    })
+    this.selection = id
   }
 
   // 控制客邀城市显示

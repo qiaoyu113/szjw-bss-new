@@ -30,14 +30,14 @@ export const cancelMatchCustInvite = (data: any) =>
   // 批量发起客邀
 export const CreateLaunchGuestsBatch = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/startMatchCustInviteBatch`,
+    url: `${departCenter}/v1/matchCustInvite/startMatchCustInviteBatch`,
     method: 'post',
     data
   })
 // 批量取消客邀
 export const cancelMatchCustInviteBatch = (data: any) =>
   request({
-    url: `mock/283/v1/matchCustInvite/cancelMatchCustInviteBatch`,
+    url: `${departCenter}/v1/matchCustInvite/cancelMatchCustInviteBatch`,
     method: 'post',
     data
   })
