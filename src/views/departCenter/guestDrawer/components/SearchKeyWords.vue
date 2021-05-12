@@ -590,6 +590,7 @@ export default class SearchKeyWords extends Vue {
   initData() {
     this.getLineInfoFromStorage()
     this.getBusiType(this.rowData)
+    this.getCarType(this.rowData)
     this.getCargoType(this.rowData)
     this.getHandlingDifficulty(this.rowData)
     this.getCarType(this.rowData)

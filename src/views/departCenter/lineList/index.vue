@@ -1,6 +1,7 @@
 
 <template>
   <div
+    ref="linebox"
     v-loading.body="listLoading"
     class="LineListBox"
     :class="{
@@ -103,7 +104,7 @@
         ref="listTable"
         :list-query="listQuery"
         :is-show-percent="true"
-        :obj="{}"
+        :pageobj="page"
         @launchGuest="handleLaunchGuest($event)"
         @cancelGuest="handleCancelGuest($event)"
         @cancelTryRun="handleCancelTryRun($event)"
@@ -141,9 +142,9 @@ import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
-import { GetDictionaryList, GetDictionaryCity } from '@/api/common'
+import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch } from '@/api/departCenter'
+import { getLineSearch, GetcustInviteCitys } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
@@ -153,6 +154,7 @@ import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { showWork } from '@/utils'
 import { cloneDeep } from 'lodash'
+import { clueGetCityGroup } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -186,7 +188,9 @@ export default class extends Vue {
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
+  private hashScrollTop:string = ''
   private ids = []
+  private tableScroll:string =''
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -386,13 +390,10 @@ export default class extends Vue {
   //   this.page.limit = page.limit
   // }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:PageObj) {
+    this.page.page = page.page
+    this.page.limit = page.limit
+    console.log(this.page)
     this.getList()
   }
   // 根据关键字查线路id
@@ -493,15 +494,11 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    // this.cityList.push({
-    //   value: 0,
-    //   label: '全部城市'
-    // })
-    let { data: city } = await GetDictionaryCity()
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
+    let { data: res } = await GetcustInviteCitys()
+    if (res.success) {
+      const nodes = res.data.map(function(item: any) {
         return {
-          value: +item.code,
+          value: item.id,
           label: item.name
         }
       })
@@ -563,8 +560,8 @@ export default class extends Vue {
   // 取消创建试跑意向
   handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    const { lineId, matchId, matchStatus, runTestId, status } = row
-    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    const { lineId, matchId, runTestId } = row
+    const cancelData = { lineId, matchId, runTestId, cancelRunTestOrigin: 1, type: 1, remark: '' }
     this.cancelData = cancelData
   }
   private checkOff(id:any) {
@@ -590,7 +587,22 @@ export default class extends Vue {
 
   // 取消试跑成功后刷新列表
   ctrSuccessHandle() {
-    (this.$refs.listTable as any).refreshList()
+    console.log('记录当前scrollTop', this.tableScroll)
+    this.hashScrollTop = this.tableScroll;
+    (this.$refs.cancelTryRun as any).showDialog = false;
+    (this.$refs.listTable as any).getLists().then(() => {
+      if ((this.$refs.lineboxas as any)['scrollTop']) {
+        (this.$refs.lineboxas as any)['scrollTop'] = this.hashScrollTop
+      }
+    })
+  }
+
+  handleScroll() {
+    (this.$refs.linebox as any)['addEventListener']('scroll', () => {
+      if ((this.$refs.lineboxas as any)['scrollTop']) {
+        this.tableScroll = (this.$refs.lineboxas as any)['scrollTop']
+      }
+    }, false)
   }
   init() {
     this.cityDetail()
@@ -600,6 +612,7 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getList()
+    this.handleScroll()
   }
 }
 </script>

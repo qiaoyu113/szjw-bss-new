@@ -26,8 +26,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
-import { CreateLaunchGuests, CreateLaunchGuestsBatch } from '@/api/departCenter'
-import { GetDictionaryCity } from '@/api/common'
+import { CreateLaunchGuests, CreateLaunchGuestsBatch, GetstartCustInviteCity } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -90,19 +89,20 @@ export default class extends Vue {
   }
   // 根据大区获取城市列表
   async cityDetail() {
-    // this.cityList.push({
-    //   value: 0,
-    //   label: ''
-    // })
-    let { data: city } = await GetDictionaryCity()
-    if (city.success) {
-      const nodes = city.data.map(function(item: any) {
-        return {
-          value: +item.code,
-          label: item.name
-        }
-      })
-      this.cityList.push(...nodes)
+    let { data: res } = await GetstartCustInviteCity()
+    if (res.success) {
+      if (Array.isArray(res.data)) {
+        const nodes = res.data.map(function(item: any) {
+          return {
+            value: item.cityCode,
+            label: item.cityName
+          }
+        })
+        this.cityList.push(...nodes)
+      } else {
+        const nodes = { value: res.data.cityCode, label: res.data.cityName }
+        this.cityList.push(nodes)
+      }
     }
   }
   // 发起客邀
