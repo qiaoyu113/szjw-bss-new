@@ -31,7 +31,11 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { exportFileTip } from '@/utils/exportTip'
+import { visitExport } from '@/api/line-shelf'
 import { lock } from '@/utils/index'
+interface IState {
+  [key: string]: any;
+}
 @Component({
   name: 'Agent',
   components: {
@@ -123,32 +127,26 @@ export default class extends Vue {
     try {
       this.ExportClick = true
       let params:IState = {}
-      // this.listQuery.key && (params.key = this.listQuery.key)
-      // this.listQuery.driverId && (params.driverId = this.listQuery.driverId)
-      // this.listQuery.aDriverId && (params.otherDriverId = this.listQuery.aDriverId)
-      // this.listQuery.workCity && (params.workCity = this.listQuery.workCity)
-      // this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      // this.listQuery.status && (params.status = this.listQuery.status)
-      // if (this.listQuery.time && this.listQuery.time.length > 0) {
-      //   let startDate = new Date(this.listQuery.time[0])
-      //   let endDate = new Date(this.listQuery.time[1])
-      //   startDate.setHours(0, 0, 0)
-      //   endDate.setHours(23, 59, 59)
-      //   params.startDate = startDate.setHours(0, 0, 0)
-      //   params.endDate = endDate.setHours(23, 59, 59)
-      // }
-      // let { data: res } = await ExportDriverTagList(params)
-      // if (res.success) {
-      //   sucFun()
-      //   this.ExportClick = false
-      //   this.$message({
-      //     type: 'success',
-      //     message: '导出成功!'
-      //   })
-      // } else {
-      //   this.ExportClick = false
-      //   this.$message.error(res.errorMsg)
-      // }
+      if (this.listQuery.visitTime && this.listQuery.visitTime.length > 0) {
+        let startDate = new Date(this.listQuery.visitTime[0])
+        let endDate = new Date(this.listQuery.visitTime[1])
+        startDate.setHours(0, 0, 0)
+        endDate.setHours(23, 59, 59)
+        params.startDate = startDate.setHours(0, 0, 0)
+        params.endDate = endDate.setHours(23, 59, 59)
+      }
+      let { data: res } = await visitExport(params)
+      if (res.success) {
+        sucFun()
+        this.ExportClick = false
+        this.$message({
+          type: 'success',
+          message: '导出成功!'
+        })
+      } else {
+        this.ExportClick = false
+        this.$message.error(res.errorMsg)
+      }
     } catch (err) {
       console.log(`get list fail:${err}`)
     }
