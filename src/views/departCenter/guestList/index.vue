@@ -452,10 +452,6 @@ export default class extends Vue {
         this.listLoading = false
       }
     }
-    // 客邀状态变化
-    handleStatusChange(val:string|number) {
-      console.log('xxx:', val)
-    }
     // 分页
     handlePageSizeChange(page: PageObj) {
       if (page.page) {
@@ -489,6 +485,27 @@ export default class extends Vue {
       } finally {
         //
       }
+    }
+    /**
+     * @description 锚链接滚动过渡
+     * @param {String} selector   元素ID or 定位点
+     */
+    goAnchor(selector:any) {
+      // 移动距离
+      let dom:any = this.$refs.selectForm
+      let top = 0
+      // 当前滚动条位置
+      const scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop
+      // 若为指定距离
+      if (typeof selector === 'number') {
+        top = selector - scrollTop
+      } else {
+        debugger
+        const anchor = document.querySelector(selector) || { offsetTop: 0 }
+        top = anchor.offsetTop - scrollTop
+      }
+      // window.scrollBy({ top, behavior: 'smooth' })
+      dom.scrollBy({ top, behavior: 'smooth' })
     }
 
     init() {
