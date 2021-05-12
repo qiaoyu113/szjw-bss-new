@@ -2,6 +2,7 @@ import request from '@/utils/request'
 const base = '/base_center'
 
 const prefix = `/mock/283`
+const prefix1 = `/match`
 
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
@@ -117,16 +118,15 @@ export function unfoldDriverInfo(params:any) {
 // 获取弹框司机详情-外呼记录
 export function getCallDetail(data:any) {
   return request({
-    url: `${prefix}/v2/outboundCall/getListByBusinessId`,
+    url: `${prefix1}/v1/outboundCall/getListByBusinessId`,
     method: 'post',
     data
   })
 }
-
 // 获取弹框司机详情-试跑信息
 export function getRunDetail(data:any) {
   return request({
-    url: `/mock/291/v2/runtest/getRunTestInfoByDriverId`,
+    url: `/waybill/v2/runtest/getRunTestInfoByDriverId`,
     method: 'post',
     data
   })
@@ -142,7 +142,7 @@ export function getDriverDetail(params:any) {
 // 获取弹框司机详情-基础信息
 export function getBasicDetail(params:any) {
   return request({
-    url: `${prefix}/v1/matchDriverInfo/getDriverMatchByDriverId`,
+    url: `${prefix1}/v1/matchDriverInfo/getDriverMatchByDriverId`,
     method: 'get',
     params
   })

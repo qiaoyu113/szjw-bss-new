@@ -22,7 +22,12 @@
               :form-item="formItem"
               label-width="120px"
               label-suffix=" :"
-            />
+            >
+              <template slot="address">
+                <span v-if="listQuery.liveDistrict">{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}-{{ listQuery.liveDistrict }}</span>
+                <span v-else>{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}</span>
+              </template>
+            </SelfForm>
           </el-tab-pane>
           <el-tab-pane
             label="司机标签"
@@ -64,7 +69,8 @@
               @onPageSize="handlePageSize"
             >
               <template v-slot:distributionTime="scope">
-                <span> {{ scope.row.deliveryStartDate }}-{{ scope.row.deliveryEndDate }}</span>
+                <span v-if="scope.row.deliveryStartDate"> {{ scope.row.deliveryStartDate }}-{{ scope.row.deliveryEndDate }}</span>
+                <span v-else>暂无数据</span>
               </template>
             </SelfTable>
           </el-tab-pane>
@@ -80,8 +86,13 @@
               :page="page"
               @onPageSize="handlePageSize1"
             >
-              <template v-slot:recordFileAddress>
-                <span> Mp4 </span>
+              <template v-slot:recordFileAddress="scope">
+                <a
+                  v-if="scope.row.recordFileAddress"
+                  :href="scope.row.recordFileAddress"
+                  style="color:#649CEE;cursor: pointer;"
+                >Mp4</a>
+                <span v-else>暂无数据</span>
               </template>
             </SelfTable>
           </el-tab-pane>
@@ -182,10 +193,11 @@ export default class extends Vue {
       col: 24
     },
     {
-      type: 7,
-      key: 'liveDistrict',
+      type: 'address',
+      key: 'address',
       label: '现居住地址',
-      col: 24
+      col: 24,
+      slot: true
     },
     {
       type: 7,
@@ -405,36 +417,27 @@ export default class extends Vue {
       createInterval: '一小时'
     }
   ];
-  private tableDataDetailInfor: IState = [
-    {
-      createTime: '2020-02-01  16:44:24',
-      runStartTime: '2020-02-01 ',
-      runEndTime: '2020-02-01 ',
-      lineName: '京东2121',
-      warehouseArea: '上海莫个地方',
-      distributionArea: '上海市上海区',
-      distributionTime: '06:30-14:00',
-      distributionNum: '20',
-      offLineReason: '司机换线',
-      dutyManagerIdName: '张经理'
-    }
-  ];
+  private tableDataDetailInfor: IState = [];
   private columns: IState = [
     {
       key: 'createDate',
-      label: '创建意向时间'
+      label: '创建意向时间',
+      'width': '140px'
     },
     {
       key: 'startDate',
-      label: '试跑开始时间'
+      label: '试跑开始时间',
+      'width': '140px'
     },
     {
       key: 'endDate',
-      label: '试跑结束时间'
+      label: '试跑结束时间',
+      'width': '140px'
     },
     {
       key: 'lineName',
-      label: '线路名称'
+      label: '线路名称',
+      'width': '140px'
     },
     {
       key: 'warehouseAreaName',
@@ -447,6 +450,7 @@ export default class extends Vue {
     {
       key: 'distributionTime',
       label: '配送时间',
+      'width': '245px',
       slot: true
     },
     {
@@ -477,11 +481,13 @@ export default class extends Vue {
     },
     {
       key: 'beginTime',
-      label: '外呼时间'
+      label: '外呼时间',
+      'width': '140px'
     },
     {
       key: 'endTime',
-      label: '挂断时间'
+      label: '挂断时间',
+      'width': '140px'
     },
     {
       key: 'recordFileAddress',
@@ -516,7 +522,7 @@ export default class extends Vue {
       let params:any = {
         limit: this.page.limit,
         page: this.page.page,
-        businessId: this.driverId
+        businessId: 'xs1'
       }
       let { data: res } = await getCallDetail(params)
 
@@ -533,11 +539,10 @@ export default class extends Vue {
       let parmas:any = {
         limit: this.page.limit,
         page: this.page.page,
-        driverId: this.driverId
+        driverId: 'SZS201912251001'
       }
       let { data: res } = await getRunDetail(parmas)
       if (res.success) {
-        console.log(res.data)
         this.tableDataDetailInfor = res.data
         this.page.total = res.page.total
       }
@@ -604,20 +609,25 @@ export default class extends Vue {
   async getBasicsInfor() {
     try {
       let parmas:any = {
-        driverId: this.driverId
+        driverId: 'SJ202103220001'
       }
       let { data: res } = await getBasicDetail(parmas)
-      if (res.data.success) {
-        this.listQuery.currentCarTypeName = res.data.DriverMatchVO.currentCarTypeName
-        this.listQuery.canBreakingNodriving = res.data.DriverMatchVO.canBreakingNodriving ? '是' : '否'
-        this.listQuery.canBreakingTrafficRestriction = res.data.DriverMatchVO.canBreakingTrafficRestriction ? '是' : '否'
-        this.listQuery.plateNo = res.data.DriverMatchVO.plateNo
-        this.listQuery.busiTypeName = res.data.DriverMatchVO.busiTypeName
-        this.listQuery.liveDistrict = res.data.DriverMatchVO.liveDistrict
-        this.listQuery.age = res.data.DriverMatchVO.age
-        this.listQuery.statusName = res.data.DriverMatchVO.statusName
-        this.listQuery.orderId = res.data.DriverMatchVO.orderId
-        this.listQuery.contractStatusName = res.data.DriverMatchVO.contractStatusName
+      if (res.success) {
+        this.listQuery.currentCarTypeName = res.data.currentCarTypeName
+        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving === 1 ? '是' : '否'
+        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction === 1 ? '是' : '否'
+        this.listQuery.plateNo = res.data.plateNo
+        this.listQuery.busiTypeName = res.data.busiTypeName
+
+        this.listQuery.liveProvinceName = res.data.liveProvinceName
+        this.listQuery.liveCityName = res.data.liveCityName
+        this.listQuery.liveCountyName = res.data.liveCountyName
+        this.listQuery.liveDistrict = res.data.liveDistrict
+
+        this.listQuery.age = res.data.age
+        this.listQuery.statusName = res.data.statusName
+        this.listQuery.orderId = res.data.orderId
+        this.listQuery.contractStatusName = res.data.contractStatusName
       }
     } catch (err) {
       console.log(err)
