@@ -54,7 +54,10 @@
           />
         </div>
       </section>
-      <SetTag ref="tagShow" />
+      <SetTag
+        ref="tagShow"
+        :driver-id="driverId"
+      />
     </Scroll>
     <CreateTryRun
       ref="tryRunShow"
@@ -62,7 +65,7 @@
     />
     <DetailDialog
       actived="third"
-      :driver-id="detailId"
+      :driver-id="driverId"
       :dialog-table-visible.sync="detailDio"
     />
   </DrawerModel>
@@ -77,10 +80,9 @@ import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
-import SetTag from './components/SetTag.vue'
+import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
-import { cloneDeep } from 'lodash'
 
 const pageInfo = {
   limit: 30,
@@ -105,6 +107,7 @@ const pageInfo = {
 export default class GuestDrawer extends Vue {
     @Prop({ default: false }) private value !: boolean
     private visible : boolean = false // 抽屉显示隐藏
+    private driverId: string = ''
     private tagShow:boolean = false
     private pageSize:number = 1
     private tryRunShow:boolean = false
@@ -126,7 +129,6 @@ export default class GuestDrawer extends Vue {
       f2: ''
     }
     private detailDio:Boolean = false
-    private detailId:string = ''
     $eventBus: any
     @Watch('value')
     onValueChanged(val: boolean, oldVal: boolean) {
@@ -165,7 +167,8 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
       setTimeout(() => {
-        (this.$refs.driverDrawer as any).getStorage();
+        this.driverId = JSON.parse(sessionStorage.getItem('driver_row') || '{}').driverId || ''
+        ;(this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
         ;(this.$refs.searchKeyWords as any).initQuery()
       }, 20)
@@ -191,7 +194,6 @@ export default class GuestDrawer extends Vue {
         lineId: keyWords,
         driverId,
         workHours: workRange // todo confirm
-        // todo 分页
       }
       this.queryData()
     }

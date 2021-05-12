@@ -121,7 +121,7 @@ export const getOfficeByTypeAndOfficeId = (data:any) =>
     params: data
   })
 
-// 加盟经理(1)  外销销售(2) 上岗经理(3)
+// 加盟经理(1)  外销销售(2) 上岗经理(3)        司撮经理(15)
 export const GetSpecifiedRoleList = (data:any) =>
   request({
     url: `/base/v2/base/user/getSpecifiedLowerUserListByCondition`,

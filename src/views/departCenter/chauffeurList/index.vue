@@ -46,7 +46,10 @@
       :clue-id="callObj.clueId"
       @success="getLists"
     />
-    <SetTag ref="setTag" />
+    <SetTag
+      ref="setTag"
+      :driver-id="checkOne.driverId"
+    />
     <DetailDialog
       actived="third"
       :driver-id="detailId"
@@ -56,14 +59,19 @@
     <allotDio
       :dialog-visible.sync="allotDialog"
       :allot-title="allotTitle"
+      :driver-id-list="driverIdList"
       @close="closeAllot"
     />
-    <chooseCity :dialog-visible.sync="cityDio" />
+    <chooseCity
+      :dialog-visible.sync="cityDio"
+      :options="cityOptions"
+      :obj="checkOne"
+    />
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { matchDriverInfo } from '@/api/departCenter'
+import { matchDriverInfo, getDriverWorkCity } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
 import { showWork, HandlePages } from '@/utils'
 import CallPhone from '@/views/clue/components/CallPhone/index.vue'
@@ -111,7 +119,7 @@ export default class extends Vue {
       expectAccountingPeriod: 0,
       rents: [],
       time: [],
-      status: 0,
+      status: 1,
       driverMatchManagerId: '',
       hasDriverMatchManager: ''
     };
@@ -135,6 +143,8 @@ export default class extends Vue {
     private showDrawer: Boolean = false
     private allotData:IState[] = []
     private checkOne:IState = {}
+    private cityOptions:IState[] = []
+    private driverIdList:IState[] = []
     // 表格分页
     private page: PageObj = {
       page: 1,
@@ -165,8 +175,8 @@ export default class extends Vue {
           })
         })
     }
-    tag(row:IState) {
-      console.log('tag');
+    tag(val:IState) {
+      this.checkOne = val;
       (this.$refs.setTag as any).isShow = true
     }
     depart() {
@@ -177,18 +187,40 @@ export default class extends Vue {
     }
     allotSome(val:IState) {
       this.allotTitle = '分配司撮'
-      this.allotDialog = true
       this.checkOne = val
+      this.driverIdList.push(this.checkOne.driverId)
+      this.allotDialog = true
     }
     chooseCity(val:IState) {
       this.cityDio = true
       this.checkOne = val
+      this.getCityChoose()
     }
     detail() {
       this.detailDio = true
     }
     closeAllot() {
       (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
+    }
+    async getCityChoose() {
+      try {
+        let ChangeDriverWorkCityDTO = {
+          driverId: this.checkOne.driverId,
+          workCity: this.checkOne.workCity,
+          dmId: this.checkOne.joinManagerId
+        }
+        let { data: res } = await getDriverWorkCity(ChangeDriverWorkCityDTO)
+        if (res.success) {
+          let cityOptions = res.data.map((item:IState) => {
+            return { label: `${item.workCity}(${item.nick}${item.moblie})`, value: item.driverId }
+          })
+          this.cityOptions.push(...cityOptions)
+        } else {
+          this.$message.warning(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     dealParams(listQuery:IState) {
@@ -229,7 +261,7 @@ export default class extends Vue {
         const params = this.dealParams(this.listQuery)
         let { data: res } = await matchDriverInfo(params)
         if (res.success) {
-          this.tableData = [res.data]
+          this.tableData = res.data
           let page = await HandlePages(res.page)
           this.page.total = page.total
         } else {
