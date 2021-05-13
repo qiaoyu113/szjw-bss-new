@@ -4,28 +4,31 @@
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <Scroll
-      :on-reach-bottom="loadMoreHandle"
-      :stop-slide="disabled"
-      :is-lock="isLock"
-      :distance-to-edge="20"
-    >
-      <!-- 撮合线路 -->
-      <section class="departLine">
-        <h3>待撮合线路</h3>
-        <AtableLine
-          ref="lineDrawer"
-          :line-table-data.sync="lineTableData"
-          :is-more="true"
+    <div v-loading.body="listLoading">
+      <Scroll
+        :on-reach-bottom="loadMoreHandle"
+        :stop-slide="disabled"
+        :is-lock="isLock"
+        :distance-to-edge="20"
+      >
+        <!-- 撮合线路 -->
+        <section class="departLine">
+          <h3>待撮合线路</h3>
+          <AtableLine
+            ref="lineDrawer"
+            :line-table-data.sync="lineTableData"
+            :is-more="true"
+          />
+        </section>
+        <!-- 撮合匹配的司机列表 -->
+        <MatchDriver
+          ref="matchDriver"
+          @on-loading="loadChange"
+          @on-end="disabled=true"
+          @on-lock="isLock=true"
         />
-      </section>
-      <!-- 撮合匹配的司机列表 -->
-      <MatchDriver
-        ref="matchDriver"
-        @on-end="disabled=true"
-        @on-lock="isLock=true"
-      />
-    </Scroll>
+      </Scroll>
+    </div>
   </DrawerModel>
 </template>
 
@@ -53,6 +56,7 @@ export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
+  private listLoading:boolean = false
   private disabled: boolean = false
   private isLock: boolean = false
   private lineTableData:IState[] = [] // 线路列表
@@ -82,6 +86,9 @@ export default class GuestDrawer extends Vue {
   }
   loadMoreHandle() {
     (this.$refs.matchDriver as any).getMoreData()
+  }
+  loadChange(status) {
+    this.listLoading = status
   }
   mounted() {
 
