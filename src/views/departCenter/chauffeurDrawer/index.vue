@@ -48,7 +48,6 @@
             ref="lineTableDrawer"
             :line-table-data="lineTableData"
             :is-show-percent="true"
-            obj="{}"
             :is-more="true"
             @tryRun="onCreateTryRun"
           />
@@ -61,7 +60,7 @@
     </Scroll>
     <CreateTryRun
       ref="tryRunShow"
-      :obj="rowData"
+      :obj.sync="rowData"
     />
     <DetailDialog
       actived="third"

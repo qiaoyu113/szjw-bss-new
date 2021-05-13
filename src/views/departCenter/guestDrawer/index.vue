@@ -15,7 +15,6 @@
         <AtableLine
           ref="lineDrawer"
           :line-table-data.sync="lineTableData"
-          obj="{}"
           :is-more="true"
         />
       </section>
