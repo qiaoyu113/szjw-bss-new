@@ -357,12 +357,10 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
       let { page, limit } = this.pageobj
       let params = { ...this.listQuery, page, limit }
-      console.log('params', params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
@@ -414,7 +412,6 @@ export default class extends Vue {
   }
 
   showMarkHandle(params:any) {
-    console.log(params)
     this.getRemarks(params)
   }
   async getRemarks(params:any) {
@@ -422,12 +419,10 @@ export default class extends Vue {
     if (res.success) {
       this.remarks = res.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
     }
-    console.log(res)
   }
 
   // 更新列表
   refreshList() {
-    console.log('刷新列表')
     this.getLists()
   }
 }

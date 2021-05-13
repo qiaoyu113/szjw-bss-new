@@ -390,7 +390,6 @@ export default class extends Vue {
   }
   // 分页
   handlePageSizeChange(page:any) {
-    console.log('page', page)
     this.page.page = page.page
     this.page.limit = page.limit
     setTimeout(() => {
@@ -581,14 +580,12 @@ export default class extends Vue {
 
   // 弹框成功后刷新列表
   successHandle() {
-    console.log('记录当前scrollTop', this.tableScroll)
     this.hashScrollTop = this.tableScroll;
     (this.$refs.cancelTryRun as any).showDialog = false
     this.listLoading = true
     setTimeout(() => {
       (this.$refs.listTable as any).getLists().then(() => {
         (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
-        console.log('改变scrollTop', (this.$refs.linebox as any)['scrollTop'])
         this.listLoading = false
       })
     }, 100)
