@@ -117,9 +117,13 @@ export default class extends Vue {
       }
       let { data: res } = await updateDriverDmBatch(params)
       if (res.success) {
-        this.$message.success('操作成功')
-        this.show = false;
-        (this.$parent as any).getLists()
+        if (res.data.flag) {
+          this.$message.success(res.data.msg)
+          this.show = false;
+          (this.$parent as any).getLists()
+        } else {
+          this.$message.warning(res.data.msg)
+        }
       } else {
         this.$message.warning(res.errorMsg)
       }

@@ -173,6 +173,16 @@ export function getBasicDetail(params:any) {
   })
 }
 
+// 司推【抽屉】-展开司机详情
+
+export function getDriverInfoByDriverId(params:any) {
+  return request({
+    url: `${departCenter}/v1/matchDriverInfo/getDriverInfoByDriverId`,
+    method: 'get',
+    params
+  })
+}
+
 // 获取司推列表
 export function matchDriverInfo(data:any) {
   return request({
@@ -203,7 +213,7 @@ export function updateDriverWorkCityByDriverId(data:any) {
 // 批量修改司撮
 export function updateDriverDmBatch(data:any) {
   return request({
-    url: `${prefix}/v2/driver/updateDriverDmBatch`,
+    url: `driver/v2/driver/updateDriverDmBatch`,
     method: 'post',
     data
   })
