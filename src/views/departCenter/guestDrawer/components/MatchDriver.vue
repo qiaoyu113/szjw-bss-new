@@ -63,6 +63,7 @@ export default class DepartLine extends Vue {
   private tryRunShow:boolean = false
   private rowData:any = {}
   private driverData:any = {}
+  private notIncludedDriverIds:IState[] = []
   private listQueryLine:IState = {}
   private driverTableData:IState[] = [] // 司机列表
   private detailDialog:Boolean = false
@@ -114,7 +115,9 @@ export default class DepartLine extends Vue {
   searchData(data:any) {
     this.pageSize = 1
     this.driverTableData = []
+    this.notIncludedDriverIds = []
     this.listQueryLine = data
+    this.$emit('on-reset')
     this.getLists()
   }
   async getLists() {
@@ -123,13 +126,14 @@ export default class DepartLine extends Vue {
       this.listQueryLine.page = this.pageSize
       this.listQueryLine.limit = 10
       let notIncludedDriverIds:any = []
-      this.driverTableData.forEach((item:any) => {
-        notIncludedDriverIds.push(item.driverId)
-      })
-      this.listQueryLine.notIncludedDriverIds = notIncludedDriverIds.length === 0 ? null : notIncludedDriverIds
+
+      this.listQueryLine.notIncludedDriverIds = this.notIncludedDriverIds.length === 0 ? null : this.notIncludedDriverIds
       this.$emit('on-loading', true)
       let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
       if (res.success) {
+        res.data.forEach((item:any) => {
+          this.notIncludedDriverIds.push(item.driverId)
+        })
         this.driverTableData = [...this.driverTableData, ...res.data]
         if (res.data.length < 10) {
           this.$emit('on-end')
@@ -158,10 +162,9 @@ export default class DepartLine extends Vue {
   // 瀑布流加载
   getMoreData() {
     if (this.driverTableData.length > 9) {
-      this.pageSize++
       this.getLists()
     } else {
-      this.$emit('on-end')
+      this.$emit('on-end', true)
     }
   }
   // 打标签成功
@@ -179,13 +182,12 @@ export default class DepartLine extends Vue {
     this.driverTableData[index].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
     this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
     this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
-    console.log(this.driverTableData)
   }
   // 创建试跑意向成功
   createTryRunSuccess() {
     setTimeout(() => {
       this.$router.go(0)
-    }, 1000)
+    }, 500)
   }
   mounted() {
     this.getLineInfoFromStorage()

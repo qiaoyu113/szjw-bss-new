@@ -40,6 +40,7 @@
       >
         <el-button
           v-if="listQuery.customerStatus === '1'"
+          v-permission="['/v1/matchCustInvite/startMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchLaunchGuest"
@@ -48,6 +49,7 @@
         </el-button>
         <el-button
           v-if="listQuery.customerStatus === '2'"
+          v-permission="['/v1/matchCustInvite/cancelMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchCancelGuest"
@@ -387,13 +389,9 @@ export default class extends Vue {
     total: 0
   }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:any) {
+    this.page.page = page.page
+    this.page.limit = page.limit
     setTimeout(() => {
       this.getList()
     }, 20)
@@ -580,19 +578,17 @@ export default class extends Vue {
     }
   }
 
-  // 取消试跑成功后刷新列表
+  // 弹框成功后刷新列表
   successHandle() {
-    console.log('记录当前scrollTop', this.tableScroll)
     this.hashScrollTop = this.tableScroll;
-    (this.$refs.cancelTryRun as any).showDialog = false;
-    (this.$refs.listTable as any).getLists().then(() => {
-      (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
-      console.log('改变scrollTop', (this.$refs.linebox as any)['scrollTop'])
-    })
-
-    if (this.listQuery.customerStatus !== '') {
-      (this.$refs.listTable as any).refreshList()
-    }
+    (this.$refs.cancelTryRun as any).showDialog = false
+    this.listLoading = true
+    setTimeout(() => {
+      (this.$refs.listTable as any).getLists().then(() => {
+        (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
+        this.listLoading = false
+      })
+    }, 100)
   }
   handleScroll() {
     (this.$refs.linebox as any)['addEventListener']('scroll', () => {
