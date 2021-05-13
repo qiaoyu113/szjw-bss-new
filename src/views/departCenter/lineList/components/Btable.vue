@@ -122,7 +122,7 @@
               预计月运费:{{ row.shipperOffer }}元
             </p>
             <p class="text">
-              结算周期/天数:{{ row.settlementCycle }}/7天
+              结算周期/天数:{{ row.settlementCycle||'  ' }}/{{ row.settlementDays||'  ' }}天
             </p>
           </template>
         </el-table-column>
@@ -161,7 +161,7 @@
             <p
               class="text"
             >
-              {{ row.urgent }}
+              {{ row.urgent | urgentFilter }}
             </p>
           </template>
         </el-table-column>
@@ -333,9 +333,12 @@ interface IState {
         case 5: return '极瘦'
       }
     },
-    hourFilter(val:string) {
-      let arr = JSON.parse(val)
-      return `${arr[0]}:00-${arr[arr.length - 1]}:00`
+    urgentFilter(value:number) {
+      switch (value) {
+        case 0 : return '已下架'
+        case 1 : return '客急'
+        case 2 : return '客常'
+      }
     }
   }
 })
@@ -350,8 +353,6 @@ export default class extends Vue {
 
   private selection:[] = []
   private remarks:string = ''
-  private page:number = 1
-  private limit:number = 30
 
   // 调用接口获取表单数据
   // 获取列表数据
@@ -359,7 +360,8 @@ export default class extends Vue {
     console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
-      let params = { ...this.listQuery, ...this.pageobj }
+      let { page, limit } = this.pageobj
+      let params = { ...this.listQuery, page, limit }
       console.log('params', params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;

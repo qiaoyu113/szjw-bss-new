@@ -89,7 +89,6 @@ export default class extends Vue {
         this.$emit('success');
         (this.$refs.cancelForm as any).resetForm()
       } else {
-        this.$emit('success')
         this.$message.error(res.errorMsg);
         (this.$refs.cancelForm as any).resetForm()
       }

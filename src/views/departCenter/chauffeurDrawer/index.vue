@@ -248,14 +248,14 @@ export default class GuestDrawer extends Vue {
       } else {
         this.pageInfo = { ...pageInfo }
       }
-      // MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
-      MatchLineListForDriver(Object.assign({}, this.pageInfo)).then((res: any) => {
+      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
           this.lineTableData = append ? this.lineTableData.concat(res.data || []) : (res.data || [])
           this.total = (res.page || {}).total
         } else {
           console.log(res.errorMsg)
+          this.$message({ type: 'error', message: res.errorMsg })
         }
       })
     }

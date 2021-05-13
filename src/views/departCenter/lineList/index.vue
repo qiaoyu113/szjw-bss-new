@@ -102,7 +102,7 @@
       class="table_box"
     >
       <div class="middle">
-        <span>筛选结果：{{ total }}条</span>
+        <span>筛选结果：{{ total||' ' }}条</span>
       </div>
       <Btable
         ref="listTable"
@@ -116,7 +116,7 @@
       />
       <pagination
         :operation-list="[]"
-        :total="page.total"
+        :total="total||0"
         :page.sync="page.page"
         :page-sizes="[10, 20, 30, 40, 50]"
         :limit.sync="page.limit"
@@ -389,13 +389,10 @@ export default class extends Vue {
     total: 0
   }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:any) {
+    console.log('page', page)
+    this.page.page = page.page
+    this.page.limit = page.limit
     setTimeout(() => {
       this.getList()
     }, 20)
