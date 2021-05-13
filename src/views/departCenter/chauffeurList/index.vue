@@ -180,7 +180,7 @@ export default class extends Vue {
         let { data: res } = await getDriverWorkCity(params)
         if (res.success) {
           let cityOptions = res.data.map((item:IState) => {
-            return { label: `${item.workCity}(${item.nick}${item.moblie})`, value: item.driverId }
+            return { label: `${item.city}(${item.name}${item.phone})`, value: item.id }
           })
           this.cityOptions.push(...cityOptions)
         } else {
