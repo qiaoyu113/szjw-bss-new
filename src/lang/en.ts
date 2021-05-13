@@ -183,7 +183,9 @@ export default {
     dataSystem: 'DataSystem',
     authoritySystem: 'AuthoritySystem',
     roleSystem: 'RoleSystem',
-    addUserNew: 'addUser'
+    addUserNew: 'addUser',
+    depart: 'depart',
+    guestList: 'guestList'
   },
   navbar: {
     logOut: 'Log Out',

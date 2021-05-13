@@ -21,6 +21,7 @@
         :offset="item.offset|| 0"
       >
         <el-form-item
+          v-if="!item.hidden"
           :label="item.label"
           :prop="item.key"
           :label-width="item.w"
@@ -30,6 +31,7 @@
           <el-input
             v-if="item.type === 1"
             v-model.trim="listQuery[item.key]"
+            :style="item.style"
             v-bind="item.tagAttrs || {}"
             v-on="item.listeners"
           >
@@ -129,6 +131,7 @@
             v-else-if="item.type ===8"
             ref="cascader"
             v-model="listQuery[item.key]"
+            :style="item.style"
             v-bind="item.tagAttrs || {}"
             :options="item.options"
             v-on="item.listeners"
@@ -186,6 +189,27 @@
               }"
             />
           </template>
+          <template v-else-if="item.type === 15">
+            <el-select
+              v-model.trim="listQuery[item.key]"
+              v-loadmore="loadQueryLineByKeyword"
+              placeholder="请选择"
+              reserve-keyword
+              :default-first-option="true"
+              clearable
+              filterable
+              remote
+              :remote-method="queryLineByKeyword"
+              @clear="handleClearQueryLine"
+            >
+              <el-option
+                v-for="sub in lineOptions"
+                :key="sub.value"
+                :label="sub.label"
+                :value="sub.value"
+              />
+            </el-select>
+          </template>
           <slot
             v-else-if="item.slot"
             :name="item.type"
@@ -204,16 +228,18 @@ import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { DataIsNull } from '@/utils/index'
 import '@/styles/common.scss'
-import { stream } from 'xlsx/types'
 
-  interface IState {
-    [key: string]: any;
-  }
-
-  @Component({
-    name: 'SelfForm.houseAddress'
-
-  })
+interface IState {
+  [key: string]: any;
+}
+interface PageObj {
+  page:number,
+  limit:number,
+  total?:number
+}
+@Component({
+  name: 'SelfForm.houseAddress'
+})
 export default class extends Vue {
     // 判断是否是PC
     @Prop({ default: () => {} }) listQuery!:IState
@@ -222,6 +248,14 @@ export default class extends Vue {
     @Prop({ default: () => {} }) rules!:IState
     @Prop({ default: false }) mBlock!:boolean
     @Prop({ default: false }) pcBlock!:boolean
+    @Prop({ default: () => {} }) loadByKeyword!:Function
+    private lineOptions:IState[] = []
+    private lineKeyword = '' // 线路关键字
+    private queryLineLoading:boolean = false
+    private linePage:PageObj ={
+      page: 0,
+      limit: 10
+    }
     // 区分设备
     get isPC() {
       return SettingsModule.isPC
@@ -265,6 +299,44 @@ export default class extends Vue {
     }
     @Emit('onPass')
     handlePass(isPass:boolean, args:any) {
+    }
+    // 顶部查询线路列表
+    async loadQueryLineByKeyword(val?:string) {
+      this.linePage.page++
+      val = this.lineKeyword
+      let params:IState = {
+        page: this.linePage.page,
+        limit: this.linePage.limit
+      }
+      val !== '' && (params.key = val)
+      this.queryLineLoading = true
+      try {
+        let result:IState[] = await this.loadByKeyword(params)
+        this.lineOptions.push(...result)
+      } finally {
+        this.queryLineLoading = false
+      }
+    }
+    // 顶部线路关键字搜索
+    queryLineByKeyword(val:string) {
+      this.linePage.page = 0
+      this.lineKeyword = val
+      this.resetLineOptions()
+      this.loadQueryLineByKeyword(val)
+    }
+    // 删除查询区选中的线路
+    handleClearQueryLine() {
+      this.lineKeyword = ''
+      this.linePage.page = 0
+      this.resetLineOptions()
+      this.loadQueryLineByKeyword()
+    }
+    // 清空线路列表
+    resetLineOptions() {
+      let len:number = this.lineOptions.length
+      if (len > 0) {
+        this.lineOptions.splice(0, len)
+      }
     }
 }
 </script>

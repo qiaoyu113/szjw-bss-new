@@ -5,7 +5,7 @@
 import { Vue, Component, Watch } from 'vue-property-decorator'
 import { GetInfoByUserId } from '@/api/common'
 import { PhoneModule } from '@/store/modules/phone'
-import { hangUp, anwserPhone, startRecordTime, clearTimer } from './phone'
+import { hangUp, anwserPhone, startRecordTime, clearTimer, setInfo } from './phone'
 import { VNode } from 'vue'
 interface IState {
   [key: string]: any;
@@ -74,18 +74,19 @@ export default class extends Vue {
     try {
       let { data: res } = await GetInfoByUserId()
       if (res.success) {
-        let { loginName, password, appId, secret } = res.data
+        let { loginName, password, appId, secret, proxyUrl, url, qhbUrl } = res.data
         if (!loginName || !password || !appId || !secret) {
           return this.$message.error('当前用户没有配置坐席号')
         }
-        let obj:IState = { appId, secret }
+        let obj:IState = { appId, secret, proxyUrl, url, qhbUrl }
         await PhoneModule.ChangePhone(obj)
-        // '8001@yunniao'
-        // 2_kHzxLREx8001
-        // T00000019075
-        // dbfecf80-677b-11eb-a7ab-13b8c3cc732e
-        // this.handleAddDom({ account: `8001@yunniao`, password: '2_kHzxLREx8001' })
-        this.handleAddDom({ account: `${loginName}@yunniao`, password })
+        setInfo()
+        if (res.data.env !== 'prod') {
+          this.handleAddDom({ account: `${loginName}@ynkeji2`, password })
+        } else {
+          this.handleAddDom({ account: `${loginName}@yunniao`, password })
+        }
+
         this.addEventListener()
       } else {
         this.$message.error(res.message)
