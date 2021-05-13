@@ -149,7 +149,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch, GetcustInviteCitys, getLineInfo } from '@/api/departCenter'
+import { getLineSearch, GetcustInviteCitys } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
@@ -257,12 +257,6 @@ export default class extends Vue {
       },
       options: this.loadDiffArr
     },
-    // {
-    //   type: 'guestCity',
-    //   label: '客邀城市',
-    //   key: 'guestCity',
-    //   slot: true
-    // },
     {
       type: 'freightSection',
       label: '单趟运费区间',
@@ -391,11 +385,6 @@ export default class extends Vue {
     limit: 30,
     total: 0
   }
-  // 分页
-  // handlePageSize(page:PageObj) {
-  //   this.page.page = page.page
-  //   this.page.limit = page.limit
-  // }
   // 分页
   handlePageSizeChange(page:number, limit:number) {
     if (page) {
