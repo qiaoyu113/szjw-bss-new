@@ -36,7 +36,7 @@
           class="width-80"
           size="mini"
         />
-        <span>~</span>
+        <span>-</span>
         <el-input
           v-model="listQuery.f2"
           v-only-number="{min: 0, max: 20000, precision: 0}"
@@ -414,6 +414,9 @@ export default class SearchKeyWords extends Vue {
     }
   }
   searchHandle() {
+    if (this.listQuery.f1 && this.listQuery.f2 && this.listQuery.f1 > this.listQuery.f2) {
+      [this.listQuery.f1, this.listQuery.f2] = [this.listQuery.f2, this.listQuery.f1]
+    }
     this.$emit('query', this.listQuery)
   }
   initQuery() {
