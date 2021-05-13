@@ -134,8 +134,18 @@ export function cancelIntention(data:any) {
 
 export function unfoldDriverInfo(params:any) {
   return request({
-    url: `${prefix}/v1/customerInviteDrawer/driverInfo/${params}`,
+    url: `${departfix}/v1/customerInviteDrawer/driverInfo/${params}`,
     method: 'get'
+  })
+}
+
+// 司推【抽屉】-展开司机详情
+
+export function getDriverInfoByDriverId(params:any) {
+  return request({
+    url: `${departCenter}/v1/matchDriverInfo/getDriverInfoByDriverId`,
+    method: 'get',
+    params
   })
 }
 
