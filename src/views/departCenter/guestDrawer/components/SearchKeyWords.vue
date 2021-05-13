@@ -210,7 +210,7 @@ export default class SearchKeyWords extends Vue {
   private selectList: IState[] = [
     {
       options: [{
-        value: 2,
+        value: '',
         label: '全部'
       }, {
         value: 1,
@@ -327,7 +327,7 @@ export default class SearchKeyWords extends Vue {
           this.selectedData[index].selected = (this.multiple || isWorkRange) ? this.selectedData[index].selected : []
           this.selectedData[index].optionIds = (this.multiple || isWorkRange) ? this.selectedData[index].optionIds : []
           if (command === '全部') {
-            this.selectedData[index].optionIds = []
+            this.selectedData[index].optionIds = ['']
             this.selectedData[index].selected = ['全部']
           } else {
             if (this.selectedData[index].optionIds[0] === '') {
@@ -454,7 +454,6 @@ export default class SearchKeyWords extends Vue {
       })
       return this.$message.error('只能选择同一省下的市，区')
     }
-    console.log(this.levelData)
     let cityNum = 0
     for (let itemKey in this.levelData) {
       cityNum++
@@ -561,36 +560,42 @@ export default class SearchKeyWords extends Vue {
   }
   // 回显货品类型
   getCargoType(data:any) {
-    let cargoType:any = {
-      key: 'cargoType',
-      optionIds: [data.cargoType],
-      selected: [data.cargoTypeValue],
-      type: '货品类型'
+    if (data.cargoType) {
+      let cargoType:any = {
+        key: 'cargoType',
+        optionIds: [data.cargoType],
+        selected: [data.cargoTypeValue],
+        type: '货品类型'
+      }
+      this.selectedData.push(cargoType)
+      this.listQuery['cargoType'] = cargoType.optionIds
     }
-    this.selectedData.push(cargoType)
-    this.listQuery['cargoType'] = cargoType.optionIds
   }
   // 回显装卸难度
   getHandlingDifficulty(data:any) {
-    let handlingDifficulty:any = {
-      key: 'handlingDifficulty',
-      optionIds: [data.handlingDifficulty],
-      selected: [data.handlingDifficultyValue],
-      type: '装卸难度'
+    if (data.handlingDifficulty) {
+      let handlingDifficulty:any = {
+        key: 'handlingDifficulty',
+        optionIds: [data.handlingDifficulty],
+        selected: [data.handlingDifficultyValue],
+        type: '装卸难度'
+      }
+      this.selectedData.push(handlingDifficulty)
+      this.listQuery['handlingDifficulty'] = handlingDifficulty.optionIds
     }
-    this.selectedData.push(handlingDifficulty)
-    this.listQuery['handlingDifficulty'] = handlingDifficulty.optionIds
   }
   // 回显配送车型
   getCarType(data:any) {
-    let carType:any = {
-      key: 'carType',
-      optionIds: [data.carType],
-      selected: [data.carTypeValue],
-      type: '配送车型'
+    if (data.carType) {
+      let carType:any = {
+        key: 'carType',
+        optionIds: [data.carType],
+        selected: [data.carTypeValue],
+        type: '配送车型'
+      }
+      this.selectedData.push(carType)
+      this.listQuery['carType'] = carType.optionIds
     }
-    this.selectedData.push(carType)
-    this.listQuery['carType'] = carType.optionIds
   }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
@@ -608,8 +613,7 @@ export default class SearchKeyWords extends Vue {
     this.getCarType(this.rowData)
     this.getCargoType(this.rowData)
     this.getHandlingDifficulty(this.rowData)
-    this.getCarType(this.rowData)
-    this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
+    this.initSelectItem(`${this.rowData.workingTime}`, `${this.rowData.workingTime}`, true)
     this.$emit('on-search', this.listQuery)
   }
   mounted() {
