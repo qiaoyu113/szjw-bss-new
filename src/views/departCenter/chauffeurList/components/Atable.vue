@@ -363,8 +363,13 @@
               <div class="title">
                 基础信息:
               </div>
-              <div class="content">
-                {{ `${unfoldData.age}岁/${unfoldData.drivingLicenceTypeName}本/${unfoldData.drivingExperience}年货运经验/${unfoldData.sourceChannelName}/成交:${unfoldData.driverPassTime}` }}
+              <div
+                v-if="unfoldData.driverMatchBasicVO && unfoldData.driverLabelsVO"
+                class="content center"
+              >
+                <span>{{ `${unfoldData.driverMatchBasicVO.age}岁/${unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${unfoldData.driverMatchBasicVO.experienceName}/${unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
+                <span>{{ `成交:${ parseTime(unfoldData.driverLabelsVO.dealDate,'{y}-{m}-{d}')}` }}</span>
+                <span>{{ !isShowPercent ? `最后一次出车日期:${ parseTime(unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` : '' }}</span>
               </div>
             </div>
             <div class="item">
@@ -385,16 +390,22 @@
               <div class="title">
                 司机状态:
               </div>
-              <div class="content">
-                {{ unfoldData.driverSituation }}
+              <div
+                v-if="unfoldData.driverLabelsVO"
+                class="content"
+              >
+                {{ unfoldData.driverLabelsVO.driverSituationName }}
               </div>
             </div>
             <div class="item">
               <div class="title">
                 备注信息:
               </div>
-              <div class="content">
-                {{ unfoldData.driverMatchRemarksName }}, {{ unfoldData.driverMatchManuallyRemarks }}
+              <div
+                v-if="unfoldData.driverLabelRemarksVO"
+                class="content"
+              >
+                {{ unfoldData.driverLabelRemarksVO.manuallyRemarks }}
               </div>
             </div>
           </div>
@@ -412,7 +423,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
-import { unfoldDriverInfo } from '@/api/departCenter'
+import { getDriverInfoByDriverId } from '@/api/departCenter'
+import { parseTime } from '@/utils'
 const driverKey = 'driver_row'
 const lineKey = 'line_row'
 interface IState {
@@ -436,6 +448,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) opType!: number[];
   @PropSync('driverTableData', { default: () => [] }) _tableData!: IState[];
 
+  private parseTime:Function = parseTime
   private driverPhone: string = '';
   private callId: string | number = '';
   private unfoldData: {} = {};
@@ -486,8 +499,8 @@ export default class extends Vue {
   async unfoldInfo(driverId: string) {
     try {
       this.listLoading = true
-      let params = driverId
-      let { data: res } = await unfoldDriverInfo(params)
+      let params = { driverId: 'SJ202103220001' }
+      let { data: res } = await getDriverInfoByDriverId(params)
       this.unfoldData = res.data
       this.listLoading = false
     } catch (err) {
@@ -663,6 +676,17 @@ export default class extends Vue {
     color: #acc4e2;
     font-size: 18px;
     cursor: pointer;
+  }
+  .center{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    span{
+      margin-left: 30px;
+    }
+  }
+  .center span:first-child {
+    margin-left: 0;
   }
   .item {
     margin-top: 10px;

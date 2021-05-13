@@ -398,7 +398,7 @@ export default class extends Vue {
         let params:IState = {
           page: this.page.page,
           limit: this.page.limit,
-          thisCityInvite: 1
+          currentCityInvite: 1
         }
         this.listQuery.carType && (params.carType = this.listQuery.carType)
         this.listQuery.handlingDifficulty && (params.handlingDifficulty = this.listQuery.handlingDifficulty)

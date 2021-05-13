@@ -24,7 +24,6 @@
         :op-type="[2,1,5,6]"
         @call="call"
         @tag="tag"
-        @detail="detail"
         @depart="depart"
         @checkData="checkData"
         @allotSome="allotSome"
@@ -50,11 +49,6 @@
       ref="setTag"
       :driver-id="checkOne.driverId"
     />
-    <DetailDialog
-      actived="third"
-      :driver-id="detailId"
-      :dialog-table-visible.sync="detailDio"
-    />
     <ChauffeureDrawer v-model="showDrawer" />
     <allotDio
       :dialog-visible.sync="allotDialog"
@@ -75,7 +69,6 @@ import { matchDriverInfo, getDriverWorkCity } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
 import { showWork, HandlePages } from '@/utils'
 import CallPhone from '@/views/clue/components/CallPhone/index.vue'
-import DetailDialog from './components/DetailDialog.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
@@ -100,7 +93,6 @@ import chooseCity from './components/chooseCity.vue'
       CallPhone,
       SearchForm,
       SetTag,
-      DetailDialog,
       ChauffeureDrawer,
       allotDio,
       chooseCity
@@ -134,11 +126,9 @@ export default class extends Vue {
       clueId: '',
       phone: ''
     };
-    private detailDio:Boolean = false
     private cityDio:Boolean = false
     private allotDialog:Boolean = false
     private allotTitle:string = ''
-    private detailId:string = ''
     private showTag:Boolean = false
     private showDrawer: Boolean = false
     private allotData:IState[] = []
@@ -194,9 +184,6 @@ export default class extends Vue {
       this.cityDio = true
       this.checkOne = val
       this.getCityChoose()
-    }
-    detail() {
-      this.detailDio = true
     }
     closeAllot() {
       (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()

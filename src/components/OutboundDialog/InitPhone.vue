@@ -81,7 +81,12 @@ export default class extends Vue {
         let obj:IState = { appId, secret, proxyUrl, url, qhbUrl }
         await PhoneModule.ChangePhone(obj)
         setInfo()
-        this.handleAddDom({ account: `${loginName}`, password })
+        if (res.data.env !== 'prod') {
+          this.handleAddDom({ account: `${loginName}@ynkeji2`, password })
+        } else {
+          this.handleAddDom({ account: `${loginName}@yunniao`, password })
+        }
+
         this.addEventListener()
       } else {
         this.$message.error(res.message)
