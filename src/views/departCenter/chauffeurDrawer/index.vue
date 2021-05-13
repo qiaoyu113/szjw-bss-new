@@ -194,7 +194,7 @@ export default class GuestDrawer extends Vue {
     }
     onQuery(params: any) {
       console.log('params', params)
-      const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
+      const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
       // const workHours = workRange ? workRange.split(',')
@@ -205,11 +205,11 @@ export default class GuestDrawer extends Vue {
         expectStabilityTemporaryList: stability || null,
         expectedFreightTripStart: f1 || null,
         expectedFreightTripEnd: f2 || null,
-        heavyLiftingList: loadDifficulty,
+        heavyLiftingList: loadDifficulty || null,
         deliveryDifficulty: deliverComplexity || null,
         labelTypeList: lineQuality || null,
         lineId: keyWords || null,
-        driverId,
+        driverId: this.driverId,
         liveAddressProvince: repoInfo.province,
         liveAddressCityList: repoInfo.cities,
         liveAddressCountyList: repoInfo.counties,

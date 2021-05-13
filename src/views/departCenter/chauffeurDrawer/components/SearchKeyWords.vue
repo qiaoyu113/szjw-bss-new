@@ -300,6 +300,7 @@ export default class SearchKeyWords extends Vue {
   }
   handleClearAll() {
     this.selectedData = []
+    this.listQuery = Object.assign({ ...formData }, { driverId: this.listQuery.driverId })
     this.$emit('on-clear')
   }
   handleChange(item:any) {

@@ -130,7 +130,7 @@ export default class extends Vue {
     }
 
     call(row:IState) {
-      let phone = row.driverPhone
+      let phone = row.driverPhone || ''
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
