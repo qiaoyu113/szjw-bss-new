@@ -172,6 +172,7 @@ export default {
     lineShelf: 'Line shelf maintenance',
     complete: 'completed',
     agent: 'agent',
+    exportVisit: 'ExportVisit',
     RandomlyAssigned: 'Randomly assign policy settings',
     BackflowPolicy: 'Backflow policy settings',
     campaignList: 'campaignListMa',

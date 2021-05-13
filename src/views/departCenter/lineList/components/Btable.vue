@@ -290,6 +290,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v3/line/shelf/menu']"
                 type="text"
                 size="small"
                 @click.stop="handleDetailClick(row)"

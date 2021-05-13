@@ -119,7 +119,7 @@ export default class DepartLine extends Vue {
   }
   async getLists() {
     try {
-      this.listQueryLine.lineId = 'XL202011070277' // this.rowData.lineId
+      this.listQueryLine.lineId = this.rowData.lineId
       this.listQueryLine.page = this.pageSize
       this.listQueryLine.limit = 10
       let notIncludedDriverIds:any = []
