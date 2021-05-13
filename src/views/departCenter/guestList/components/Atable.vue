@@ -6,6 +6,7 @@
       style="width: 100%"
       border
       stripe
+      row-key="lineId"
       highlight-current-row
       size="mini"
       fit
