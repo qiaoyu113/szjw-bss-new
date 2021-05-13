@@ -145,7 +145,7 @@ export default class extends Vue {
   async getLineDetail() {
     try {
       let params:IState = {
-        lineId: 'XL202011070011' || this._obj.lineId
+        lineId: this._obj.lineId
       }
       let { data: res } = await getLineDetailInfo(params)
       if (res.success) {
