@@ -30,10 +30,10 @@
           加载中...
         </p>
         <p
-          v-if="stopSlide"
+          v-if="stopSlide && !isLock"
           class="bottomLoader"
         >
-          没有更多了
+          已经到底了！
         </p>
       </div>
     </div>
@@ -68,6 +68,10 @@ export default {
       default: 0
     },
     stopSlide: {
+      type: Boolean,
+      default: false
+    },
+    isLock: {
       type: Boolean,
       default: false
     }

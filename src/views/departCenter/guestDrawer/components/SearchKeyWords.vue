@@ -97,7 +97,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workRange' ? '~' : ',')) }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : (item.selected.join(item.key === 'workingHours' ? '~' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -154,22 +154,20 @@ export default class SearchKeyWords extends Vue {
   private cycleOptions: IState[] = [
     { label: '全部', value: '' }
   ];
-  private lineList: any = [
-    { label: '司机1', value: 'line1' },
-    { label: '司机2', value: 'line2' }
-  ]
   private timeLists:IState[] = []
   private listQuery:IState = {
-    busiType: '', // 所属业务线
-    carType: '', // 车类型
-    handlingDifficulty: '', // 装卸接受度
-    settlementCycle: '', // 结算周期
-    lineCategory: '', // 期望稳定/临时
-    cargoType: '', // 期望货品类型
-    distributionWay: '', // 期望配送难度
-    start: '',
-    end: '',
-    address: '',
+    busiType: null, // 所属业务线
+    carType: null, // 司机车型
+    handlingDifficulty: null, // 装卸接受度
+    settlementCycle: null, // 期望结算周期
+    lineCategory: null, // 期望稳定/临时
+    cargoType: null, // 期望货品类型
+    distributionWay: null, // 期望配送难度
+    start: null,
+    end: null,
+    everyTripGuaranteedEnd: '',
+    everyTripGuaranteedStart: '',
+    address: null,
     driverInfo: ''
   }
   private formItem:any[] = [
@@ -212,13 +210,13 @@ export default class SearchKeyWords extends Vue {
   private selectList: IState[] = [
     {
       options: [{
-        value: '',
+        value: 2,
         label: '全部'
       }, {
-        value: 0,
+        value: 1,
         label: '共享'
       }, {
-        value: 1,
+        value: 0,
         label: '专车'
       }],
       key: 'busiType',
@@ -269,10 +267,10 @@ export default class SearchKeyWords extends Vue {
         value: '',
         label: '全部'
       }, {
-        value: '1',
+        value: 1,
         label: '整车'
       }, {
-        value: '2',
+        value: 2,
         label: '多点配'
       }],
       multiple: false,
@@ -292,6 +290,18 @@ export default class SearchKeyWords extends Vue {
   ]
   handleClearAll() {
     this.selectedData = []
+    this.listQuery.busiType = null // 所属业务线
+    this.listQuery.carType = null // 车类型
+    this.listQuery.handlingDifficulty = null // 装卸接受度
+    this.listQuery.settlementCycle = null // 结算周期
+    this.listQuery.lineCategory = null // 期望稳定/临时
+    this.listQuery.cargoType = null // 期望货品类型
+    this.listQuery.distributionWay = null // 期望配送难度
+    this.listQuery.workingHours = null
+    this.listQuery.everyTripGuaranteedEnd = ''
+    this.listQuery.everyTripGuaranteedStart = ''
+    this.listQuery.address = null
+    this.listQuery.driverInfo = ''
     this.$emit('on-clear')
   }
   handleChange(item:any) {
@@ -308,7 +318,7 @@ export default class SearchKeyWords extends Vue {
     let id = obj.value
     if (this.selectedData.length > 0) {
       let index = this.selectedData.findIndex((item) => {
-        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workRange'))
+        return item.key === this.key || ((this.key === 'start' || this.key === 'end') && (item.key === 'workingHours'))
       })
       if (index > -1) {
         let selecteds = this.selectedData[index].selected
@@ -350,9 +360,8 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
-          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('~'))
+          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('~'))
         }
-        console.log(this.selectedData)
       } else {
         this.initSelectItem(id, command)
       }
@@ -365,17 +374,17 @@ export default class SearchKeyWords extends Vue {
     if (isInitWorkRange) {
       let obj = {
         type: '工作时间段',
-        key: 'workRange',
+        key: 'workingHours',
         optionIds: id,
         selected: command
       }
-      this.listQuery.workRange = id
+      this.listQuery.workingHours = id
       this.selectedData.push(obj)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
       let obj = {
         type: isWorkRange ? '工作时间段' : this.selectTitle,
-        key: isWorkRange ? 'workRange' : this.key,
+        key: isWorkRange ? 'workingHours' : this.key,
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }
@@ -536,16 +545,17 @@ export default class SearchKeyWords extends Vue {
     }
     if (shareArr.indexOf(data.labelTypeValue) > -1) {
       this.selectedData = []
-      busiType.optionIds.push('0')
+      busiType.optionIds.push(0)
       busiType.selected.push('共享')
       this.selectedData.push(busiType)
     }
     if (specialArr.indexOf(data.labelTypeValue) > -1) {
-      busiType.optionIds.push('1')
+      busiType.optionIds.push(1)
       busiType.selected.push('专车')
       this.selectedData = []
       this.selectedData.push(busiType)
     }
+    this.listQuery['busiType'] = busiType.optionIds
   }
   // 回显货品类型
   getCargoType(data:any) {
@@ -556,6 +566,7 @@ export default class SearchKeyWords extends Vue {
       type: '货品类型'
     }
     this.selectedData.push(cargoType)
+    this.listQuery['cargoType'] = cargoType.optionIds
   }
   // 回显装卸难度
   getHandlingDifficulty(data:any) {
@@ -566,6 +577,7 @@ export default class SearchKeyWords extends Vue {
       type: '装卸难度'
     }
     this.selectedData.push(handlingDifficulty)
+    this.listQuery['handlingDifficulty'] = handlingDifficulty.optionIds
   }
   // 回显配送车型
   getCarType(data:any) {
@@ -576,6 +588,7 @@ export default class SearchKeyWords extends Vue {
       type: '配送车型'
     }
     this.selectedData.push(carType)
+    this.listQuery['carType'] = carType.optionIds
   }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
@@ -595,6 +608,7 @@ export default class SearchKeyWords extends Vue {
     this.getHandlingDifficulty(this.rowData)
     this.getCarType(this.rowData)
     this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
+    this.$emit('on-search', this.listQuery)
   }
   mounted() {
     this.getOptions()
