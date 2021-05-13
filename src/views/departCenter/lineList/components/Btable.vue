@@ -357,7 +357,7 @@ export default class extends Vue {
     console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
-      let { page, limit } = this.pageobj.page
+      let { page, limit } = this.pageobj
       let params = { ...this.listQuery, page, limit }
       console.log('params', params)
       let { data: res } = await getLineInfo(params)

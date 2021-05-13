@@ -387,13 +387,10 @@ export default class extends Vue {
     total: 0
   }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:any) {
+    console.log('page', page)
+    this.page.page = page.page
+    this.page.limit = page.limit
     setTimeout(() => {
       this.getList()
     }, 20)
