@@ -425,19 +425,19 @@ export default class SearchKeyWords extends Vue {
     }
     if (driver.heavyLifting) {
       this.key = 'loadDifficulty'
-      this.initSelectItem((driver.heavyLifting + '').split(','), driver.heavyLiftingName.split(','))
+      this.initSelectItem(driver.heavyLifting, driver.heavyLiftingName)
     }
     if (driver.carType) {
       this.key = 'model'
-      this.initSelectItem((driver.carType + '').split(','), driver.carTypeName.split(','))
+      this.initSelectItem(driver.carType, driver.carTypeName)
     }
     if (driver.intentCargoType) {
       this.key = 'cargoType'
-      this.initSelectItem(driver.intentCargoType || [], driver.intentCargoTypeName || [])
+      this.initSelectItem((driver.intentCargoType || []).join(','), (driver.intentCargoTypeName || []).join(','))
     }
-    if ((driver.liveAddressCity && driver.liveAddressProvince) || process.env.NODE_ENV === 'development') {
-      this.listQuery.repoLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
-      this.listQuery.distLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
+    if (driver.liveAddressCity && driver.liveAddressProvince) {
+      this.listQuery.repoLoc = [driver.liveAddressProvince, driver.liveAddressCity]
+      this.listQuery.distLoc = [driver.liveAddressProvince, driver.liveAddressCity]
     }
     this.$emit('query', this.listQuery)
   }
