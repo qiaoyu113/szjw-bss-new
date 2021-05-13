@@ -1590,7 +1590,7 @@ export default class extends Vue {
 }
 </style>
 
-<style lang="scss" scope>
+<style lang="scss" scoped>
 // .el-collapse-item__content {
 //   padding-bottom: 0;
 // }

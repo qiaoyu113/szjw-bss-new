@@ -119,6 +119,8 @@ export default class extends Vue {
     agentId: '', // 待办ID
     lineName: '', // 线路名称
     agencyTime: [],
+    lineSale: '',
+    lineCity: '',
     checkStatus: ''
   }
   //  原因下拉框数据
@@ -155,6 +157,8 @@ export default class extends Vue {
         params.endUpdateDate = new Date(this.listQuery.agencyTime[1]).setHours(23, 59, 59)
       }
       this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
+      this.listQuery.lineSale !== '' && (params.lineSaleId = this.listQuery.lineSale)
+      this.listQuery.lineCity !== '' && (params.city = this.listQuery.lineCity)
       this.listQuery.lineName !== '' && (params.key = this.listQuery.lineName)
       this.listQuery.checkStatus !== '' && (params.agentStatus = this.listQuery.checkStatus)
       let { data: res } = await getFinishedMoreLine(params)
