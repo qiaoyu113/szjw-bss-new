@@ -26,6 +26,7 @@
           @on-loading="loadChange"
           @on-end="disabled=true"
           @on-lock="isLock=true"
+          @on-reset="resetScroll"
         />
       </Scroll>
     </div>
@@ -89,6 +90,10 @@ export default class GuestDrawer extends Vue {
   }
   loadChange(status:any) {
     this.listLoading = status
+  }
+  resetScroll() {
+    this.isLock = false
+    this.disabled = false
   }
   mounted() {
 
