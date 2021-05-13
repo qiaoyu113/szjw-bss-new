@@ -8,7 +8,7 @@
       stripe
       highlight-current-row
       size="mini"
-      row-key="id"
+      row-key="driverId"
       fit
       @selection-change="handleSelectionChange"
     >
@@ -115,7 +115,7 @@
             <span :class="addClass('canBreakingTrafficRestriction',row.canBreakingTrafficRestriction)">
               {{ row.liveAddressProvinceName }}
             </span> -
-            <span>
+            <span :class="addClass(obj.warehouseCity,row.liveAddressCity)">
               {{ row.liveAddressCityName }}
             </span> -
             <span>
@@ -176,7 +176,7 @@
         <template slot-scope="{row}">
           <p class="text">
             期望货品:
-            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ row.intentCargoTypeName }}</span>
+            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ (row.intentCargoTypeName || []).toString() }}</span>
           </p>
           <p class="text">
             期望装卸难度:
@@ -187,11 +187,15 @@
             <span>{{ (row.deliveryDifficultyNames || []).toString() }}</span>
           </p>
           <p class="text">
-            工作时间段:{{ row.workHoursStr }}
+            工作时间段:{{ row.workHoursStr | showWorkHours }}
           </p>
           <p class="text">
             期望稳定/临时:
-            <span :class="addClass(obj.lineCategory === 1,row.canBreakingTrafficRestriction)">{{ (row.expectStabilityTemporaryNames || []).toString() }}</span>
+            <span
+              v-for="(item,index) in (row.expectStabilityTemporaryNames || [])"
+              :key="index"
+              :class="addClassArr(obj.lineCategory,row.canBreakingTrafficRestriction)"
+            >{{ item }}&#8197;</span>
           </p>
         </template>
       </el-table-column>
@@ -246,7 +250,10 @@
       >
         <template slot-scope="{row}">
           <section class="opBox">
-            <p class="text">
+            <p
+              v-permission="['/v1/outboundCall/getListByBusinessId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -258,7 +265,11 @@
                 {{ row.driverPhone }}
               </span>
             </p>
-            <p class="text">
+
+            <p
+              v-permission="['/v1/matchDriverLabelInfo/updateDriverLabelByDriverId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -273,6 +284,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/queryMatchLineForMatchDriver']"
                 type="text"
                 size="small"
                 @click.stop="handleDepart(row)"
@@ -286,6 +298,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v2/runtest/creatIntentionRun']"
                 type="text"
                 size="small"
                 @click.stop="handleCreatRun(row)"
@@ -311,6 +324,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverInfoByDriverId']"
                 size="mini"
                 class="showMoreBtn"
                 @click.stop="toogleExpand(row)"
@@ -337,6 +351,7 @@
                 class="text"
               >
                 <el-button
+                  v-permission="['/v2/driver/updateDriverWorkCityByDriverId']"
                   type="text"
                   size="small"
                   @click.stop="handleChooseCity(row)"
@@ -355,58 +370,64 @@
         class-name="expand"
       >
         <template slot-scope="{row}">
-          <div v-loading="listLoading">
+          <div
+            class="item"
+            :a="row"
+          >
+            <div class="title">
+              基础信息:
+            </div>
             <div
-              class="item"
-              :a="row"
+              v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
+              class="content center"
             >
-              <div class="title">
-                基础信息:
-              </div>
-              <div
-                v-if="unfoldData.driverMatchBasicVO && unfoldData.driverLabelsVO"
-                class="content center"
-              >
-                <span>{{ `${unfoldData.driverMatchBasicVO.age}岁/${unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${unfoldData.driverMatchBasicVO.experienceName}/${unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
-                <span>{{ `成交:${ parseTime(unfoldData.driverLabelsVO.dealDate,'{y}-{m}-{d}')}` }}</span>
-                <span>{{ !isShowPercent ? `最后一次出车日期:${ parseTime(unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` : '' }}</span>
-              </div>
+              <span>{{ `${row.unfoldData.driverMatchBasicVO.age}岁/${row.unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${row.unfoldData.driverMatchBasicVO.experienceName}/${row.unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
+              <span>{{ `成交:${ parseTime(row.unfoldData.driverLabelsVO.dealDate,'{y}-{m}-{d}')}` }}</span>
+              <span>{{ !isShowPercent ? `最后一次出车日期:${ parseTime(row.unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` : '' }}</span>
             </div>
-            <div class="item">
-              <div class="title">
-                试跑信息:
-              </div>
-              <div class="content">
-                <el-button
-                  size="mini"
-                  type="text"
-                  @click.stop="handleDetail(row)"
-                >
-                  立即查看
-                </el-button>
-              </div>
+          </div>
+          <div
+            v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
+            class="item"
+          >
+            <div class="title">
+              试跑信息:
             </div>
-            <div class="item">
-              <div class="title">
-                司机状态:
-              </div>
-              <div
-                v-if="unfoldData.driverLabelsVO"
-                class="content"
+            <div class="content">
+              <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId','/v1/matchDriverLabelInfo/getDriverLabelByDriverId','/v2/runtest/getRunTestInfoByDriverId','/v1/outboundCall/getListByBusinessId']"
+                size="mini"
+                type="text"
+                @click.stop="handleDetail(row)"
               >
-                {{ unfoldData.driverLabelsVO.driverSituationName }}
-              </div>
+                立即查看
+              </el-button>
             </div>
-            <div class="item">
-              <div class="title">
-                备注信息:
-              </div>
-              <div
-                v-if="unfoldData.driverLabelRemarksVO"
-                class="content"
-              >
-                {{ unfoldData.driverLabelRemarksVO.manuallyRemarks }}
-              </div>
+          </div>
+          <div
+            v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
+            class="item"
+          >
+            <div class="title">
+              司机状态:
+            </div>
+            <div
+              class="content"
+            >
+              {{ row.unfoldData.driverLabelsVO.driverSituationName }}
+            </div>
+          </div>
+          <div
+            v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
+            class="item"
+          >
+            <div class="title">
+              备注信息:
+            </div>
+            <div
+              class="content"
+            >
+              {{ row.unfoldData.driverLabelRemarksVO.manuallyRemarks }}
             </div>
           </div>
         </template>
@@ -438,6 +459,14 @@ interface IState {
   filters: {
     addZreo(val: string) {
       return +val > 9 ? val : `0${val}`
+    },
+    showWorkHours(val:string) {
+      if (val) {
+        let arr = val.split('-')
+        return arr.length > 0 ? `${arr[0]}:00-${arr[1]}:00` : ''
+      } else {
+        return ''
+      }
     }
   }
 })
@@ -451,7 +480,6 @@ export default class extends Vue {
   private parseTime:Function = parseTime
   private driverPhone: string = '';
   private callId: string | number = '';
-  private unfoldData: {} = {};
   private listLoading: boolean = true;
   private obj: IState = {};
 
@@ -462,6 +490,14 @@ export default class extends Vue {
   addClass(objData: any, rowData: any, otherData?:any) {
     if (this.isShowPercent) {
       return (objData === rowData || otherData === rowData) ? 'orange' : ''
+    } else {
+      return ''
+    }
+  }
+  addClassArr(objData: any, rowData: any[]) {
+    if (this.isShowPercent) {
+      // return rowData.includes(objData) ? 'orange' : ''
+      return ''
     } else {
       return ''
     }
@@ -479,11 +515,11 @@ export default class extends Vue {
     }
   }
   // 展开
-  toogleExpand(row: IState) {
+  async toogleExpand(row: IState) {
     let $table: any = this.$refs.chauffeurTable
     for (let i = 0; i < this._tableData.length; i++) {
       let item: IState = this._tableData[i]
-      if (row.id === item.id && row.isOpen) {
+      if (row.driverId === item.driverId && row.isOpen) {
         row.isOpen = false
         $table.toggleRowExpansion(item, false)
         return false
@@ -492,17 +528,17 @@ export default class extends Vue {
         $table.toggleRowExpansion(item, false)
       }
     }
-    debugger
     row.isOpen = true
+    await this.unfoldInfo(row)
     $table.toggleRowExpansion(row, true)
-    this.unfoldInfo(row.driverId)
   }
-  async unfoldInfo(driverId: string) {
+  async unfoldInfo(row:any) {
     try {
       this.listLoading = true
-      let params = { driverId: 'SJ202103220001' }
+      let params = { driverId: row.driverId }
       let { data: res } = await getDriverInfoByDriverId(params)
-      this.unfoldData = res.data
+      this.$set(row, 'unfoldData', res.data || {})
+      console.log(row, 'row')
       this.listLoading = false
     } catch (err) {
       this.listLoading = false

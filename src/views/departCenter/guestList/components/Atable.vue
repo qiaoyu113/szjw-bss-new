@@ -6,6 +6,7 @@
       style="width: 100%"
       border
       stripe
+      row-key="lineId"
       highlight-current-row
       size="mini"
       fit
@@ -42,7 +43,10 @@
                     {{ scope.row.remark }}
                   </template>
                 </div>
-                <div slot="reference">
+                <div
+                  slot="reference"
+                  style="display: inline-block;"
+                >
                   <i
                     class="el-icon-chat-dot-round"
                   />
@@ -50,7 +54,12 @@
               </el-popover>
             </p>
             <p :class="obj.lineSaleName === scope.row.lineSaleName ? 'blue text' : 'text'">
-              {{ scope.row.lineSaleName | DataIsNull }}
+              <template v-if="scope.row.lineSaleName">
+                （{{ scope.row.lineSaleName }}）
+              </template>
+              <template v-else>
+                暂无数据
+              </template>
             </p>
             <p
               :class="obj.lineId === scope.row.lineId ? 'blue text' : 'text'"
@@ -225,7 +234,10 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            v-permission="['/v1/customerInviteDrawer/queryMatchDriver']"
+            class="text"
+          >
             <el-button
               v-if="!isMore"
               type="text"
@@ -235,7 +247,11 @@
               匹配撮合
             </el-button>
           </p>
-          <p class="text">
+
+          <p
+            v-permission="['/v2/runtest/creatIntentionRun']"
+            class="text"
+          >
             <el-button
               v-if="isShowPercent"
               type="text"
@@ -255,17 +271,20 @@
               查看线路详情
             </el-button>
           </p>
-          <p
-            v-if="isMore"
-            class="text"
-          >
-            <el-button
-              size="mini"
-              @click.stop="toogleExpand(row)"
+
+          <template v-if="isMore">
+            <p
+              v-permission="['/v1/driver/invitation/line/detail']"
+              class="text"
             >
-              {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
-            </el-button>
-          </p>
+              <el-button
+                size="mini"
+                @click.stop="toogleExpand(row)"
+              >
+                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+              </el-button>
+            </p>
+          </template>
         </template>
       </el-table-column>
       <el-table-column
@@ -404,7 +423,10 @@ export default class extends Vue {
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {
-        let remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        let remarks = '暂无数据'
+        if (res.data && res.data.remarks) {
+          remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        }
         this.$set(row, 'remark', remarks)
       } else {
         this.$message.error(res.errorMsg)

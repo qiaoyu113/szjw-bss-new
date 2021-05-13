@@ -302,7 +302,7 @@ export default class SearchKeyWords extends Vue {
     this.listQuery.everyTripGuaranteedStart = ''
     this.listQuery.address = null
     this.listQuery.driverInfo = ''
-    this.$emit('on-clear')
+    this.$emit('on-search', this.listQuery)
   }
   handleChange(item:any) {
     console.log(item)

@@ -410,14 +410,19 @@ export default class extends Vue {
           params.cityCode = +this.listQuery.cityCode[1]
         }
         // 单趟运费区间
-        if (this.listQuery.everyTripGuaranteed && this.listQuery.everyTripGuaranteed.length > 1) {
+        if (this.listQuery.everyTripGuaranteed && this.listQuery.everyTripGuaranteed.filter((item:any) => item).length > 1) {
           params.everyTripGuaranteedStart = +this.listQuery.everyTripGuaranteed[0]
           params.everyTripGuaranteedEnd = +this.listQuery.everyTripGuaranteed[1]
         }
         // 工作时间段
         if (this.listQuery.workingHours && this.listQuery.workingHours.length > 1) {
-          params.workingHourStart = Number(this.listQuery.workingHours[0])
-          params.workingHourEnd = Number(this.listQuery.workingHours[1])
+          let len:number = this.listQuery.workingHours.filter((item:any) => item).length
+          if (len > 1) {
+            params.workingHourStart = Number(this.listQuery.workingHours[0])
+            params.workingHourEnd = Number(this.listQuery.workingHours[1])
+          } else if (len === 1) {
+            return this.$message.warning('工作时间段输入不完整')
+          }
         }
         // 仓库位置
         if (this.listQuery.warehouse && this.listQuery.warehouse.length > 2) {

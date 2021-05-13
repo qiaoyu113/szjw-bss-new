@@ -33,6 +33,7 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -121,7 +122,7 @@
               预计月运费:{{ row.shipperOffer }}元
             </p>
             <p class="text">
-              结算周期/天数:{{ row.settlementCycle }}/7天
+              结算周期/天数:{{ row.settlementCycle||'  ' }}/{{ row.settlementDays||'  ' }}天
             </p>
           </template>
         </el-table-column>
@@ -160,7 +161,7 @@
             <p
               class="text"
             >
-              {{ row.urgent }}
+              {{ row.urgent | urgentFilter }}
             </p>
           </template>
         </el-table-column>
@@ -252,6 +253,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/cancelMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelGuest(row.custInviteId)"
@@ -264,6 +266,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/startMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleLaunchGuest(row)"
@@ -277,6 +280,7 @@
             >
               <!-- 本城客邀撮合成功时显示 -->
               <el-button
+                v-permission="['/v2/runtest/intention/cancel']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelTryRun(row)"
@@ -290,6 +294,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v3/line/shelf/menu']"
                 type="text"
                 size="small"
                 @click.stop="handleDetailClick(row)"
@@ -329,9 +334,12 @@ interface IState {
         case 5: return '极瘦'
       }
     },
-    hourFilter(val:string) {
-      let arr = JSON.parse(val)
-      return `${arr[0]}:00-${arr[arr.length - 1]}:00`
+    urgentFilter(value:number) {
+      switch (value) {
+        case 0 : return '已下架'
+        case 1 : return '客急'
+        case 2 : return '客常'
+      }
     }
   }
 })
@@ -346,17 +354,14 @@ export default class extends Vue {
 
   private selection:[] = []
   private remarks:string = ''
-  private page:number = 1
-  private limit:number = 30
 
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
-      let params = { ...this.listQuery, ...this.pageobj }
-      console.log('params', params)
+      let { page, limit } = this.pageobj
+      let params = { ...this.listQuery, page, limit }
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
@@ -408,20 +413,17 @@ export default class extends Vue {
   }
 
   showMarkHandle(params:any) {
-    console.log(params)
     this.getRemarks(params)
   }
   async getRemarks(params:any) {
     let { data: res } = await getLineRemarks(params)
     if (res.success) {
-      this.remarks = res.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
+      this.remarks = res.data.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
     }
-    console.log(res)
   }
 
   // 更新列表
   refreshList() {
-    console.log('刷新列表')
     this.getLists()
   }
 }

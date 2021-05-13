@@ -42,6 +42,7 @@ export default class extends Vue {
   @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
   private cancelOptions:IState[] = [] // 取消原因
+  private cancelId:any = this.id
   private listQuery:IState = {
     custInviteId: '',
     cancelInviteReason: ''
@@ -83,20 +84,19 @@ export default class extends Vue {
     if (this.cancelGuestState === 1) {
       try {
         let params:IState = {
-          // custInviteId: this.custInviteId,
-          custInviteId: 'afda9',
+          custInviteId: this.custInviteId,
           cancelInviteReason: this.listQuery.cancelInviteReason
         }
         if (this.listQuery.cancelInviteReason === '') {
           return this.$message.warning('请选择取消客邀原因')
         }
         let { data: res } = await cancelMatchCustInvite(params)
-        if (res.data.success) {
+        if (res.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
           console.log('err')
-          this.$message.error(res.data.errorMsg)
+          this.$message.error(res.errorMsg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
@@ -107,19 +107,26 @@ export default class extends Vue {
     if (this.cancelGuestState === 2) {
       try {
         let params:IState = {
-          // custInviteIds: this.id,
-          custInviteIds: ['afda9', 'KY2105111001', 'KY2105111002', '9c4fedd'],
+          custInviteIds: this.cancelId,
           cancelInviteReason: this.listQuery.cancelInviteReason
         }
         if (this.listQuery.cancelInviteReason === '') {
           return this.$message.warning('请选择取消客邀原因')
         }
         let { data: res } = await cancelMatchCustInviteBatch(params)
-        if (res.data.success) {
+        if (res.data.flag) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-          this.$message.error(res.data.Msg)
+          let arr = res.data.msg
+          let str = ''
+          arr.forEach((item:any) => {
+            item.lineIds.forEach((val:any) => {
+              str += val + ','
+            })
+            str += `-${item.reason}`
+          })
+          this.$message.error(str)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
