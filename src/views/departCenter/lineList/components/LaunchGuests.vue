@@ -44,6 +44,7 @@ export default class extends Vue {
   private showDialog:boolean = false
   private cityList:IState[] = []; // 城市列表
   private matchCustInviteInfo: any[] = []
+  private launchId:any = this.id
   private listQuery:IState = {
     city: '',
     remarks: ''
@@ -119,11 +120,11 @@ export default class extends Vue {
           return this.$message.warning('请选择客邀城市')
         }
         let { data: res } = await CreateLaunchGuests(params)
-        if (res.data.success) {
+        if (res.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-          this.$message.error(res.data.errorMsg)
+          this.$message.error(res.errorMsg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
@@ -133,36 +134,29 @@ export default class extends Vue {
     }
     if (this.launchGuestState === 2) {
       try {
-        // let obj1 = { city: this.listQuery.city,
-        //   remarks: this.listQuery.remarks }
-        // this.id = this.id.map((item) => {
-        //   return Object.assign(item, obj1)
-        // })
-        let params =
-        // startMatchCustInvites: this.id
-           [
-             { lineId: '82000019840128',
-               matchId: '82000019840128',
-               // city: this.listQuery.city,
-               city: '111',
-               remarks: this.listQuery.remarks }]
-        // { lineId: '222',
-        //   matchId: '222',
-        //   city: '333',
-        // city: this.listQuery.city,
-        // remarks: this.listQuery.remarks }]
-        // city: this.listQuery.city,
-        // remarks: this.listQuery.remarks
-
-        // if (this.listQuery.city === '') {
-        //   return this.$message.warning('请选择客邀城市')
-        // }
+        let obj1 = { city: this.listQuery.city,
+          remarks: this.listQuery.remarks }
+        this.launchId = this.launchId.map((item:any) => {
+          return Object.assign(item, obj1)
+        })
+        let params = this.launchId
+        if (this.listQuery.city === '') {
+          return this.$message.warning('请选择客邀城市')
+        }
         let { data: res } = await CreateLaunchGuestsBatch(params)
-        if (res.data.success) {
+        if (res.data.flag) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-          this.$message.error(res.data.Msg)
+          let arr = res.data.msg
+          let str = ''
+          arr.forEach((item:any) => {
+            item.lineIds.forEach((val:any) => {
+              str += val + ','
+            })
+            str += `-${item.reason}`
+          })
+          this.$message.error(str)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
