@@ -40,6 +40,7 @@
       >
         <el-button
           v-if="listQuery.customerStatus === '1'"
+          v-permission="['/v1/matchCustInvite/startMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchLaunchGuest"
@@ -48,6 +49,7 @@
         </el-button>
         <el-button
           v-if="listQuery.customerStatus === '2'"
+          v-permission="['/v1/matchCustInvite/cancelMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchCancelGuest"
@@ -387,13 +389,10 @@ export default class extends Vue {
     total: 0
   }
   // 分页
-  handlePageSizeChange(page:number, limit:number) {
-    if (page) {
-      this.page.page = page
-    }
-    if (limit) {
-      this.page.limit = limit
-    }
+  handlePageSizeChange(page:any) {
+    console.log('page', page)
+    this.page.page = page.page
+    this.page.limit = page.limit
     setTimeout(() => {
       this.getList()
     }, 20)

@@ -33,6 +33,7 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -252,6 +253,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/cancelMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelGuest(row.custInviteId)"
@@ -264,6 +266,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/startMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleLaunchGuest(row)"
@@ -357,7 +360,7 @@ export default class extends Vue {
     console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
-      let { page, limit } = this.pageobj.page
+      let { page, limit } = this.pageobj
       let params = { ...this.listQuery, page, limit }
       console.log('params', params)
       let { data: res } = await getLineInfo(params)
