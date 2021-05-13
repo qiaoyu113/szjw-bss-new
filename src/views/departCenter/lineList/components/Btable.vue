@@ -33,10 +33,10 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-show="row.inviteMark"
                   placement="right"
                   min-width="200"
                   trigger="hover"
+                  @mouseover="showMarkHandle({lineId: row.lineId,city: row.currentCity})"
                 >
                   <div class="text1">
                     {{ row.inviteMark }}
@@ -141,7 +141,7 @@
               配送复杂度:{{ row.distributionWay }}
             </p>
             <p class="text">
-              工作时间段:{{ row.workingHours | hourFilter }}/{{ row.lineCategory==='1'?'稳定':'临时' }}/{{ row.stabilityRate }}
+              工作时间段:{{ row.workingTime }}/{{ row.lineCategory==='1'?'稳定':'临时' }}/{{ row.stabilityRate }}
             </p>
           </template>
         </el-table-column>
@@ -305,7 +305,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { getLineInfo } from '@/api/departCenter'
+import { getLineInfo, getLineRemarks } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -405,6 +405,15 @@ export default class extends Vue {
   handleSelectionChange(selection:[]) {
     this.selection = selection
     this.$emit('SelectionChange', selection)
+  }
+
+  showMarkHandle(params:any) {
+    console.log(params)
+    this.getRemarks(params)
+  }
+  async getRemarks(params:any) {
+    let { data: res } = await getLineRemarks(params)
+    console.log(res)
   }
 
   // 更新列表
