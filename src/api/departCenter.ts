@@ -3,7 +3,8 @@ const base = '/base_center'
 const departCenter = `match`
 const prefix = `/mock/283`
 const prefix1 = `/match`
-
+const basefix = 'base'
+const driverfix = 'driver'
 const departfix = 'match_center'
 
 // 创建试跑意向
@@ -193,18 +194,18 @@ export function matchDriverInfo(data:any) {
 }
 
 // 获取司机变更城市
-export function getDriverWorkCity(data:any) {
+export function getDriverWorkCity(params:any) {
   return request({
-    url: `${prefix}/v2/driver/getDriverWorkCity`,
-    method: 'post',
-    data
+    url: `${basefix}/v3/base/user/getUserInfoByDutyid`,
+    method: 'get',
+    params
   })
 }
 
 // 更改工作城市
 export function updateDriverWorkCityByDriverId(data:any) {
   return request({
-    url: `${prefix}/v2/driver/updateDriverWorkCityByDriverId`,
+    url: `${driverfix}/v2/driver/updateDriverWorkCityByDriverId`,
     method: 'post',
     data
   })

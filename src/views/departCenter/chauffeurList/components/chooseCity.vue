@@ -76,7 +76,8 @@ export default class extends Vue {
   }
   // 确定按钮
   private confirm() {
-    (this.$refs.cityForm as any).submitForm()
+    // (this.$refs.cityForm as any).submitForm()
+    this.handlePassChange()
   }
   // 验证通过
   async handlePassChange() {
@@ -86,7 +87,7 @@ export default class extends Vue {
         workCity: this.listQuery.workCity,
         dmId: this.obj.joinManagerId
       }
-      let { data: res } = await updateDriverWorkCityByDriverId({ ChangeDriverWorkCityDTO: params })
+      let { data: res } = await updateDriverWorkCityByDriverId(params)
       if (res.success) {
         this.show = false
         this.$message.success('操作成功');
