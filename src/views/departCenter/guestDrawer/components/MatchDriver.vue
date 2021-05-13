@@ -27,7 +27,7 @@
     />
     <CreateTryRun
       ref="tryRunShow"
-      :obj="rowData"
+      :obj.sync="rowData"
     />
     <DetailDialog
       actived="third"

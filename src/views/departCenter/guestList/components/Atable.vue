@@ -42,10 +42,12 @@
                     {{ scope.row.remark }}
                   </template>
                 </div>
-                <i
-                  slot="reference"
-                  class="el-icon-chat-dot-round"
-                />
+                <div>
+                  <i
+                    slot="reference"
+                    class="el-icon-chat-dot-round"
+                  />
+                </div>
               </el-popover>
             </p>
             <p :class="obj.lineSaleName === scope.row.lineSaleName ? 'blue text' : 'text'">
@@ -136,12 +138,12 @@
             货品:<span :class="isShowPercent && row.cargoTypeHit ? 'blue' : ''">{{ row.cargoTypeValue | DataIsNull }}</span>
           </p>
           <p class="text">
-            装卸难度:<span :class="isShowPercent && row.handlingDifficultyHit ? 'blue' : ''">{{ row.handlingDifficultyValue }}</span>
+            装卸难度:<span :class="isShowPercent && row.handlingDifficultyHit ? 'blue' : ''">{{ row.handlingDifficultyValue | DataIsNull }}</span>
           </p>
           <p
             class="text"
           >
-            配送复杂度:<span :class="isShowPercent && row.distributionWayHit ? 'blue' : ''">{{ row.distributionWayValue }}</span>
+            配送复杂度:<span :class="isShowPercent && row.distributionWayHit ? 'blue' : ''">{{ row.distributionWayValue | DataIsNull }}</span>
           </p>
           <p
             class="text"
@@ -338,9 +340,8 @@ export default class extends Vue {
   private obj:IState = {}
   // 计算窗口期
   private _calcDay(row:IState) {
-    let day = Number(row.recruitWindowPeriod)
-    if (row.lineCreateDate && day) {
-      return parseInt((new Date(row.lineCreateDate).getTime() + day * 3600 * 24 * 1000 - Date.now()) / (3600 * 24 * 1000) + '')
+    if (row.waitDirveValidity) {
+      return parseInt((new Date(row.waitDirveValidity).getTime() - Date.now()) / (3600 * 24 * 1000) + '')
     } else {
       return 0
     }
