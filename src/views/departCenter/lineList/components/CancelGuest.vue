@@ -87,6 +87,9 @@ export default class extends Vue {
           custInviteId: 'afda9',
           cancelInviteReason: this.listQuery.cancelInviteReason
         }
+        if (this.listQuery.cancelInviteReason === '') {
+          return this.$message.warning('请选择取消客邀原因')
+        }
         let { data: res } = await cancelMatchCustInvite(params)
         if (res.success) {
           this.$message.success('操作成功')
@@ -103,8 +106,12 @@ export default class extends Vue {
     if (this.cancelGuestState === 2) {
       try {
         let params:IState = {
-          custInviteIds: this.id,
+          // custInviteIds: this.id,
+          custInviteIds: ['afda9', 'KY2105111001', 'KY2105111002', '9c4fedd'],
           cancelInviteReason: this.listQuery.cancelInviteReason
+        }
+        if (this.listQuery.cancelInviteReason === '') {
+          return this.$message.warning('请选择取消客邀原因')
         }
         let { data: res } = await cancelMatchCustInviteBatch(params)
         if (res.success) {

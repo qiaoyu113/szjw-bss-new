@@ -11,7 +11,7 @@ export const hangUp = () => {
   }
 }
 
-export const setInfo = (callId = '') => {
+export const setInfo = (callId = '', module = '', oper_type = '') => {
   let userId = localStorage.getItem('userId')
   let num = String(Math.random()).slice(2, 10)
   let date = `${userId}${Date.now()}${num}`
@@ -23,18 +23,20 @@ export const setInfo = (callId = '') => {
     secret: PhoneModule.secret,
     proxy_url: PhoneModule.proxyUrl,
     url: PhoneModule.url,
-    qhbUrl: PhoneModule.qhbUrl
+    qhbUrl: PhoneModule.qhbUrl,
+    module,
+    oper_type
   }
   localStorage.setItem('szjw_params', JSON.stringify(obj))
   return date
 }
 // 呼叫
-export const callPhone = (phone:string, callId:string) => {
+export const callPhone = (phone:string, callId:string, module:string, oper_type = '') => {
   if (!phone) {
     Message.warning('请输入外呼电话')
     return ''
   }
-  let date = setInfo(callId);
+  let date = setInfo(callId, module, oper_type);
   // 设置电话
   (window.frames as any).szjwCall.document.getElementById('moorCall-dialout-input').value = phone;
   // 外呼

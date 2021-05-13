@@ -115,6 +115,9 @@ export default class extends Vue {
           city: this.listQuery.city,
           remarks: this.listQuery.remarks
         }
+        if (this.listQuery.city === '') {
+          return this.$message.warning('请选择客邀城市')
+        }
         let { data: res } = await CreateLaunchGuests(params)
         if (res.success) {
           this.$message.success('操作成功')
@@ -130,11 +133,30 @@ export default class extends Vue {
     }
     if (this.launchGuestState === 2) {
       try {
-        let params:IState = {
-          matchCustInviteInfos: this.id,
-          city: this.listQuery.city,
-          remarks: this.listQuery.remarks
-        }
+        // let obj1 = { city: this.listQuery.city,
+        //   remarks: this.listQuery.remarks }
+        // this.id = this.id.map((item) => {
+        //   return Object.assign(item, obj1)
+        // })
+        let params =
+        // startMatchCustInvites: this.id
+           [
+             { lineId: '82000019840128',
+               matchId: '82000019840128',
+               // city: this.listQuery.city,
+               city: '111',
+               remarks: this.listQuery.remarks }]
+        // { lineId: '222',
+        //   matchId: '222',
+        //   city: '333',
+        // city: this.listQuery.city,
+        // remarks: this.listQuery.remarks }]
+        // city: this.listQuery.city,
+        // remarks: this.listQuery.remarks
+
+        // if (this.listQuery.city === '') {
+        //   return this.$message.warning('请选择客邀城市')
+        // }
         let { data: res } = await CreateLaunchGuestsBatch(params)
         if (res.success) {
           this.$message.success('操作成功')

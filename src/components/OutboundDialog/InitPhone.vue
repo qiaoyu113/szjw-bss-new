@@ -81,14 +81,12 @@ export default class extends Vue {
         let obj:IState = { appId, secret, proxyUrl, url, qhbUrl }
         await PhoneModule.ChangePhone(obj)
         setInfo()
-        let host = window.location.host
-        if (['szjw-bss-web-m1.yunniao.cn'].includes(host)) { // m1、m2(测试环境)
+        if (res.data.env !== 'prod') {
           this.handleAddDom({ account: `${loginName}@ynkeji2`, password })
-        } else if (host === 'szjw-bss-web.yunniao.cn') { // 生产环境
-          this.handleAddDom({ account: `${loginName}@yunniao`, password })
-        } else { // 预生产环境
+        } else {
           this.handleAddDom({ account: `${loginName}@yunniao`, password })
         }
+
         this.addEventListener()
       } else {
         this.$message.error(res.message)

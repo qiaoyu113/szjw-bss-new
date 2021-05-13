@@ -69,8 +69,8 @@ export default class extends Vue {
   }
 
   // 呼出电话
-  handleCallClick() {
-    let random:string = callPhone(this.phone, this.callId)
+  handleCallClick(module:string = '', oper_type:string = '') {
+    let random:string = callPhone(this.phone, this.callId, module, oper_type)
     this.$emit('random', random)
   }
   handleHangUp() {

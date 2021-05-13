@@ -109,14 +109,14 @@ import chooseCity from './components/chooseCity.vue'
 export default class extends Vue {
     private tableData:IState[] = [];
     private listQuery: IState = {
-      busiType: 0,
+      busiType: '',
       carType: '',
-      isNewEnergy: 0,
+      isNewEnergy: '',
       driverId: '',
       address: [],
-      heavyLifting: 0,
-      expectStabilityTemporary: 0,
-      expectAccountingPeriod: 0,
+      heavyLifting: '',
+      expectStabilityTemporary: '',
+      expectAccountingPeriod: '',
       rents: [],
       time: [],
       status: 1,
@@ -156,8 +156,7 @@ export default class extends Vue {
     }
 
     call(row:IState) {
-      console.log(row)
-      let phone = '18838928206'
+      let phone = row.driverPhone
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -228,13 +227,13 @@ export default class extends Vue {
         page: this.page.page,
         limit: this.page.limit
       }
-      listQuery.busiType !== 0 && (params.busiType = listQuery.busiType)
+      listQuery.busiType !== '' && (params.busiType = listQuery.busiType)
       listQuery.carType !== '' && (params.carType = listQuery.carType)
-      listQuery.isNewEnergy !== 0 && (params.isNewEnergy = listQuery.isNewEnergy)
+      listQuery.isNewEnergy !== '' && (params.isNewEnergy = listQuery.isNewEnergy)
       listQuery.driverId !== '' && (params.driverId = listQuery.driverId)
-      listQuery.heavyLifting !== 0 && (params.heavyLifting = listQuery.heavyLifting)
-      listQuery.expectStabilityTemporary !== 0 && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)
-      listQuery.expectAccountingPeriod !== 0 && (params.expectAccountingPeriod = listQuery.expectAccountingPeriod)
+      listQuery.heavyLifting !== '' && (params.heavyLifting = listQuery.heavyLifting)
+      listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)
+      listQuery.expectAccountingPeriod !== '' && (params.expectAccountingPeriod = listQuery.expectAccountingPeriod)
       if (listQuery.address.length > 1) {
         params.liveAddressProvince = listQuery.address[0]
         params.liveAddressCity = listQuery.address[1]
@@ -258,7 +257,39 @@ export default class extends Vue {
     async getLists() {
       try {
         this.listLoading = true
-        const params = this.dealParams(this.listQuery)
+        // const params = this.dealParams(this.listQuery)
+        const params = {
+          'busiType': '',
+          'carType': '',
+          'driverId': '',
+          'driverMatchManagerId': '',
+          'driverStatus': '',
+          'endDate': '',
+          'expectAccountingPeriod': '',
+          'expectStabilityTemporary': [
+
+          ],
+          'expectedFreightTripEnd': '',
+          'expectedFreightTripStart': '',
+          'heavyLifting': '',
+          'key': '',
+          'limit': 30,
+          'liveAddressCity': '',
+          'liveAddressCounty': '',
+          'liveAddressProvince': '',
+          'oilElectricityRequirement': '',
+          'page': 1,
+          'pageNumber': '',
+          'projectIds': [
+            {}
+          ],
+          'selectIds': [
+            {}
+          ],
+          'startDate': '',
+          'workHourEnd': '',
+          'workHourStart': ''
+        }
         let { data: res } = await matchDriverInfo(params)
         if (res.success) {
           this.tableData = res.data
