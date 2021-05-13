@@ -179,7 +179,7 @@ export function updateDriverWorkCityByDriverId(data:any) {
 // 批量修改司撮
 export function updateDriverDmBatch(data:any) {
   return request({
-    url: `${prefix}/v2/driver/updateDriverDmBatch`,
+    url: `driver/v2/driver/updateDriverDmBatch`,
     method: 'post',
     data
   })
