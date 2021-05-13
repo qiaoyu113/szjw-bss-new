@@ -59,7 +59,7 @@ export const GetstartCustInviteCity = () =>
 // 获取客邀列表
 export function getInvitedLines(data:any) {
   return request({
-    url: `${prefix}/v1/matchLineInfo/queryInvitedLines`,
+    url: `/match_center/v1/matchLineInfo/queryInvitedLines`,
     method: 'post',
     data
   })
@@ -74,7 +74,7 @@ export const getLineInfo = (params:any) =>
 // 获取线路suggest列表
 export function getLineSearch(data:any) {
   return request({
-    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    url: `/line_center/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })
@@ -116,7 +116,7 @@ export function getLineListForSearch(data: any) {
 // 通过线路id和当前城市获取备注
 export function getLineRemarks(data:any) {
   return request({
-    url: `${prefix}/v1/matchCustInvite/queryRemarks`,
+    url: `/match/v1/matchCustInvite/queryRemarks`,
     method: 'post',
     data
   })
@@ -125,7 +125,7 @@ export function getLineRemarks(data:any) {
 // 取消试跑意向
 export function cancelIntention(data:any) {
   return request({
-    url: `waybill/v2/runtest/intention/cancel`,
+    url: `/waybill/v2/runtest/intention/cancel`,
     method: 'post',
     data
   })
