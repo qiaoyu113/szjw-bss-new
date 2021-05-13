@@ -176,7 +176,7 @@
         <template slot-scope="{row}">
           <p class="text">
             期望货品:
-            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ row.intentCargoTypeName }}</span>
+            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ (row.intentCargoTypeName || []).toString() }}</span>
           </p>
           <p class="text">
             期望装卸难度:
