@@ -12,7 +12,7 @@
     >
       <el-table-column
         label="基础信息"
-        min-width="190"
+        min-width="210"
         align="center"
         class-name="firstColumn"
       >
@@ -38,25 +38,20 @@
                 @show="handleHoverRemark(scope.row)"
               >
                 <div class="text1">
-                  <template v-if="scope.row.remark">
+                  <template>
                     {{ scope.row.remark }}
                   </template>
-                  <template v-else>
-                    <i class="el-icon-loading" />
-                    <span class="loading-left">
-                      加载中...
-                    </span>
-                  </template>
                 </div>
-                <i
-                  v-if="scope.row.isHot"
-                  slot="reference"
-                  class="el-icon-chat-dot-round"
-                />
+                <div>
+                  <i
+                    slot="reference"
+                    class="el-icon-chat-dot-round"
+                  />
+                </div>
               </el-popover>
             </p>
             <p :class="obj.lineSaleName === scope.row.lineSaleName ? 'blue text' : 'text'">
-              ({{ scope.row.lineSaleName }})
+              {{ scope.row.lineSaleName | DataIsNull }}
             </p>
             <p
               :class="obj.lineId === scope.row.lineId ? 'blue text' : 'text'"
@@ -83,7 +78,7 @@
           <p
             class="text"
           >
-            <span :class="isShowPercent && obj.carType === row.carType ? 'blue' : ''">{{ row.carTypeValue }}</span>/<span :class="isShowPercent && ((obj.oilElectricityRequirement === row.oilElectricityRequirement) || Number(row.oilElectricityRequirement) === 3) ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
+            <span :class="isShowPercent && obj.carType === row.carType ? 'blue' : ''">{{ row.carTypeValue | DataIsNull }}</span>/<span :class="isShowPercent && ((obj.oilElectricityRequirement === row.oilElectricityRequirement) || Number(row.oilElectricityRequirement) === 3) ? 'blue' : ''">{{ row.oilElectricityRequirementValue }}</span>
           </p>
           <p
             class="text"
@@ -101,12 +96,12 @@
           <p
             class="text"
           >
-            仓库位置:<span :class="isShowPercent && obj.warehouseCityCode === row.warehouseCityCode ? 'blue' : ''">{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}</span>
+            仓库位置:<span :class="isShowPercent && obj.warehouseCityCode === row.warehouseCity ? 'blue' : ''">{{ row.warehouseProvinceValue }}-{{ row.warehouseCityValue }}-{{ row.warehouseCountyValue }}</span>
           </p>
           <p
             class="text"
           >
-            配送区域:<span :class="isShowPercent && obj.cityAreaCode === row.cityAreaCode ? 'blue' : ''">{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}</span>
+            配送区域:<span :class="isShowPercent && obj.cityAreaCode === row.cityArea ? 'blue' : ''">{{ row.provinceAreaValue }}-{{ row.cityAreaValue }}-{{ row.countyAreaValue || '全区域' }}</span>
           </p>
         </template>
       </el-table-column>
@@ -140,22 +135,22 @@
           <p
             class="text"
           >
-            货品:<span :class="isShowPercent && row.cargoTypeHit ? 'blue' : ''">{{ row.cargoTypeValue }}</span>
+            货品:<span :class="isShowPercent && row.cargoTypeHit ? 'blue' : ''">{{ row.cargoTypeValue | DataIsNull }}</span>
           </p>
           <p class="text">
-            装卸难度:<span :class="isShowPercent && row.handlingDifficultyHit ? 'blue' : ''">{{ row.handlingDifficultyValue }}</span>
+            装卸难度:<span :class="isShowPercent && row.handlingDifficultyHit ? 'blue' : ''">{{ row.handlingDifficultyValue | DataIsNull }}</span>
           </p>
           <p
             class="text"
           >
-            配送复杂度:<span :class="isShowPercent && row.distributionWayHit ? 'blue' : ''">{{ row.distributionWayValue }}</span>
+            配送复杂度:<span :class="isShowPercent && row.distributionWayHit ? 'blue' : ''">{{ row.distributionWayValue | DataIsNull }}</span>
           </p>
           <p
             class="text"
           >
             工作时间段:<template v-if="row.workingHours&&row.workingHours.length >1">
               <span :class="isShowPercent && row.workingHoursHit ? 'blue':''">
-                {{ row.workingHours[0] }}~{{ row.workingHours[1] }}
+                {{ row.workingHours[0] }}~{{ row.workingHours[row.workingHours.length -1] }}
               </span>
             </template>/
             <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
@@ -345,9 +340,8 @@ export default class extends Vue {
   private obj:IState = {}
   // 计算窗口期
   private _calcDay(row:IState) {
-    let day = Number(row.recruitWindowPeriod)
-    if (row.lineCreateDate && day) {
-      return parseInt((new Date(row.lineCreateDate).getTime() + day * 3600 * 24 * 1000 - Date.now()) / (3600 * 24 * 1000) + '')
+    if (row.waitDirveValidity) {
+      return parseInt((new Date(row.waitDirveValidity).getTime() - Date.now()) / (3600 * 24 * 1000) + '')
     } else {
       return 0
     }
@@ -403,13 +397,15 @@ export default class extends Vue {
   // 获取线路备注
   async getLineRemark(row:IState) {
     try {
+      this.$set(row, 'remark', '正在加载中....')
       let params:IState = {
         lineId: row.lineId,
         city: row.currentCityCode
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {
-        this.$set(row, 'remark', res.data.remarks)
+        let remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        this.$set(row, 'remark', remarks)
       } else {
         this.$message.error(res.errorMsg)
       }

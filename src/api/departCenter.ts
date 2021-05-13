@@ -2,6 +2,7 @@ import request from '@/utils/request'
 const base = '/base_center'
 const departCenter = `match`
 const prefix = `/mock/283`
+const prefix1 = `/match`
 
 const departfix = 'match_center'
 
@@ -58,7 +59,7 @@ export const GetstartCustInviteCity = () =>
 // 获取客邀列表
 export function getInvitedLines(data:any) {
   return request({
-    url: `${prefix}/v1/matchLineInfo/queryInvitedLines`,
+    url: `/match_center/v1/matchLineInfo/queryInvitedLines`,
     method: 'post',
     data
   })
@@ -73,7 +74,7 @@ export const getLineInfo = (data:any) =>
 // 获取线路suggest列表
 export function getLineSearch(data:any) {
   return request({
-    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    url: `/line_center/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })
@@ -115,7 +116,7 @@ export function getLineListForSearch(data: any) {
 // 通过线路id和当前城市获取备注
 export function getLineRemarks(data:any) {
   return request({
-    url: `${prefix}/v1/matchCustInvite/queryRemarks`,
+    url: `/match/v1/matchCustInvite/queryRemarks`,
     method: 'post',
     data
   })
@@ -124,7 +125,7 @@ export function getLineRemarks(data:any) {
 // 取消试跑意向
 export function cancelIntention(data:any) {
   return request({
-    url: `waybill/v2/runtest/intention/cancel`,
+    url: `/waybill/v2/runtest/intention/cancel`,
     method: 'post',
     data
   })
@@ -136,6 +137,49 @@ export function unfoldDriverInfo(params:any) {
   return request({
     url: `${prefix}/v1/customerInviteDrawer/driverInfo/${params}`,
     method: 'get'
+  })
+}
+
+// 获取弹框司机详情-外呼记录
+export function getCallDetail(data:any) {
+  return request({
+    url: `${prefix1}/v1/outboundCall/getListByBusinessId`,
+    method: 'post',
+    data
+  })
+}
+// 获取弹框司机详情-试跑信息
+export function getRunDetail(data:any) {
+  return request({
+    url: `/waybill/v2/runtest/getRunTestInfoByDriverId`,
+    method: 'post',
+    data
+  })
+}
+// 获取弹框司机详情-司机标签
+export function getDriverDetail(params:any) {
+  return request({
+    url: `${prefix1}/v1/matchDriverLabelInfo/getDriverLabelByDriverId`,
+    method: 'get',
+    params
+  })
+}
+// 获取弹框司机详情-基础信息
+export function getBasicDetail(params:any) {
+  return request({
+    url: `${prefix1}/v1/matchDriverInfo/getDriverMatchByDriverId`,
+    method: 'get',
+    params
+  })
+}
+
+// 司推【抽屉】-展开司机详情
+
+export function getDriverInfoByDriverId(params:any) {
+  return request({
+    url: `${departCenter}/v1/matchDriverInfo/getDriverInfoByDriverId`,
+    method: 'get',
+    params
   })
 }
 
@@ -169,8 +213,34 @@ export function updateDriverWorkCityByDriverId(data:any) {
 // 批量修改司撮
 export function updateDriverDmBatch(data:any) {
   return request({
-    url: `${prefix}/v2/driver/updateDriverDmBatch`,
+    url: `driver/v2/driver/updateDriverDmBatch`,
     method: 'post',
     data
   })
 }
+/**
+ * 给司机打标签-查询接口
+ */
+export const searchMatchDriverInfo = (driverId: any) =>
+  request({
+    url: `${departfix}/v1/matchDriverLabel/getMatchDriverLabel/${driverId}`,
+    method: 'get'
+  })
+/**
+* 给司机打标签-保存接口
+*/
+export const updateDriverTag = (data:any) =>
+  request({
+    url: `${departfix}/v1/matchDriverLabel/updateMatchDriverLabel`,
+    method: 'post',
+    data
+  })
+/**
+* 司机匹配线路查询接口
+*/
+export const queryMatchDriverForMatchLine = (data: any) =>
+  request({
+    url: `${departfix}/v1/customerInviteDrawer/queryMatchDriver`,
+    method: 'post',
+    data
+  })

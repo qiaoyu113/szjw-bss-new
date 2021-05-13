@@ -119,11 +119,11 @@ export default class extends Vue {
           return this.$message.warning('请选择客邀城市')
         }
         let { data: res } = await CreateLaunchGuests(params)
-        if (res.success) {
+        if (res.data.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-        // this.$message.error(res.errorMsg)
+          this.$message.error(res.data.errorMsg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
@@ -158,11 +158,11 @@ export default class extends Vue {
         //   return this.$message.warning('请选择客邀城市')
         // }
         let { data: res } = await CreateLaunchGuestsBatch(params)
-        if (res.success) {
+        if (res.data.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-        // this.$message.error(res.errorMsg)
+          this.$message.error(res.data.Msg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
