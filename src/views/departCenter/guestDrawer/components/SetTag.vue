@@ -132,7 +132,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityData, getProvinceList, getProviceCityAndCountry } from '../../js/index'
-import { searchMatchDriverInfo, updateDriverTag } from '@/api/drawer-guest'
+import { searchMatchDriverInfo, updateDriverTag } from '@/api/departCenter'
 interface IState {
   [key: string]: any;
 }
@@ -145,7 +145,7 @@ var _this:any = {}
   }
 })
 export default class extends Vue {
-  @Prop({ default: 'BJS201912281010' }) driverId!:''
+  @Prop({ default: '' }) driverId!:''
   private isShow : boolean = false // 抽屉显示隐藏
   private countyOptions:IState[] = []
   private cancelOptions:IState[] = [] // 取消原因
@@ -521,6 +521,8 @@ export default class extends Vue {
     let { data: res } = await searchMatchDriverInfo(this.driverId)
     if (res.success) {
       console.log(res)
+      this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
+      this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
       this.listQuery.heavyLifting = res.data.heavyLifting
       this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
       this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
@@ -534,10 +536,27 @@ export default class extends Vue {
       this.listQuery.driverSituation = res.data.driverSituation
       this.listQuery.remarks = [res.data.remarks]
       this.listQuery.manuallyRemarks = res.data.manuallyRemarks
-      if (res.data.hasIncomeOutside) {
-        this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
-        this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
+      if (res.data.canBreakingNodriving) {
+        this.$nextTick(() => {
+          this.listQuery.prohibitionAddress = [res.data.breakingNodrivingProvince, res.data.breakingNodrivingCity] // 禁行省市
+          this.listQuery.breakingNodrivingCounty = res.data.breakingNodrivingCounty // 可跑禁行区域-区县
+          this.getCountryData('prohibitionAddress', 2, true)
+        })
       }
+      if (res.data.canBreakingTrafficRestriction) {
+        this.$nextTick(() => {
+          this.listQuery.prohibitionRegion = [res.data.breakingTrafficRestrictionProvince, res.data.breakingTrafficRestrictionCity] // 限行省市
+          this.listQuery.breakingTrafficRestrictionCounty = res.data.breakingTrafficRestrictionCounty // 可跑限行区域-区县 */
+          this.getCountryData('prohibitionRegion', 5, true)
+        })
+      }
+      if (res.data.hasIncomeOutside) {
+        this.$nextTick(() => {
+          this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
+          this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
+        })
+      }
+      console.log(this.listQuery)
     } else {
       this.$message.error(res.errorMsg)
     }
@@ -575,18 +594,22 @@ export default class extends Vue {
     this.listQuery.prohibitionRegion = ''
     this.listQuery.start = ''
     this.listQuery.delivery = ''
-    this.listQuery.driverSituation = []
+    this.listQuery.driverSituation = null
+    this.listQuery.remarks = [] // 司机备注
+    this.listQuery.manuallyRemarks = ''
     this.isShow = false
   }
-  private getCountryData(key:string, index:number) {
+  private getCountryData(key:string, index:number, reset:boolean) {
     setTimeout(async() => {
       if (!this.listQuery[key]) return false
       console.log(this.listQuery[key])
       let res:any = await getProvinceList(['100000', ...this.listQuery[key]])
-      if (key === 'prohibitionAddress') {
-        this.listQuery.breakingNodrivingCounty = []
-      } else {
-        this.listQuery.breakingTrafficRestrictionCounty = []
+      if (!reset) {
+        if (key === 'prohibitionAddress') {
+          this.listQuery.breakingNodrivingCounty = []
+        } else {
+          this.listQuery.breakingTrafficRestrictionCounty = []
+        }
       }
       this.$set(this.formItem[index], 'options', res)
     }, 10)
@@ -636,8 +659,8 @@ export default class extends Vue {
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
       expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
       expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
-      deliveryDifficulty: this.listQuery.deliveryDifficulty > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
-      deliveryDifficultyNames: this.listQuery.deliveryDifficulty,
+      deliveryDifficulty: this.listQuery.deliveryDifficulty,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
       expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
       expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
         return item.value === this.listQuery.expectAccountingPeriod
@@ -648,6 +671,7 @@ export default class extends Vue {
       })[0].label : null
     }
     let params = { ...this.listQuery }
+    params.driverId = this.driverId
     params.startPointStartTime = params.startPointStartTime ? parseInt((params.startPointStartTime.split(':')[0])) : null
     params.startPointEndTime = params.startPointEndTime ? parseInt((params.startPointEndTime.split(':')[0])) : null
     params.deliveryPointStartTime = params.deliveryPointStartTime ? parseInt((params.deliveryPointStartTime.split(':')[0])) : null

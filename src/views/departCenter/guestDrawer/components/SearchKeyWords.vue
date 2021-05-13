@@ -154,23 +154,21 @@ export default class SearchKeyWords extends Vue {
   private cycleOptions: IState[] = [
     { label: '全部', value: '' }
   ];
-  private lineList: any = [
-    { label: '司机1', value: 'line1' },
-    { label: '司机2', value: 'line2' }
-  ]
   private timeLists:IState[] = []
   private listQuery:IState = {
     busiType: null, // 所属业务线
-    carType: null, // 车类型
+    carType: null, // 司机车型
     handlingDifficulty: null, // 装卸接受度
-    settlementCycle: null, // 结算周期
+    settlementCycle: null, // 期望结算周期
     lineCategory: null, // 期望稳定/临时
     cargoType: null, // 期望货品类型
     distributionWay: null, // 期望配送难度
     start: null,
     end: null,
+    everyTripGuaranteedEnd: '',
+    everyTripGuaranteedStart: '',
     address: null,
-    driverInfo: null
+    driverInfo: ''
   }
   private formItem:any[] = [
     {
@@ -212,7 +210,7 @@ export default class SearchKeyWords extends Vue {
   private selectList: IState[] = [
     {
       options: [{
-        value: '2',
+        value: 2,
         label: '全部'
       }, {
         value: 1,
@@ -269,10 +267,10 @@ export default class SearchKeyWords extends Vue {
         value: '',
         label: '全部'
       }, {
-        value: '1',
+        value: 1,
         label: '整车'
       }, {
-        value: '2',
+        value: 2,
         label: '多点配'
       }],
       multiple: false,
@@ -292,6 +290,18 @@ export default class SearchKeyWords extends Vue {
   ]
   handleClearAll() {
     this.selectedData = []
+    this.listQuery.busiType = null // 所属业务线
+    this.listQuery.carType = null // 车类型
+    this.listQuery.handlingDifficulty = null // 装卸接受度
+    this.listQuery.settlementCycle = null // 结算周期
+    this.listQuery.lineCategory = null // 期望稳定/临时
+    this.listQuery.cargoType = null // 期望货品类型
+    this.listQuery.distributionWay = null // 期望配送难度
+    this.listQuery.workingHours = null
+    this.listQuery.everyTripGuaranteedEnd = ''
+    this.listQuery.everyTripGuaranteedStart = ''
+    this.listQuery.address = null
+    this.listQuery.driverInfo = ''
     this.$emit('on-clear')
   }
   handleChange(item:any) {
@@ -352,7 +362,6 @@ export default class SearchKeyWords extends Vue {
           this.listQuery[this.key] = this.selectedData[index].optionIds
           isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('~'))
         }
-        console.log(this.selectedData)
       } else {
         this.initSelectItem(id, command)
       }
@@ -536,16 +545,17 @@ export default class SearchKeyWords extends Vue {
     }
     if (shareArr.indexOf(data.labelTypeValue) > -1) {
       this.selectedData = []
-      busiType.optionIds.push('0')
+      busiType.optionIds.push(0)
       busiType.selected.push('共享')
       this.selectedData.push(busiType)
     }
     if (specialArr.indexOf(data.labelTypeValue) > -1) {
-      busiType.optionIds.push('1')
+      busiType.optionIds.push(1)
       busiType.selected.push('专车')
       this.selectedData = []
       this.selectedData.push(busiType)
     }
+    this.listQuery['busiType'] = busiType.optionIds
   }
   // 回显货品类型
   getCargoType(data:any) {
@@ -556,6 +566,7 @@ export default class SearchKeyWords extends Vue {
       type: '货品类型'
     }
     this.selectedData.push(cargoType)
+    this.listQuery['cargoType'] = cargoType.optionIds
   }
   // 回显装卸难度
   getHandlingDifficulty(data:any) {
@@ -566,6 +577,7 @@ export default class SearchKeyWords extends Vue {
       type: '装卸难度'
     }
     this.selectedData.push(handlingDifficulty)
+    this.listQuery['handlingDifficulty'] = handlingDifficulty.optionIds
   }
   // 回显配送车型
   getCarType(data:any) {
@@ -576,6 +588,7 @@ export default class SearchKeyWords extends Vue {
       type: '配送车型'
     }
     this.selectedData.push(carType)
+    this.listQuery['carType'] = carType.optionIds
   }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
@@ -595,6 +608,7 @@ export default class SearchKeyWords extends Vue {
     this.getHandlingDifficulty(this.rowData)
     this.getCarType(this.rowData)
     this.initSelectItem(`${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, `${this.rowData.workingHours[0]}~${this.rowData.workingHours[1]}`, true)
+    this.$emit('on-search', this.listQuery)
   }
   mounted() {
     this.getOptions()

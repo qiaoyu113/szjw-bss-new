@@ -7,6 +7,7 @@
     <Scroll
       :on-reach-bottom="loadMoreHandle"
       :stop-slide="disabled"
+      :is-lock="isLock"
       :distance-to-edge="20"
     >
       <!-- 撮合线路 -->
@@ -23,6 +24,7 @@
       <MatchDriver
         ref="matchDriver"
         @on-end="disabled=true"
+        @on-lock="isLock=true"
       />
     </Scroll>
   </DrawerModel>
@@ -53,6 +55,7 @@ export default class GuestDrawer extends Vue {
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
   private disabled: boolean = false
+  private isLock: boolean = false
   private lineTableData:IState[] = [] // 线路列表
   $eventBus: any
   @Watch('value')
@@ -75,8 +78,7 @@ export default class GuestDrawer extends Vue {
     setTimeout(() => {
       (this.$refs.lineDrawer as any).getStorage();
       ((this.$refs.matchDriver as any).$refs.tableDriver as any).getLineInfoFromStorage();
-      ((this.$refs.matchDriver as any).$refs.searchKeyWords as any).initData();
-      (this.$refs.matchDriver as any).initData()
+      ((this.$refs.matchDriver as any).$refs.searchKeyWords as any).initData()
     }, 20)
   }
   loadMoreHandle() {
@@ -92,10 +94,6 @@ export default class GuestDrawer extends Vue {
   width: 100%;
   height: 100%;
   overflow: auto;
-  /* ::v-deep .el-drawer{
-    overflow: initial;
-    background: #e6e9f0;
-  } */
 }
 .departLine{
   padding: 1px 30px 20px;
