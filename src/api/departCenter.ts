@@ -5,6 +5,7 @@ const prefix = `/mock/283`
 const prefix1 = `/match`
 
 const departfix = 'match_center'
+const lineCenter = 'line_center'
 
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
@@ -107,7 +108,7 @@ export function MatchLineListForDriver(data: any) {
 // 司推：线路ID/名称列表
 export function getLineListForSearch(data: any) {
   return request({
-    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    url: `${lineCenter}/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })

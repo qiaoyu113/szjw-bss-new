@@ -83,7 +83,6 @@ import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
-import { parse } from 'node_modules/path-to-regexp'
 
 const pageInfo = {
   limit: 30,
