@@ -432,7 +432,7 @@ export default class SearchKeyWords extends Vue {
     }
     if (driver.intentCargoType) {
       this.key = 'cargoType'
-      this.initSelectItem((driver.intentCargoType + '').split(','), driver.intentCargoTypeName.split(','))
+      this.initSelectItem(driver.intentCargoType || [], driver.intentCargoTypeName || [])
     }
     if ((driver.liveAddressCity && driver.liveAddressProvince) || process.env.NODE_ENV === 'development') {
       this.listQuery.repoLoc = [driver.liveAddressProvince || 430000, driver.liveAddressCity || 430100]
