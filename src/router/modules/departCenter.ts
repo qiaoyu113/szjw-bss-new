@@ -18,7 +18,7 @@ const departCenterRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/lineList/index.vue'),
       name: 'LineList',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/matchLineInfo/search/1',
         title: 'lineList',
         noCache: false
       }
