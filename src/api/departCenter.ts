@@ -10,7 +10,7 @@ const lineCenter = 'line_center'
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
-    url: `${prefix}/v2/runtest/creatIntentionRun`,
+    url: `/match/v2/runtest/creatIntentionRun`,
     method: 'post',
     data
   })
