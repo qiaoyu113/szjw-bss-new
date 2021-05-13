@@ -35,7 +35,7 @@ service.interceptors.response.use(
     if (res.errorCode) {
       res.message = res.errorMsg || '接口错误' + res.errorCode + ',请联系技术人员。'
     }
-    if (res.code === 401 || res.code === 402 || res.code === 406 || res.code === 407 || res.code === 408) {
+    if ([40101, 401, 402, 406, 407].includes(res.code)) {
       Message({
         message: res.message,
         type: 'error',

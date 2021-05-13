@@ -1,7 +1,6 @@
 
 <template>
   <div
-    ref="linebox"
     v-loading.body="listLoading"
     class="LineListBox"
     :class="{
@@ -41,6 +40,7 @@
         <el-button
           v-if="listQuery.customerStatus === '1'"
           type="primary"
+          :disabled="selection.length > 0 ? false :true"
           @click="batchLaunchGuest"
         >
           批量发起客邀
@@ -48,6 +48,7 @@
         <el-button
           v-if="listQuery.customerStatus === '2'"
           type="primary"
+          :disabled="selection.length > 0 ? false :true"
           @click="batchCancelGuest"
         >
           批量取消客邀
@@ -104,7 +105,7 @@
         ref="listTable"
         :list-query="listQuery"
         :is-show-percent="true"
-        :pageobj="page"
+        :obj="{}"
         @launchGuest="handleLaunchGuest($event)"
         @cancelGuest="handleCancelGuest($event)"
         @cancelTryRun="handleCancelTryRun($event)"
@@ -125,6 +126,7 @@
       :launch-arguments="launchArguments"
     />
     <cancel-guest
+      :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
     />
@@ -144,7 +146,7 @@ import SelfTable from '@/components/Base/SelfTable.vue'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import { GetDictionaryList } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../js/index'
-import { getLineSearch, GetcustInviteCitys } from '@/api/departCenter'
+import { getLineSearch, GetcustInviteCitys, getLineInfo } from '@/api/departCenter'
 import Btable from './components/Btable.vue'
 import LaunchGuest from './components/LaunchGuests.vue'
 import CancelGuest from './components/CancelGuest.vue'
@@ -154,7 +156,6 @@ import InputRange from '../chauffeurList/components/doubleInput.vue'
 import CancelTryRun from './components/CancelTryRun.vue'
 import { showWork } from '@/utils'
 import { cloneDeep } from 'lodash'
-import { clueGetCityGroup } from '@/api/clue'
 interface PageObj {
   page:number,
   limit:number,
@@ -185,12 +186,13 @@ export default class extends Vue {
   private loadDiffArr:IState[] = [{ label: '全部', value: '' }] // 装卸难度
   private cityList:IState[] = []; // 城市列表
   private timeLists:IState[] = []
+  private selection: any[] = [];
+  private rows: IState[] = []; // 弹框选中的数据
   private shareScopeEnd:IState[] = []
   private showDialog: boolean = false
   private tableData:any[] = []
-  private hashScrollTop:string = ''
   private ids = []
-  private tableScroll:string =''
+  private idss = []
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -390,11 +392,16 @@ export default class extends Vue {
   //   this.page.limit = page.limit
   // }
   // 分页
-  handlePageSizeChange(page:PageObj) {
-    this.page.page = page.page
-    this.page.limit = page.limit
-    console.log(this.page)
-    this.getList()
+  handlePageSizeChange(page:number, limit:number) {
+    if (page) {
+      this.page.page = page
+    }
+    if (limit) {
+      this.page.limit = limit
+    }
+    setTimeout(() => {
+      this.getList()
+    }, 20)
   }
   // 根据关键字查线路id
   async loadLineByKeyword(params:IState) {
@@ -449,25 +456,9 @@ export default class extends Vue {
   private async getList() {
     try {
       this.listLoading = true
-      // let params: IState = {
-      //   page: this.page.page,
-      //   limit: this.page.limit
-      // }
-      // if (this.listQuery.workCity && this.listQuery.workCity.length > 1) {
-      //   params.workCity = this.listQuery.workCity[1]
-      // }
-      // this.listQuery.carType !== '' && (params.carType = this.listQuery.carTpe)
-      // this.listQuery.lineFineness !== '' && (params.lineFineness = this.listQuery.lineFineness)
-      // this.listQuery.handlingDifficulty !== '' && (params.handlingDifficulty = this.listQuery.handlingDifficulty)
-      // this.listQuery.freightSection !== '' && (params.freightSection = this.listQuery.freightSection)
-      // this.listQuery.warehouseLocation !== '' && (params.warehouseLocation = this.listQuery.warehouseLocation)
-      // this.listQuery.distributionArea !== '' && (params.distributionArea = this.listQuery.distributionArea)
-      // this.listQuery.stabilityTemporary !== '' && (params.stabilityTemporary = this.listQuery.stabilityTemporary)
       setTimeout(() => {
         (this.$refs.listTable as any).getLists()
       }, 500)
-      // console.log('listQuery', this.listQuery)
-      // let { data: res } = await getLists(params)
     } catch (err) {
       console.log(`getlist fail:${err}`)
     } finally {
@@ -551,23 +542,32 @@ export default class extends Vue {
   private batchLaunchGuest() {
     (this.$refs.launchGuest as any).showDialog = true;
     (this.$refs.launchGuest as any).launchGuestState = 2
+    this.rows.push(...this.selection)
   }
   // 批量取消客邀
   private batchCancelGuest() {
     (this.$refs.cancelGuest as any).showDialog = true;
     (this.$refs.cancelGuest as any).cancelGuestState = 2
+    this.rows.push(...this.selection)
   }
   // 取消创建试跑意向
   handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
-    const { lineId, matchId, runTestId } = row
-    const cancelData = { lineId, matchId, runTestId, cancelRunTestOrigin: 1, type: 1, remark: '' }
+    const { lineId, matchId, matchStatus, runTestId, status } = row
+    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
     this.cancelData = cancelData
   }
   private checkOff(id:any) {
     this.ids = id.map((item:any) => {
-      return item.id
+      return {
+        lineId: item.lineId,
+        matchId: item.matchId
+      }
     })
+    this.idss = id.map((item:any) => {
+      return item.custInviteId
+    })
+    this.selection = id
   }
 
   // 控制客邀城市显示
@@ -587,22 +587,7 @@ export default class extends Vue {
 
   // 取消试跑成功后刷新列表
   ctrSuccessHandle() {
-    console.log('记录当前scrollTop', this.tableScroll)
-    this.hashScrollTop = this.tableScroll;
-    (this.$refs.cancelTryRun as any).showDialog = false;
-    (this.$refs.listTable as any).getLists().then(() => {
-      if ((this.$refs.lineboxas as any)['scrollTop']) {
-        (this.$refs.lineboxas as any)['scrollTop'] = this.hashScrollTop
-      }
-    })
-  }
-
-  handleScroll() {
-    (this.$refs.linebox as any)['addEventListener']('scroll', () => {
-      if ((this.$refs.lineboxas as any)['scrollTop']) {
-        this.tableScroll = (this.$refs.lineboxas as any)['scrollTop']
-      }
-    }, false)
+    (this.$refs.listTable as any).refreshList()
   }
   init() {
     this.cityDetail()
@@ -612,7 +597,6 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getList()
-    this.handleScroll()
   }
 }
 </script>

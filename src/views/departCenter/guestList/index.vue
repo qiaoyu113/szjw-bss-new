@@ -452,10 +452,6 @@ export default class extends Vue {
         this.listLoading = false
       }
     }
-    // 客邀状态变化
-    handleStatusChange(val:string|number) {
-      console.log('xxx:', val)
-    }
     // 分页
     handlePageSizeChange(page: PageObj) {
       if (page.page) {
