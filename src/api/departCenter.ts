@@ -5,11 +5,12 @@ const prefix = `/mock/283`
 const prefix1 = `/match`
 
 const departfix = 'match_center'
+const lineCenter = 'line_center'
 
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
-    url: `${prefix}/v2/runtest/creatIntentionRun`,
+    url: `/match/v2/runtest/creatIntentionRun`,
     method: 'post',
     data
   })
@@ -98,7 +99,7 @@ export function getLineDetail(params:any) {
 // 司推：司机匹配线路
 export function MatchLineListForDriver(data: any) {
   return request({
-    url: `${prefix}/v1/matchDriverInfo/queryMatchLineForMatchDriver`,
+    url: `${departfix}/v1/matchDriverInfo/queryMatchLineForMatchDriver`,
     method: 'post',
     data
   })
@@ -107,7 +108,7 @@ export function MatchLineListForDriver(data: any) {
 // 司推：线路ID/名称列表
 export function getLineListForSearch(data: any) {
   return request({
-    url: `${prefix}/v2/line/lineInfo/matchFuzzyCheck`,
+    url: `${lineCenter}/v2/line/lineInfo/matchFuzzyCheck`,
     method: 'post',
     data
   })

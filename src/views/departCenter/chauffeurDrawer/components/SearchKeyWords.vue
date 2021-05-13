@@ -65,7 +65,7 @@
         <div>&nbsp;&nbsp;&nbsp;</div>
         <el-select
           v-model="listQuery.keyWords"
-          placeholder="选择/搜索线路名称/编号"
+          placeholder="搜索/选择线路名称/编号"
           filterable
           remote
           clearable
@@ -376,6 +376,7 @@ export default class SearchKeyWords extends Vue {
       }
       this.listQuery.workRange = id
       this.selectedData.push(obj)
+      console.log(this.selectedData)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
       const title = (this.selectList.find((v: any) => v.key === this.key) || {}).title
@@ -420,7 +421,7 @@ export default class SearchKeyWords extends Vue {
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
     this.listQuery.driverId = driver.driverId || driver.id
     if ((driver.workHours || []).length) {
-      this.initSelectItem((driver.workHours || []).join(','), (driver.workHours || []).join(','), true)
+      this.initSelectItem(driver.workHoursStr, driver.workHoursStr, true)
     }
     if (driver.heavyLifting) {
       this.key = 'loadDifficulty'
@@ -443,7 +444,7 @@ export default class SearchKeyWords extends Vue {
   getLineListForSearch(input: string) {
     if (input) {
       this.isLoading = true
-      getLineListForSearch({ key: input, limit: 8, page: 1 }).then(res => {
+      getLineListForSearch({ key: input, limit: 20, page: 1 }).then(res => {
         const data = res.data || {}
         if (data.success) {
           this.lineList = data.data || []
