@@ -76,7 +76,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import Scroll from '@/components/Scroll/index.vue'
 import SearchKeyWords from './components/SearchKeyWords.vue'
 import DrawerModel from '@/components/DrawerModel/index.vue'
-import CreateTryRun from '../chauffeurList/components/CreateTryRun.vue'
+import CreateTryRun from '../guestList/components/CreateTryRun.vue'
 import AtableLine from '../guestList/components/Atable.vue'
 import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
@@ -187,29 +187,60 @@ export default class GuestDrawer extends Vue {
       this.rowData = params
     }
     onCreateTryRunSucc() {
+      (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
+      this.queryData()
     }
     onQuery(params: any) {
+      console.log('params', params)
       const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
+      const distInfo = this.composePCC(distLoc)
+      const repoInfo = this.composePCC(repoLoc)
+      // const workHours = workRange ? workRange.split(',')
       this.params = {
-        carTypeList: model,
-        cargoTypeList: cargoType,
-        // todo 省市区
-        expectAccountingPeriodList: clearCycle,
-        expectStabilityTemporaryList: stability,
-        expectedFreightTripStart: f1,
-        expectedFreightTripEnd: f2,
+        carTypeList: model || null,
+        cargoTypeList: cargoType || null,
+        expectAccountingPeriodList: clearCycle || null,
+        expectStabilityTemporaryList: stability || null,
+        expectedFreightTripStart: f1 || null,
+        expectedFreightTripEnd: f2 || null,
         heavyLiftingList: loadDifficulty,
-        deliveryDifficulty: deliverComplexity,
-        labelTypeList: lineQuality,
-        lineId: keyWords,
+        deliveryDifficulty: deliverComplexity || null,
+        labelTypeList: lineQuality || null,
+        lineId: keyWords || null,
         driverId,
+        liveAddressProvince: repoInfo.province,
+        liveAddressCityList: repoInfo.cities,
+        liveAddressCountyList: repoInfo.counties,
+        provinceArea: distInfo.province,
+        cityAreaList: distInfo.cities,
+        countyAreaList: distInfo.counties,
         workHours: workRange // todo confirm
       }
       this.queryData()
     }
+    // 组装省市区
+    composePCC(selections: any) {
+      if (!Array.isArray(selections[0])) {
+        selections = [selections]
+      }
+      const province = (selections[0] || [])[0] || ''
+      const cities: any = []
+      const counties: any = []
+      selections.forEach((sel: any) => {
+        if (sel[1] && !cities.includes(sel[1])) {
+          cities.push(sel[1])
+        }
+        if (sel[2] && !counties.includes(sel[2])) {
+          counties.push(sel[2])
+        }
+      })
+      return { province, cities, counties }
+    }
     loadMoreHandle() {
-      this.queryData(true)
+      if (this.lineTableData.length < this.total) {
+        this.queryData(true)
+      }
     }
     queryData(append?: boolean) {
       if (append) {
@@ -217,7 +248,8 @@ export default class GuestDrawer extends Vue {
       } else {
         this.pageInfo = { ...pageInfo }
       }
-      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      // MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      MatchLineListForDriver(Object.assign({}, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
           this.lineTableData = append ? this.lineTableData.concat(res.data || []) : (res.data || [])

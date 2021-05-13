@@ -152,7 +152,7 @@
                 {{ row.workingTime }}
               </span>
             </template>/
-            <span :class="isShowPercent && obj.lineCategory.includes(row.lineCategory) ? 'blue':''">
+            <span :class="isShowPercent && (obj.lineCategory || []).includes(row.lineCategory) ? 'blue':''">
               <template v-if="row.lineCategory ===1">
                 稳定/{{ row.stabilityRate }}
               </template>
