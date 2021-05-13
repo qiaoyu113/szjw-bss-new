@@ -83,6 +83,7 @@ import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
+import { parse } from 'node_modules/path-to-regexp'
 
 const pageInfo = {
   limit: 30,
@@ -107,6 +108,7 @@ const pageInfo = {
 export default class GuestDrawer extends Vue {
     @Prop({ default: false }) private value !: boolean
     private visible : boolean = false // 抽屉显示隐藏
+    private driver: any = {}
     private driverId: string = ''
     private tagShow:boolean = false
     private pageSize:number = 1
@@ -167,15 +169,22 @@ export default class GuestDrawer extends Vue {
     handleOpenClick() {
       AppModule.CloseSideBar(false)
       setTimeout(() => {
-        this.driverId = JSON.parse(sessionStorage.getItem('driver_row') || '{}').driverId || ''
+        this.driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
+        this.driverId = this.driver.driverId || ''
         ;(this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
         ;(this.$refs.searchKeyWords as any).initQuery()
       }, 20)
     }
     onCreateTryRun(data:any) {
-      (this.$refs.tryRunShow as any).showDialog = true
-      this.rowData = data
+      const params = Object.assign({}, data, this.driver, {
+        name: this.driver.driverName || '',
+        phone: this.driver.driverPhone || '',
+        // dutyManagerId: data.lineSaleId,
+        matchType: 1 // 司推。客邀2
+      })
+      ;(this.$refs.tryRunShow as any).showDialog = true
+      this.rowData = params
     }
     onQuery(params: any) {
       console.log(params)
