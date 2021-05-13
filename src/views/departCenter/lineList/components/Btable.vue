@@ -280,6 +280,7 @@
             >
               <!-- 本城客邀撮合成功时显示 -->
               <el-button
+                v-permission="['/v2/runtest/intention/cancel']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelTryRun(row)"
