@@ -102,7 +102,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import SelfTable from '@/components/Base/SelfTable.vue'
 import { SettingsModule } from '@/store/modules/settings'
 import { HandlePages, phoneReg, lock } from '@/utils/index'
-import { getFinishedLine } from '@/api/line-shelf'
+import { getFinishedLine, getLineSale } from '@/api/line-shelf'
 interface IState {
   [key: string]: any;
 }
@@ -132,6 +132,8 @@ export default class extends Vue {
       lineName: '', // 线路名称
       agencyTime: [],
       result: '',
+      lineSale: '',
+      lineCity: '',
       checkStatus: '',
       checkStatus1: '' //  冗余线路检查按钮状态
 
@@ -171,6 +173,8 @@ export default class extends Vue {
         }
 
         this.listQuery.agentId !== '' && (params.agentId = this.listQuery.agentId)
+        this.listQuery.lineSale !== '' && (params.lineSaleId = this.listQuery.lineSale)
+        this.listQuery.lineCity !== '' && (params.city = this.listQuery.lineCity)
         this.listQuery.lineName !== '' && (params.key = this.listQuery.lineName)
         this.listQuery.checkStatus !== '' && (params.inspectionStatus = this.listQuery.checkStatus)
         this.listQuery.result !== '' && (params.rejectionReasons = this.listQuery.result)
@@ -190,6 +194,7 @@ export default class extends Vue {
         console.log(`get lists fail:`, err)
       }
     }
+
     // 页数更改
     handlePageSize(page: any) {
       this.page.page = page.page

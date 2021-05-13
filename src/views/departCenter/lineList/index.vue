@@ -100,7 +100,7 @@
       class="table_box"
     >
       <div class="middle">
-        <span>筛选结果：{{ 111 }}条</span>
+        <span>筛选结果：{{ total }}条</span>
       </div>
       <Btable
         ref="listTable"
@@ -198,6 +198,7 @@ export default class extends Vue {
   private idss = []
   private tableScroll:string =''
   private hashScrollTop:string = ''
+  private total:string = ''
   private listQuery:IState = {
     workCity: [],
     carType: '',

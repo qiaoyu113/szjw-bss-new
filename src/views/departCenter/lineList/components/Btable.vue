@@ -36,10 +36,10 @@
                   placement="right"
                   min-width="200"
                   trigger="hover"
-                  @mouseover="showMarkHandle({lineId: row.lineId,city: row.currentCity})"
+                  @show="showMarkHandle({lineId: row.lineId,city: row.currentCity||249})"
                 >
                   <div class="text1">
-                    {{ row.inviteMark }}
+                    {{ remarks }}
                   </div>
                   <i
                     slot="reference"
@@ -359,8 +359,8 @@ export default class extends Vue {
       let params = { ...this.listQuery, ...this.pageobj }
       console.log('params', params)
       let { data: res } = await getLineInfo(params)
-      this.tableData = res.data
-      console.log('tableData', res.data, this.tableData)
+      this.tableData = res.data;
+      (this.$parent as any).total = res.page.total
     } catch (err) {
       console.log('err', err)
     } finally {
@@ -414,6 +414,9 @@ export default class extends Vue {
   }
   async getRemarks(params:any) {
     let { data: res } = await getLineRemarks(params)
+    if (res.success) {
+      this.remarks = res.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
+    }
     console.log(res)
   }
 
