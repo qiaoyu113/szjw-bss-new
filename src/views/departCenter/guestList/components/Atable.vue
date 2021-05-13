@@ -234,7 +234,10 @@
         align="center"
       >
         <template slot-scope="{row}">
-          <p class="text">
+          <p
+            v-permission="['/v1/customerInviteDrawer/queryMatchDriver']"
+            class="text"
+          >
             <el-button
               v-if="!isMore"
               type="text"
@@ -244,7 +247,11 @@
               匹配撮合
             </el-button>
           </p>
-          <p class="text">
+
+          <p
+            v-permission="['/v2/runtest/creatIntentionRun']"
+            class="text"
+          >
             <el-button
               v-if="isShowPercent"
               type="text"
@@ -264,17 +271,20 @@
               查看线路详情
             </el-button>
           </p>
-          <p
-            v-if="isMore"
-            class="text"
-          >
-            <el-button
-              size="mini"
-              @click.stop="toogleExpand(row)"
+
+          <template v-if="isMore">
+            <p
+              v-permission="['/v1/driver/invitation/line/detail']"
+              class="text"
             >
-              {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
-            </el-button>
-          </p>
+              <el-button
+                size="mini"
+                @click.stop="toogleExpand(row)"
+              >
+                {{ row.isOpen ? '收起':'展开' }}详情<i :class="row.isOpen ?'el-icon-arrow-up':'el-icon-arrow-down'" />
+              </el-button>
+            </p>
+          </template>
         </template>
       </el-table-column>
       <el-table-column

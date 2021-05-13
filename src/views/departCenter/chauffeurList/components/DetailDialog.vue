@@ -14,6 +14,7 @@
           @tab-click="handleClick"
         >
           <el-tab-pane
+            v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId']"
             label="基础信息"
             name="first"
           >
@@ -30,6 +31,7 @@
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/matchDriverLabelInfo/getDriverLabelByDriverId']"
             label="司机标签"
             name="second"
           >
@@ -57,6 +59,7 @@
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v2/runtest/getRunTestInfoByDriverId']"
             label="试跑信息"
             name="third"
           >
@@ -75,6 +78,7 @@
             </SelfTable>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/outboundCall/getListByBusinessId']"
             label="外呼记录"
             name="fourth"
           >

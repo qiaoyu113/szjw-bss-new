@@ -9,7 +9,7 @@ const departCenterRouter: RouteConfig = {
   meta: {
     title: 'depart',
     icon: 'depart',
-    apiUrl: 'root',
+    apiUrl: ['/v1/matchLineInfo/search', '/v1/matchLineInfo/queryInvitedLines', '/v1/matchDriverInfo/list'],
     alwaysShow: true
   },
   children: [
@@ -18,7 +18,7 @@ const departCenterRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/lineList/index.vue'),
       name: 'LineList',
       meta: {
-        apiUrl: '/v1/matchLineInfo/search/1',
+        apiUrl: '/v1/matchLineInfo/search',
         title: 'lineList',
         noCache: false
       }
@@ -38,7 +38,7 @@ const departCenterRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/chauffeurList/index.vue'),
       name: 'ChauffeurList',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/matchDriverInfo/list',
         title: 'chauffeurList',
         noCache: false
       }
