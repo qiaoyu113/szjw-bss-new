@@ -47,8 +47,8 @@
               </template>
 
               <template slot="startArea">
-                <span class="area">{{ listQuery.startingPointProvinceName }}-{{ listQuery.startingPointCityName }}-{{ listQuery.startingPointCountyName }}</span>
-                <span>{{ listQuery.startingPointStartTime }}-{{ listQuery.startingPointEndTime }}</span>
+                <span class="area">{{ listQuery.startPointProvinceName }}-{{ listQuery.startPointCityName }}-{{ listQuery.startPointCountyName }}</span>
+                <span>{{ listQuery.startPointStartTime }}-{{ listQuery.startPointEndTime }}</span>
               </template>
               <template slot="lineArea">
                 <span class="area">{{ listQuery.deliveryPointProvinceName }}-{{ listQuery.deliveryPointCityName }}-{{ listQuery.deliveryPointCountyName }}</span>
@@ -144,7 +144,7 @@ export default class extends Vue {
     age: '', // 年龄
     statusName: '', // 状态
     orderId: '', // 订单编号
-    contractState: '', // 合同状态
+    contractStatusName: '', // 合同状态
     behaviorArea: '', // 可闯禁行区域
     breakingNodrivingProvinceName: '',
     breakingNodrivingCityName: '',
@@ -159,7 +159,10 @@ export default class extends Vue {
     startArea: '', // 起始点
     lineArea: '', // 配送点
     driverSituation: '', // 司机情况
-    remak: '' // 备注
+    remarksName: '', // 备注
+    liveProvinceName: '',
+    liveCityName: '',
+    liveCountyName: ''
   };
   private formItem: any[] = [
     {
@@ -272,7 +275,7 @@ export default class extends Vue {
     {
       type: 7,
       key: 'expectIncomeTrip',
-      label: '期望运费',
+      label: '期望运费（趟）',
       col: 24
     },
     {
@@ -309,7 +312,7 @@ export default class extends Vue {
     },
     {
       type: 7,
-      key: 'manuallyRemarks',
+      key: 'remarksName',
       label: '备注',
       col: 24
     }
@@ -362,7 +365,7 @@ export default class extends Vue {
      {
        type: 7,
        key: 'expectIncomeTrip',
-       label: '期望运费',
+       label: '期望运费（趟）',
        col: 24
      },
      {
@@ -399,7 +402,7 @@ export default class extends Vue {
      },
      {
        type: 7,
-       key: 'manuallyRemarks',
+       key: 'remarksName',
        label: '备注',
        col: 24
      }
@@ -510,11 +513,15 @@ export default class extends Vue {
   getData(index:string) {
     this.page.page = 1
     this.page.limit = 10
-    console.log(index, 'get')
-    this.getCallRecord()
-    this.getRunInfor()
-    this.getBasicsInfor()
-    this.getDriverLabel()
+    if (index === 'first') {
+      this.getBasicsInfor()
+    } else if (index === 'second') {
+      this.getDriverLabel()
+    } else if (index === 'third') {
+      this.getRunInfor()
+    } else if (index === 'fourth') {
+      this.getCallRecord()
+    }
   }
   // 外呼记录
   async getCallRecord() {
@@ -522,7 +529,9 @@ export default class extends Vue {
       let params:any = {
         limit: this.page.limit,
         page: this.page.page,
-        businessId: 'xs1'
+        businessId: this.driverId,
+        module: 'match',
+        operType: 'driver_push'
       }
       let { data: res } = await getCallDetail(params)
 
@@ -539,7 +548,7 @@ export default class extends Vue {
       let parmas:any = {
         limit: this.page.limit,
         page: this.page.page,
-        driverId: 'SZS201912251001'
+        driverId: this.driverId
       }
       let { data: res } = await getRunDetail(parmas)
       if (res.success) {
@@ -553,7 +562,7 @@ export default class extends Vue {
   async getDriverLabel() {
     try {
       let parmas:any = {
-        driverId: 'BJS201903301'
+        driverId: this.driverId
       }
       let { data: res } = await getDriverDetail(parmas)
       if (res.success) {
@@ -574,11 +583,11 @@ export default class extends Vue {
         this.listQuery.breakingTrafficRestrictionCountyName = res.data.breakingTrafficRestrictionCountyName
         this.listQuery.breakingTrafficRestrictionCountyName = this.listQuery.breakingTrafficRestrictionCountyName.join(' ')
         // 起始点
-        this.listQuery.startingPointProvinceName = res.data.startingPointProvinceName
-        this.listQuery.startingPointCityName = res.data.startingPointCityName
-        this.listQuery.startingPointCountyName = res.data.startingPointCountyName
-        this.listQuery.startingPointStartTime = res.data.startingPointStartTime
-        this.listQuery.startingPointEndTime = res.data.startingPointEndTime
+        this.listQuery.startPointProvinceName = res.data.startPointProvinceName
+        this.listQuery.startPointCityName = res.data.startPointCityName
+        this.listQuery.startPointCountyName = res.data.startPointCountyName
+        this.listQuery.startPointStartTime = res.data.startPointStartTime
+        this.listQuery.startPointEndTime = res.data.startPointEndTime
         // 配送点
         this.listQuery.deliveryPointProvinceName = res.data.deliveryPointProvinceName
         this.listQuery.deliveryPointCityName = res.data.deliveryPointCityName
@@ -600,7 +609,7 @@ export default class extends Vue {
         this.listQuery.expectStabilityTemporary = this.listQuery.expectStabilityTemporary.join('、')
         this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside ? '是' : '否'
         this.listQuery.driverSituation = res.data.driverSituationName
-        this.listQuery.manuallyRemarks = res.data.manuallyRemarksName
+        this.listQuery.remarksName = res.data.remarksName
       }
     } catch (err) {
       console.log(err)
@@ -609,7 +618,7 @@ export default class extends Vue {
   async getBasicsInfor() {
     try {
       let parmas:any = {
-        driverId: 'SJ202103220001'
+        driverId: this.driverId
       }
       let { data: res } = await getBasicDetail(parmas)
       if (res.success) {
@@ -628,6 +637,7 @@ export default class extends Vue {
         this.listQuery.statusName = res.data.statusName
         this.listQuery.orderId = res.data.orderId
         this.listQuery.contractStatusName = res.data.contractStatusName
+        console.log('xxxx:', this.listQuery, res.data)
       }
     } catch (err) {
       console.log(err)

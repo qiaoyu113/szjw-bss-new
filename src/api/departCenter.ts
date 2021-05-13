@@ -159,7 +159,7 @@ export function getRunDetail(data:any) {
 // 获取弹框司机详情-司机标签
 export function getDriverDetail(params:any) {
   return request({
-    url: `/mock/283/v1/matchDriverLabel/getMatchDriverLabel/{driverId}`,
+    url: `${prefix1}/v1/matchDriverLabelInfo/getDriverLabelByDriverId`,
     method: 'get',
     params
   })
