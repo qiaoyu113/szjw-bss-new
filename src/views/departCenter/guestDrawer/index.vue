@@ -87,7 +87,7 @@ export default class GuestDrawer extends Vue {
   loadMoreHandle() {
     (this.$refs.matchDriver as any).getMoreData()
   }
-  loadChange(status) {
+  loadChange(status:any) {
     this.listLoading = status
   }
   mounted() {
