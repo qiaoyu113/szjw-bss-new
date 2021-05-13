@@ -492,6 +492,7 @@ export default class extends Vue {
         $table.toggleRowExpansion(item, false)
       }
     }
+    debugger
     row.isOpen = true
     $table.toggleRowExpansion(row, true)
     this.unfoldInfo(row.driverId)

@@ -1,6 +1,5 @@
 <template>
   <div
-    v-loading.body="showBottomLoader"
     :class="wrapClasses"
     style="touch-action: none;"
   >

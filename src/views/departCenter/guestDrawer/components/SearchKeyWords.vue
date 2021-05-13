@@ -393,6 +393,8 @@ export default class SearchKeyWords extends Vue {
     }
   }
   clearSelect(i: number) {
+    let key:any = this.selectedData[i].key
+    this.listQuery[key] = null
     this.selectedData.splice(i, 1)
   }
   async getOptions() {
@@ -632,9 +634,6 @@ export default class SearchKeyWords extends Vue {
   }
 </style>
 <style lang="scss" scoped>
-.formList{
-  width:100%;
-}
 .searchBox{
   background: #fff;
   ::v-deep .el-dropdown-link{

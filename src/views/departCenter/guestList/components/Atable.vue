@@ -95,12 +95,12 @@
           <p
             class="text"
           >
-            仓库位置:<span :class="isShowPercent && obj.warehouseCityCode === row.warehouseCity ? 'blue' : ''">{{ row.warehouseProvinceValue }}-{{ row.warehouseCityValue }}-{{ row.warehouseCountyValue }}</span>
+            仓库位置:<span :class="isShowPercent && obj.liveAddressCity === row.warehouseCity ? 'blue' : ''">{{ row.warehouseProvinceValue }}-{{ row.warehouseCityValue }}-{{ row.warehouseCountyValue }}</span>
           </p>
           <p
             class="text"
           >
-            配送区域:<span :class="isShowPercent && obj.cityAreaCode === row.cityArea ? 'blue' : ''">{{ row.provinceAreaValue }}-{{ row.cityAreaValue }}-{{ row.countyAreaValue || '全区域' }}</span>
+            配送区域:<span :class="isShowPercent && obj.deliveryPointCity === row.cityArea ? 'blue' : ''">{{ row.provinceAreaValue }}-{{ row.cityAreaValue }}-{{ row.countyAreaValue || '全区域' }}</span>
           </p>
         </template>
       </el-table-column>
@@ -113,7 +113,7 @@
           <p
             class="text"
           >
-            单趟运费:<span :class="isShowPercent && row.settlementCycleHit ? 'blue' : ''">{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天</span>
+            单趟运费:{{ row.everyTripGuaranteed }}元/{{ row.dayNum }}趟/{{ row.monthNum }}天
           </p>
           <p
             class="text"
@@ -152,7 +152,7 @@
                 {{ row.workingTime }}
               </span>
             </template>/
-            <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
+            <span :class="isShowPercent && obj.lineCategory.includes(row.lineCategory) ? 'blue':''">
               <template v-if="row.lineCategory ===1">
                 稳定/{{ row.stabilityRate }}
               </template>
