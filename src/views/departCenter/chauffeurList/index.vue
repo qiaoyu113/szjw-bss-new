@@ -38,13 +38,6 @@
         @pagination="handlePageSizeChange"
       />
     </div>
-    <CallPhone
-      :show-dialog.sync="callObj.callPhoneDio"
-      :clue-status="callObj.clueType"
-      :phone="callObj.phone"
-      :clue-id="callObj.clueId"
-      @success="getLists"
-    />
     <SetTag
       ref="setTag"
       :driver-id="checkOne.driverId"
@@ -68,7 +61,6 @@ import { Vue, Component } from 'vue-property-decorator'
 import { matchDriverInfo, getDriverWorkCity } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
 import { showWork, HandlePages } from '@/utils'
-import CallPhone from '@/views/clue/components/CallPhone/index.vue'
 import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
@@ -90,7 +82,6 @@ import chooseCity from './components/chooseCity.vue'
     components: {
       Atable,
       Pagination,
-      CallPhone,
       SearchForm,
       SetTag,
       ChauffeureDrawer,
@@ -111,21 +102,14 @@ export default class extends Vue {
       expectAccountingPeriod: '',
       rents: [],
       time: [],
-      status: 1,
+      status: 3,
       driverMatchManagerId: '',
       hasDriverMatchManager: ''
     };
     private listLoading: boolean = false;
     private callPhoneDio: boolean = false;
-    private clueType: number = 0;
     private clueId: string = '';
     private phone: string = '';
-    private callObj: IState = {
-      callPhoneDio: false,
-      clueType: 0,
-      clueId: '',
-      phone: ''
-    };
     private cityDio:Boolean = false
     private allotDialog:Boolean = false
     private allotTitle:string = ''
@@ -155,7 +139,7 @@ export default class extends Vue {
         type: 'warning'
       })
         .then(() => {
-          (this.$refs.Atable as any).callPhone(phone, '123')
+          (this.$refs.Atable as any).callPhone(phone, row.driverId)
         })
         .catch(() => {
           this.$message({
@@ -190,12 +174,10 @@ export default class extends Vue {
     }
     async getCityChoose() {
       try {
-        let ChangeDriverWorkCityDTO = {
-          driverId: this.checkOne.driverId,
-          workCity: this.checkOne.workCity,
-          dmId: this.checkOne.joinManagerId
+        let params = {
+          frontValue: 14
         }
-        let { data: res } = await getDriverWorkCity(ChangeDriverWorkCityDTO)
+        let { data: res } = await getDriverWorkCity(params)
         if (res.success) {
           let cityOptions = res.data.map((item:IState) => {
             return { label: `${item.workCity}(${item.nick}${item.moblie})`, value: item.driverId }
@@ -227,8 +209,8 @@ export default class extends Vue {
         listQuery.address[2] && (params.liveAddressCounty = listQuery.address[2])
       }
       if (listQuery.rents.length > 1) {
-        params.expectedFreightTripStart = listQuery.rents[0]
-        params.expectedFreightTripEnd = listQuery.rents[1]
+        params.expectedFreightTripStart = +listQuery.rents[0]
+        params.expectedFreightTripEnd = +listQuery.rents[1]
       }
       if (listQuery.time.length > 1) {
         params.workHourStart = listQuery.time[0]
@@ -236,7 +218,7 @@ export default class extends Vue {
       }
       listQuery.driverMatchManagerId !== '' && (params.driverMatchManagerId = listQuery.driverMatchManagerId)
       listQuery.hasDriverMatchManager !== '' && (params.hasDriverMatchManager = listQuery.hasDriverMatchManager)
-      params.driverStatus = listQuery.status
+      listQuery.status !== '' && (params.driverStatus = listQuery.status)
       return params
     }
 
@@ -244,39 +226,7 @@ export default class extends Vue {
     async getLists() {
       try {
         this.listLoading = true
-        // const params = this.dealParams(this.listQuery)
-        const params = {
-          'busiType': '',
-          'carType': '',
-          'driverId': '',
-          'driverMatchManagerId': '',
-          'driverStatus': '',
-          'endDate': '',
-          'expectAccountingPeriod': '',
-          'expectStabilityTemporary': [
-
-          ],
-          'expectedFreightTripEnd': '',
-          'expectedFreightTripStart': '',
-          'heavyLifting': '',
-          'key': '',
-          'limit': 30,
-          'liveAddressCity': '',
-          'liveAddressCounty': '',
-          'liveAddressProvince': '',
-          'oilElectricityRequirement': '',
-          'page': 1,
-          'pageNumber': '',
-          'projectIds': [
-            {}
-          ],
-          'selectIds': [
-            {}
-          ],
-          'startDate': '',
-          'workHourEnd': '',
-          'workHourStart': ''
-        }
+        const params = this.dealParams(this.listQuery)
         let { data: res } = await matchDriverInfo(params)
         if (res.success) {
           this.tableData = res.data

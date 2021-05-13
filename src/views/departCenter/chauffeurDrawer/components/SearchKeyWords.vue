@@ -105,7 +105,7 @@
           v-for="(item,index) in selectedData"
           :key="index"
         >
-          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : ((item.selected || []).join(item.key === 'workRange' ? '~' : ',')) }}<i
+          {{ item.type }}：{{ typeof item.selected === 'string' ? item.selected : ((item.selected || []).join(item.key === 'workRange' ? '-' : ',')) }}<i
             class="el-icon-circle-close"
             @click="clearSelect(index)"
           />
@@ -357,7 +357,7 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
-          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('~'))
+          isWorkRange && (this.listQuery.workRange = this.selectedData[index].optionIds.join('-'))
         }
       } else {
         this.initSelectItem(id, command)
@@ -465,7 +465,7 @@ export default class SearchKeyWords extends Vue {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({
         label: count,
-        value: count
+        value: i + ''
       })
     }
   }

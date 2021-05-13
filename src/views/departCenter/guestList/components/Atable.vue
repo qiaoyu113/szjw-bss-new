@@ -6,6 +6,7 @@
       style="width: 100%"
       border
       stripe
+      row-key="lineId"
       highlight-current-row
       size="mini"
       fit
@@ -42,7 +43,10 @@
                     {{ scope.row.remark }}
                   </template>
                 </div>
-                <div slot="reference">
+                <div
+                  slot="reference"
+                  style="display: inline-block;"
+                >
                   <i
                     class="el-icon-chat-dot-round"
                   />
@@ -50,7 +54,12 @@
               </el-popover>
             </p>
             <p :class="obj.lineSaleName === scope.row.lineSaleName ? 'blue text' : 'text'">
-              {{ scope.row.lineSaleName | DataIsNull }}
+              <template v-if="scope.row.lineSaleName">
+                （{{ scope.row.lineSaleName }}）
+              </template>
+              <template v-else>
+                暂无数据
+              </template>
             </p>
             <p
               :class="obj.lineId === scope.row.lineId ? 'blue text' : 'text'"
@@ -404,7 +413,10 @@ export default class extends Vue {
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {
-        let remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        let remarks = '暂无数据'
+        if (res.data && res.data.remarks) {
+          remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        }
         this.$set(row, 'remark', remarks)
       } else {
         this.$message.error(res.errorMsg)
