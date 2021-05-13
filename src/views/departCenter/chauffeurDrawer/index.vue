@@ -255,6 +255,7 @@ export default class GuestDrawer extends Vue {
           this.total = (res.page || {}).total
         } else {
           console.log(res.errorMsg)
+          this.$message({ type: 'error', message: res.errorMsg })
         }
       })
     }
