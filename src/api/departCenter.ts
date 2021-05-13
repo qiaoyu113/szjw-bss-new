@@ -10,7 +10,7 @@ const lineCenter = 'line_center'
 // 创建试跑意向
 export const CreateLntentionRun = (data: any) =>
   request({
-    url: `/match/v2/runtest/creatIntentionRun`,
+    url: `/waybill/v2/runtest/creatIntentionRun`,
     method: 'post',
     data
   })
@@ -66,11 +66,11 @@ export function getInvitedLines(data:any) {
   })
 }
 // 查询线路列表表单信息
-export const getLineInfo = (params:any) =>
+export const getLineInfo = (data:any) =>
   request({
-    url: `/mock/283/v1/line/search`,
+    url: `${departfix}/v1/matchLineInfo/search`,
     method: 'post',
-    params
+    data
   })
 // 获取线路suggest列表
 export function getLineSearch(data:any) {

@@ -182,18 +182,18 @@ export default class extends Vue {
     canBreakingTrafficRestriction: '', // 能否闯限行
     prohibitionRegion: '', // 限行省市
     breakingTrafficRestrictionCounty: [], // 可跑限行区域-区县
-    heavyLifting: '', // 装卸接受度
+    heavyLifting: null, // 装卸接受度
     deliveryDifficulty: [], // 配送难度
-    expectAccountingPeriod: '', // 期望账期
+    expectAccountingPeriod: null, // 期望账期
     expectIncomeTrip: '', // 期望运费（趟）
-    hasIncomeOutside: '', // 外面是否有活
+    hasIncomeOutside: null, // 外面是否有活
     expectStabilityTemporary: [], // 期望稳定/临时
-    start: '', // 起始点
+    start: [], // 起始点
     startPointStartTime: null, // 起始点-开始时间
     startPointEndTime: null, // 起始点-结束时间
     deliveryPointStartTime: null, // 配送点-开始时间
     deliveryPointEndTime: null, // 配送点-结束时间
-    delivery: '', // 配送点
+    delivery: [], // 配送点
     driverSituation: '', // 司机情况
     remarks: [], // 司机备注
     manuallyRemarks: '' // 手动备注
@@ -251,6 +251,9 @@ export default class extends Vue {
         placeholder: '请选择',
         clearable: true,
         multiple: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'prohibitionAddress',
         props: {
           lazy: true,
           lazyLoad: getProviceCityData
@@ -297,6 +300,9 @@ export default class extends Vue {
         placeholder: '请选择',
         clearable: true,
         multiple: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'prohibitionRegion',
         props: {
           lazy: true,
           lazyLoad: getProviceCityData
@@ -388,10 +394,14 @@ export default class extends Vue {
     {
       type: 8,
       col: 12,
-      hidden: false,
+      hidden: true,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        multiple: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'start',
         props: {
           lazy: true,
           lazyLoad: getProviceCityAndCountry
@@ -427,10 +437,14 @@ export default class extends Vue {
     {
       type: 8,
       col: 12,
-      hidden: false,
+      hidden: true,
       tagAttrs: {
         placeholder: '请选择',
         clearable: true,
+        multiple: true,
+        'default-expanded-keys': true,
+        'default-checked-keys': true,
+        'node-key': 'delivery',
         props: {
           lazy: true,
           lazyLoad: getProviceCityAndCountry
@@ -520,14 +534,13 @@ export default class extends Vue {
   async initData() {
     let { data: res } = await searchMatchDriverInfo(this.driverId)
     if (res.success) {
-      console.log(res)
+      this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
       this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
       this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
       this.listQuery.heavyLifting = res.data.heavyLifting
       this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
       this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
       this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
-      this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
       this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
       this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
       this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
@@ -551,12 +564,9 @@ export default class extends Vue {
         })
       }
       if (res.data.hasIncomeOutside) {
-        this.$nextTick(() => {
-          this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
-          this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
-        })
+        this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
+        this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
       }
-      console.log(this.listQuery)
     } else {
       this.$message.error(res.errorMsg)
     }
@@ -628,32 +638,20 @@ export default class extends Vue {
     })
     return arr
   }
+  params(params:any) {
+    let ret:any = {}
+    // 过滤空值数据
+    for (let prop in params) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (!params.hasOwnProperty(prop)) continue
+      let value = params[prop]
+      // eslint-disable-next-line no-undefined
+      if (value !== '' && value !== undefined && value !== null && value !== 'null') ret[prop] = value
+    }
+    return ret
+  }
   // 验证通过
   async handlePassChange() {
-    if (this.listQuery.canBreakingNodriving) {
-      this.listQuery.breakingNodrivingCity = this.listQuery.prohibitionAddress[1] // 可跑禁行区域-市
-      this.listQuery.breakingNodrivingProvince = this.listQuery.prohibitionAddress[0] // 可跑禁行区域-省
-    }
-    if (this.listQuery.canBreakingTrafficRestriction) {
-      this.listQuery.breakingTrafficRestrictionProvince = this.listQuery.prohibitionRegion[0] // 可跑限行区域-省
-      this.listQuery.breakingTrafficRestrictionCity = this.listQuery.prohibitionRegion[1] // 可跑限行区域-市
-    }
-    if (this.listQuery.hasIncomeOutside) {
-      this.listQuery.startPointCounty = this.listQuery.start[2]
-      this.listQuery.startPointCity = this.listQuery.start[1]
-      this.listQuery.startPointProvince = this.listQuery.start[0]
-      this.listQuery.deliveryPointCity = this.listQuery.delivery[1]
-      this.listQuery.deliveryPointCounty = this.listQuery.delivery[2]
-      this.listQuery.deliveryPointProvince = this.listQuery.delivery[0]
-    }
-    /*
-    canBreakingNodriving // 司机能否闯禁行
-    canBreakingTrafficRestriction // 司机能否闯限行
-    expectAccountingPeriod // 结算周期
-    deliveryDifficulty // 配送复杂度
-    expectStabilityTemporary // 稳定/临时
-    heavyLifting //装卸难度
-    */
     let emitData:any = {
       canBreakingNodriving: this.listQuery.canBreakingNodriving,
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
@@ -670,17 +668,47 @@ export default class extends Vue {
         return item.value === this.listQuery.heavyLifting
       })[0].label : null
     }
-    let params = { ...this.listQuery }
+    let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
     params.startPointStartTime = params.startPointStartTime ? parseInt((params.startPointStartTime.split(':')[0])) : null
     params.startPointEndTime = params.startPointEndTime ? parseInt((params.startPointEndTime.split(':')[0])) : null
     params.deliveryPointStartTime = params.deliveryPointStartTime ? parseInt((params.deliveryPointStartTime.split(':')[0])) : null
     params.deliveryPointEndTime = params.deliveryPointEndTime ? parseInt((params.deliveryPointEndTime.split(':')[0])) : null
     params.remarks = params.remarks.length > 0 ? params.remarks[0] : null
-    let { data: res } = await updateDriverTag(params)
+    if (this.listQuery.canBreakingNodriving) {
+      params.breakingNodrivingCity = this.listQuery.prohibitionAddress[1] // 可跑禁行区域-市
+      params.breakingNodrivingProvince = this.listQuery.prohibitionAddress[0] // 可跑禁行区域-省
+    } else {
+      params.breakingNodrivingCity = null
+      params.breakingNodrivingProvince = null
+    }
+    if (this.listQuery.canBreakingTrafficRestriction) {
+      params.breakingTrafficRestrictionProvince = this.listQuery.prohibitionRegion[0] // 可跑限行区域-省
+      params.breakingTrafficRestrictionCity = this.listQuery.prohibitionRegion[1] // 可跑限行区域-市
+    } else {
+      params.breakingTrafficRestrictionProvince = null
+      params.breakingTrafficRestrictionCity = null
+    }
+    if (this.listQuery.hasIncomeOutside) {
+      params.startPointCounty = this.listQuery.start[2]
+      params.startPointCity = this.listQuery.start[1]
+      params.startPointProvince = this.listQuery.start[0]
+      params.deliveryPointCity = this.listQuery.delivery[1]
+      params.deliveryPointCounty = this.listQuery.delivery[2]
+      params.deliveryPointProvince = this.listQuery.delivery[0]
+    } else {
+      params.startPointCounty = null
+      params.startPointCity = null
+      params.startPointProvince = null
+      params.deliveryPointCity = null
+      params.deliveryPointCounty = null
+      params.deliveryPointProvince = null
+    }
+    let { data: res } = await updateDriverTag(this.params(params))
     if (res.success) {
       this.resetFrom()
       this.$emit('on-success', emitData, this.driverId)
+      this.$message.success('操作成功')
     } else {
       this.$message.error(res.errorMsg)
     }
