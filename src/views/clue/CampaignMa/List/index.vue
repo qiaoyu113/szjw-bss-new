@@ -665,7 +665,6 @@ export default class extends Vue {
             label: item.dictLabel
           }
         })
-        debugger
         this.regionList.push(...nodes)
       }
     } catch (err) {

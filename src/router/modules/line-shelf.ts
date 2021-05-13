@@ -23,6 +23,16 @@ const lineShelfRouter: RouteConfig = {
       }
     },
     {
+      path: 'exportVisit',
+      component: () => import(/* webpackChunkName: "driver" */ '@/views/line-shelf/exportVisit/index.vue'),
+      name: 'ExportVisit',
+      meta: {
+        apiUrl: 'root',
+        title: 'exportVisit',
+        noCache: false
+      }
+    },
+    {
       path: 'complete',
       component: () => import(/* webpackChunkName: "driver" */ '@/views/line-shelf/complete/index.vue'),
       name: 'Complete',
