@@ -33,6 +33,7 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -252,6 +253,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/cancelMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelGuest(row.custInviteId)"
@@ -264,6 +266,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchCustInvite/startMatchCustInvite']"
                 type="text"
                 size="small"
                 @click.stop="handleLaunchGuest(row)"

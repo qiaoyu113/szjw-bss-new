@@ -40,6 +40,7 @@
       >
         <el-button
           v-if="listQuery.customerStatus === '1'"
+          v-permission="['/v1/matchCustInvite/startMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchLaunchGuest"
@@ -48,6 +49,7 @@
         </el-button>
         <el-button
           v-if="listQuery.customerStatus === '2'"
+          v-permission="['/v1/matchCustInvite/cancelMatchCustInviteBatch']"
           type="primary"
           :disabled="selection.length > 0 ? false :true"
           @click="batchCancelGuest"
