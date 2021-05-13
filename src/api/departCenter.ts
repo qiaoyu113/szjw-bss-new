@@ -98,7 +98,7 @@ export function getLineDetail(params:any) {
 // 司推：司机匹配线路
 export function MatchLineListForDriver(data: any) {
   return request({
-    url: `${prefix}/v1/matchDriverInfo/queryMatchLineForMatchDriver`,
+    url: `${departfix}/v1/matchDriverInfo/queryMatchLineForMatchDriver`,
     method: 'post',
     data
   })

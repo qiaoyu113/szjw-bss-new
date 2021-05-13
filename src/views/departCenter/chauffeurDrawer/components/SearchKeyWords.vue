@@ -376,6 +376,7 @@ export default class SearchKeyWords extends Vue {
       }
       this.listQuery.workRange = id
       this.selectedData.push(obj)
+      console.log(this.selectedData)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
       const title = (this.selectList.find((v: any) => v.key === this.key) || {}).title
@@ -420,7 +421,7 @@ export default class SearchKeyWords extends Vue {
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
     this.listQuery.driverId = driver.driverId || driver.id
     if ((driver.workHours || []).length) {
-      this.initSelectItem((driver.workHours || []).join(','), (driver.workHours || []).join(','), true)
+      this.initSelectItem(driver.workHoursStr, driver.workHoursStr, true)
     }
     if (driver.heavyLifting) {
       this.key = 'loadDifficulty'
