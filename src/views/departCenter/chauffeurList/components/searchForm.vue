@@ -273,7 +273,7 @@ export default class extends Vue {
       },
       label: '司机是否分配司撮',
       key: 'hasDriverMatchManager',
-      options: [{ label: '是', value: 1 }, { label: '否', value: 2 }]
+      options: [{ label: '是', value: true }, { label: '否', value: false }]
     },
     {
       type: 'status',
@@ -293,15 +293,15 @@ export default class extends Vue {
   private statusLists: IState[] = [
     {
       label: '全部',
-      value: 0
+      value: ''
     },
     {
       label: '已成交待上岗',
-      value: 1
+      value: 3
     },
     {
       label: '已上岗',
-      value: 2
+      value: 4
     }
   ];
 

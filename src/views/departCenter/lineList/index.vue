@@ -100,7 +100,7 @@
       class="table_box"
     >
       <div class="middle">
-        <span>筛选结果：{{ total }}条</span>
+        <span>筛选结果：{{ total||' ' }}条</span>
       </div>
       <Btable
         ref="listTable"
@@ -114,7 +114,7 @@
       />
       <pagination
         :operation-list="[]"
-        :total="page.total"
+        :total="total||0"
         :page.sync="page.page"
         :page-sizes="[10, 20, 30, 40, 50]"
         :limit.sync="page.limit"
