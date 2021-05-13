@@ -28,6 +28,7 @@
     <CreateTryRun
       ref="tryRunShow"
       :obj.sync="rowData"
+      @success="createTryRunSuccess"
     />
     <DetailDialog
       actived="third"
@@ -61,7 +62,7 @@ interface IState {
 export default class DepartLine extends Vue {
   private tryRunShow:boolean = false
   private rowData:any = {}
-  private driverData:object = {}
+  private driverData:any = {}
   private listQueryLine:IState = {}
   private driverTableData:IState[] = [] // 司机列表
   private detailDialog:Boolean = false
@@ -75,10 +76,8 @@ export default class DepartLine extends Vue {
       if (!params.hasOwnProperty(prop)) continue
       let value = params[prop]
       // eslint-disable-next-line no-undefined
-      console.log(value)
       if (value !== '' && value !== undefined && value !== null && value !== 'null') ret[prop] = value
     }
-    console.log(ret)
     return ret
   }
   setTagHandle(row:any) {
@@ -105,6 +104,7 @@ export default class DepartLine extends Vue {
   creatRunHandle(data:any) {
     (this.$refs.tryRunShow as any).showDialog = true
     this.rowData.driverId = data.driverId
+    this.rowData.matchType = 2
   }
   detailHandle(row:any) {
     this.detailDialog = true
@@ -118,26 +118,33 @@ export default class DepartLine extends Vue {
     this.getLists()
   }
   async getLists() {
-    this.listQueryLine.lineId = 'XL202011070277' // this.rowData.lineId
-    this.listQueryLine.page = this.pageSize
-    this.listQueryLine.limit = 10
-    let notIncludedDriverIds:any = []
-    this.driverTableData.forEach((item:any) => {
-      notIncludedDriverIds.push(item.driverId)
-    })
-    this.listQueryLine.notIncludedDriverIds = notIncludedDriverIds
-    let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
-    if (res.success) {
-      this.driverTableData = [...this.driverTableData, ...res.data]
-      if (res.data.length < 10) {
-        this.$emit('on-end')
+    try {
+      this.listQueryLine.lineId = 'XL202011070277' // this.rowData.lineId
+      this.listQueryLine.page = this.pageSize
+      this.listQueryLine.limit = 10
+      let notIncludedDriverIds:any = []
+      this.driverTableData.forEach((item:any) => {
+        notIncludedDriverIds.push(item.driverId)
+      })
+      this.listQueryLine.notIncludedDriverIds = notIncludedDriverIds.length === 0 ? null : notIncludedDriverIds
+      this.$emit('on-loading', true)
+      let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
+      if (res.success) {
+        this.driverTableData = [...this.driverTableData, ...res.data]
+        if (res.data.length < 10) {
+          this.$emit('on-end')
+        }
+        if (this.driverTableData.length < 10 && this.pageSize === 1) {
+          this.$emit('on-lock')
+        }
+        console.log(this.driverTableData)
+      } else {
+        this.$message.error(res.errorMsg)
       }
-      if (this.driverTableData.length < 10 && this.pageSize === 1) {
-        this.$emit('on-lock')
-      }
-      console.log(this.driverTableData)
-    } else {
-      this.$message.error(res.errorMsg)
+    } catch (err) {
+      console.log(`get list fail fail:${err}`)
+    } finally {
+      this.$emit('on-loading', false)
     }
   }
   // 从缓存获取线路信息
@@ -173,6 +180,12 @@ export default class DepartLine extends Vue {
     this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
     this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
     console.log(this.driverTableData)
+  }
+  // 创建试跑意向成功
+  createTryRunSuccess() {
+    setTimeout(() => {
+      this.$router.go(0)
+    }, 1000)
   }
   mounted() {
     this.getLineInfoFromStorage()
