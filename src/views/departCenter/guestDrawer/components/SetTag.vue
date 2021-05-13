@@ -611,6 +611,12 @@ export default class extends Vue {
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
+    this.formItem[12].hidden = true
+    this.formItem[13].hidden = true
+    this.formItem[14].hidden = true
+    this.formItem[15].hidden = true
+    this.formItem[16].hidden = true
+    this.formItem[17].hidden = true
     this.isShow = false
   }
   private getCountryData(key:string, index:number, reset:boolean) {

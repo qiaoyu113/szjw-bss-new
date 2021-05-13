@@ -125,8 +125,6 @@ export default class DepartLine extends Vue {
       this.listQueryLine.lineId = this.rowData.lineId
       this.listQueryLine.page = this.pageSize
       this.listQueryLine.limit = 10
-      let notIncludedDriverIds:any = []
-
       this.listQueryLine.notIncludedDriverIds = this.notIncludedDriverIds.length === 0 ? null : this.notIncludedDriverIds
       this.$emit('on-loading', true)
       let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
@@ -141,7 +139,6 @@ export default class DepartLine extends Vue {
         if (this.driverTableData.length < 10 && this.pageSize === 1) {
           this.$emit('on-lock')
         }
-        console.log(this.driverTableData)
       } else {
         this.$message.error(res.errorMsg)
       }
