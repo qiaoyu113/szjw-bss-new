@@ -1,6 +1,7 @@
 
 <template>
   <div
+    ref="linebox"
     v-loading.body="listLoading"
     class="LineListBox"
     :class="{
@@ -105,7 +106,7 @@
         ref="listTable"
         :list-query="listQuery"
         :is-show-percent="true"
-        :obj="{}"
+        :pageobj="page"
         @launchGuest="handleLaunchGuest($event)"
         @cancelGuest="handleCancelGuest($event)"
         @cancelTryRun="handleCancelTryRun($event)"
@@ -124,16 +125,18 @@
       :id="ids"
       ref="launchGuest"
       :launch-arguments="launchArguments"
+      @success="successHandle"
     />
     <cancel-guest
       :id="idss"
       ref="cancelGuest"
       :cust-invite-id="custInviteId"
+      @success="successHandle"
     />
     <cancel-tryRun
       ref="cancelTryRun"
       :cancel-data="cancelData"
-      @success="ctrSuccessHandle"
+      @success="successHandle"
     />
   </div>
 </template>
@@ -193,6 +196,8 @@ export default class extends Vue {
   private tableData:any[] = []
   private ids = []
   private idss = []
+  private tableScroll:string =''
+  private hashScrollTop:string = ''
   private listQuery:IState = {
     workCity: [],
     carType: '',
@@ -586,9 +591,25 @@ export default class extends Vue {
   }
 
   // 取消试跑成功后刷新列表
-  ctrSuccessHandle() {
-    (this.$refs.listTable as any).refreshList()
+  successHandle() {
+    console.log('记录当前scrollTop', this.tableScroll)
+    this.hashScrollTop = this.tableScroll;
+    (this.$refs.cancelTryRun as any).showDialog = false;
+    (this.$refs.listTable as any).getLists().then(() => {
+      (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
+      console.log('改变scrollTop', (this.$refs.linebox as any)['scrollTop'])
+    })
+
+    if (this.listQuery.customerStatus !== '') {
+      (this.$refs.listTable as any).refreshList()
+    }
   }
+  handleScroll() {
+    (this.$refs.linebox as any)['addEventListener']('scroll', () => {
+      this.tableScroll = (this.$refs.linebox as any)['scrollTop']
+    })
+  }
+
   init() {
     this.cityDetail()
     this.getDictList();
@@ -597,6 +618,7 @@ export default class extends Vue {
   mounted() {
     this.init()
     this.getList()
+    this.handleScroll()
   }
 }
 </script>

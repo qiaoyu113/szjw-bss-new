@@ -33,13 +33,13 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-show="row.inviteReMark"
+                  v-show="row.inviteMark"
                   placement="right"
                   min-width="200"
                   trigger="hover"
                 >
                   <div class="text1">
-                    {{ row.inviteReMark }}
+                    {{ row.inviteMark }}
                   </div>
                   <i
                     slot="reference"
@@ -55,7 +55,7 @@
                 {{ row.lineSaleId }}
               </p>
               <p class="text">
-                窗口期:剩余{{ row.recruitWindowPeriod }}天
+                窗口期:剩余{{ row.recruitWindowPeriod||' ' }}天
               </p>
               <p class="text scale">
                 {{ row.lineCreateDate }}创建
@@ -73,13 +73,13 @@
               {{ row.carType }}/{{ row.oilElectricityRequirement }}
             </p>
             <p
-              v-if="row.isBehavior===1"
+              v-if="row.behavior"
               class="text"
             >
               能闯禁行
             </p>
             <p
-              v-if="row.isRestriction===1"
+              v-if="row.restriction"
               class="text"
             >
               能闯限行
@@ -101,7 +101,7 @@
               仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.deliveryProvince }}-{{ row.deliveryCity }}-{{ row.deliveryCounty }}
+              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
             </p>
           </template>
         </el-table-column>
@@ -135,13 +135,13 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty |difficultyFilter }}
+              装卸难度:{{ row.handlingDifficulty }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
             </p>
             <p class="text">
-              工作时间段:{{ row.workingHours }}/{{ row.lineCategory }}/{{ row.stabilityRate }}
+              工作时间段:{{ row.workingHours | hourFilter }}/{{ row.lineCategory==='1'?'稳定':'临时' }}/{{ row.stabilityRate }}
             </p>
           </template>
         </el-table-column>
@@ -152,7 +152,7 @@
         >
           <template slot-scope="{row}">
             <p
-              v-show="row.isHot===1"
+              v-show="row.hot"
               class="text"
             >
               爆款
@@ -171,19 +171,19 @@
         >
           <template slot-scope="{row}">
             <p
-              v-show="row.inviteCitys.length===1"
+              v-if="row.inviteCities&&row.inviteCities.length===1"
               class="text"
             >
-              {{ row.inviteCitys[0] }}已客邀
+              {{ row.inviteCities[0] }}已客邀
             </p>
             <p
-              v-show="row.inviteCitys.length===2"
+              v-if="row.inviteCities&&row.inviteCities.length===2"
               class="text"
             >
-              {{ row.inviteCitys[0]+'、'+row.inviteCitys[1] }}已客邀
+              {{ row.inviteCities[0]+'、'+row.inviteCities[1] }}已客邀
             </p>
             <p
-              v-show="row.inviteCitys.length>2"
+              v-if="row.inviteCities&&row.inviteCities.length>2"
               class="text"
             >
               <el-popover
@@ -192,12 +192,12 @@
                 trigger="hover"
               >
                 <div class="text1">
-                  {{ row.inviteCitys | cityListFilter }}
+                  {{ row.inviteCities | cityListFilter }}
                 </div>
                 <span
                   slot="reference"
                   style="color:orange"
-                >{{ row.inviteCitys.length }}<span style="color:#444">个城市已客邀</span></span>
+                >{{ row.inviteCities.length }}<span style="color:#444">个城市已客邀</span></span>
               </el-popover>
             </p>
 
@@ -312,16 +312,6 @@ interface IState {
 @Component({
   name: 'Btable',
   filters: {
-    difficultyFilter(value:number) {
-      switch (value) {
-        case 1: return '不装卸'
-        case 2: return '只装不卸（轻）'
-        case 3: return '只卸不装（轻）'
-        case 4: return '只装不卸（重）'
-        case 5: return '只卸不装（重）'
-        case 6: return '重装卸（重）'
-      }
-    },
     cityListFilter(value:[]) {
       let str = ''
       value.forEach(item => {
@@ -338,6 +328,10 @@ interface IState {
         case 4: return '中瘦'
         case 5: return '极瘦'
       }
+    },
+    hourFilter(val:string) {
+      let arr = JSON.parse(val)
+      return `${arr[0]}:00-${arr[arr.length - 1]}:00`
     }
   }
 })
@@ -358,13 +352,14 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    console.log('listQuery', this.listQuery)
+    console.log('listQuery', this.listQuery, this.pageobj)
     try {
     // 调用查询接口
       let params = { ...this.listQuery, ...this.pageobj }
       console.log('params', params)
       let { data: res } = await getLineInfo(params)
-      this.tableData = res
+      this.tableData = res.data
+      console.log('tableData', res.data, this.tableData)
     } catch (err) {
       console.log('err', err)
     } finally {
