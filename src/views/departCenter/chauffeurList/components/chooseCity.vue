@@ -76,8 +76,7 @@ export default class extends Vue {
   }
   // 确定按钮
   private confirm() {
-    // (this.$refs.cityForm as any).submitForm()
-    this.handlePassChange()
+    (this.$refs.cityForm as any).submitForm()
   }
   // 验证通过
   async handlePassChange() {

@@ -130,7 +130,7 @@ export default class extends Vue {
     }
 
     call(row:IState) {
-      let phone = row.driverPhone
+      let phone = row.driverPhone || ''
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -180,7 +180,7 @@ export default class extends Vue {
         let { data: res } = await getDriverWorkCity(params)
         if (res.success) {
           let cityOptions = res.data.map((item:IState) => {
-            return { label: `${item.workCity}(${item.nick}${item.moblie})`, value: item.driverId }
+            return { label: `${item.city}(${item.name}${item.phone})`, value: item.id }
           })
           this.cityOptions.push(...cityOptions)
         } else {

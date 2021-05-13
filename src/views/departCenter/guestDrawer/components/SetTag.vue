@@ -7,6 +7,7 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
+      @before-close="handleDialogClosed"
     >
       <self-form
         ref="setTagFrom"
@@ -412,7 +413,7 @@ export default class extends Vue {
     },
     {
       slot: true,
-      hidden: false,
+      hidden: true,
       type: 'jobStartDate',
       w: '0px',
       tagAttrs: {
@@ -424,7 +425,7 @@ export default class extends Vue {
     },
     {
       slot: true,
-      hidden: false,
+      hidden: true,
       type: 'jobEndDate',
       w: '0px',
       tagAttrs: {
@@ -455,7 +456,7 @@ export default class extends Vue {
     },
     {
       slot: true,
-      hidden: false,
+      hidden: true,
       type: 'jobStartDate2',
       w: '0px',
       tagAttrs: {
@@ -467,7 +468,7 @@ export default class extends Vue {
     },
     {
       slot: true,
-      hidden: false,
+      hidden: true,
       type: 'jobEndDate2',
       w: '0px',
       tagAttrs: {
@@ -534,38 +535,42 @@ export default class extends Vue {
   async initData() {
     let { data: res } = await searchMatchDriverInfo(this.driverId)
     if (res.success) {
-      this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
-      this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
-      this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
-      this.listQuery.heavyLifting = res.data.heavyLifting
-      this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
-      this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
-      this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
-      this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
-      this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
-      this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
-      this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime ? ((res.data.deliveryPointStartTime > 9 ? res.data.deliveryPointStartTime : ('0' + res.data.deliveryPointStartTime)) + ':00') : null
-      this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime ? ((res.data.deliveryPointEndTime > 9 ? res.data.deliveryPointEndTime : ('0' + res.data.deliveryPointEndTime)) + ':00') : null
-      this.listQuery.driverSituation = res.data.driverSituation
-      this.listQuery.remarks = [res.data.remarks]
-      this.listQuery.manuallyRemarks = res.data.manuallyRemarks
-      if (res.data.canBreakingNodriving) {
-        this.$nextTick(() => {
-          this.listQuery.prohibitionAddress = [res.data.breakingNodrivingProvince, res.data.breakingNodrivingCity] // 禁行省市
-          this.listQuery.breakingNodrivingCounty = res.data.breakingNodrivingCounty // 可跑禁行区域-区县
-          this.getCountryData('prohibitionAddress', 2, true)
-        })
-      }
-      if (res.data.canBreakingTrafficRestriction) {
-        this.$nextTick(() => {
-          this.listQuery.prohibitionRegion = [res.data.breakingTrafficRestrictionProvince, res.data.breakingTrafficRestrictionCity] // 限行省市
-          this.listQuery.breakingTrafficRestrictionCounty = res.data.breakingTrafficRestrictionCounty // 可跑限行区域-区县 */
-          this.getCountryData('prohibitionRegion', 5, true)
-        })
-      }
-      if (res.data.hasIncomeOutside) {
-        this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
-        this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
+      if (res.data) {
+        this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside
+        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
+        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
+        this.listQuery.heavyLifting = res.data.heavyLifting
+        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
+        this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
+        this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
+        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
+        this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
+        this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
+        this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime ? ((res.data.deliveryPointStartTime > 9 ? res.data.deliveryPointStartTime : ('0' + res.data.deliveryPointStartTime)) + ':00') : null
+        this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime ? ((res.data.deliveryPointEndTime > 9 ? res.data.deliveryPointEndTime : ('0' + res.data.deliveryPointEndTime)) + ':00') : null
+        this.listQuery.driverSituation = res.data.driverSituation
+        this.listQuery.remarks = [res.data.remarks]
+        this.listQuery.manuallyRemarks = res.data.manuallyRemarks
+        if (res.data.canBreakingNodriving) {
+          this.$nextTick(() => {
+            this.listQuery.prohibitionAddress = [res.data.breakingNodrivingProvince, res.data.breakingNodrivingCity] // 禁行省市
+            this.listQuery.breakingNodrivingCounty = res.data.breakingNodrivingCounty // 可跑禁行区域-区县
+            this.getCountryData('prohibitionAddress', 2, true)
+          })
+        }
+        if (res.data.canBreakingTrafficRestriction) {
+          this.$nextTick(() => {
+            this.listQuery.prohibitionRegion = [res.data.breakingTrafficRestrictionProvince, res.data.breakingTrafficRestrictionCity] // 限行省市
+            this.listQuery.breakingTrafficRestrictionCounty = res.data.breakingTrafficRestrictionCounty // 可跑限行区域-区县 */
+            this.getCountryData('prohibitionRegion', 5, true)
+          })
+        }
+        if (res.data.hasIncomeOutside) {
+          this.listQuery.start = [res.data.startPointProvince, res.data.startPointCity, res.data.startPointCounty]
+          this.listQuery.delivery = [res.data.deliveryPointProvince, res.data.deliveryPointCity, res.data.deliveryPointCounty]
+        }
+      } else {
+        this.listQuery.hasIncomeOutside = true
       }
     } else {
       this.$message.error(res.errorMsg)
@@ -607,6 +612,12 @@ export default class extends Vue {
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
+    this.formItem[12].hidden = true
+    this.formItem[13].hidden = true
+    this.formItem[14].hidden = true
+    this.formItem[15].hidden = true
+    this.formItem[16].hidden = true
+    this.formItem[17].hidden = true
     this.isShow = false
   }
   private getCountryData(key:string, index:number, reset:boolean) {

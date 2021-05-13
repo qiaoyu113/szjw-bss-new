@@ -119,6 +119,7 @@ export default class GuestDrawer extends Vue {
     private params: object = {} // 来自SearchKeyWords 组件的查询数据
     private pageInfo: any = { ...pageInfo } // 分页数据
     private total: number = 0 // 总数据量
+    private isAll: boolean = false
     private listQueryDriver:IState = {
       labelType: '',
       isBehavior: '',
@@ -193,7 +194,7 @@ export default class GuestDrawer extends Vue {
     }
     onQuery(params: any) {
       console.log('params', params)
-      const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
+      const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
       // const workHours = workRange ? workRange.split(',')
@@ -204,18 +205,19 @@ export default class GuestDrawer extends Vue {
         expectStabilityTemporaryList: stability || null,
         expectedFreightTripStart: f1 || null,
         expectedFreightTripEnd: f2 || null,
-        heavyLiftingList: loadDifficulty,
+        heavyLiftingList: loadDifficulty || null,
         deliveryDifficulty: deliverComplexity || null,
         labelTypeList: lineQuality || null,
         lineId: keyWords || null,
-        driverId,
+        driverId: this.driverId,
         liveAddressProvince: repoInfo.province,
         liveAddressCityList: repoInfo.cities,
         liveAddressCountyList: repoInfo.counties,
         provinceArea: distInfo.province,
         cityAreaList: distInfo.cities,
         countyAreaList: distInfo.counties,
-        workHours: workRange // todo confirm
+        workHours: workRange,
+        shownLines: this.lineTableData.map(v => v.lineId)
       }
       this.queryData()
     }
@@ -238,7 +240,7 @@ export default class GuestDrawer extends Vue {
       return { province, cities, counties }
     }
     loadMoreHandle() {
-      if (this.lineTableData.length < this.total) {
+      if (!this.isAll) {
         this.queryData(true)
       }
     }
@@ -251,7 +253,11 @@ export default class GuestDrawer extends Vue {
       MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
-          this.lineTableData = append ? this.lineTableData.concat(res.data || []) : (res.data || [])
+          const list = res.data || []
+          if (list.length < this.pageInfo.limit) {
+            this.isAll = true
+          }
+          this.lineTableData = append ? this.lineTableData.concat(list) : list
           this.total = (res.page || {}).total
         } else {
           console.log(res.errorMsg)
