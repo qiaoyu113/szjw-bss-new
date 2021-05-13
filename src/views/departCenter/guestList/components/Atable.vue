@@ -42,9 +42,8 @@
                     {{ scope.row.remark }}
                   </template>
                 </div>
-                <div>
+                <div slot="reference">
                   <i
-                    slot="reference"
                     class="el-icon-chat-dot-round"
                   />
                 </div>
@@ -148,17 +147,17 @@
           <p
             class="text"
           >
-            工作时间段:<template v-if="row.workingHours&&row.workingHours.length >1">
+            工作时间段:<template v-if="row.workingTime">
               <span :class="isShowPercent && row.workingHoursHit ? 'blue':''">
-                {{ row.workingHours[0] }}~{{ row.workingHours[row.workingHours.length -1] }}
+                {{ row.workingTime }}
               </span>
             </template>/
             <span :class="isShowPercent && row.lineCategory === obj.lineCategory ? 'blue':''">
               <template v-if="row.lineCategory ===1">
-                稳定/{{ row.stabilityRateValue }}
+                稳定/{{ row.stabilityRate }}
               </template>
               <template v-else>
-                临时/{{ row.waitDirveValidity }}
+                临时/{{ row.stabilityRate }}
               </template>
             </span>
           </p>
@@ -177,7 +176,7 @@
             爆款
           </p>
           <p
-            v-if="row.urgent"
+            v-if="row.urgent ===1"
             class="text"
           >
             客急
