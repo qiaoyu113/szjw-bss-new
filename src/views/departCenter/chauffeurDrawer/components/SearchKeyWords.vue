@@ -436,8 +436,9 @@ export default class SearchKeyWords extends Vue {
       this.initSelectItem((driver.intentCargoType || []).join(','), (driver.intentCargoTypeName || []).join(','))
     }
     if (driver.liveAddressCity && driver.liveAddressProvince) {
-      this.listQuery.repoLoc = [driver.liveAddressProvince, driver.liveAddressCity]
-      this.listQuery.distLoc = [driver.liveAddressProvince, driver.liveAddressCity]
+      const county = driver.liveAddressCounty
+      this.listQuery.repoLoc = [driver.liveAddressProvince, driver.liveAddressCity].concat(county ? [county] : [])
+      this.listQuery.distLoc = [driver.liveAddressProvince, driver.liveAddressCity].concat(county ? [county] : [])
     }
     this.$emit('query', this.listQuery)
   }

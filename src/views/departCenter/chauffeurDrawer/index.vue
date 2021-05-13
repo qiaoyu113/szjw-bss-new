@@ -187,14 +187,19 @@ export default class GuestDrawer extends Vue {
       this.rowData = params
     }
     onCreateTryRunSucc() {
+      (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
+      this.queryData()
     }
     onQuery(params: any) {
+      console.log('params', params)
       const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
+      const distInfo = this.composePCC(distLoc)
+      const repoInfo = this.composePCC(repoLoc)
+      // const workHours = workRange ? workRange.split(',')
       this.params = {
         carTypeList: model || null,
         cargoTypeList: cargoType || null,
-        // todo 省市区
         expectAccountingPeriodList: clearCycle || null,
         expectStabilityTemporaryList: stability || null,
         expectedFreightTripStart: f1 || null,
@@ -204,9 +209,33 @@ export default class GuestDrawer extends Vue {
         labelTypeList: lineQuality || null,
         lineId: keyWords || null,
         driverId,
+        liveAddressProvince: repoInfo.province,
+        liveAddressCityList: repoInfo.cities,
+        liveAddressCountyList: repoInfo.counties,
+        provinceArea: distInfo.province,
+        cityAreaList: distInfo.cities,
+        countyAreaList: distInfo.counties,
         workHours: workRange // todo confirm
       }
       this.queryData()
+    }
+    // 组装省市区
+    composePCC(selections: any) {
+      if (!Array.isArray(selections[0])) {
+        selections = [selections]
+      }
+      const province = (selections[0] || [])[0] || ''
+      const cities: any = []
+      const counties: any = []
+      selections.forEach((sel: any) => {
+        if (sel[1] && !cities.includes(sel[1])) {
+          cities.push(sel[1])
+        }
+        if (sel[2] && !counties.includes(sel[2])) {
+          counties.push(sel[2])
+        }
+      })
+      return { province, cities, counties }
     }
     loadMoreHandle() {
       if (this.lineTableData.length < this.total) {
@@ -219,7 +248,8 @@ export default class GuestDrawer extends Vue {
       } else {
         this.pageInfo = { ...pageInfo }
       }
-      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      // MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      MatchLineListForDriver(Object.assign({}, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
           this.lineTableData = append ? this.lineTableData.concat(res.data || []) : (res.data || [])
