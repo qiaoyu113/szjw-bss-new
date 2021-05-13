@@ -162,3 +162,10 @@ export const abc12 = () => {
     url: `${produce}/v3/line/shelf/maintenance/getMaintenanceNumGroupByCity`
   })
 }
+
+export const visitExport = (data: any) =>
+  request({
+    url: `${produce}/v3/line/manager/visitExport`,
+    method: 'post',
+    data
+  })
