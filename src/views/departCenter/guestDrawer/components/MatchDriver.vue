@@ -115,6 +115,7 @@ export default class DepartLine extends Vue {
   searchData(data:any) {
     this.pageSize = 1
     this.driverTableData = []
+    this.notIncludedDriverIds = []
     this.listQueryLine = data
     this.$emit('on-reset')
     this.getLists()
@@ -181,7 +182,6 @@ export default class DepartLine extends Vue {
     this.driverTableData[index].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
     this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
     this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
-    console.log(this.driverTableData)
   }
   // 创建试跑意向成功
   createTryRunSuccess() {
