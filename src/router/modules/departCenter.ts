@@ -28,7 +28,7 @@ const departCenterRouter: RouteConfig = {
       component: () => import(/* webpackChunkName: "depart" */ '@/views/departCenter/guestList/index.vue'),
       name: 'GuestList',
       meta: {
-        apiUrl: 'root',
+        apiUrl: '/v1/matchLineInfo/queryInvitedLines',
         title: 'guestList',
         noCache: false
       }
