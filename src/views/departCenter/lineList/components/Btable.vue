@@ -141,7 +141,7 @@
               配送复杂度:{{ row.distributionWay }}
             </p>
             <p class="text">
-              工作时间段:{{ row.workingHours }}/{{ row.lineCategory==='1'?'稳定':'临时' }}/{{ row.stabilityRate }}
+              工作时间段:{{ row.workingHours | hourFilter }}/{{ row.lineCategory==='1'?'稳定':'临时' }}/{{ row.stabilityRate }}
             </p>
           </template>
         </el-table-column>
