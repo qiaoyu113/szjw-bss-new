@@ -646,10 +646,8 @@ export default class extends Vue {
       if (!params.hasOwnProperty(prop)) continue
       let value = params[prop]
       // eslint-disable-next-line no-undefined
-      console.log(value)
       if (value !== '' && value !== undefined && value !== null && value !== 'null') ret[prop] = value
     }
-    console.log(ret)
     return ret
   }
   // 验证通过
@@ -709,8 +707,8 @@ export default class extends Vue {
     let { data: res } = await updateDriverTag(this.params(params))
     if (res.success) {
       this.resetFrom()
-      console.log(emitData)
       this.$emit('on-success', emitData, this.driverId)
+      this.$message.success('操作成功')
     } else {
       this.$message.error(res.errorMsg)
     }
