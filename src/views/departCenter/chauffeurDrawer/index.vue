@@ -30,6 +30,7 @@
           @tag="setTagHandle"
           @call="setCallHandle"
           @creatRun="onCreateTryRun"
+          @success="onCreateTryRunSucc"
           @detail="onViewDriverDetail"
         />
       </section>
@@ -82,7 +83,6 @@ import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
-import { parse } from 'node_modules/path-to-regexp'
 
 const pageInfo = {
   limit: 30,
@@ -176,17 +176,20 @@ export default class GuestDrawer extends Vue {
       }, 20)
     }
     onCreateTryRun(data:any) {
-      const params = Object.assign({}, data, this.driver, {
+      const params = {
+        driverId: this.driverId,
         name: this.driver.driverName || '',
         phone: this.driver.driverPhone || '',
-        // dutyManagerId: data.lineSaleId,
+        lineId: data.lineId,
         matchType: 1 // 司推。客邀2
-      })
+      }
       ;(this.$refs.tryRunShow as any).showDialog = true
       this.rowData = params
     }
+    onCreateTryRunSucc() {
+      this.rowData = {}
+    }
     onQuery(params: any) {
-      console.log(params)
       const { cargoType, clearCycle, deliverComplexity, distLoc, driverId, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       this.params = {
         carTypeList: model,
