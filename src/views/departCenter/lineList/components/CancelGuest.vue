@@ -91,11 +91,12 @@ export default class extends Vue {
           return this.$message.warning('请选择取消客邀原因')
         }
         let { data: res } = await cancelMatchCustInvite(params)
-        if (res.success) {
+        if (res.data.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-        // this.$message.error(res.errorMsg)
+          console.log('err')
+          this.$message.error(res.data.errorMsg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)
@@ -114,11 +115,11 @@ export default class extends Vue {
           return this.$message.warning('请选择取消客邀原因')
         }
         let { data: res } = await cancelMatchCustInviteBatch(params)
-        if (res.success) {
+        if (res.data.success) {
           this.$message.success('操作成功')
           this.$emit('success')
         } else {
-        // this.$message.error(res.errorMsg)
+          this.$message.error(res.data.Msg)
         }
       } catch (err) {
         console.log(`launch guest fail:${err}`)

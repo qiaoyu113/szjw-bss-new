@@ -69,7 +69,6 @@
         :is-more="false"
         :line-table-data="tableData"
         :is-show-percent="false"
-        :obj="{}"
         @match="handleMatchTryRun"
       />
       <pagination

@@ -30,7 +30,7 @@
   </SelfDialog>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, PropSync } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { CreateLntentionRun, getLineDetailInfo } from '@/api/departCenter'
@@ -46,17 +46,13 @@ interface IState {
   }
 })
 export default class extends Vue {
-  @Prop({ default: () => {} }) obj!:IState
+  @PropSync('obj', { default: () => {} }) _obj!:IState
 
-  // lineCategory:'' //线路分类 稳定线路、临时线路
   // driverId:'' //司机id
   // name:''//司机姓名
   // phone:''//司机手机号
-  // lineName:''//线路名字
   // lineId:''//线路id
-  // dutyManagerId:''//线路上客户维护经理
   // matchType 撮合类型(1: 司推系、2：客邀系)
-  // matchStatus 撮合单状态
   // matchId  撮合单编号
 
   private showDialog:boolean = false
@@ -66,7 +62,6 @@ export default class extends Vue {
     otherReason: '',
     arrivalTime: ''
   }
-  private workingTimeStart = '00:00'
 
   private formItem:any[] = [
     {
@@ -150,15 +145,18 @@ export default class extends Vue {
   async getLineDetail() {
     try {
       let params:IState = {
-        lineId: 'XL202104300001' || this.obj.lineId
+        lineId: this._obj.lineId
       }
       let { data: res } = await getLineDetailInfo(params)
       if (res.success) {
         let times:IState[] = res.data.lineDeliveryInfoFORMS
         if (Array.isArray(times) && times.length > 0) {
-          this.workingTimeStart = times[0].workingTimeStart
+          this._obj.workingTimeStart = times[0].workingTimeStart || '00:00'
+          this._obj.lineCategory = res.data.lineCategory
+          this._obj.lineName = res.data.lineName
+          this._obj.dutyManagerId = res.data.dutyManagerId
         }
-        this.handleWorkingTimeStartChange(this.workingTimeStart)
+        this.handleWorkingTimeStartChange(this._obj.workingTimeStart)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -185,19 +183,19 @@ export default class extends Vue {
   async saveData() {
     try {
       let params:IState = {
-        lineCategory: this.obj.lineCategory,
-        driverMessage: `${this.obj.name}/${this.obj.phone}`,
-        lineMessage: `${this.obj.lineName}/${this.obj.lineId}`,
-        dutyManagerId: this.obj.dutyManagerId,
-        driverId: this.obj.driverId,
-        lineId: this.obj.lineId,
+        lineCategory: this._obj.lineCategory,
+        driverMessage: `${this._obj.name}/${this._obj.phone}`,
+        lineMessage: `${this._obj.lineName}/${this._obj.lineId}`,
+        dutyManagerId: this._obj.dutyManagerId,
+        driverId: this._obj.driverId,
+        lineId: this._obj.lineId,
         operateFlag: 'creatIntentionRun',
         intentionType: this.listQuery.intentionType,
         otherReason: this.listQuery.otherReason,
         arrivalTime: new Date(this.listQuery.arrivalTime).getTime(),
-        matchType: this.obj.matchType, // 撮合类型(1: 司推系、2：客邀系)
-        matchStatus: this.obj.matchStatus, // 撮合单状态
-        matchId: this.obj.matchId, // 撮合单编号
+        matchType: this._obj.matchType, // 撮合类型(1: 司推系、2：客邀系)
+        matchStatus: this._obj.matchStatus, // 撮合单状态
+        matchId: this._obj.matchId, // 撮合单编号
         createRunTestOrigin: 1 // 创建试跑意向来源（1：司撮、2：H5）
       }
       let { data: res } = await CreateLntentionRun(params)
