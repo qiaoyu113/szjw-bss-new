@@ -8,7 +8,7 @@
       stripe
       highlight-current-row
       size="mini"
-      row-key="id"
+      row-key="driverId"
       fit
       @selection-change="handleSelectionChange"
     >
@@ -525,7 +525,7 @@ export default class extends Vue {
       this.listLoading = true
       let params = { driverId: row.driverId }
       let { data: res } = await getDriverInfoByDriverId(params)
-      this.$set(row, 'unfoldData', res.data)
+      this.$set(row, 'unfoldData', res.data || {})
       console.log(row, 'row')
       this.listLoading = false
     } catch (err) {
