@@ -226,7 +226,7 @@ export default class SearchKeyWords extends Vue {
     {
       options: this.carLists,
       multiple: true,
-      key: 'carType',
+      key: 'carTypeList',
       title: '配送车型'
     },
     {
@@ -360,7 +360,7 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
-          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('~'))
+          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('-'))
         }
       } else {
         this.initSelectItem(id, command)
@@ -406,6 +406,7 @@ export default class SearchKeyWords extends Vue {
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+        console.log(this.carLists)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -588,13 +589,13 @@ export default class SearchKeyWords extends Vue {
   getCarType(data:any) {
     if (data.carType) {
       let carType:any = {
-        key: 'carType',
+        key: 'carTypeList',
         optionIds: [data.carType],
         selected: [data.carTypeValue],
         type: '配送车型'
       }
       this.selectedData.push(carType)
-      this.listQuery['carType'] = carType.optionIds
+      this.listQuery['carTypeList'] = carType.optionIds
     }
   }
   // 从缓存获取线路信息
