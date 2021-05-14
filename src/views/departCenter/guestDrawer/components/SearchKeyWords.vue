@@ -39,7 +39,7 @@
             <el-input
               v-model="listQuery.everyTripGuaranteedStart"
               v-only-number="{min: 0, max: 20000, precision: 0}"
-              style="width:100px"
+              style="width:80px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
@@ -47,7 +47,7 @@
               v-model="listQuery.everyTripGuaranteedEnd"
               v-only-number="{min: 0, max: 20000, precision: 0}"
               :disabled="!listQuery.everyTripGuaranteedStart"
-              style="width:100px"
+              style="width:80px"
               placeholder="请输入"
             />
           </template>
@@ -227,7 +227,7 @@ export default class SearchKeyWords extends Vue {
       options: this.carLists,
       multiple: true,
       key: 'carType',
-      title: '司机车型'
+      title: '配送车型'
     },
     {
       options: this.hardOptions,
@@ -248,19 +248,19 @@ export default class SearchKeyWords extends Vue {
       }],
       multiple: false,
       key: 'lineCategory',
-      title: '期望稳定/临时'
+      title: '稳定/临时'
     },
     {
       options: this.cycleOptions,
       multiple: true,
       key: 'settlementCycle',
-      title: '期望结算周期'
+      title: '结算周期'
     },
     {
       options: this.expectOptions,
       key: 'cargoType',
       multiple: true,
-      title: '期望货品类型'
+      title: '货品类型'
     },
     {
       options: [{
@@ -275,7 +275,7 @@ export default class SearchKeyWords extends Vue {
       }],
       multiple: false,
       key: 'distributionWay',
-      title: '期望配送复杂度'
+      title: '配送复杂度'
     },
     {
       title: '开始工作时间',
@@ -691,7 +691,7 @@ export default class SearchKeyWords extends Vue {
     padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
     ::v-deep .el-form-item{
-      // margin-bottom: 5px !important;
+      margin-bottom: 5px !important;
     }
     ::v-deep .selfForm{
       padding-left: 0;
@@ -721,6 +721,8 @@ export default class SearchKeyWords extends Vue {
     .formList{
       display: flex;
       align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 5px;
       .formItem{
         display: inline-block;
         margin-right: 10px;

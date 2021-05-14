@@ -605,13 +605,18 @@ export default class extends Vue {
   }
   resetFrom() {
     (this.$refs.setTagFrom as any).resetForm()
-    this.listQuery.prohibitionAddress = ''
-    this.listQuery.prohibitionRegion = ''
+    this.listQuery.prohibitionAddress = null
+    this.listQuery.prohibitionRegion = null
     this.listQuery.start = ''
     this.listQuery.delivery = ''
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
+    this.listQuery.hasIncomeOutside = null
+    this.formItem[1].hidden = true
+    this.formItem[2].hidden = true
+    this.formItem[4].hidden = true
+    this.formItem[5].hidden = true
     this.formItem[12].hidden = true
     this.formItem[13].hidden = true
     this.formItem[14].hidden = true
