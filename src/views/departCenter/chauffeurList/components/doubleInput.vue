@@ -49,9 +49,9 @@ export default class extends Vue {
   private handleBlur(e:any, index:number) {
     let min = Number(this.range[0])
     let max = Number(this.range[1])
-    if (Number(e) > max) {
+    if (max && Number(e) > max) {
       this.sendMessage(max, index)
-    } else if (Number(e) < min) {
+    } else if (min && Number(e) < min) {
       this.sendMessage(min, index)
     }
   }
