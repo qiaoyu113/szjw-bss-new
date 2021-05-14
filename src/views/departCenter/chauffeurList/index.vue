@@ -201,7 +201,7 @@ export default class extends Vue {
       listQuery.oilElectricityRequirement !== '' && (params.oilElectricityRequirement = listQuery.oilElectricityRequirement)
       listQuery.driverId !== '' && (params.driverId = listQuery.driverId)
       listQuery.heavyLifting !== '' && (params.heavyLifting = listQuery.heavyLifting)
-      listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)
+      listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = [listQuery.expectStabilityTemporary])
       listQuery.expectAccountingPeriod !== '' && (params.expectAccountingPeriod = listQuery.expectAccountingPeriod)
       if (listQuery.address.length > 1) {
         params.liveAddressProvince = listQuery.address[0]
