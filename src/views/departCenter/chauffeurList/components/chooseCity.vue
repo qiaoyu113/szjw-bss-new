@@ -44,7 +44,7 @@ export default class extends Vue {
   @Prop({ default: () => {} }) obj!: IState; // row data
   @PropSync('dialogVisible', { type: Boolean }) show!: Boolean;
   private listQuery: IState = {
-    workCity: ''
+    params: ''
   };
   private formItem: any[] = [
     {
@@ -55,12 +55,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '新工作城市',
-      key: 'workCity',
+      key: 'params',
       options: this.options
     }
   ];
   private rules: IState = {
-    workCity: [
+    params: [
       {
         required: true,
         message: '请选择新工作城市',
@@ -81,10 +81,11 @@ export default class extends Vue {
   // 验证通过
   async handlePassChange() {
     try {
+      let query = JSON.parse(this.listQuery.params)
       let params = {
         driverId: this.obj.driverId,
-        workCity: this.listQuery.workCity,
-        dmId: this.obj.joinManagerId
+        workCity: query.code,
+        dmId: query.dmId
       }
       let { data: res } = await updateDriverWorkCityByDriverId(params)
       if (res.success) {
