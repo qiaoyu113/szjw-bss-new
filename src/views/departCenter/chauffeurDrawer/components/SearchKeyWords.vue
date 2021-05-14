@@ -377,7 +377,6 @@ export default class SearchKeyWords extends Vue {
       }
       this.listQuery.workRange = id
       this.selectedData.push(obj)
-      console.log(this.selectedData)
     } else {
       const isWorkRange: boolean = this.key === 'start' || this.key === 'end'
       const title = (this.selectList.find((v: any) => v.key === this.key) || {}).title
@@ -392,7 +391,15 @@ export default class SearchKeyWords extends Vue {
     }
   }
   clearSelect(i: number) {
-    this.selectedData.splice(i, 1)
+    const item: any = this.selectedData.splice(i, 1)
+    const key: string = (item[0] || {}).key
+    if (key === 'workRange') {
+      this.listQuery.workRange = ''
+      this.listQuery.start = ''
+      this.listQuery.end = ''
+    } else {
+      this.listQuery[item[0].key] = formData[key] || ''
+    }
   }
   onClearInput() {
     this.lineList = []
@@ -427,17 +434,17 @@ export default class SearchKeyWords extends Vue {
     if ((driver.workHours || []).length) {
       this.initSelectItem(driver.workHoursStr, driver.workHoursStr, true)
     }
-    if (driver.heavyLifting) {
+    if (driver.heavyLifting && driver.heavyLiftingName) {
       this.key = 'loadDifficulty'
       this.initSelectItem(driver.heavyLifting, driver.heavyLiftingName)
     }
-    if (driver.carType) {
+    if (driver.carType && driver.carTypeName) {
       this.key = 'model'
       this.initSelectItem(driver.carType, driver.carTypeName)
     }
-    if (driver.intentCargoType) {
+    if (driver.intentCargoType && driver.intentCargoTypeName) {
       this.key = 'cargoType'
-      this.initSelectItem((driver.intentCargoType || []).join(','), (driver.intentCargoTypeName || []).join(','))
+      this.initSelectItem(driver.intentCargoType.join(','), driver.intentCargoTypeName.join(','))
     }
     if (driver.liveAddressCity && driver.liveAddressProvince) {
       const county = driver.liveAddressCounty
