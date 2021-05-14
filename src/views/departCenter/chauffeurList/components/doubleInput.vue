@@ -31,7 +31,9 @@ interface IState {
 export default class extends Vue {
   @Model('inputChange', { type: Array }) readonly modelArr!: any[]
   @Prop({ default: () => [] }) range?:number[]
-  private newModelArr:string[] = ['', '']
+  get newModelArr() {
+    return this.modelArr
+  }
   get sortModel() {
     return (this.range as number[]).sort((a, b) => a - b)
   }

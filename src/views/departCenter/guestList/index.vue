@@ -356,21 +356,6 @@ export default class extends Vue {
     }
     // 查询
     handleFilterClick() {
-      // 单趟运费区间
-      const moneyRange = (this.listQuery.start || []).filter((item:string | number) => item !== '')
-      if (moneyRange.length === 1) {
-        return this.$message.warning('单趟运费输入不完整')
-      } else if (moneyRange.length === 2) {
-        if (Number(moneyRange[0]) > Number(moneyRange[1])) {
-          return this.$message.warning('单趟运费起始金额不能大于终止金额')
-        }
-      }
-      // 工作时间段
-      const timeRange = (this.listQuery.time || []).filter((item:string | number) => item !== '')
-      if (timeRange.length === 1) {
-        return this.$message.warning('工作时间段输入不完整')
-      }
-
       this.getLists()
     }
     // 重置
@@ -410,15 +395,28 @@ export default class extends Vue {
           params.cityCode = +this.listQuery.cityCode[1]
         }
         // 单趟运费区间
-        if (this.listQuery.everyTripGuaranteed && this.listQuery.everyTripGuaranteed.length > 1) {
+        const moneyRange = (this.listQuery.everyTripGuaranteed || []).filter((item:string | number) => item)
+        if (moneyRange.length === 1) {
+          return this.$message.warning('请完善期望运费')
+        } else if (moneyRange.length === 2) {
+          if (Number(moneyRange[0]) > Number(moneyRange[1])) {
+            return this.$message.warning('期望运费后置参数大于前置参数')
+          }
           params.everyTripGuaranteedStart = +this.listQuery.everyTripGuaranteed[0]
           params.everyTripGuaranteedEnd = +this.listQuery.everyTripGuaranteed[1]
         }
         // 工作时间段
-        if (this.listQuery.workingHours && this.listQuery.workingHours.length > 1) {
-          params.workingHourStart = Number(this.listQuery.workingHours[0])
-          params.workingHourEnd = Number(this.listQuery.workingHours[1])
+        const timeRange = (this.listQuery.workingHours || []).filter((item:string | number) => item)
+        if (timeRange.length === 1) {
+          return this.$message.warning('请完善可工作时间段')
+        } else if (timeRange.length === 2) {
+          params.workingHourStart = Number(this.listQuery.workingHours[0].split(':')[0])
+          params.workingHourEnd = Number(this.listQuery.workingHours[1].split(':')[0])
         }
+        // 单趟运费区间
+
+        // 工作时间段
+
         // 仓库位置
         if (this.listQuery.warehouse && this.listQuery.warehouse.length > 2) {
           params.warehouseProvince = +this.listQuery.warehouse[0]

@@ -14,6 +14,7 @@
           @tab-click="handleClick"
         >
           <el-tab-pane
+            v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId']"
             label="基础信息"
             name="first"
           >
@@ -25,11 +26,13 @@
             >
               <template slot="address">
                 <span v-if="listQuery.liveDistrict">{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}-{{ listQuery.liveDistrict }}</span>
+                <span v-else-if="!listQuery.liveProvinceName"> 暂无数据</span>
                 <span v-else>{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}</span>
               </template>
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/matchDriverLabelInfo/getDriverLabelByDriverId']"
             label="司机标签"
             name="second"
           >
@@ -57,6 +60,7 @@
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v2/runtest/getRunTestInfoByDriverId']"
             label="试跑信息"
             name="third"
           >
@@ -75,6 +79,7 @@
             </SelfTable>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/outboundCall/getListByBusinessId']"
             label="外呼记录"
             name="fourth"
           >

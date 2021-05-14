@@ -5,7 +5,7 @@
       ref="searchKeyWords"
       @on-search="searchData"
     />
-    <h3>司机匹配线路</h3>
+    <h3>线路匹配司机</h3>
     <div class="lineTable">
       <AtableDriver
         ref="tableDriver"
@@ -125,9 +125,12 @@ export default class DepartLine extends Vue {
       this.listQueryLine.lineId = this.rowData.lineId
       this.listQueryLine.page = this.pageSize
       this.listQueryLine.limit = 10
-      let notIncludedDriverIds:any = []
-
       this.listQueryLine.notIncludedDriverIds = this.notIncludedDriverIds.length === 0 ? null : this.notIncludedDriverIds
+      this.listQueryLine.busiType = (this.listQueryLine.busiType && this.listQueryLine.busiType.indexOf('') === -1) ? this.listQueryLine.busiType : null
+      this.listQueryLine.carType = (this.listQueryLine.carType && this.listQueryLine.carType.indexOf('') === -1) ? this.listQueryLine.carType : null
+      this.listQueryLine.cargoType = (this.listQueryLine.cargoType && this.listQueryLine.cargoType.indexOf('') === -1) ? this.listQueryLine.cargoType : null
+      this.listQueryLine.handlingDifficulty = (this.listQueryLine.handlingDifficulty && this.listQueryLine.handlingDifficulty.indexOf('') === -1) ? this.listQueryLine.handlingDifficulty : null
+      this.listQueryLine.settlementCycle = (this.listQueryLine.settlementCycle && this.listQueryLine.settlementCycle.indexOf('') === -1) ? this.listQueryLine.settlementCycle : null
       this.$emit('on-loading', true)
       let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
       if (res.success) {
@@ -141,7 +144,6 @@ export default class DepartLine extends Vue {
         if (this.driverTableData.length < 10 && this.pageSize === 1) {
           this.$emit('on-lock')
         }
-        console.log(this.driverTableData)
       } else {
         this.$message.error(res.errorMsg)
       }

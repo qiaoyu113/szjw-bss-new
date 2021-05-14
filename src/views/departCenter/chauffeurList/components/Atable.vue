@@ -250,7 +250,10 @@
       >
         <template slot-scope="{row}">
           <section class="opBox">
-            <p class="text">
+            <p
+              v-permission="['/v1/outboundCall/getListByBusinessId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -262,7 +265,11 @@
                 {{ row.driverPhone }}
               </span>
             </p>
-            <p class="text">
+
+            <p
+              v-permission="['/v1/matchDriverLabelInfo/updateDriverLabelByDriverId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -277,6 +284,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/queryMatchLineForMatchDriver']"
                 type="text"
                 size="small"
                 @click.stop="handleDepart(row)"
@@ -290,6 +298,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v2/runtest/creatIntentionRun']"
                 type="text"
                 size="small"
                 @click.stop="handleCreatRun(row)"
@@ -315,6 +324,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverInfoByDriverId']"
                 size="mini"
                 class="showMoreBtn"
                 @click.stop="toogleExpand(row)"
@@ -341,6 +351,7 @@
                 class="text"
               >
                 <el-button
+                  v-permission="['/v2/driver/updateDriverWorkCityByDriverId']"
                   type="text"
                   size="small"
                   @click.stop="handleChooseCity(row)"
@@ -384,6 +395,7 @@
             </div>
             <div class="content">
               <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId','/v1/matchDriverLabelInfo/getDriverLabelByDriverId','/v2/runtest/getRunTestInfoByDriverId','/v1/outboundCall/getListByBusinessId']"
                 size="mini"
                 type="text"
                 @click.stop="handleDetail(row)"
