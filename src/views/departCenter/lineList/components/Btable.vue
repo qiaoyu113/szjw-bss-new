@@ -101,7 +101,7 @@
               仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
+              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}{{ row.countyArea?`-${row.countyArea}`:'' }}
             </p>
           </template>
         </el-table-column>
@@ -121,7 +121,7 @@
               预计月运费:{{ row.shipperOffer }}元
             </p>
             <p class="text">
-              结算周期/天数:{{ row.settlementCycle||'  ' }}/{{ row.settlementDays||'  ' }}天
+              结算周期/天数:{{ row.settlementCycle||'    ' }}/{{ row.settlementDays||'    ' }}天
             </p>
           </template>
         </el-table-column>
@@ -135,7 +135,7 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty }}
+              装卸难度:{{ row.handlingDifficulty||'全部' }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
@@ -383,7 +383,8 @@ export default class extends Vue {
         custInviteStatus: customerStatus
       }
       let { page, limit } = this.pageobj
-      let params = { queryParams, page, limit }
+      let params = { ...queryParams, page, limit }
+      console.log('params', queryParams, params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
