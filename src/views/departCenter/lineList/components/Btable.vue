@@ -76,21 +76,9 @@
               {{ row.carType }}/{{ row.oilElectricityRequirement }}
             </p>
             <p
-              v-if="row.behavior"
               class="text"
             >
-              能闯禁行
-            </p>
-            <p
-              v-if="row.restriction"
-              class="text"
-            >
-              能闯限行
-            </p>
-            <p
-              class="text"
-            >
-              {{ row.labelType }}
+              {{ row.behavior?'能闯禁行':'不能闯禁行' }}{{ row.restriction?'/能闯限行':'/不能闯限行' }}{{ row.labelType?'/'+row.labelType:'' }}
             </p>
           </template>
         </el-table-column>
