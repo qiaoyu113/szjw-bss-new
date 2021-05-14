@@ -95,6 +95,7 @@ export default class extends Vue {
   padding-top: 50px;
   height: 100vh;
   overflow: auto;
+  z-index: 200;
 }
 
 .hasTagsView {
