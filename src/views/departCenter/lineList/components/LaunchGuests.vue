@@ -154,7 +154,7 @@ export default class extends Vue {
             item.lineIds.forEach((val:any) => {
               str += val + ','
             })
-            str += `-${item.reason}`
+            str += `${item.reason}`
           })
           this.$message.error(str)
         }
