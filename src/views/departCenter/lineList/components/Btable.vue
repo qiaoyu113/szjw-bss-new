@@ -31,15 +31,15 @@
               style="margin-left:50px;"
             >
               <p class="text">
-                {{ row.lineName }}
+                {{ row.lineId }}
                 <el-popover
                   placement="right"
                   min-width="200"
                   trigger="hover"
-                  @show="showMarkHandle({lineId: row.lineId,city: row.currentCity||249})"
+                  @show="showMarkHandle(row)"
                 >
                   <div class="text1">
-                    {{ remarks }}
+                    {{ row.remark }}
                   </div>
                   <i
                     slot="reference"
@@ -54,7 +54,10 @@
               <p class="text">
                 {{ row.lineSaleId }}
               </p>
-              <p class="text">
+              <p
+                v-show="row.recruitWindowPeriod"
+                class="text"
+              >
                 窗口期:剩余{{ row.recruitWindowPeriod||' ' }}天
               </p>
               <p class="text scale">
@@ -357,6 +360,7 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
+    console.log('this.listQuery', this.listQuery)
     try {
     // 调用查询接口
       const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
@@ -435,13 +439,30 @@ export default class extends Vue {
     this.$emit('SelectionChange', selection)
   }
 
-  showMarkHandle(params:any) {
-    this.getRemarks(params)
+  showMarkHandle(row:IState) {
+    if (!row.remark) {
+      this.getRemarks(row)
+    }
   }
-  async getRemarks(params:any) {
-    let { data: res } = await getLineRemarks(params)
-    if (res.success) {
-      this.remarks = res.data.data
+  async getRemarks(row:IState) {
+    try {
+      this.$set(row, 'remark', '正在加载中....')
+      let params:IState = {
+        lineId: row.lineId,
+        city: row.currentCity || '276'
+      }
+      let { data: res } = await getLineRemarks(params)
+      if (res.success) {
+        let remarks = '暂无数据'
+        if (res.data && res.data.remarks) {
+          remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        }
+        this.$set(row, 'remark', remarks)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line remark fail:${err}`)
     }
   }
 
