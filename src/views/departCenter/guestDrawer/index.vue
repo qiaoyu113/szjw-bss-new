@@ -64,6 +64,7 @@ export default class GuestDrawer extends Vue {
   $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
+    console.log('works', val)
     this.visible = val
     this.$eventBus.$emit('setIndex', val)
   }
