@@ -90,11 +90,11 @@
             />
           </p>
           <p class="text">
-            <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving)">
+            <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving,true)">
               {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}
             </span>
             /
-            <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction)">
+            <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction,true)">
               {{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}
             </span>
             /
@@ -112,38 +112,44 @@
         <template slot-scope="{row}">
           <p class="text">
             现居住地址:
-            <span :class="addClass('canBreakingTrafficRestriction',row.canBreakingTrafficRestriction)">
-              {{ row.liveAddressProvinceName }}
-            </span> -
-            <span :class="addClass(obj.warehouseCity,row.liveAddressCity)">
-              {{ row.liveAddressCityName }}
-            </span> -
-            <span>
-              {{ row.liveAddressCountyName }}
+            <span :class="cityClass(row.liveAddressCity)">
+              <span>
+                {{ row.liveAddressProvinceName }}
+              </span> -
+              <span>
+                {{ row.liveAddressCityName }}
+              </span> -
+              <span>
+                {{ row.liveAddressCountyName }}
+              </span>
             </span>
           </p>
           <p class="text">
             其他活仓地址:
-            <span>
-              {{ row.startingPointProvinceName }}
-            </span> -
-            <span>
-              {{ row.startingPointCityName }}
-            </span> -
-            <span>
-              {{ row.startingPointCountyName }}
+            <span :class="cityClass(row.startingPointCity)">
+              <span>
+                {{ row.startingPointProvinceName }}
+              </span> -
+              <span>
+                {{ row.startingPointCityName }}
+              </span> -
+              <span>
+                {{ row.startingPointCountyName }}
+              </span>
             </span>
           </p>
           <p class="text">
             其他活配送点:
-            <span>
-              {{ row.deliveryPointProvinceName }}
-            </span> -
-            <span>
-              {{ row.deliveryPointCityName }}
-            </span> -
-            <span>
-              {{ row.deliveryPointCountyName }}
+            <span :class="cityClass(row.deliveryPointCity)">
+              <span>
+                {{ row.deliveryPointProvinceName }}
+              </span> -
+              <span>
+                {{ row.deliveryPointCityName }}
+              </span> -
+              <span>
+                {{ row.deliveryPointCountyName }}
+              </span>
             </span>
           </p>
         </template>
@@ -179,9 +185,9 @@
             <span
               v-for="(item,index) in (row.intentCargoType || [])"
               :key="index"
-              :class="hitClass(row.intentCargoTypeHit)"
+              :class="(row.intentCargoTypeHitCode).includes(item) ? 'orange' : ''"
             >
-              {{ row.intentCargoTypeName[index] }}
+              {{ row.intentCargoTypeName[index] }}&#8197;
             </span>
           </p>
           <p class="text">
@@ -190,7 +196,11 @@
           </p>
           <p class="text">
             期望配送复杂度:
-            <span :class="hitClass(row.deliveryDifficultyHit)">{{ (row.deliveryDifficultyNames || []).toString() }}</span>
+            <span
+              v-for="(item,index) in row.deliveryDifficulty"
+              :key="index"
+              :class="addClass(obj.distributionWay,item)"
+            >{{ row.deliveryDifficultyNames[index] }}&#8197;</span>
           </p>
           <p
             class="text"
@@ -513,14 +523,10 @@ export default class extends Vue {
   hitClass(val:any) {
     return val ? 'orange' : ''
   }
-  busiTypeClass(objData: any, rowData: any) {
-    // <!-- 1:超肥 2:单肥 3:次肥 4:中瘦 5极瘦 -->
+  cityClass(val:any) {
     if (this.isShowPercent) {
-      if (rowData === 1) {
-        return [3, 4, 5].includes(objData) ? 'orange' : ''
-      } else if (rowData === 1) {
-        return [1, 2, 3, 4, 5].includes(objData) ? 'orange' : ''
-      }
+      let cityArr = [this.obj.warehouseCity, this.obj.cityArea]
+      return cityArr.includes(val) ? 'orange' : ''
     } else {
       return ''
     }
