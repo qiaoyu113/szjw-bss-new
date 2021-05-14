@@ -51,7 +51,7 @@ interface PageObj {
 export default class extends Vue {
   private active: string = '0'
   private statusActive: number = 0
-    private lineSale:IState = [];
+  private lineSale:IState = [];
   private lineCity:IState = [];
   private page: PageObj = {
     page: 1,

@@ -38,7 +38,7 @@ Component.registerHooks([
   'beforeRouteLeave', // 离开路由之前
   'beforeRouteUpdate'
 ])
-
+Vue.prototype.$eventBus = new Vue()
 // Register global directives
 Object.keys(directives).forEach(key => {
   Vue.directive(key, (directives as { [key: string ]: DirectiveOptions })[key])

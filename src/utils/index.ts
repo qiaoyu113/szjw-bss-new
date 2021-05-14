@@ -1,5 +1,6 @@
 // Parse the time to string
 import Vue from 'vue'
+import dayjs from 'dayjs'
 import {
   getOfficeByTypeAndOfficeId,
   getOfficeByType,
@@ -594,3 +595,22 @@ async function getCityGroupForLine(cityCode:number, clueType:any = 0) {
     //
   }
 }
+
+export const formatDate = (time: number | Date, cFormat:string = 'YYYY-MM-DD HH:mm:ss') => {
+  if (time) {
+    return dayjs(time).format(cFormat)
+  } else {
+    return ''
+  }
+}
+
+// 数组内部是对象的时候根据某一个字段去重
+function uniqueByKey(data:[], key:Function) {
+  return [
+    ...new Map(
+      data.map((x:any) => [key(x), x])
+    ).values()
+  ]
+}
+
+// 使用方法   uniqueByKey(users, item => item.id)
