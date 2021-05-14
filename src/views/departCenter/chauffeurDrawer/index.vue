@@ -12,6 +12,8 @@
     @open="handleOpenClick"
   >
     <Scroll
+      :stop-slide="disabled"
+      :is-lock="isLock"
       :on-reach-bottom="loadMoreHandle"
       :distance-to-edge="0"
     >
@@ -120,6 +122,8 @@ export default class GuestDrawer extends Vue {
     private pageInfo: any = { ...pageInfo } // 分页数据
     private total: number = 0 // 总数据量
     private isAll: boolean = false
+    private disabled: boolean = false
+    private isLock: boolean = false
     private listQueryDriver:IState = {
       labelType: '',
       isBehavior: '',
@@ -261,7 +265,13 @@ export default class GuestDrawer extends Vue {
           if (list.length < this.pageInfo.limit) {
             this.isAll = true
           }
+          if (list.length < 10) {
+            this.disabled = true
+          }
           this.lineTableData = append ? this.lineTableData.concat(list) : list
+          if (this.lineTableData.length < 10 && this.pageSize === 1) {
+            this.isLock = true
+          }
           this.total = (res.page || {}).total
         } else {
           this.$message({ type: 'error', message: res.errorMsg })
