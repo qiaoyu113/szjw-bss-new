@@ -42,7 +42,6 @@ export default class extends Vue {
   @Prop({ default: () => [] }) id!:any[]
   private showDialog:boolean = false
   private cancelOptions:IState[] = [] // 取消原因
-  private cancelId:any = this.id
   private listQuery:IState = {
     custInviteId: '',
     cancelInviteReason: ''
@@ -107,7 +106,7 @@ export default class extends Vue {
     if (this.cancelGuestState === 2) {
       try {
         let params:IState = {
-          custInviteIds: this.cancelId,
+          custInviteIds: this.id,
           cancelInviteReason: this.listQuery.cancelInviteReason
         }
         if (this.listQuery.cancelInviteReason === '') {
