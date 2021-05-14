@@ -41,6 +41,7 @@
     <SetTag
       ref="setTag"
       :driver-id="checkOne.driverId"
+      @on-success="getLists"
     />
     <ChauffeureDrawer v-model="showDrawer" />
     <allotDio
@@ -243,7 +244,6 @@ export default class extends Vue {
     }
     // 客邀状态变化
     handleStatusChange(val: string | number) {
-      console.log('xxx:', val)
       this.getLists()
     }
     // 线路名称/编号 模糊搜索
