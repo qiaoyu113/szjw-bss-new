@@ -160,7 +160,7 @@ export default class SearchKeyWords extends Vue {
     carType: null, // 司机车型
     handlingDifficulty: null, // 装卸接受度
     settlementCycle: null, // 期望结算周期
-    lineCategory: null, // 期望稳定/临时
+    expectStabilityTemporary: null, // 期望稳定/临时
     cargoType: null, // 期望货品类型
     distributionWay: null, // 期望配送难度
     start: null,
@@ -247,7 +247,7 @@ export default class SearchKeyWords extends Vue {
         label: '临时'
       }],
       multiple: false,
-      key: 'lineCategory',
+      key: 'expectStabilityTemporary',
       title: '稳定/临时'
     },
     {
@@ -294,7 +294,7 @@ export default class SearchKeyWords extends Vue {
     this.listQuery.carType = null // 车类型
     this.listQuery.handlingDifficulty = null // 装卸接受度
     this.listQuery.settlementCycle = null // 结算周期
-    this.listQuery.lineCategory = null // 期望稳定/临时
+    this.listQuery.expectStabilityTemporary = null // 期望稳定/临时
     this.listQuery.cargoType = null // 期望货品类型
     this.listQuery.distributionWay = null // 期望配送难度
     this.listQuery.workingHours = null
