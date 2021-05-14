@@ -291,7 +291,7 @@ export default class SearchKeyWords extends Vue {
   handleClearAll() {
     this.selectedData = []
     this.listQuery.busiType = null // 所属业务线
-    this.listQuery.carType = null // 车类型
+    this.listQuery.carTypeList = null // 车类型
     this.listQuery.handlingDifficulty = null // 装卸接受度
     this.listQuery.settlementCycle = null // 结算周期
     this.listQuery.expectStabilityTemporary = null // 期望稳定/临时
@@ -360,6 +360,7 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
+          console.log(this.listQuery[this.key] + '---' + this.selectedData[index].optionIds)
           isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('-'))
         }
       } else {
@@ -388,7 +389,7 @@ export default class SearchKeyWords extends Vue {
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }
-      this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+      this.listQuery[this.key] = this.multiple ? obj.optionIds : id ? [id] : null
       this.selectedData.push(obj)
     }
   }
