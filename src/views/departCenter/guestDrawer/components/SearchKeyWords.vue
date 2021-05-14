@@ -38,14 +38,14 @@
           <template slot="freight">
             <el-input
               v-model="listQuery.everyTripGuaranteedStart"
-              v-only-number="{min: 0, max: 19999, precision: 0}"
+              v-only-number="{min: 1, max: 19999, precision: 0}"
               style="width:70px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.everyTripGuaranteedEnd"
-              v-only-number="{min: 0, max: 19999, precision: 0}"
+              v-only-number="{min: 1, max: 19999, precision: 0}"
               :disabled="!listQuery.everyTripGuaranteedStart"
               style="width:70px"
               placeholder="请输入"
@@ -303,6 +303,12 @@ export default class SearchKeyWords extends Vue {
     this.listQuery.address = null
     this.listQuery.driverInfo = ''
     this.$emit('on-search', this.listQuery)
+  }
+  resetData() {
+    this.listQuery.everyTripGuaranteedEnd = ''
+    this.listQuery.everyTripGuaranteedStart = ''
+    this.listQuery.address = null
+    this.listQuery.driverInfo = ''
   }
   handleChange(item:any) {
     console.log(item)

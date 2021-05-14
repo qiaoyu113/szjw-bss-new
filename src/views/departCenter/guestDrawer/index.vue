@@ -71,7 +71,8 @@ export default class GuestDrawer extends Vue {
     this.visible = false
     this.$emit('input', false);
     // 关闭抽屉删掉线路表格的数据
-    (this.$refs.lineDrawer as any).removeTableInfo()
+    (this.$refs.lineDrawer as any).removeTableInfo();
+    ((this.$refs.matchDriver as any).$refs.searchKeyWords as any).resetData()
   }
   // 取消创建试跑意向
   handleCancelTryRun1() {

@@ -150,7 +150,7 @@ export default class GuestDrawer extends Vue {
       (this.$refs.tagShow as any).isShow = true
     }
     setCallHandle(data:any) {
-      let phone = data.phoneNum
+      let phone = data.driverPhone || ''
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -158,7 +158,7 @@ export default class GuestDrawer extends Vue {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log(123)
+        (this.$refs.driverDrawer as any).callPhone(phone, this.driverId)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -182,6 +182,7 @@ export default class GuestDrawer extends Vue {
         name: this.driver.driverName || '',
         phone: this.driver.driverPhone || '',
         lineId: data.lineId,
+        matchId: data.matchId,
         matchType: 1 // 司推。客邀2
       }
       ;(this.$refs.tryRunShow as any).showDialog = true
@@ -193,7 +194,6 @@ export default class GuestDrawer extends Vue {
       this.queryData()
     }
     onQuery(params: any) {
-      console.log('params', params)
       const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
@@ -216,9 +216,9 @@ export default class GuestDrawer extends Vue {
         provinceArea: distInfo.province,
         cityAreaList: distInfo.cities,
         countyAreaList: distInfo.counties,
-        workHours: workRange,
-        shownLines: this.lineTableData.map(v => v.lineId)
+        workHours: workRange
       }
+      this.isAll = false
       this.queryData()
     }
     // 组装省市区
@@ -246,8 +246,12 @@ export default class GuestDrawer extends Vue {
     }
     queryData(append?: boolean) {
       if (append) {
+        this.params = Object.assign({}, this.params, {
+          shownLines: this.lineTableData.map(v => v.lineId)
+        })
         this.pageInfo.page += 1
       } else {
+        this.lineTableData = []
         this.pageInfo = { ...pageInfo }
       }
       MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
@@ -260,7 +264,6 @@ export default class GuestDrawer extends Vue {
           this.lineTableData = append ? this.lineTableData.concat(list) : list
           this.total = (res.page || {}).total
         } else {
-          console.log(res.errorMsg)
           this.$message({ type: 'error', message: res.errorMsg })
         }
       })
