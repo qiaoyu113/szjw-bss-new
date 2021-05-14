@@ -38,14 +38,14 @@
           <template slot="freight">
             <el-input
               v-model="listQuery.everyTripGuaranteedStart"
-              v-only-number="{min: 0, max: 19999, precision: 0}"
+              v-only-number="{min: 1, max: 19999, precision: 0}"
               style="width:70px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.everyTripGuaranteedEnd"
-              v-only-number="{min: 0, max: 19999, precision: 0}"
+              v-only-number="{min: 1, max: 19999, precision: 0}"
               :disabled="!listQuery.everyTripGuaranteedStart"
               style="width:70px"
               placeholder="请输入"
@@ -304,6 +304,12 @@ export default class SearchKeyWords extends Vue {
     this.listQuery.driverInfo = ''
     this.$emit('on-search', this.listQuery)
   }
+  resetData() {
+    this.listQuery.everyTripGuaranteedEnd = ''
+    this.listQuery.everyTripGuaranteedStart = ''
+    this.listQuery.address = null
+    this.listQuery.driverInfo = ''
+  }
   handleChange(item:any) {
     console.log(item)
     this.selectTitle = item.label || item.title
@@ -478,11 +484,6 @@ export default class SearchKeyWords extends Vue {
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
-        params.workCity = this.listQuery.workCity[1]
-      }
-      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.joinManagerId !== '' && (params.gmId = this.listQuery.joinManagerId)
       let { data: res } = await getDriverNoAndNameList(params, {
         url: '/v2/wt-driver-account/refund/queryDriverList'
       })

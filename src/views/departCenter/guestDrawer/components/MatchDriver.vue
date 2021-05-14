@@ -128,7 +128,7 @@ export default class DepartLine extends Vue {
       this.listQueryLine.notIncludedDriverIds = this.notIncludedDriverIds.length === 0 ? null : this.notIncludedDriverIds
       this.listQueryLine.busiType = (this.listQueryLine.busiType && this.listQueryLine.busiType.indexOf('') === -1) ? this.listQueryLine.busiType : null
       this.listQueryLine.carTypeList = (this.listQueryLine.carTypeList && this.listQueryLine.carTypeList.indexOf('') === -1) ? this.listQueryLine.carTypeList : null
-      this.listQueryLine.distributionWay = (this.listQueryLine.distributionWay && this.listQueryLine.distributionWay.indexOf('') === -1) ? this.listQueryLine.distributionWay : null
+      this.listQueryLine.distributionWay = this.listQueryLine.distributionWay ? this.listQueryLine.distributionWay : null
       this.listQueryLine.cargoType = (this.listQueryLine.cargoType && this.listQueryLine.cargoType.indexOf('') === -1) ? this.listQueryLine.cargoType : null
       this.listQueryLine.handlingDifficulty = (this.listQueryLine.handlingDifficulty && this.listQueryLine.handlingDifficulty.indexOf('') === -1) ? this.listQueryLine.handlingDifficulty : null
       this.listQueryLine.settlementCycle = (this.listQueryLine.settlementCycle && this.listQueryLine.settlementCycle.indexOf('') === -1) ? this.listQueryLine.settlementCycle : null
