@@ -21,6 +21,10 @@
     >
       <i class="el-icon-d-arrow-right" />
     </a>
+    <div
+      class="maskModel"
+      @click="closeHandle"
+    />
   </el-drawer>
 </template>
 
@@ -75,6 +79,14 @@ export default class DrawerModel extends Vue {
     overflow: auto!important;
     //background: #e6e9f0;
   }
+}
+.maskModel{
+  width: 18%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top:0;
+  opacity: 0;
 }
 .actionBtn{
     display: flex;
