@@ -484,11 +484,6 @@ export default class SearchKeyWords extends Vue {
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      if (this.listQuery.workCity && this.listQuery.workCity.length > 0) {
-        params.workCity = this.listQuery.workCity[1]
-      }
-      this.listQuery.busiType !== '' && (params.busiType = this.listQuery.busiType)
-      this.listQuery.joinManagerId !== '' && (params.gmId = this.listQuery.joinManagerId)
       let { data: res } = await getDriverNoAndNameList(params, {
         url: '/v2/wt-driver-account/refund/queryDriverList'
       })
