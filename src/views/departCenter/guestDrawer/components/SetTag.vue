@@ -7,7 +7,7 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      @before-close="handleDialogClosed"
+      @close="resetFrom"
     >
       <self-form
         ref="setTagFrom"
