@@ -87,7 +87,7 @@
             <p
               class="text"
             >
-              {{ row.labelType | labelFilter }}
+              {{ row.labelType }}
             </p>
           </template>
         </el-table-column>
@@ -360,7 +360,7 @@ export default class extends Vue {
     try {
     // 调用查询接口
       const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
-        warehouseLocation, distributionArea, stabilityTemporary, lineName, guestCity, customerStatus
+        warehouseLocation, distributionArea, stabilityTemporary, lineCode, guestCity, customerStatus
       } = this.listQuery
       let queryParams = {
         city: workCity[1] || '',
@@ -378,7 +378,7 @@ export default class extends Vue {
         deliveryCity: distributionArea[1] || '',
         deliveryCounty: distributionArea[2] || '',
         lineCategory: stabilityTemporary || '',
-        lineName,
+        lineCode,
         inviteCity: guestCity || '',
         custInviteStatus: customerStatus
       }
