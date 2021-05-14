@@ -229,7 +229,6 @@ export default class extends Vue {
     if (val.length > 1) {
       this.listQuery.remarks.shift()
     }
-    // this.listQuery.manuallyRemarks = ''
   }
   private formItem:any[] = [
     {
@@ -261,10 +260,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionAddress', 2)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionAddress', 2)
         }
       }
     },
@@ -310,10 +307,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionRegion', 5)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionRegion', 5)
         }
       }
     },
