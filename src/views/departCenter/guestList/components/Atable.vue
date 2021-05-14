@@ -161,7 +161,7 @@
                 {{ row.workingTime }}
               </span>
             </template>/
-            <span :class="isShowPercent && (obj.lineCategory || []).includes(row.lineCategory) ? 'blue':''">
+            <span :class="isShowPercent && (obj.expectStabilityTemporary || []).includes(row.lineCategory) ? 'blue':''">
               <template v-if="row.lineCategory ===1">
                 稳定/{{ row.stabilityRate }}
               </template>
@@ -215,7 +215,7 @@
                 </template>
               </el-popover>
             </template>
-            <template v-else>
+            <template v-else-if="row.inviteCitys && row.inviteCitys.length > 0">
               {{ (row.inviteCitys || []).join('、') }}已客邀
             </template>
           </p>
