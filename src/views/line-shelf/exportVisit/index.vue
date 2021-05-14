@@ -12,7 +12,6 @@
         :class="isPC ? 'btnPc' : 'mobile'"
       >
         <el-button
-          v-permission="['/v3/line/manager/visitExport']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           :disabled="times === 10 ? false :true"
