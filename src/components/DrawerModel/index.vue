@@ -9,7 +9,6 @@
     :modal="false"
     :destroy-on-close="true"
     @close="closeHandle"
-    @click="closeModel"
     @open="handleOpenClick"
   >
     <div class="drawerContent">
@@ -48,9 +47,6 @@ export default class DrawerModel extends Vue {
   }
   handleOpenClick() {
     this.$emit('open')
-  }
-  closeModel(e) {
-    console.log(e)
   }
 }
 </script>
