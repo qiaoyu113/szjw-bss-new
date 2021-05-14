@@ -7,7 +7,6 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      @close="resetFrom"
     >
       <self-form
         ref="setTagFrom"
@@ -203,6 +202,8 @@ export default class extends Vue {
   onisShowChanged(val: any, oldVal: any) {
     if (val) {
       this.initData()
+    } else {
+      this.resetFrom()
     }
   }
   @Watch('listQuery.canBreakingNodriving')
