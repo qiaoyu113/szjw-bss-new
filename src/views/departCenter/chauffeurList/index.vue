@@ -94,7 +94,7 @@ export default class extends Vue {
     private listQuery: IState = {
       busiType: '',
       carType: '',
-      isNewEnergy: '',
+      oilElectricityRequirement: '',
       driverId: '',
       address: [],
       heavyLifting: '',
@@ -180,7 +180,7 @@ export default class extends Vue {
         let { data: res } = await getDriverWorkCity(params)
         if (res.success) {
           let cityOptions = res.data.map((item:IState) => {
-            return { label: `${item.city}(${item.name}${item.phone})`, value: item.id }
+            return { label: `${item.city}(${item.name}${item.phone})`, value: JSON.stringify({ dmId: item.id, code: item.cityCode }) }
           })
           this.cityOptions.push(...cityOptions)
         } else {
@@ -198,7 +198,7 @@ export default class extends Vue {
       }
       listQuery.busiType !== '' && (params.busiType = listQuery.busiType)
       listQuery.carType !== '' && (params.carType = listQuery.carType)
-      listQuery.isNewEnergy !== '' && (params.isNewEnergy = listQuery.isNewEnergy)
+      listQuery.oilElectricityRequirement !== '' && (params.oilElectricityRequirement = listQuery.oilElectricityRequirement)
       listQuery.driverId !== '' && (params.driverId = listQuery.driverId)
       listQuery.heavyLifting !== '' && (params.heavyLifting = listQuery.heavyLifting)
       listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)

@@ -82,6 +82,7 @@
           重置
         </el-button>
         <el-button
+          v-permission="['/v2/driver/updateDriverDmBatch']"
           size="small"
           :class="isPC ? '' : 'btnMobile'"
           type="primary"
@@ -181,7 +182,7 @@ export default class extends Vue {
         filterable: true
       },
       label: '电油分类',
-      key: 'isNewEnergy',
+      key: 'oilElectricityRequirement',
       options: this.carKindOptions
     },
     {
@@ -403,7 +404,7 @@ export default class extends Vue {
     try {
       let params = {
         roleTypes: [15],
-        uri: '/driverGmInfo/role'
+        uri: '/v2/driver/updateDriverDmBatch'
       }
       let { data: res } = await GetSpecifiedLowerUserListByCondition(params)
       if (res.success) {

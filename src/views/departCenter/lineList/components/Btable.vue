@@ -33,7 +33,6 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -360,8 +359,31 @@ export default class extends Vue {
   async getLists() {
     try {
     // 调用查询接口
+      const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
+        warehouseLocation, distributionArea, stabilityTemporary, lineName, guestCity, customerStatus
+      } = this.listQuery
+      let queryParams = {
+        city: workCity[1] || '',
+        carType,
+        labelType: lineFineness,
+        handlingDifficulty,
+        everyTripMinFees: freightSection[0] || '',
+        everyTripMaxFees: freightSection[1] || '',
+        workingStartHour: time[0] || '',
+        workingEndHour: time[1] || '',
+        warehouseLocationProvince: warehouseLocation[0] || '',
+        warehouseLocationCity: warehouseLocation[1] || '',
+        warehouseLocationCounty: warehouseLocation[2] || '',
+        deliveryProvince: distributionArea[0] || '',
+        deliveryCity: distributionArea[1] || '',
+        deliveryCounty: distributionArea[2] || '',
+        lineCategory: stabilityTemporary || '',
+        lineName,
+        inviteCity: guestCity || '',
+        custInviteStatus: customerStatus
+      }
       let { page, limit } = this.pageobj
-      let params = { ...this.listQuery, page, limit }
+      let params = { queryParams, page, limit }
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
@@ -418,7 +440,7 @@ export default class extends Vue {
   async getRemarks(params:any) {
     let { data: res } = await getLineRemarks(params)
     if (res.success) {
-      this.remarks = res.data.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
+      this.remarks = res.data.data
     }
   }
 
