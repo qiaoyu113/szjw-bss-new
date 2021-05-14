@@ -87,7 +87,7 @@
             <p
               class="text"
             >
-              {{ row.labelType | labelFilter }}
+              {{ row.labelType }}
             </p>
           </template>
         </el-table-column>
