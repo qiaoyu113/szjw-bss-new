@@ -185,7 +185,7 @@
             <span
               v-for="(item,index) in (row.intentCargoType || [])"
               :key="index"
-              :class="(row.intentCargoTypeHitCode).includes(item) ? 'orange' : ''"
+              :class="(row.intentCargoTypeHitCode || []).includes(item) ? 'orange' : ''"
             >
               {{ row.intentCargoTypeName[index] }}&#8197;
             </span>
