@@ -4,11 +4,12 @@
     :visible.sync="visible"
     :with-header="false"
     :modal-append-to-body="false"
-    size="86%"
+    size="100%"
     top="84px"
-    :wrapper-closable="true"
+    :modal="false"
     :destroy-on-close="true"
     @close="closeHandle"
+    @click="closeModel"
     @open="handleOpenClick"
   >
     <div class="drawerContent">
@@ -48,12 +49,16 @@ export default class DrawerModel extends Vue {
   handleOpenClick() {
     this.$emit('open')
   }
+  closeModel(e) {
+    console.log(e)
+  }
 }
 </script>
 <style lang="scss" scoped>
 ::v-deep .el-drawer__body{
   height: 100%;
-  padding-left: 25px;
+  background:rgba(0,0,0,0.5);
+  padding-left: 18%;
   >div{
     height: 100%;
     overflow: auto;
@@ -82,7 +87,7 @@ export default class DrawerModel extends Vue {
     justify-content: center;
     align-items: center;
     position: absolute;
-    left: 0;
+    left: calc(18% - 25px);
     top:50%;
     transform: translateY(-50%);
     background: #fff;

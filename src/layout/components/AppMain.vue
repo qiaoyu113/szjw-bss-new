@@ -89,14 +89,12 @@ export default class extends Vue {
   position: relative;
   overflow: hidden;
   background: #f8f9fa;
-  z-index: 0;
 }
 
 .fixed-header+.app-main {
   padding-top: 50px;
   height: 100vh;
   overflow: auto;
-  z-index: 200;
 }
 
 .hasTagsView {
