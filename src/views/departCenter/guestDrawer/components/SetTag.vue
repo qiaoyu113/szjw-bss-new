@@ -330,7 +330,18 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: this.hardOptions
+      options: [ {
+        label: '不接受装卸',
+        value: 2
+      },
+      {
+        label: '轻装卸',
+        value: 1
+      },
+      {
+        label: '重装卸',
+        value: 0
+      }]
     },
     {
       type: 5,
@@ -480,7 +491,7 @@ export default class extends Vue {
       col: 24,
       options: [
         { label: '着急试跑', value: 1 },
-        { label: '想跟跑', value: 2 },
+        { label: '想跟车', value: 2 },
         { label: '考虑退费', value: 3 },
         { label: '威胁司撮要退费', value: 4 },
         { label: '铁了心要退费', value: 5 },
@@ -591,6 +602,8 @@ export default class extends Vue {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+
+        console.log(this.hardOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
