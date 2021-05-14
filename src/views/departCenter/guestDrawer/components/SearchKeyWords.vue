@@ -38,16 +38,16 @@
           <template slot="freight">
             <el-input
               v-model="listQuery.everyTripGuaranteedStart"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
-              style="width:100px"
+              v-only-number="{min: 0, max: 19999, precision: 0}"
+              style="width:70px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.everyTripGuaranteedEnd"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
+              v-only-number="{min: 0, max: 19999, precision: 0}"
               :disabled="!listQuery.everyTripGuaranteedStart"
-              style="width:100px"
+              style="width:70px"
               placeholder="请输入"
             />
           </template>
@@ -160,7 +160,7 @@ export default class SearchKeyWords extends Vue {
     carType: null, // 司机车型
     handlingDifficulty: null, // 装卸接受度
     settlementCycle: null, // 期望结算周期
-    lineCategory: null, // 期望稳定/临时
+    expectStabilityTemporary: null, // 期望稳定/临时
     cargoType: null, // 期望货品类型
     distributionWay: null, // 期望配送难度
     start: null,
@@ -226,14 +226,14 @@ export default class SearchKeyWords extends Vue {
     {
       options: this.carLists,
       multiple: true,
-      key: 'carType',
-      title: '司机车型'
+      key: 'carTypeList',
+      title: '配送车型'
     },
     {
       options: this.hardOptions,
       multiple: true,
       key: 'handlingDifficulty',
-      title: '装卸接受度'
+      title: '装卸难度'
     },
     {
       options: [{
@@ -247,20 +247,20 @@ export default class SearchKeyWords extends Vue {
         label: '临时'
       }],
       multiple: false,
-      key: 'lineCategory',
-      title: '期望稳定/临时'
+      key: 'expectStabilityTemporary',
+      title: '稳定/临时'
     },
     {
       options: this.cycleOptions,
       multiple: true,
       key: 'settlementCycle',
-      title: '期望结算周期'
+      title: '结算周期'
     },
     {
       options: this.expectOptions,
       key: 'cargoType',
       multiple: true,
-      title: '期望货品类型'
+      title: '货品类型'
     },
     {
       options: [{
@@ -275,7 +275,7 @@ export default class SearchKeyWords extends Vue {
       }],
       multiple: false,
       key: 'distributionWay',
-      title: '期望配送复杂度'
+      title: '配送复杂度'
     },
     {
       title: '开始工作时间',
@@ -291,10 +291,10 @@ export default class SearchKeyWords extends Vue {
   handleClearAll() {
     this.selectedData = []
     this.listQuery.busiType = null // 所属业务线
-    this.listQuery.carType = null // 车类型
+    this.listQuery.carTypeList = null // 车类型
     this.listQuery.handlingDifficulty = null // 装卸接受度
     this.listQuery.settlementCycle = null // 结算周期
-    this.listQuery.lineCategory = null // 期望稳定/临时
+    this.listQuery.expectStabilityTemporary = null // 期望稳定/临时
     this.listQuery.cargoType = null // 期望货品类型
     this.listQuery.distributionWay = null // 期望配送难度
     this.listQuery.workingHours = null
@@ -360,7 +360,8 @@ export default class SearchKeyWords extends Vue {
             }
           }
           this.listQuery[this.key] = this.selectedData[index].optionIds
-          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('~'))
+          console.log(this.listQuery[this.key] + '---' + this.selectedData[index].optionIds)
+          isWorkRange && (this.listQuery.workingHours = this.selectedData[index].optionIds.join('-'))
         }
       } else {
         this.initSelectItem(id, command)
@@ -388,7 +389,7 @@ export default class SearchKeyWords extends Vue {
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }
-      this.listQuery[this.key] = this.multiple ? obj.optionIds : id
+      this.listQuery[this.key] = this.multiple ? obj.optionIds : id ? [id] : null
       this.selectedData.push(obj)
     }
   }
@@ -406,6 +407,7 @@ export default class SearchKeyWords extends Vue {
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+        console.log(this.carLists)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -588,13 +590,13 @@ export default class SearchKeyWords extends Vue {
   getCarType(data:any) {
     if (data.carType) {
       let carType:any = {
-        key: 'carType',
+        key: 'carTypeList',
         optionIds: [data.carType],
         selected: [data.carTypeValue],
         type: '配送车型'
       }
       this.selectedData.push(carType)
-      this.listQuery['carType'] = carType.optionIds
+      this.listQuery['carTypeList'] = carType.optionIds
     }
   }
   // 从缓存获取线路信息
@@ -691,7 +693,7 @@ export default class SearchKeyWords extends Vue {
     padding:15px 30px 0 30px;
     border-bottom:2px solid #f3f3f5;
     ::v-deep .el-form-item{
-      // margin-bottom: 5px !important;
+      margin-bottom: 5px !important;
     }
     ::v-deep .selfForm{
       padding-left: 0;
@@ -721,6 +723,8 @@ export default class SearchKeyWords extends Vue {
     .formList{
       display: flex;
       align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 5px;
       .formItem{
         display: inline-block;
         margin-right: 10px;

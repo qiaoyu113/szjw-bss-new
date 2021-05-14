@@ -7,7 +7,7 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      @before-close="handleDialogClosed"
+      @close="resetFrom"
     >
       <self-form
         ref="setTagFrom"
@@ -57,7 +57,7 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expectIncomeTrip']"
-            v-only-number="{min: 0, max: 20000, precision: 0}"
+            v-only-number="{min: 0, max: 19999, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
             placeholder="请输入"
@@ -229,7 +229,6 @@ export default class extends Vue {
     if (val.length > 1) {
       this.listQuery.remarks.shift()
     }
-    // this.listQuery.manuallyRemarks = ''
   }
   private formItem:any[] = [
     {
@@ -261,10 +260,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionAddress', 2)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionAddress', 2)
         }
       }
     },
@@ -310,10 +307,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionRegion', 5)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionRegion', 5)
         }
       }
     },
@@ -605,13 +600,18 @@ export default class extends Vue {
   }
   resetFrom() {
     (this.$refs.setTagFrom as any).resetForm()
-    this.listQuery.prohibitionAddress = ''
-    this.listQuery.prohibitionRegion = ''
+    this.listQuery.prohibitionAddress = null
+    this.listQuery.prohibitionRegion = null
     this.listQuery.start = ''
     this.listQuery.delivery = ''
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
+    this.listQuery.hasIncomeOutside = null
+    this.formItem[1].hidden = true
+    this.formItem[2].hidden = true
+    this.formItem[4].hidden = true
+    this.formItem[5].hidden = true
     this.formItem[12].hidden = true
     this.formItem[13].hidden = true
     this.formItem[14].hidden = true
