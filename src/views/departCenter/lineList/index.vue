@@ -426,6 +426,7 @@ export default class extends Vue {
     if (timeRange.length === 1) {
       return this.$message.warning('工作时间段输入不完整')
     }
+    this.page.page = 1
     this.getList()
   }
   // 重置

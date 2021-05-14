@@ -360,6 +360,30 @@ export default class extends Vue {
   async getLists() {
     try {
     // 调用查询接口
+      const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
+        warehouseLocation, distributionArea, stabilityTemporary, lineName, guestCity, customerStatus
+      } = this.listQuery
+      let queryParams = {
+        city: workCity[1],
+        carType,
+        labelType: lineFineness,
+        handlingDifficulty,
+        everyTripMinFees: freightSection[0] || '',
+        everyTripMaxFees: freightSection[1] || '',
+        workingStartHour: time[0],
+        workingEndHour: time[1],
+        warehouseLocationProvince: warehouseLocation[0] || '',
+        warehouseLocationCity: warehouseLocation[1] || '',
+        warehouseLocationCounty: warehouseLocation[2] || '',
+        deliveryProvince: distributionArea[0] || '',
+        deliveryCity: distributionArea[1] || '',
+        deliveryCounty: distributionArea[2] || '',
+        lineCategory: stabilityTemporary || '',
+        lineName,
+        inviteCity: guestCity || '',
+        custInviteStatus: customerStatus
+      }
+      console.log('queryParams', queryParams)
       let { page, limit } = this.pageobj
       let params = { ...this.listQuery, page, limit }
       let { data: res } = await getLineInfo(params)
