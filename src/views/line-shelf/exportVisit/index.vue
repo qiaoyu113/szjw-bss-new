@@ -134,18 +134,20 @@ export default class extends Vue {
         endDate.setHours(23, 59, 59)
         params.startDate = startDate.setHours(0, 0, 0)
         params.endDate = endDate.setHours(23, 59, 59)
-      }
-      let { data: res } = await visitExport(params)
-      if (res.success) {
-        sucFun()
-        this.ExportClick = false
-        this.$message({
-          type: 'success',
-          message: '导出成功!'
-        })
+        let { data: res } = await visitExport(params)
+        if (res.success) {
+          sucFun()
+          this.ExportClick = false
+          this.$message({
+            type: 'success',
+            message: '导出成功!'
+          })
+        } else {
+          this.ExportClick = false
+          this.$message.error(res.errorMsg)
+        }
       } else {
-        this.ExportClick = false
-        this.$message.error(res.errorMsg)
+        this.$message('请选取拜访时间后导出数据')
       }
     } catch (err) {
       console.log(`get list fail:${err}`)
