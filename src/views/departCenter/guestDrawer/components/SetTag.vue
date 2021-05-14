@@ -57,7 +57,7 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expectIncomeTrip']"
-            v-only-number="{min: 0, max: 19999, precision: 0}"
+            v-only-number="{min: 1, max: 19999, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
             placeholder="请输入"
@@ -188,7 +188,7 @@ export default class extends Vue {
     expectAccountingPeriod: null, // 期望账期
     expectIncomeTrip: '', // 期望运费（趟）
     hasIncomeOutside: null, // 外面是否有活
-    expectStabilityTemporary: [], // 期望稳定/临时
+    expectStabilityTemporary: null, // 期望稳定/临时
     start: [], // 起始点
     startPointStartTime: null, // 起始点-开始时间
     startPointEndTime: null, // 起始点-结束时间
