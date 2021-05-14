@@ -24,6 +24,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, PropSync, Emit } from 'vue-property-decorator'
+import { delayTime } from '@/settings'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { updateDriverDmBatch } from '@/api/departCenter'
@@ -119,8 +120,10 @@ export default class extends Vue {
       if (res.success) {
         if (res.data.flag) {
           this.$message.success(res.data.msg)
-          this.show = false;
-          (this.$parent as any).getLists()
+          this.show = false
+          setTimeout(() => {
+            (this.$parent as any).getLists()
+          }, delayTime)
         } else {
           this.$message.warning(res.data.msg)
         }

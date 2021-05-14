@@ -27,6 +27,7 @@ import { Vue, Component, Prop, PropSync, Emit } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { updateDriverWorkCityByDriverId } from '@/api/departCenter'
+import { delayTime } from '@/settings'
 
 interface IState {
   [key: string]: any;
@@ -90,8 +91,10 @@ export default class extends Vue {
       let { data: res } = await updateDriverWorkCityByDriverId(params)
       if (res.success) {
         this.show = false
-        this.$message.success('操作成功');
-        (this.$parent as any).getLists()
+        this.$message.success('操作成功')
+        setTimeout(() => {
+          (this.$parent as any).getLists()
+        }, delayTime)
       } else {
         this.$message.warning(res.errorMsg)
       }
