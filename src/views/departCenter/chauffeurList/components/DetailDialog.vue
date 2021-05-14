@@ -26,6 +26,7 @@
             >
               <template slot="address">
                 <span v-if="listQuery.liveDistrict">{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}-{{ listQuery.liveDistrict }}</span>
+                <span v-else-if="!listQuery.liveProvinceName"> 暂无数据</span>
                 <span v-else>{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}</span>
               </template>
             </SelfForm>
