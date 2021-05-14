@@ -31,7 +31,7 @@
               style="margin-left:50px;"
             >
               <p class="text">
-                {{ row.lineId }}
+                {{ row.lineName }}
                 <el-popover
                   placement="right"
                   min-width="200"
@@ -52,7 +52,7 @@
                 ({{ row.lineSaleName }})
               </p>
               <p class="text">
-                {{ row.lineSaleId }}
+                {{ row.lineId }}
               </p>
               <p
                 v-show="row.recruitWindowPeriod"
