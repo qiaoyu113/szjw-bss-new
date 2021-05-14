@@ -91,7 +91,7 @@
           <p
             class="text"
           >
-            <span :class="isShowPercent && ((row.isBehavior === 1) === obj.canBreakingNodriving) ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && ((row.isRestriction ===1) === obj.canBreakingTrafficRestriction) ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
+            <span :class="isShowPercent && ((obj.canBreakingNodriving || ((row.isBehavior === 1) === obj.canBreakingNodriving))) ? 'blue':''"> {{ row.isBehavior ===1 ? '能闯禁行' : '不能闯禁行' }}</span>/<span :class="isShowPercent && (obj.canBreakingTrafficRestriction || ((row.isRestriction ===1) === obj.canBreakingTrafficRestriction)) ? 'blue':''">{{ row.isRestriction ===1? '能闯限行':'不能闯限行' }}</span>/<span :class="isShowPercent && row.labelTypeHit ? 'blue' : ''">{{ row.labelTypeValue }}</span>
           </p>
         </template>
       </el-table-column>
@@ -104,12 +104,12 @@
           <p
             class="text"
           >
-            仓库位置:<span :class="isShowPercent && obj.liveAddressCity === row.warehouseCity ? 'blue' : ''">{{ row.warehouseProvinceValue }}-{{ row.warehouseCityValue }}-{{ row.warehouseCountyValue }}</span>
+            仓库位置:<span :class="isShowPercent && [obj.liveAddressCity,obj.deliveryPointCity,obj.startingPointCity].includes(row.warehouseCity) ? 'blue' : ''">{{ row.warehouseProvinceValue }}-{{ row.warehouseCityValue }}-{{ row.warehouseCountyValue }}</span>
           </p>
           <p
             class="text"
           >
-            配送区域:<span :class="isShowPercent && obj.deliveryPointCity === row.cityArea ? 'blue' : ''">{{ row.provinceAreaValue }}-{{ row.cityAreaValue }}-{{ row.countyAreaValue || '全区域' }}</span>
+            配送区域:<span :class="isShowPercent && [obj.liveAddressCity,obj.deliveryPointCity,obj.startingPointCity].includes(row.cityArea) ? 'blue' : ''">{{ row.provinceAreaValue }}-{{ row.cityAreaValue }}-{{ row.countyAreaValue || '全区域' }}</span>
           </p>
         </template>
       </el-table-column>
