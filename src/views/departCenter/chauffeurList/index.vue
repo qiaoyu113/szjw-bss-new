@@ -41,6 +41,7 @@
     <SetTag
       ref="setTag"
       :driver-id="checkOne.driverId"
+      @on-success="listSuccess"
     />
     <ChauffeureDrawer v-model="showDrawer" />
     <allotDio
@@ -61,6 +62,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { matchDriverInfo, getDriverWorkCity } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
 import { showWork, HandlePages } from '@/utils'
+import { delayTime } from '@/settings'
 import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
@@ -172,6 +174,11 @@ export default class extends Vue {
     closeAllot() {
       (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
     }
+    listSuccess() {
+      setTimeout(() => {
+        this.getLists()
+      }, delayTime)
+    }
     async getCityChoose() {
       try {
         let params = {
@@ -243,7 +250,6 @@ export default class extends Vue {
     }
     // 客邀状态变化
     handleStatusChange(val: string | number) {
-      console.log('xxx:', val)
       this.getLists()
     }
     // 线路名称/编号 模糊搜索
