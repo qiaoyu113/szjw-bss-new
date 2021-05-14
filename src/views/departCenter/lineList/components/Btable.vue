@@ -33,7 +33,6 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -441,7 +440,7 @@ export default class extends Vue {
   async getRemarks(params:any) {
     let { data: res } = await getLineRemarks(params)
     if (res.success) {
-      this.remarks = res.data.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
+      this.remarks = res.data.data
     }
   }
 
