@@ -122,7 +122,7 @@ import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop } from 'vue-property-decorator'
 
-const formData = {
+const formData: any = {
   driverId: '', // 司机ID
   lineQuality: '', // 线路肥瘦
   model: '', // 车型
