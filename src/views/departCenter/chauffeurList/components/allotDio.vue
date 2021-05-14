@@ -75,7 +75,7 @@ export default class extends Vue {
     try {
       let params = {
         roleTypes: [15],
-        uri: '/driverGmInfo/role'
+        uri: '/v2/driver/updateDriverDmBatch'
       }
       let { data: res } = await GetSpecifiedLowerUserListByCondition(params)
       if (res.success) {
