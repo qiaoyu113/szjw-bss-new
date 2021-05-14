@@ -57,7 +57,7 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expectIncomeTrip']"
-            v-only-number="{min: 0, max: 20000, precision: 0}"
+            v-only-number="{min: 0, max: 19999, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
             placeholder="请输入"

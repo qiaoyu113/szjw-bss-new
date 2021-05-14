@@ -38,16 +38,16 @@
           <template slot="freight">
             <el-input
               v-model="listQuery.everyTripGuaranteedStart"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
-              style="width:80px"
+              v-only-number="{min: 0, max: 19999, precision: 0}"
+              style="width:70px"
               placeholder="请输入"
             />
             <span style="margin:0 5px">-</span>
             <el-input
               v-model="listQuery.everyTripGuaranteedEnd"
-              v-only-number="{min: 0, max: 20000, precision: 0}"
+              v-only-number="{min: 0, max: 19999, precision: 0}"
               :disabled="!listQuery.everyTripGuaranteedStart"
-              style="width:80px"
+              style="width:70px"
               placeholder="请输入"
             />
           </template>
