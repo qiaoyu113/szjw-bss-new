@@ -233,7 +233,7 @@ export default class SearchKeyWords extends Vue {
       options: this.hardOptions,
       multiple: true,
       key: 'handlingDifficulty',
-      title: '装卸接受度'
+      title: '装卸难度'
     },
     {
       options: [{
