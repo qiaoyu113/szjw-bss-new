@@ -212,7 +212,7 @@ export default class extends Vue {
     warehouseLocation: '',
     distributionArea: '',
     stabilityTemporary: '',
-    lineName: '',
+    lineCode: '',
     customerStatus: ''
   }
   private formItem:any[] = [
@@ -337,7 +337,7 @@ export default class extends Vue {
     {
       type: 15,
       label: '线路名称/编号',
-      key: 'lineName',
+      key: 'lineCode',
       slot: true,
       w: '110px',
       col: 8,
@@ -442,7 +442,7 @@ export default class extends Vue {
       warehouseLocation: '',
       distributionArea: '',
       stabilityTemporary: '',
-      lineName: '',
+      lineCode: '',
       customerStatus: ''
     }
   }
