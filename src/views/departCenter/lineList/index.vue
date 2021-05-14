@@ -75,6 +75,7 @@
         <input-range
           v-model="listQuery.freightSection"
           v-only-number="{min: 1, max: 19999, precision: 0}"
+          :range="[1,19999]"
         />
       </template>
       <template
@@ -212,7 +213,7 @@ export default class extends Vue {
     warehouseLocation: '',
     distributionArea: '',
     stabilityTemporary: '',
-    lineName: '',
+    lineCode: '',
     customerStatus: ''
   }
   private formItem:any[] = [
@@ -337,7 +338,7 @@ export default class extends Vue {
     {
       type: 15,
       label: '线路名称/编号',
-      key: 'lineName',
+      key: 'lineCode',
       slot: true,
       w: '110px',
       col: 8,
@@ -426,6 +427,7 @@ export default class extends Vue {
     if (timeRange.length === 1) {
       return this.$message.warning('工作时间段输入不完整')
     }
+    this.page.page = 1
     this.getList()
   }
   // 重置
@@ -441,7 +443,7 @@ export default class extends Vue {
       warehouseLocation: '',
       distributionArea: '',
       stabilityTemporary: '',
-      lineName: '',
+      lineCode: '',
       customerStatus: ''
     }
   }

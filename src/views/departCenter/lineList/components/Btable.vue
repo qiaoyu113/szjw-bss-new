@@ -33,14 +33,13 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
-                  v-permission="['/v1/matchCustInvite/queryRemarks']"
                   placement="right"
                   min-width="200"
                   trigger="hover"
-                  @show="showMarkHandle({lineId: row.lineId,city: row.currentCity||249})"
+                  @show="showMarkHandle(row)"
                 >
                   <div class="text1">
-                    {{ remarks }}
+                    {{ row.remark }}
                   </div>
                   <i
                     slot="reference"
@@ -53,9 +52,12 @@
                 ({{ row.lineSaleName }})
               </p>
               <p class="text">
-                {{ row.lineSaleId }}
+                {{ row.lineId }}
               </p>
-              <p class="text">
+              <p
+                v-show="row.recruitWindowPeriod"
+                class="text"
+              >
                 窗口期:剩余{{ row.recruitWindowPeriod||' ' }}天
               </p>
               <p class="text scale">
@@ -74,21 +76,9 @@
               {{ row.carType }}/{{ row.oilElectricityRequirement }}
             </p>
             <p
-              v-if="row.behavior"
               class="text"
             >
-              能闯禁行
-            </p>
-            <p
-              v-if="row.restriction"
-              class="text"
-            >
-              能闯限行
-            </p>
-            <p
-              class="text"
-            >
-              {{ row.labelType | labelFilter }}
+              {{ row.behavior?'能闯禁行':'不能闯禁行' }}{{ row.restriction?'/能闯限行':'/不能闯限行' }}{{ row.labelType?'/'+row.labelType:'' }}
             </p>
           </template>
         </el-table-column>
@@ -102,7 +92,7 @@
               仓地址:{{ row.warehouseProvince }}-{{ row.warehouseCity }}-{{ row.warehouseCounty }}
             </p>
             <p class="text">
-              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}-{{ row.countyArea }}
+              配送区域:{{ row.provinceArea }}-{{ row.cityArea }}{{ row.countyArea?`-${row.countyArea}`:'' }}
             </p>
           </template>
         </el-table-column>
@@ -122,7 +112,7 @@
               预计月运费:{{ row.shipperOffer }}元
             </p>
             <p class="text">
-              结算周期/天数:{{ row.settlementCycle||'  ' }}/{{ row.settlementDays||'  ' }}天
+              结算周期/天数:{{ row.settlementCycle||'    ' }}/{{ row.settlementDays||'    ' }}天
             </p>
           </template>
         </el-table-column>
@@ -136,7 +126,7 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty }}
+              装卸难度:{{ row.handlingDifficulty||'全部' }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
@@ -280,6 +270,7 @@
             >
               <!-- 本城客邀撮合成功时显示 -->
               <el-button
+                v-permission="['/v2/runtest/intention/cancel']"
                 type="text"
                 size="small"
                 @click.stop="handleCancelTryRun(row)"
@@ -357,10 +348,35 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
+    console.log('this.listQuery', this.listQuery)
     try {
     // 调用查询接口
+      const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
+        warehouseLocation, distributionArea, stabilityTemporary, lineCode, guestCity, customerStatus
+      } = this.listQuery
+      let queryParams = {
+        city: workCity[1] || '',
+        carType,
+        labelType: lineFineness,
+        handlingDifficulty,
+        everyTripMinFees: freightSection[0] || '',
+        everyTripMaxFees: freightSection[1] || '',
+        workingStartHour: time[0] || '',
+        workingEndHour: time[1] || '',
+        warehouseLocationProvince: warehouseLocation[0] || '',
+        warehouseLocationCity: warehouseLocation[1] || '',
+        warehouseLocationCounty: warehouseLocation[2] || '',
+        deliveryProvince: distributionArea[0] || '',
+        deliveryCity: distributionArea[1] || '',
+        deliveryCounty: distributionArea[2] || '',
+        lineCategory: stabilityTemporary || '',
+        lineCode,
+        inviteCity: guestCity || '',
+        custInviteStatus: customerStatus
+      }
       let { page, limit } = this.pageobj
-      let params = { ...this.listQuery, page, limit }
+      let params = { ...queryParams, page, limit }
+      console.log('params', queryParams, params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
@@ -411,13 +427,30 @@ export default class extends Vue {
     this.$emit('SelectionChange', selection)
   }
 
-  showMarkHandle(params:any) {
-    this.getRemarks(params)
+  showMarkHandle(row:IState) {
+    if (!row.remark) {
+      this.getRemarks(row)
+    }
   }
-  async getRemarks(params:any) {
-    let { data: res } = await getLineRemarks(params)
-    if (res.success) {
-      this.remarks = res.data.data || '这条线路非常火爆，4.2米箱货城配，场景简单，菜鸟也能干'
+  async getRemarks(row:IState) {
+    try {
+      this.$set(row, 'remark', '正在加载中....')
+      let params:IState = {
+        lineId: row.lineId,
+        city: row.currentCity || '276'
+      }
+      let { data: res } = await getLineRemarks(params)
+      if (res.success) {
+        let remarks = '暂无数据'
+        if (res.data && res.data.remarks) {
+          remarks = res.data.remarks ? res.data.remarks : '暂无数据'
+        }
+        this.$set(row, 'remark', remarks)
+      } else {
+        this.$message.error(res.errorMsg)
+      }
+    } catch (err) {
+      console.log(`get line remark fail:${err}`)
     }
   }
 

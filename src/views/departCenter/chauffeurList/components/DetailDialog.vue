@@ -14,6 +14,7 @@
           @tab-click="handleClick"
         >
           <el-tab-pane
+            v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId']"
             label="基础信息"
             name="first"
           >
@@ -25,11 +26,13 @@
             >
               <template slot="address">
                 <span v-if="listQuery.liveDistrict">{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}-{{ listQuery.liveDistrict }}</span>
+                <span v-else-if="!listQuery.liveProvinceName"> 暂无数据</span>
                 <span v-else>{{ listQuery.liveProvinceName }}-{{ listQuery.liveCityName }}-{{ listQuery.liveCountyName }}</span>
               </template>
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/matchDriverLabelInfo/getDriverLabelByDriverId']"
             label="司机标签"
             name="second"
           >
@@ -57,6 +60,7 @@
             </SelfForm>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v2/runtest/getRunTestInfoByDriverId']"
             label="试跑信息"
             name="third"
           >
@@ -75,6 +79,7 @@
             </SelfTable>
           </el-tab-pane>
           <el-tab-pane
+            v-permission="['/v1/outboundCall/getListByBusinessId']"
             label="外呼记录"
             name="fourth"
           >
@@ -235,6 +240,7 @@ export default class extends Vue {
       col: 24
     },
     {
+      hidden: false,
       type: 'behaviorArea',
       key: 'behaviorArea',
       label: '可闯禁行区域',
@@ -242,12 +248,14 @@ export default class extends Vue {
       col: 24
     },
     {
+
       type: 7,
       key: 'canBreakingTrafficRestriction',
       label: '是否可以闯限行',
       col: 24
     },
     {
+      hidden: false,
       type: 'restrictionArea',
       key: 'restrictionArea',
       label: '可闯限行区域',
@@ -291,6 +299,7 @@ export default class extends Vue {
       col: 24
     },
     {
+      hidden: false,
       type: 'startArea',
       key: 'startArea',
       label: '起始点 (4级)',
@@ -298,6 +307,7 @@ export default class extends Vue {
       slot: true
     },
     {
+      hidden: false,
       type: 'lineArea',
       key: 'lineArea',
       label: '配送点 (4级)',
@@ -317,96 +327,6 @@ export default class extends Vue {
       col: 24
     }
   ];
-   private formItem2: any[] = [
-     {
-       type: 7,
-       key: 'canBreakingNodriving',
-       label: '是否可以闯禁行',
-       col: 24
-     },
-     {
-       type: 'behaviorArea',
-       key: 'behaviorArea',
-       label: '可闯禁行区域',
-       slot: true,
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'canBreakingTrafficRestriction',
-       label: '是否可以闯限行',
-       col: 24
-     },
-     {
-       type: 'restrictionArea',
-       key: 'restrictionArea',
-       label: '可闯限行区域',
-       slot: true,
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'heavyLifting',
-       label: '装卸接收程度',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'deliveryDifficulty',
-       label: '配送复杂度',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'expectAccountingPeriod',
-       label: '期望账期',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'expectIncomeTrip',
-       label: '期望运费（趟）',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'expectStabilityTemporary',
-       label: '期望稳定/临时',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'hasIncomeOutside',
-       label: '外面是否有活',
-       col: 24
-     },
-     {
-       type: 'startArea',
-       key: 'startArea',
-       label: '起始点 (4级)',
-       col: 24,
-       slot: true
-     },
-     {
-       type: 'lineArea',
-       key: 'lineArea',
-       label: '配送点 (4级)',
-       col: 24,
-       slot: true
-     },
-     {
-       type: 7,
-       key: 'driverSituation',
-       label: '司机情况',
-       col: 24
-     },
-     {
-       type: 7,
-       key: 'remarksName',
-       label: '备注',
-       col: 24
-     }
-   ];
 
   // 详情弹框外呼记录表格
   private tableDataDetailRecord: IState = [
@@ -566,12 +486,11 @@ export default class extends Vue {
       }
       let { data: res } = await getDriverDetail(parmas)
       if (res.success) {
-        this.formItem1 = this.formItem2
         this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving ? '是' : '否'
         if (!res.data.canBreakingNodriving) {
-          this.formItem1 = this.formItem1.filter((item:any, index:any) => {
-            return item.key !== 'behaviorArea'
-          })
+          this.formItem1[1].hidden = true
+        } else {
+          this.formItem1[1].hidden = false
         }
         // 禁行区域
         this.listQuery.breakingNodrivingProvinceName = res.data.breakingNodrivingProvinceName
@@ -596,9 +515,9 @@ export default class extends Vue {
         this.listQuery.deliveryPointEndTime = res.data.deliveryPointEndTime
         this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction ? '是' : '否'
         if (!res.data.canBreakingTrafficRestriction) {
-          this.formItem1 = this.formItem1.filter((item:any, index:any) => {
-            return item.key !== 'restrictionArea'
-          })
+          this.formItem1[3].hidden = true
+        } else {
+          this.formItem1[3].hidden = false
         }
         this.listQuery.heavyLifting = res.data.heavyLiftingName
         this.listQuery.deliveryDifficulty = res.data.deliveryDifficultyName // 数组
@@ -608,6 +527,13 @@ export default class extends Vue {
         this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporaryName // 数组
         this.listQuery.expectStabilityTemporary = this.listQuery.expectStabilityTemporary.join('、')
         this.listQuery.hasIncomeOutside = res.data.hasIncomeOutside ? '是' : '否'
+        if (!res.data.hasIncomeOutside) {
+          this.formItem1[10].hidden = true
+          this.formItem1[11].hidden = true
+        } else {
+          this.formItem1[10].hidden = false
+          this.formItem1[11].hidden = false
+        }
         this.listQuery.driverSituation = res.data.driverSituationName
         this.listQuery.remarksName = res.data.remarksName
       }
@@ -623,8 +549,8 @@ export default class extends Vue {
       let { data: res } = await getBasicDetail(parmas)
       if (res.success) {
         this.listQuery.currentCarTypeName = res.data.currentCarTypeName
-        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving === 1 ? '是' : '否'
-        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction === 1 ? '是' : '否'
+        this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving ? '是' : '否'
+        this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction ? '是' : '否'
         this.listQuery.plateNo = res.data.plateNo
         this.listQuery.busiTypeName = res.data.busiTypeName
 

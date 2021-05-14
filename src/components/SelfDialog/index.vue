@@ -103,6 +103,9 @@ export default class extends Vue {
   private hideDialog() {
     this.show = false
   }
+  private handleClose() {
+    this.$emit('before-close')
+  }
   mounted() {}
 
   beforeDestory() {}

@@ -7,6 +7,7 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
+      @close="resetFrom"
     >
       <self-form
         ref="setTagFrom"
@@ -56,7 +57,7 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expectIncomeTrip']"
-            v-only-number="{min: 0, max: 20000, precision: 0}"
+            v-only-number="{min: 0, max: 19999, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
             placeholder="请输入"
@@ -228,7 +229,6 @@ export default class extends Vue {
     if (val.length > 1) {
       this.listQuery.remarks.shift()
     }
-    // this.listQuery.manuallyRemarks = ''
   }
   private formItem:any[] = [
     {
@@ -260,10 +260,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionAddress', 2)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionAddress', 2)
         }
       }
     },
@@ -309,10 +307,8 @@ export default class extends Vue {
         }
       },
       listeners: {
-        'visible-change': (visible:boolean) => {
-          if (!visible) {
-            _this.getCountryData('prohibitionRegion', 5)
-          }
+        'change': () => {
+          _this.getCountryData('prohibitionRegion', 5)
         }
       }
     },
@@ -334,7 +330,18 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: this.hardOptions
+      options: [ {
+        label: '不接受装卸',
+        value: 2
+      },
+      {
+        label: '轻装卸',
+        value: 1
+      },
+      {
+        label: '重装卸',
+        value: 0
+      }]
     },
     {
       type: 5,
@@ -484,7 +491,7 @@ export default class extends Vue {
       col: 24,
       options: [
         { label: '着急试跑', value: 1 },
-        { label: '想跟跑', value: 2 },
+        { label: '想跟车', value: 2 },
         { label: '考虑退费', value: 3 },
         { label: '威胁司撮要退费', value: 4 },
         { label: '铁了心要退费', value: 5 },
@@ -595,6 +602,8 @@ export default class extends Vue {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+
+        console.log(this.hardOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -604,13 +613,24 @@ export default class extends Vue {
   }
   resetFrom() {
     (this.$refs.setTagFrom as any).resetForm()
-    this.listQuery.prohibitionAddress = ''
-    this.listQuery.prohibitionRegion = ''
+    this.listQuery.prohibitionAddress = null
+    this.listQuery.prohibitionRegion = null
     this.listQuery.start = ''
     this.listQuery.delivery = ''
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
+    this.listQuery.hasIncomeOutside = null
+    this.formItem[1].hidden = true
+    this.formItem[2].hidden = true
+    this.formItem[4].hidden = true
+    this.formItem[5].hidden = true
+    this.formItem[12].hidden = true
+    this.formItem[13].hidden = true
+    this.formItem[14].hidden = true
+    this.formItem[15].hidden = true
+    this.formItem[16].hidden = true
+    this.formItem[17].hidden = true
     this.isShow = false
   }
   private getCountryData(key:string, index:number, reset:boolean) {

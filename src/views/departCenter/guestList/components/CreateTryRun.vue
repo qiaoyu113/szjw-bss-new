@@ -194,7 +194,6 @@ export default class extends Vue {
         otherReason: this.listQuery.otherReason,
         arrivalTime: new Date(this.listQuery.arrivalTime).getTime(),
         matchType: this._obj.matchType, // 撮合类型(1: 司推系、2：客邀系)
-        matchStatus: this._obj.matchStatus, // 撮合单状态
         matchId: this._obj.matchId, // 撮合单编号
         createRunTestOrigin: 1 // 创建试跑意向来源（1：司撮、2：H5）
       }

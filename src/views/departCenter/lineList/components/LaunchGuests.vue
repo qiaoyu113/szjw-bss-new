@@ -44,7 +44,7 @@ export default class extends Vue {
   private showDialog:boolean = false
   private cityList:IState[] = []; // 城市列表
   private matchCustInviteInfo: any[] = []
-  private launchId:any = this.id
+  private launchId:any = []
   private listQuery:IState = {
     city: '',
     remarks: ''
@@ -136,7 +136,7 @@ export default class extends Vue {
       try {
         let obj1 = { city: this.listQuery.city,
           remarks: this.listQuery.remarks }
-        this.launchId = this.launchId.map((item:any) => {
+        this.launchId = this.id.map((item:any) => {
           return Object.assign(item, obj1)
         })
         let params = this.launchId
@@ -154,7 +154,7 @@ export default class extends Vue {
             item.lineIds.forEach((val:any) => {
               str += val + ','
             })
-            str += `-${item.reason}`
+            str += `${item.reason}`
           })
           this.$message.error(str)
         }

@@ -41,6 +41,7 @@
     <SetTag
       ref="setTag"
       :driver-id="checkOne.driverId"
+      @on-success="listSuccess"
     />
     <ChauffeureDrawer v-model="showDrawer" />
     <allotDio
@@ -61,6 +62,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import { matchDriverInfo, getDriverWorkCity } from '@/api/departCenter'
 import Atable from './components/Atable.vue'
 import { showWork, HandlePages } from '@/utils'
+import { delayTime } from '@/settings'
 import Pagination from '@/components/Pagination/index.vue'
 import SearchForm from './components/searchForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
@@ -94,7 +96,7 @@ export default class extends Vue {
     private listQuery: IState = {
       busiType: '',
       carType: '',
-      isNewEnergy: '',
+      oilElectricityRequirement: '',
       driverId: '',
       address: [],
       heavyLifting: '',
@@ -172,6 +174,11 @@ export default class extends Vue {
     closeAllot() {
       (this.$refs.Atable as any).$refs.chauffeurTable.clearSelection()
     }
+    listSuccess() {
+      setTimeout(() => {
+        this.getLists()
+      }, delayTime)
+    }
     async getCityChoose() {
       try {
         let params = {
@@ -180,7 +187,7 @@ export default class extends Vue {
         let { data: res } = await getDriverWorkCity(params)
         if (res.success) {
           let cityOptions = res.data.map((item:IState) => {
-            return { label: `${item.workCity}(${item.nick}${item.moblie})`, value: item.driverId }
+            return { label: `${item.city}(${item.name}${item.phone})`, value: JSON.stringify({ dmId: item.id, code: item.cityCode }) }
           })
           this.cityOptions.push(...cityOptions)
         } else {
@@ -198,10 +205,10 @@ export default class extends Vue {
       }
       listQuery.busiType !== '' && (params.busiType = listQuery.busiType)
       listQuery.carType !== '' && (params.carType = listQuery.carType)
-      listQuery.isNewEnergy !== '' && (params.isNewEnergy = listQuery.isNewEnergy)
+      listQuery.oilElectricityRequirement !== '' && (params.oilElectricityRequirement = listQuery.oilElectricityRequirement)
       listQuery.driverId !== '' && (params.driverId = listQuery.driverId)
       listQuery.heavyLifting !== '' && (params.heavyLifting = listQuery.heavyLifting)
-      listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = listQuery.expectStabilityTemporary)
+      listQuery.expectStabilityTemporary !== '' && (params.expectStabilityTemporary = [listQuery.expectStabilityTemporary])
       listQuery.expectAccountingPeriod !== '' && (params.expectAccountingPeriod = listQuery.expectAccountingPeriod)
       if (listQuery.address.length > 1) {
         params.liveAddressProvince = listQuery.address[0]
@@ -243,7 +250,6 @@ export default class extends Vue {
     }
     // 客邀状态变化
     handleStatusChange(val: string | number) {
-      console.log('xxx:', val)
       this.getLists()
     }
     // 线路名称/编号 模糊搜索

@@ -65,7 +65,7 @@
             <p class="text">
               <span>({{ `${scope.row.joinManagerName}加盟经理` }})</span>
               <br>
-              <span v-if="!isMore">({{ `${scope.row.driverMatchManagerName}司撮经理` }})</span>
+              <span v-if="!isMore && scope.row.driverMatchManagerId">({{ `${scope.row.driverMatchManagerName}司撮经理` }})</span>
             </p>
             <p class="text">
               {{ scope.row.driverId }}
@@ -85,20 +85,20 @@
               v-text="row.carTypeName"
             />/
             <span
-              :class="addClass(obj.oilElectricityRequirementValue,row.isNewEnergy ? '电车' : '油车',3)"
+              :class="addClass(obj.oilElectricityRequirementValue,row.isNewEnergy ? '电车' : '油车','均可')"
               v-text="row.isNewEnergy ? '电车' : '油车'"
             />
           </p>
           <p class="text">
-            <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving)">
+            <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving,true)">
               {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}
             </span>
             /
-            <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction)">
+            <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction,true)">
               {{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}
             </span>
             /
-            <span :class="busiTypeClass(obj.labelTypeHit,row.carType)">
+            <span :class="hitClass(row.busiTypeHit)">
               {{ row.busiTypeName }}
             </span>
           </p>
@@ -112,38 +112,44 @@
         <template slot-scope="{row}">
           <p class="text">
             现居住地址:
-            <span :class="addClass('canBreakingTrafficRestriction',row.canBreakingTrafficRestriction)">
-              {{ row.liveAddressProvinceName }}
-            </span> -
-            <span :class="addClass(obj.warehouseCity,row.liveAddressCity)">
-              {{ row.liveAddressCityName }}
-            </span> -
-            <span>
-              {{ row.liveAddressCountyName }}
+            <span :class="cityClass(row.liveAddressCity)">
+              <span>
+                {{ row.liveAddressProvinceName }}
+              </span> -
+              <span>
+                {{ row.liveAddressCityName }}
+              </span> -
+              <span>
+                {{ row.liveAddressCountyName }}
+              </span>
             </span>
           </p>
           <p class="text">
             其他活仓地址:
-            <span>
-              {{ row.startingPointProvinceName }}
-            </span> -
-            <span>
-              {{ row.startingPointCityName }}
-            </span> -
-            <span>
-              {{ row.startingPointCountyName }}
+            <span :class="cityClass(row.startingPointCity)">
+              <span>
+                {{ row.startingPointProvinceName }}
+              </span> -
+              <span>
+                {{ row.startingPointCityName }}
+              </span> -
+              <span>
+                {{ row.startingPointCountyName }}
+              </span>
             </span>
           </p>
           <p class="text">
             其他活配送点:
-            <span>
-              {{ row.deliveryPointProvinceName }}
-            </span> -
-            <span>
-              {{ row.deliveryPointCityName }}
-            </span> -
-            <span>
-              {{ row.deliveryPointCountyName }}
+            <span :class="cityClass(row.deliveryPointCity)">
+              <span>
+                {{ row.deliveryPointProvinceName }}
+              </span> -
+              <span>
+                {{ row.deliveryPointCityName }}
+              </span> -
+              <span>
+                {{ row.deliveryPointCountyName }}
+              </span>
             </span>
           </p>
         </template>
@@ -164,7 +170,7 @@
           </p>
           <p class="text">
             期望账期:
-            <span>{{ row.expectAccountingPeriodName }}</span>
+            <span :class="hitClass(row.expectAccountingPeriodHit)">{{ row.expectAccountingPeriodName }}</span>
           </p>
         </template>
       </el-table-column>
@@ -176,26 +182,39 @@
         <template slot-scope="{row}">
           <p class="text">
             期望货品:
-            <span :class="addClass(obj.cargoTypeHit,row.intentCargoType)">{{ (row.intentCargoTypeName || []).toString() }}</span>
+            <span
+              v-for="(item,index) in (row.intentCargoType || [])"
+              :key="index"
+              :class="(row.intentCargoTypeHitCode || []).includes(item) ? 'orange' : ''"
+            >
+              {{ row.intentCargoTypeName[index] }}&#8197;
+            </span>
           </p>
           <p class="text">
             期望装卸难度:
-            <span :class="addClass(obj.handlingDifficultyHit,row.heavyLifting)">{{ row.heavyLiftingName }}</span>
+            <span :class="hitClass(row.heavyLiftingHit)">{{ row.heavyLiftingName }}</span>
           </p>
           <p class="text">
             期望配送复杂度:
-            <span>{{ (row.deliveryDifficultyNames || []).toString() }}</span>
+            <span
+              v-for="(item,index) in row.deliveryDifficulty"
+              :key="index"
+              :class="addClass(obj.distributionWay,item)"
+            >{{ row.deliveryDifficultyNames[index] }}&#8197;</span>
           </p>
-          <p class="text">
+          <p
+            class="text"
+            :class="hitClass(row.workHoursHit)"
+          >
             工作时间段:{{ row.workHoursStr | showWorkHours }}
           </p>
           <p class="text">
             期望稳定/临时:
             <span
-              v-for="(item,index) in (row.expectStabilityTemporaryNames || [])"
+              v-for="(item,index) in (row.expectStabilityTemporary || [])"
               :key="index"
-              :class="addClassArr(obj.lineCategory,row.canBreakingTrafficRestriction)"
-            >{{ item }}&#8197;</span>
+              :class="addClass(obj.lineCategory,item)"
+            >{{ row.expectStabilityTemporaryNames[index] }}&#8197;</span>
           </p>
         </template>
       </el-table-column>
@@ -250,7 +269,10 @@
       >
         <template slot-scope="{row}">
           <section class="opBox">
-            <p class="text">
+            <p
+              v-permission="['/v1/outboundCall/getListByBusinessId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -262,7 +284,11 @@
                 {{ row.driverPhone }}
               </span>
             </p>
-            <p class="text">
+
+            <p
+              v-permission="['/v1/matchDriverLabelInfo/updateDriverLabelByDriverId']"
+              class="text"
+            >
               <el-button
                 type="text"
                 size="small"
@@ -277,6 +303,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/queryMatchLineForMatchDriver']"
                 type="text"
                 size="small"
                 @click.stop="handleDepart(row)"
@@ -290,6 +317,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v2/runtest/creatIntentionRun']"
                 type="text"
                 size="small"
                 @click.stop="handleCreatRun(row)"
@@ -315,6 +343,7 @@
               class="text"
             >
               <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverInfoByDriverId']"
                 size="mini"
                 class="showMoreBtn"
                 @click.stop="toogleExpand(row)"
@@ -327,20 +356,24 @@
                 v-if="opType.includes(5)"
                 class="text"
               >
-                <el-button
-                  v-if="!opType.includes(-1)"
-                  type="text"
-                  size="small"
-                  @click.stop="handleAllotSome(row)"
-                >
-                  分配司撮
-                </el-button>
+                <template v-if="!opType.includes(-1)">
+                  <el-button
+                    v-permission="['/v2/driver/updateDriverDmBatch']"
+
+                    type="text"
+                    size="small"
+                    @click.stop="handleAllotSome(row)"
+                  >
+                    分配司撮
+                  </el-button>
+                </template>
               </p>
               <p
                 v-if="opType.includes(6)"
                 class="text"
               >
                 <el-button
+                  v-permission="['/v2/driver/updateDriverWorkCityByDriverId']"
                   type="text"
                   size="small"
                   @click.stop="handleChooseCity(row)"
@@ -384,6 +417,7 @@
             </div>
             <div class="content">
               <el-button
+                v-permission="['/v1/matchDriverInfo/getDriverMatchByDriverId','/v1/matchDriverLabelInfo/getDriverLabelByDriverId','/v2/runtest/getRunTestInfoByDriverId','/v1/outboundCall/getListByBusinessId']"
                 size="mini"
                 type="text"
                 @click.stop="handleDetail(row)"
@@ -477,27 +511,22 @@ export default class extends Vue {
 
   addClass(objData: any, rowData: any, otherData?:any) {
     if (this.isShowPercent) {
-      return (objData === rowData || otherData === rowData) ? 'orange' : ''
-    } else {
-      return ''
-    }
-  }
-  addClassArr(objData: any, rowData: any[]) {
-    if (this.isShowPercent) {
-      // return rowData.includes(objData) ? 'orange' : ''
-      return ''
-    } else {
-      return ''
-    }
-  }
-  busiTypeClass(objData: any, rowData: any) {
-    // <!-- 1:超肥 2:单肥 3:次肥 4:中瘦 5极瘦 -->
-    if (this.isShowPercent) {
-      if (rowData === 1) {
-        return [3, 4, 5].includes(objData) ? 'orange' : ''
-      } else if (rowData === 1) {
-        return [1, 2, 3, 4, 5].includes(objData) ? 'orange' : ''
+      if (otherData === '均可') {
+        return 'orange'
+      } else {
+        return (objData === rowData || otherData === rowData) ? 'orange' : ''
       }
+    } else {
+      return ''
+    }
+  }
+  hitClass(val:any) {
+    return val ? 'orange' : ''
+  }
+  cityClass(val:any) {
+    if (this.isShowPercent) {
+      let cityArr = [this.obj.warehouseCity, this.obj.cityArea]
+      return cityArr.includes(val) ? 'orange' : ''
     } else {
       return ''
     }

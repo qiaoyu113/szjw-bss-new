@@ -27,6 +27,7 @@ import { Vue, Component, Prop, PropSync, Emit } from 'vue-property-decorator'
 import SelfDialog from '@/components/SelfDialog/index.vue'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { updateDriverWorkCityByDriverId } from '@/api/departCenter'
+import { delayTime } from '@/settings'
 
 interface IState {
   [key: string]: any;
@@ -44,7 +45,7 @@ export default class extends Vue {
   @Prop({ default: () => {} }) obj!: IState; // row data
   @PropSync('dialogVisible', { type: Boolean }) show!: Boolean;
   private listQuery: IState = {
-    workCity: ''
+    params: ''
   };
   private formItem: any[] = [
     {
@@ -55,12 +56,12 @@ export default class extends Vue {
         filterable: true
       },
       label: '新工作城市',
-      key: 'workCity',
+      key: 'params',
       options: this.options
     }
   ];
   private rules: IState = {
-    workCity: [
+    params: [
       {
         required: true,
         message: '请选择新工作城市',
@@ -76,22 +77,24 @@ export default class extends Vue {
   }
   // 确定按钮
   private confirm() {
-    // (this.$refs.cityForm as any).submitForm()
-    this.handlePassChange()
+    (this.$refs.cityForm as any).submitForm()
   }
   // 验证通过
   async handlePassChange() {
     try {
+      let query = JSON.parse(this.listQuery.params)
       let params = {
         driverId: this.obj.driverId,
-        workCity: this.listQuery.workCity,
-        dmId: this.obj.joinManagerId
+        workCity: query.code,
+        dmId: query.dmId
       }
       let { data: res } = await updateDriverWorkCityByDriverId(params)
       if (res.success) {
         this.show = false
-        this.$message.success('操作成功');
-        (this.$parent as any).getLists()
+        this.$message.success('操作成功')
+        setTimeout(() => {
+          (this.$parent as any).getLists()
+        }, delayTime)
       } else {
         this.$message.warning(res.errorMsg)
       }
