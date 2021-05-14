@@ -364,14 +364,14 @@ export default class extends Vue {
         warehouseLocation, distributionArea, stabilityTemporary, lineName, guestCity, customerStatus
       } = this.listQuery
       let queryParams = {
-        city: workCity[1],
+        city: workCity[1] || '',
         carType,
         labelType: lineFineness,
         handlingDifficulty,
         everyTripMinFees: freightSection[0] || '',
         everyTripMaxFees: freightSection[1] || '',
-        workingStartHour: time[0],
-        workingEndHour: time[1],
+        workingStartHour: time[0] || '',
+        workingEndHour: time[1] || '',
         warehouseLocationProvince: warehouseLocation[0] || '',
         warehouseLocationCity: warehouseLocation[1] || '',
         warehouseLocationCounty: warehouseLocation[2] || '',
@@ -383,9 +383,8 @@ export default class extends Vue {
         inviteCity: guestCity || '',
         custInviteStatus: customerStatus
       }
-      console.log('queryParams', queryParams)
       let { page, limit } = this.pageobj
-      let params = { ...this.listQuery, page, limit }
+      let params = { queryParams, page, limit }
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
