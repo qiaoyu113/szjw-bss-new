@@ -187,7 +187,7 @@ export default class extends Vue {
     expectAccountingPeriod: null, // 期望账期
     expectIncomeTrip: '', // 期望运费（趟）
     hasIncomeOutside: null, // 外面是否有活
-    expectStabilityTemporary: null, // 期望稳定/临时
+    expectStabilityTemporary: [], // 期望稳定/临时
     start: [], // 起始点
     startPointStartTime: null, // 起始点-开始时间
     startPointEndTime: null, // 起始点-结束时间

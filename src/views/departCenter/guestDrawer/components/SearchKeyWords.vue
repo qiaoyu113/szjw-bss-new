@@ -41,6 +41,7 @@
               v-only-number="{min: 1, max: 19999, precision: 0}"
               style="width:70px"
               placeholder="请输入"
+              @change="listQuery.everyTripGuaranteedEnd=''"
             />
             <span style="margin:0 5px">-</span>
             <el-input
