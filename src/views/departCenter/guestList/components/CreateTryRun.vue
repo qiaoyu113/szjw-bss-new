@@ -21,10 +21,10 @@
       @onPass="handlePassChange"
     >
       <template #driverId>
-        {{ obj.name }} ({{ obj.driverId }})
+        {{ _obj.name }} ({{ _obj.driverId }})
       </template>
       <template #lineId>
-        {{ obj.lineName }} ({{ obj.lineId }})
+        {{ _obj.lineName }} ({{ _obj.lineId }})
       </template>
     </self-form>
   </SelfDialog>
