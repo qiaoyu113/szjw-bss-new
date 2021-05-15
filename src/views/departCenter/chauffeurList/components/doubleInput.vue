@@ -7,6 +7,7 @@
       clearable
       placeholder="最低"
       @input="changeInput1"
+      @blur="handleBlur(modelArr[0],0)"
     />
     <span class="icon">~</span>
     <el-input
@@ -16,6 +17,7 @@
       clearable
       placeholder="最高"
       @input="changeInput2"
+      @blur="handleBlur(modelArr[1],1)"
     />
   </div>
 </template>
@@ -30,7 +32,7 @@ interface IState {
 })
 export default class extends Vue {
   @Model('inputChange', { type: Array }) readonly modelArr!: any[]
-  @Prop({ default: () => [] }) range?:number[]
+  @Prop({ default: () => [] }) range!:number[]
   get newModelArr() {
     return this.modelArr
   }
@@ -42,6 +44,19 @@ export default class extends Vue {
   }
   private changeInput2(val:string) {
     this.sendMessage(val.replace(/[^\d]/g, ''), 1)
+  }
+
+  private handleBlur(e:any, index:number) {
+    let min = Number(this.range[0])
+    let max = Number(this.range[1])
+    if (e !== '') {
+      let num = Number(e)
+      if (num > max) {
+        this.sendMessage(max, index)
+      } else if (num < min) {
+        this.sendMessage(min, index)
+      }
+    }
   }
 
   @Emit('inputChange')

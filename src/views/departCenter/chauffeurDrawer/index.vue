@@ -12,8 +12,10 @@
     @open="handleOpenClick"
   >
     <Scroll
+      :stop-slide="isAll"
+      :is-lock="isLock"
       :on-reach-bottom="loadMoreHandle"
-      :distance-to-edge="0"
+      :distance-to-edge="50"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -85,7 +87,7 @@ import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
 
 const pageInfo = {
-  limit: 30,
+  limit: 10,
   page: 1
 }
 
@@ -120,6 +122,7 @@ export default class GuestDrawer extends Vue {
     private pageInfo: any = { ...pageInfo } // 分页数据
     private total: number = 0 // 总数据量
     private isAll: boolean = false
+    private isLock: boolean = false
     private listQueryDriver:IState = {
       labelType: '',
       isBehavior: '',
@@ -150,7 +153,7 @@ export default class GuestDrawer extends Vue {
       (this.$refs.tagShow as any).isShow = true
     }
     setCallHandle(data:any) {
-      let phone = data.phoneNum
+      let phone = data.driverPhone || ''
       let repStr = phone.substr(3)
       let newStr = phone.replace(repStr, '********')
       this.$confirm(`将给${newStr}外呼, 请确定是否拨通?`, '外呼提示', {
@@ -158,7 +161,7 @@ export default class GuestDrawer extends Vue {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        console.log(123)
+        (this.$refs.driverDrawer as any).callPhone(phone, this.driverId)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -182,6 +185,7 @@ export default class GuestDrawer extends Vue {
         name: this.driver.driverName || '',
         phone: this.driver.driverPhone || '',
         lineId: data.lineId,
+        matchId: data.matchId,
         matchType: 1 // 司推。客邀2
       }
       ;(this.$refs.tryRunShow as any).showDialog = true
@@ -190,10 +194,9 @@ export default class GuestDrawer extends Vue {
     onCreateTryRunSucc() {
       (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
-      this.queryData()
+      this.closeHandle()
     }
     onQuery(params: any) {
-      console.log('params', params)
       const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
@@ -216,9 +219,10 @@ export default class GuestDrawer extends Vue {
         provinceArea: distInfo.province,
         cityAreaList: distInfo.cities,
         countyAreaList: distInfo.counties,
-        workHours: workRange,
-        shownLines: this.lineTableData.map(v => v.lineId)
+        workHours: workRange
       }
+      this.isAll = false
+      this.isLock = false
       this.queryData()
     }
     // 组装省市区
@@ -246,11 +250,21 @@ export default class GuestDrawer extends Vue {
     }
     queryData(append?: boolean) {
       if (append) {
+        this.params = Object.assign({}, this.params, {
+          shownLines: this.lineTableData.map(v => v.lineId)
+        })
         this.pageInfo.page += 1
       } else {
+        this.lineTableData = []
         this.pageInfo = { ...pageInfo }
       }
-      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      const params: any = { ...this.params }
+      Object.keys(params).forEach((k: any) => {
+        if (Array.isArray(params[k])) {
+          params[k] = params[k].filter((v: any) => !!v)
+        }
+      })
+      MatchLineListForDriver(Object.assign({}, params, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
           const list = res.data || []
@@ -258,9 +272,12 @@ export default class GuestDrawer extends Vue {
             this.isAll = true
           }
           this.lineTableData = append ? this.lineTableData.concat(list) : list
+          if (this.lineTableData.length < this.pageInfo.limit) {
+            this.isLock = true
+          }
           this.total = (res.page || {}).total
+          console.log(this.isLock, this.isAll)
         } else {
-          console.log(res.errorMsg)
           this.$message({ type: 'error', message: res.errorMsg })
         }
       })
@@ -274,6 +291,7 @@ export default class GuestDrawer extends Vue {
     width: 100%;
     height: 100%;
     overflow: auto;
+    padding-bottom: 30px;
     ::v-deep .el-drawer{
       overflow: initial;
       //background: #e6e9f0;
@@ -286,7 +304,7 @@ export default class GuestDrawer extends Vue {
   }
   .matchDriver{
     background: #fff;
-    padding-bottom: 20px;
+    //padding-bottom: 20px;
     h3{
       padding: 0 30px;
     }

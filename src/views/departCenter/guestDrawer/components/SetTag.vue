@@ -7,7 +7,6 @@
       :cancel="handleDialogClosed"
       :modal="false"
       width="800px"
-      @close="resetFrom"
     >
       <self-form
         ref="setTagFrom"
@@ -57,7 +56,7 @@
         <template slot="expected">
           <el-input
             v-model.trim="listQuery['expectIncomeTrip']"
-            v-only-number="{min: 0, max: 19999, precision: 0}"
+            v-only-number="{min: 1, max: 19999, precision: 0}"
             style="width:100px;flex:initial"
             :clearable="true"
             placeholder="请输入"
@@ -203,6 +202,8 @@ export default class extends Vue {
   onisShowChanged(val: any, oldVal: any) {
     if (val) {
       this.initData()
+    } else {
+      this.resetFrom()
     }
   }
   @Watch('listQuery.canBreakingNodriving')
@@ -621,6 +622,10 @@ export default class extends Vue {
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
     this.listQuery.hasIncomeOutside = null
+    this.listQuery.startPointStartTime = null // 起始点-开始时间
+    this.listQuery.startPointEndTime = null // 起始点-结束时间
+    this.listQuery.deliveryPointStartTime = null // 配送点-开始时间
+    this.listQuery.deliveryPointEndTime = null // 配送点-结束时间
     this.formItem[1].hidden = true
     this.formItem[2].hidden = true
     this.formItem[4].hidden = true
@@ -688,9 +693,7 @@ export default class extends Vue {
         return item.value === this.listQuery.expectAccountingPeriod
       })[0].label : null,
       heavyLifting: this.listQuery.heavyLifting,
-      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
-        return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      heavyLiftingName: this.listQuery.heavyLifting ? (this.listQuery.heavyLifting === 0 ? '重装卸' : this.listQuery.heavyLifting === 1 ? '轻装卸' : this.listQuery.heavyLifting === 2 ? '不接受装卸' : null) : null
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
@@ -705,6 +708,7 @@ export default class extends Vue {
     } else {
       params.breakingNodrivingCity = null
       params.breakingNodrivingProvince = null
+      params.breakingNodrivingCounty = null
     }
     if (this.listQuery.canBreakingTrafficRestriction) {
       params.breakingTrafficRestrictionProvince = this.listQuery.prohibitionRegion[0] // 可跑限行区域-省
@@ -727,8 +731,13 @@ export default class extends Vue {
       params.deliveryPointCity = null
       params.deliveryPointCounty = null
       params.deliveryPointProvince = null
+      params.breakingTrafficRestrictionCounty = null
+      params.startPointStartTime = null // 起始点-开始时间
+      params.startPointEndTime = null // 起始点-结束时间
+      params.deliveryPointStartTime = null // 配送点-开始时间
+      params.deliveryPointEndTime = null // 配送点-结束时间
     }
-    let { data: res } = await updateDriverTag(this.params(params))
+    let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
       this.$emit('on-success', emitData, this.driverId)

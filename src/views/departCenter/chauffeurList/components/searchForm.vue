@@ -125,8 +125,8 @@ export default class extends Vue {
   @Prop({ default: () => {} }) listQuery!: IState;
  private busiOptions: IState[] = [
    { label: '全部', value: '' },
-   { label: '专车', value: 1 },
-   { label: '共享', value: 2 }
+   { label: '专车', value: 0 },
+   { label: '共享', value: 1 }
  ];
   private carKindOptions: IState[] = [
     { label: '全部', value: '' },

@@ -51,6 +51,7 @@
         <input-range
           v-model="listQuery.everyTripGuaranteed"
           v-only-number="{min: 1, max: 19999, precision: 0}"
+          :range="[1,19999]"
         />
       </template>
       <template slot="workingHours">
