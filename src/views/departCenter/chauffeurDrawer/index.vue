@@ -15,7 +15,7 @@
       :stop-slide="isAll"
       :is-lock="isLock"
       :on-reach-bottom="loadMoreHandle"
-      :distance-to-edge="-50"
+      :distance-to-edge="50"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -285,6 +285,7 @@ export default class GuestDrawer extends Vue {
     width: 100%;
     height: 100%;
     overflow: auto;
+    padding-bottom: 30px;
     ::v-deep .el-drawer{
       overflow: initial;
       //background: #e6e9f0;
@@ -297,7 +298,7 @@ export default class GuestDrawer extends Vue {
   }
   .matchDriver{
     background: #fff;
-    padding-bottom: 20px;
+    //padding-bottom: 20px;
     h3{
       padding: 0 30px;
     }
