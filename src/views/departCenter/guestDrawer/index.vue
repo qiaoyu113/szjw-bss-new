@@ -9,7 +9,7 @@
         :on-reach-bottom="loadMoreHandle"
         :stop-slide="disabled"
         :is-lock="isLock"
-        :distance-to-edge="-50"
+        :distance-to-edge="50"
       >
         <!-- 撮合线路 -->
         <section class="departLine">

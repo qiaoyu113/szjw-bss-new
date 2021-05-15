@@ -708,6 +708,7 @@ export default class extends Vue {
     } else {
       params.breakingNodrivingCity = null
       params.breakingNodrivingProvince = null
+      params.breakingNodrivingCounty = null
     }
     if (this.listQuery.canBreakingTrafficRestriction) {
       params.breakingTrafficRestrictionProvince = this.listQuery.prohibitionRegion[0] // 可跑限行区域-省
@@ -730,6 +731,7 @@ export default class extends Vue {
       params.deliveryPointCity = null
       params.deliveryPointCounty = null
       params.deliveryPointProvince = null
+      params.breakingTrafficRestrictionCounty = null
     }
     let { data: res } = await updateDriverTag(params)
     if (res.success) {

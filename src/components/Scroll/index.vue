@@ -8,8 +8,6 @@
       :class="scrollContainerClasses"
       :style="{height: height + 'px'}"
       @scroll="handleScroll"
-      @wheel="onWheel"
-      @touchstart="onPointerDown"
     >
       <div
         ref="scrollContent"
@@ -23,10 +21,19 @@
         :style="{paddingBottom: wrapperPadding.paddingBottom}"
       >
         <p
+          v-if="!stopSlide && !showBottomLoader"
+          class="bottomLoader"
+        >
+          <span @click="onCallback(-1)">点击加载更多</span>
+        </p>
+        <p
           v-if="showBottomLoader"
           class="bottomLoader"
         >
-          加载中...
+          <i
+            v-loading="showBottomLoader"
+            element-loading-spinner="el-icon-loading"
+          />加载中...
         </p>
         <p
           v-if="stopSlide && !isLock"
@@ -150,6 +157,9 @@ export default {
     this.heightWrap()
   },
   methods: {
+    loadMore() {
+      this.$emit('on-load')
+    },
     // eslint-disable-next-line vue/no-dupe-keys
     heightWrap() {
       this.height = getDocumentRect().clientHeight - 84
@@ -168,25 +178,20 @@ export default {
     onCallback(dir) {
       this.isLoading = true
       this.showBodyLoader = true
-      if (dir > 0) {
-        this.showTopLoader = true
-        this.topRubberPadding = 20
-      } else {
-        this.showBottomLoader = true
-        this.bottomRubberPadding = 20
-        // to force the scroll to the bottom while height is animating
-        let bottomLoaderHeight = 0
-        const container = this.$refs.scrollContainer
-        const initialScrollTop = container.scrollTop
-        for (let i = 0; i < 20; i++) {
-          setTimeout(() => {
-            bottomLoaderHeight = Math.max(
-              bottomLoaderHeight,
-              this.$refs.bottomLoader.getBoundingClientRect().height
-            )
-            container.scrollTop = initialScrollTop + bottomLoaderHeight - 100
-          }, i * 50)
-        }
+      this.showBottomLoader = true
+      this.bottomRubberPadding = 20
+      // to force the scroll to the bottom while height is animating
+      let bottomLoaderHeight = 0
+      const container = this.$refs.scrollContainer
+      const initialScrollTop = container.scrollTop
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          bottomLoaderHeight = Math.max(
+            bottomLoaderHeight,
+            this.$refs.bottomLoader.getBoundingClientRect().height
+          )
+          container.scrollTop = initialScrollTop + bottomLoaderHeight - 100
+        }, i * 50)
       }
       const callbacks = [this.waitOneSecond(), this.onReachEdge ? this.onReachEdge(dir) : noop()]
       callbacks.push(dir > 0 ? this.onReachTop ? this.onReachTop() : noop() : this.onReachBottom ? this.onReachBottom() : noop())
@@ -224,7 +229,7 @@ export default {
       if (this.isLoading || this.stopSlide) return
       // get the wheel direction
       const wheelDelta = event.wheelDelta ? event.wheelDelta : -(event.detail || event.deltaY)
-      this.stretchEdge(wheelDelta)
+      // this.stretchEdge(wheelDelta)
     },
     stretchEdge(direction) {
       clearTimeout(this.rubberRollBackTimeout)
@@ -312,11 +317,12 @@ export default {
 </script>
 <style lang="scss" scoped>
   .bottomLoader{
-    padding: 10px 0 30px;
+    padding: 30px 0;
     font-size: 14px;
     text-align: center;
     margin: 0;
     background: #fff;
+    cursor: pointer;
   }
   .ivu-scroll-wrapper {
     width:auto;
@@ -359,33 +365,16 @@ export default {
     -ms-transform:scale(1);
     transform:scale(1)
   }
-  @-webkit-keyframes ani-demo-spin {
-    from {
-    -webkit-transform:rotate(0);
-    transform:rotate(0)
-  }
-  50% {
-    -webkit-transform:rotate(180deg);
-    transform:rotate(180deg)
-  }
-  to {
-    -webkit-transform:rotate(360deg);
-    transform:rotate(360deg)
-  }
-  }@keyframes ani-demo-spin {
-    from {
-    -webkit-transform:rotate(0);
-    transform:rotate(0)
-  }
-  50% {
-    -webkit-transform:rotate(180deg);
-    transform:rotate(180deg)
-  }
-  to {
-    -webkit-transform:rotate(360deg);
-    transform:rotate(360deg)
-  }
-  }.ivu-scroll-loader-wrapper .ivu-scroll-spinner {
-    position:relative
+  ::v-deep .el-loading-mask{
+    display: inline-block;
+    position: static;
+    margin-right: 5px;
+    i{
+      font-size: 16px;
+    }
+    .el-loading-spinner{
+      position: static;
+      display: inline-block;
+    }
   }
 </style>
