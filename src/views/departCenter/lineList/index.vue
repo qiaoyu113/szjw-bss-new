@@ -589,7 +589,7 @@ export default class extends Vue {
         (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
         this.listLoading = false
       })
-    }, 100)
+    }, 2000)
   }
   handleScroll() {
     (this.$refs.linebox as any)['addEventListener']('scroll', () => {
