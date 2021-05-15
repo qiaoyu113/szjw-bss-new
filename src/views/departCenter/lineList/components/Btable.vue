@@ -33,6 +33,7 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-show="row.inviteCities && row.inviteCities.length>0"
                   placement="right"
                   min-width="200"
                   trigger="hover"
