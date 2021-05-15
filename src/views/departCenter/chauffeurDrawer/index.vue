@@ -33,7 +33,6 @@
             @tag="setTagHandle"
             @call="setCallHandle"
             @creatRun="onCreateTryRun"
-            @success="onCreateTryRunSucc"
             @detail="onViewDriverDetail"
           />
         </section>
@@ -65,6 +64,7 @@
       <CreateTryRun
         ref="tryRunShow"
         :obj.sync="rowData"
+        @success="onCreateTryRunSucc"
       />
       <DetailDialog
         actived="third"
@@ -197,13 +197,13 @@ export default class GuestDrawer extends Vue {
       (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
       this.closeHandle()
+      this.$emit('close')
     }
     onQuery(params: any) {
       const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
       // const workHours = workRange ? workRange.split(',')
-      console.log(distLoc)
       this.params = {
         carTypeList: model || null,
         cargoTypeList: cargoType || null,
@@ -265,7 +265,6 @@ export default class GuestDrawer extends Vue {
             this.isLock = true
           }
           this.total = (res.page || {}).total
-          console.log(this.isLock, this.isAll)
         } else {
           this.$message({ type: 'error', message: res.errorMsg })
         }

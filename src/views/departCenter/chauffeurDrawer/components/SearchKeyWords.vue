@@ -386,7 +386,6 @@ export default class SearchKeyWords extends Vue {
         optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : (Array.isArray(id) ? id : [id]),
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }
-      console.log(id, command, this.multiple, obj)
       this.listQuery[this.key] = this.multiple ? obj.optionIds : id
       this.selectedData.push(obj)
     }
