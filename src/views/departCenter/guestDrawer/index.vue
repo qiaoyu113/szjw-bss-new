@@ -114,8 +114,6 @@ export default class GuestDrawer extends Vue {
   margin-bottom: 10px;
 }
 .matchDriver{
-  background: #fff;
-  padding-bottom: 20px;
   h3{
     padding: 0 30px;
   }
