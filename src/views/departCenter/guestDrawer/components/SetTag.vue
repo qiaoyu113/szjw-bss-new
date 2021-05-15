@@ -187,7 +187,7 @@ export default class extends Vue {
     expectAccountingPeriod: null, // 期望账期
     expectIncomeTrip: '', // 期望运费（趟）
     hasIncomeOutside: null, // 外面是否有活
-    expectStabilityTemporary: null, // 期望稳定/临时
+    expectStabilityTemporary: [], // 期望稳定/临时
     start: [], // 起始点
     startPointStartTime: null, // 起始点-开始时间
     startPointEndTime: null, // 起始点-结束时间
@@ -689,9 +689,7 @@ export default class extends Vue {
         return item.value === this.listQuery.expectAccountingPeriod
       })[0].label : null,
       heavyLifting: this.listQuery.heavyLifting,
-      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
-        return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      heavyLiftingName: this.listQuery.heavyLifting ? (this.listQuery.heavyLifting === 0 ? '重装卸' : this.listQuery.heavyLifting === 1 ? '轻装卸' : this.listQuery.heavyLifting === 2 ? '不接受装卸' : null) : null
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
@@ -729,7 +727,7 @@ export default class extends Vue {
       params.deliveryPointCounty = null
       params.deliveryPointProvince = null
     }
-    let { data: res } = await updateDriverTag(this.params(params))
+    let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
       this.$emit('on-success', emitData, this.driverId)
