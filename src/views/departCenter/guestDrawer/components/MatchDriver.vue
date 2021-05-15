@@ -201,7 +201,6 @@ export default class DepartLine extends Vue {
 <style lang="scss" scoped>
 .matchDriver{
   background: #fff;
-  padding-bottom: 20px;
   h3{
     padding: 0 30px;
     margin-top: 15px;
