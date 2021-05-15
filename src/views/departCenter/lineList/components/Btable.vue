@@ -162,19 +162,19 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.inviteCities&&row.inviteCities.length===1"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length===1"
               class="text"
             >
-              {{ row.inviteCities[0] }}已客邀
+              {{ row.inviteCityNames[0] }}已客邀
             </p>
             <p
-              v-if="row.inviteCities&&row.inviteCities.length===2"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length===2"
               class="text"
             >
-              {{ row.inviteCities[0]+'、'+row.inviteCities[1] }}已客邀
+              {{ row.inviteCityNames[0]+'、'+row.inviteCityNames[1] }}已客邀
             </p>
             <p
-              v-if="row.inviteCities&&row.inviteCities.length>2"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length>2"
               class="text"
             >
               <el-popover
@@ -183,12 +183,12 @@
                 trigger="hover"
               >
                 <div class="text1">
-                  {{ row.inviteCities | cityListFilter }}
+                  {{ row.inviteCityNames | cityListFilter }}
                 </div>
                 <span
                   slot="reference"
                   style="color:orange"
-                >{{ row.inviteCities.length }}<span style="color:#444">个城市已客邀</span></span>
+                >{{ row.inviteCityNames.length }}<span style="color:#444">个城市已客邀</span></span>
               </el-popover>
             </p>
 
@@ -348,7 +348,6 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    console.log('this.listQuery', this.listQuery)
     try {
     // 调用查询接口
       const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
@@ -376,7 +375,6 @@ export default class extends Vue {
       }
       let { page, limit } = this.pageobj
       let params = { ...queryParams, page, limit }
-      console.log('params', queryParams, params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
