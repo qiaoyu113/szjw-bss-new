@@ -732,6 +732,10 @@ export default class extends Vue {
       params.deliveryPointCounty = null
       params.deliveryPointProvince = null
       params.breakingTrafficRestrictionCounty = null
+      params.startPointStartTime = null // 起始点-开始时间
+      params.startPointEndTime = null // 起始点-结束时间
+      params.deliveryPointStartTime = null // 配送点-开始时间
+      params.deliveryPointEndTime = null // 配送点-结束时间
     }
     let { data: res } = await updateDriverTag(params)
     if (res.success) {
