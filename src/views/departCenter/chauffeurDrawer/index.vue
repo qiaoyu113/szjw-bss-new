@@ -209,7 +209,7 @@ export default class GuestDrawer extends Vue {
         expectedFreightTripStart: f1 || null,
         expectedFreightTripEnd: f2 || null,
         heavyLiftingList: loadDifficulty || null,
-        deliveryDifficulty: deliverComplexity || null,
+        distributionWayList: deliverComplexity || null,
         labelTypeList: lineQuality || null,
         lineId: keyWords || null,
         driverId: this.driverId,
