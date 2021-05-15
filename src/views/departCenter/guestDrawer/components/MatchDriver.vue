@@ -133,7 +133,6 @@ export default class DepartLine extends Vue {
       this.listQueryLine.handlingDifficulty = (this.listQueryLine.handlingDifficulty && this.listQueryLine.handlingDifficulty.indexOf('') === -1) ? this.listQueryLine.handlingDifficulty : null
       this.listQueryLine.settlementCycle = (this.listQueryLine.settlementCycle && this.listQueryLine.settlementCycle.indexOf('') === -1) ? this.listQueryLine.settlementCycle : null
       this.listQueryLine.expectStabilityTemporary = (this.listQueryLine.expectStabilityTemporary && this.listQueryLine.expectStabilityTemporary.indexOf('') === -1) ? this.listQueryLine.expectStabilityTemporary[0] : null
-      this.$emit('on-loading', true)
       let { data: res } = await queryMatchDriverForMatchLine(this.params(this.listQueryLine))
       if (res.success) {
         res.data.forEach((item:any) => {
@@ -152,7 +151,7 @@ export default class DepartLine extends Vue {
     } catch (err) {
       console.log(`get list fail fail:${err}`)
     } finally {
-      this.$emit('on-loading', false)
+      console.log('')
     }
   }
   // 从缓存获取线路信息

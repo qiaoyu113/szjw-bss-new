@@ -11,65 +11,67 @@
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <Scroll
-      :stop-slide="isAll"
-      :is-lock="isLock"
-      :on-reach-bottom="loadMoreHandle"
-      :distance-to-edge="50"
-    >
-      <!-- 撮合线路 -->
-      <section class="departLine">
-        <div style="font-size: 16px; font-weight: bold; margin-bottom: 16px;">
-          待撮合司机
-        </div>
-        <AtableDriver
-          ref="driverDrawer"
-          :list-query="listQueryDriver"
-          :driver-table-data.sync="driverTableData"
-          :is-more="true"
-          :is-show-percent="false"
-          :op-type="[]"
-          @tag="setTagHandle"
-          @call="setCallHandle"
-          @creatRun="onCreateTryRun"
-          @success="onCreateTryRunSucc"
-          @detail="onViewDriverDetail"
-        />
-      </section>
-      <!-- 撮合匹配的司机列表 -->
-      <section class="matchDriver">
-        <!-- 搜索项 -->
-        <SearchKeyWords
-          ref="searchKeyWords"
-          @query="onQuery"
-        />
-        <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
-          司机匹配线路
-        </div>
-        <div class="lineTable">
-          <AtableLine
-            ref="lineTableDrawer"
-            :line-table-data="lineTableData"
-            :is-show-percent="true"
+    <div class="drawerModel">
+      <Scroll
+        :stop-slide="isAll"
+        :is-lock="isLock"
+        :on-reach-bottom="loadMoreHandle"
+        :distance-to-edge="50"
+      >
+        <!-- 撮合线路 -->
+        <section class="departLine">
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 16px;">
+            待撮合司机
+          </div>
+          <AtableDriver
+            ref="driverDrawer"
+            :list-query="listQueryDriver"
+            :driver-table-data.sync="driverTableData"
             :is-more="true"
-            @tryRun="onCreateTryRun"
+            :is-show-percent="false"
+            :op-type="[]"
+            @tag="setTagHandle"
+            @call="setCallHandle"
+            @creatRun="onCreateTryRun"
+            @detail="onViewDriverDetail"
           />
-        </div>
-      </section>
-      <SetTag
-        ref="tagShow"
-        :driver-id="driverId"
+        </section>
+        <!-- 撮合匹配的司机列表 -->
+        <section class="matchDriver">
+          <!-- 搜索项 -->
+          <SearchKeyWords
+            ref="searchKeyWords"
+            @query="onQuery"
+          />
+          <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
+            司机匹配线路
+          </div>
+          <div class="lineTable">
+            <AtableLine
+              ref="lineTableDrawer"
+              :line-table-data="lineTableData"
+              :is-show-percent="true"
+              :is-more="true"
+              @tryRun="onCreateTryRun"
+            />
+          </div>
+        </section>
+        <SetTag
+          ref="tagShow"
+          :driver-id="driverId"
+        />
+      </Scroll>
+      <CreateTryRun
+        ref="tryRunShow"
+        :obj.sync="rowData"
+        @success="onCreateTryRunSucc"
       />
-    </Scroll>
-    <CreateTryRun
-      ref="tryRunShow"
-      :obj.sync="rowData"
-    />
-    <DetailDialog
-      actived="third"
-      :driver-id="driverId"
-      :dialog-table-visible.sync="detailDio"
-    />
+      <DetailDialog
+        actived="third"
+        :driver-id="driverId"
+        :dialog-table-visible.sync="detailDio"
+      />
+    </div>
   </DrawerModel>
 </template>
 
@@ -195,13 +197,13 @@ export default class GuestDrawer extends Vue {
       (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
       this.closeHandle()
+      this.$emit('close')
     }
     onQuery(params: any) {
       const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
       const distInfo = this.composePCC(distLoc)
       const repoInfo = this.composePCC(repoLoc)
       // const workHours = workRange ? workRange.split(',')
-      console.log(distLoc)
       this.params = {
         carTypeList: model || null,
         cargoTypeList: cargoType || null,
@@ -263,7 +265,6 @@ export default class GuestDrawer extends Vue {
             this.isLock = true
           }
           this.total = (res.page || {}).total
-          console.log(this.isLock, this.isAll)
         } else {
           this.$message({ type: 'error', message: res.errorMsg })
         }
@@ -274,6 +275,10 @@ export default class GuestDrawer extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+.drawerModel{
+  padding-bottom: 20px;
+  background: #fff;
+}
   .drawerBox {
     width: 100%;
     height: 100%;
@@ -287,7 +292,7 @@ export default class GuestDrawer extends Vue {
   .departLine{
     padding: 20px 30px;
     background: #fff;
-    margin-bottom: 10px;
+    border-bottom:10px solid #e6e9f0
   }
   .matchDriver{
     background: #fff;

@@ -4,7 +4,7 @@
     @on-close="closeHandle"
     @open="handleOpenClick"
   >
-    <div v-loading.body="listLoading">
+    <div class="drawerModel">
       <Scroll
         :on-reach-bottom="loadMoreHandle"
         :stop-slide="disabled"
@@ -23,7 +23,6 @@
         <!-- 撮合匹配的司机列表 -->
         <MatchDriver
           ref="matchDriver"
-          @on-loading="loadChange"
           @on-end="disabled=true"
           @on-lock="isLock=true"
           @on-reset="resetScroll"
@@ -57,7 +56,6 @@ export default class GuestDrawer extends Vue {
   @Prop({ default: false }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
   private rowData:object = {}
-  private listLoading:boolean = false
   private disabled: boolean = false
   private isLock: boolean = false
   private lineTableData:IState[] = [] // 线路列表
@@ -90,9 +88,6 @@ export default class GuestDrawer extends Vue {
   loadMoreHandle() {
     (this.$refs.matchDriver as any).getMoreData()
   }
-  loadChange(status:any) {
-    this.listLoading = status
-  }
   resetScroll() {
     this.isLock = false
     this.disabled = false
@@ -103,6 +98,10 @@ export default class GuestDrawer extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+.drawerModel{
+  padding-bottom: 20px;
+  background: #fff;
+}
 .drawerBox {
   width: 100%;
   height: 100%;
@@ -111,7 +110,7 @@ export default class GuestDrawer extends Vue {
 .departLine{
   padding: 1px 30px 20px;
   background: #fff;
-  margin-bottom: 10px;
+  border-bottom:10px solid #e6e9f0
 }
 .matchDriver{
   h3{
