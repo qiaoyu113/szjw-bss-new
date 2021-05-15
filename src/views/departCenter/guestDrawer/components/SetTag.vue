@@ -727,7 +727,7 @@ export default class extends Vue {
       params.deliveryPointCounty = null
       params.deliveryPointProvince = null
     }
-    let { data: res } = await updateDriverTag(this.params(params))
+    let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
       this.$emit('on-success', emitData, this.driverId)

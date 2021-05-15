@@ -407,13 +407,13 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
+      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'intent_cargo_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
+        this.expectOptions.push(...mapDictData(res.data.intent_cargo_type || []))
         console.log(this.carLists)
       } else {
         this.$message.error(res.errorMsg)
