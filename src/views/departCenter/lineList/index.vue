@@ -446,6 +446,7 @@ export default class extends Vue {
       lineCode: '',
       customerStatus: ''
     }
+    if (this.formItem[4].key === 'guestCity') { this.formItem.splice(4, 1) }
   }
   // 获取列表
   private async getList() {

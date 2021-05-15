@@ -171,7 +171,6 @@ export default class extends Vue {
       value: 5
     }
   ]
-  private expectOptions: IState[] = [];// 期望货品类型
   private hardOptions: IState[] = [];// 装卸接受度
   private cycleOptions: IState[] = []; // 期望结算周期
   private timeLists:IState[] = []
@@ -331,18 +330,7 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: [ {
-        label: '不接受装卸',
-        value: 2
-      },
-      {
-        label: '轻装卸',
-        value: 1
-      },
-      {
-        label: '重装卸',
-        value: 0
-      }]
+      options: this.hardOptions
     },
     {
       type: 5,
@@ -547,10 +535,10 @@ export default class extends Vue {
         this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
         this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
         this.listQuery.heavyLifting = res.data.heavyLifting
-        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
+        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty ? res.data.deliveryDifficulty : []
         this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
         this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
-        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
+        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary ? res.data.expectStabilityTemporary : []
         this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
         this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
         this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime ? ((res.data.deliveryPointStartTime > 9 ? res.data.deliveryPointStartTime : ('0' + res.data.deliveryPointStartTime)) + ':00') : null
@@ -597,14 +585,11 @@ export default class extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
+      let params = ['match_heavy_lifting', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
-        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
-
-        console.log(this.hardOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -685,15 +670,17 @@ export default class extends Vue {
       canBreakingNodriving: this.listQuery.canBreakingNodriving,
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
       expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
-      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
+      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
       deliveryDifficulty: this.listQuery.deliveryDifficulty,
-      deliveryDifficultyNames: this.listQuery.deliveryDifficulty > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
       expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
       expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
         return item.value === this.listQuery.expectAccountingPeriod
       })[0].label : null,
       heavyLifting: this.listQuery.heavyLifting,
-      heavyLiftingName: this.listQuery.heavyLifting ? (this.listQuery.heavyLifting === 0 ? '重装卸' : this.listQuery.heavyLifting === 1 ? '轻装卸' : this.listQuery.heavyLifting === 2 ? '不接受装卸' : null) : null
+      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
+        return item.value === this.listQuery.heavyLifting
+      })[0].label : null
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
@@ -740,6 +727,7 @@ export default class extends Vue {
     let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
+      console.log(emitData)
       this.$emit('on-success', emitData, this.driverId)
       this.$message.success('操作成功')
     } else {
