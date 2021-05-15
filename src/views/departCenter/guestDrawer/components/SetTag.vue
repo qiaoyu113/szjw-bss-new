@@ -622,6 +622,10 @@ export default class extends Vue {
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
     this.listQuery.hasIncomeOutside = null
+    this.listQuery.startPointStartTime = null // 起始点-开始时间
+    this.listQuery.startPointEndTime = null // 起始点-结束时间
+    this.listQuery.deliveryPointStartTime = null // 配送点-开始时间
+    this.listQuery.deliveryPointEndTime = null // 配送点-结束时间
     this.formItem[1].hidden = true
     this.formItem[2].hidden = true
     this.formItem[4].hidden = true
