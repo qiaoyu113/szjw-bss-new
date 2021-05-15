@@ -171,7 +171,6 @@ export default class extends Vue {
       value: 5
     }
   ]
-  private expectOptions: IState[] = [];// 期望货品类型
   private hardOptions: IState[] = [];// 装卸接受度
   private cycleOptions: IState[] = []; // 期望结算周期
   private timeLists:IState[] = []
@@ -331,18 +330,7 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: [ {
-        label: '不接受装卸',
-        value: 2
-      },
-      {
-        label: '轻装卸',
-        value: 1
-      },
-      {
-        label: '重装卸',
-        value: 0
-      }]
+      options: this.hardOptions
     },
     {
       type: 5,
@@ -597,14 +585,11 @@ export default class extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'type_of_goods']
+      let params = ['match_heavy_lifting', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
-        this.expectOptions.push(...mapDictData(res.data.type_of_goods || []))
-
-        console.log(this.hardOptions)
       } else {
         this.$message.error(res.errorMsg)
       }
@@ -693,7 +678,9 @@ export default class extends Vue {
         return item.value === this.listQuery.expectAccountingPeriod
       })[0].label : null,
       heavyLifting: this.listQuery.heavyLifting,
-      heavyLiftingName: this.listQuery.heavyLifting ? (this.listQuery.heavyLifting === 0 ? '重装卸' : this.listQuery.heavyLifting === 1 ? '轻装卸' : this.listQuery.heavyLifting === 2 ? '不接受装卸' : null) : null
+      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
+        return item.value === this.listQuery.heavyLifting
+      })[0].label : null
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
@@ -744,7 +731,7 @@ export default class extends Vue {
       this.$emit('on-success', emitData, this.driverId)
       this.$message.success('操作成功')
     } else {
-      this.$message.error(res.errorMsg ? res.errorMsg : '数据保存失败')
+      this.$message.error(res.errorMsg)
     }
   }
   mounted() {
