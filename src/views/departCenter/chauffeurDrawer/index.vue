@@ -194,7 +194,7 @@ export default class GuestDrawer extends Vue {
     onCreateTryRunSucc() {
       (this.$refs.tryRunShow as any).showDialog = false
       this.rowData = {}
-      this.queryData()
+      this.closeHandle()
     }
     onQuery(params: any) {
       const { cargoType, clearCycle, deliverComplexity, distLoc, f1, f2, keyWords, lineQuality, loadDifficulty, model, repoLoc, stability, workRange } = params
@@ -258,7 +258,13 @@ export default class GuestDrawer extends Vue {
         this.lineTableData = []
         this.pageInfo = { ...pageInfo }
       }
-      MatchLineListForDriver(Object.assign({}, this.params, this.pageInfo)).then((res: any) => {
+      const params: any = { ...this.params }
+      Object.keys(params).forEach((k: any) => {
+        if (Array.isArray(params[k])) {
+          params[k] = params[k].filter((v: any) => !!v)
+        }
+      })
+      MatchLineListForDriver(Object.assign({}, params, this.pageInfo)).then((res: any) => {
         res = res.data || {}
         if (res.success) {
           const list = res.data || []
