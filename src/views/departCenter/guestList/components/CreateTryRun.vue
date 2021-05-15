@@ -21,7 +21,7 @@
       @onPass="handlePassChange"
     >
       <template #driverId>
-        {{ obj.driverName }} ({{ obj.driverId }})
+        {{ obj.name }} ({{ obj.driverId }})
       </template>
       <template #lineId>
         {{ obj.lineName }} ({{ obj.lineId }})
