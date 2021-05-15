@@ -547,10 +547,10 @@ export default class extends Vue {
         this.listQuery.canBreakingNodriving = res.data.canBreakingNodriving // 能否闯禁行
         this.listQuery.canBreakingTrafficRestriction = res.data.canBreakingTrafficRestriction // 能否闯限行
         this.listQuery.heavyLifting = res.data.heavyLifting
-        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty
+        this.listQuery.deliveryDifficulty = res.data.deliveryDifficulty ? res.data.deliveryDifficulty : []
         this.listQuery.expectAccountingPeriod = res.data.expectAccountingPeriod
         this.listQuery.expectIncomeTrip = res.data.expectIncomeTrip
-        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary
+        this.listQuery.expectStabilityTemporary = res.data.expectStabilityTemporary ? res.data.expectStabilityTemporary : []
         this.listQuery.startPointStartTime = res.data.startPointStartTime ? ((res.data.startPointStartTime > 9 ? res.data.startPointStartTime : ('0' + res.data.startPointStartTime)) + ':00') : null
         this.listQuery.startPointEndTime = res.data.startPointEndTime ? ((res.data.startPointEndTime > 9 ? res.data.startPointEndTime : ('0' + res.data.startPointEndTime)) + ':00') : null
         this.listQuery.deliveryPointStartTime = res.data.deliveryPointStartTime ? ((res.data.deliveryPointStartTime > 9 ? res.data.deliveryPointStartTime : ('0' + res.data.deliveryPointStartTime)) + ':00') : null
@@ -685,9 +685,9 @@ export default class extends Vue {
       canBreakingNodriving: this.listQuery.canBreakingNodriving,
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
       expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
-      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
+      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
       deliveryDifficulty: this.listQuery.deliveryDifficulty,
-      deliveryDifficultyNames: this.listQuery.deliveryDifficulty > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
       expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
       expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
         return item.value === this.listQuery.expectAccountingPeriod
@@ -740,10 +740,11 @@ export default class extends Vue {
     let { data: res } = await updateDriverTag(params)
     if (res.success) {
       this.resetFrom()
+      console.log(emitData)
       this.$emit('on-success', emitData, this.driverId)
       this.$message.success('操作成功')
     } else {
-      this.$message.error(res.errorMsg)
+      this.$message.error(res.errorMsg ? res.errorMsg : '数据保存失败')
     }
   }
   mounted() {

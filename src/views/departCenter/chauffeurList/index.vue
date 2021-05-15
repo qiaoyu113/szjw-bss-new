@@ -43,7 +43,10 @@
       :driver-id="checkOne.driverId"
       @on-success="listSuccess"
     />
-    <ChauffeureDrawer v-model="showDrawer" />
+    <ChauffeureDrawer
+      v-model="showDrawer"
+      @close="onClose"
+    />
     <allotDio
       :dialog-visible.sync="allotDialog"
       :allot-title="allotTitle"
@@ -227,6 +230,10 @@ export default class extends Vue {
       listQuery.hasDriverMatchManager !== '' && (params.hasDriverMatchManager = listQuery.hasDriverMatchManager)
       listQuery.status !== '' && (params.driverStatus = listQuery.status)
       return params
+    }
+
+    onClose() {
+      this.getLists()
     }
 
     // 获取列表数据
