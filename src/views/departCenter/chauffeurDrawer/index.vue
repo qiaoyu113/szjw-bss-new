@@ -12,10 +12,10 @@
     @open="handleOpenClick"
   >
     <Scroll
-      :stop-slide="disabled"
+      :stop-slide="isAll"
       :is-lock="isLock"
       :on-reach-bottom="loadMoreHandle"
-      :distance-to-edge="0"
+      :distance-to-edge="-50"
     >
       <!-- 撮合线路 -->
       <section class="departLine">
@@ -87,7 +87,7 @@ import { AppModule } from '@/store/modules/app'
 import { MatchLineListForDriver } from '@/api/departCenter'
 
 const pageInfo = {
-  limit: 30,
+  limit: 10,
   page: 1
 }
 
@@ -122,7 +122,6 @@ export default class GuestDrawer extends Vue {
     private pageInfo: any = { ...pageInfo } // 分页数据
     private total: number = 0 // 总数据量
     private isAll: boolean = false
-    private disabled: boolean = false
     private isLock: boolean = false
     private listQueryDriver:IState = {
       labelType: '',
@@ -223,6 +222,7 @@ export default class GuestDrawer extends Vue {
         workHours: workRange
       }
       this.isAll = false
+      this.isLock = false
       this.queryData()
     }
     // 组装省市区
@@ -265,14 +265,12 @@ export default class GuestDrawer extends Vue {
           if (list.length < this.pageInfo.limit) {
             this.isAll = true
           }
-          if (list.length < 10) {
-            this.disabled = true
-          }
           this.lineTableData = append ? this.lineTableData.concat(list) : list
-          if (this.lineTableData.length < 10 && this.pageSize === 1) {
+          if (this.lineTableData.length < this.pageInfo.limit) {
             this.isLock = true
           }
           this.total = (res.page || {}).total
+          console.log(this.isLock, this.isAll)
         } else {
           this.$message({ type: 'error', message: res.errorMsg })
         }
