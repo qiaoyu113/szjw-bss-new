@@ -77,7 +77,7 @@ export default class extends Vue {
   }
   private rules:IState = {
     city: [
-      { required: true, message: '请选择客邀城市', trigger: 'blur' }
+      { required: true, message: ' ' }
     ]
   }
   // 弹框关闭
