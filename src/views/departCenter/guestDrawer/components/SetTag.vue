@@ -689,9 +689,7 @@ export default class extends Vue {
         return item.value === this.listQuery.expectAccountingPeriod
       })[0].label : null,
       heavyLifting: this.listQuery.heavyLifting,
-      heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
-        return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      heavyLiftingName: this.listQuery.heavyLifting ? (this.listQuery.heavyLifting === 0 ? '重装卸' : this.listQuery.heavyLifting === 1 ? '轻装卸' : this.listQuery.heavyLifting === 2 ? '不接受装卸' : null) : null
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
