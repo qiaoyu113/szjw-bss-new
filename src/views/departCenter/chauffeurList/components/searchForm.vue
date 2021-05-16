@@ -130,8 +130,8 @@ export default class extends Vue {
  ];
   private carKindOptions: IState[] = [
     { label: '全部', value: '' },
-    { label: '油车', value: 0 },
-    { label: '电车', value: 1 }
+    { label: '油车', value: 1 },
+    { label: '电车', value: 2 }
   ];
   private hardOptions: IState[] = [
     { label: '全部', value: '' }
