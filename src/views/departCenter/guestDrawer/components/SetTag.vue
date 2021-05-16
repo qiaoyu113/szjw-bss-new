@@ -731,7 +731,7 @@ export default class extends Vue {
       this.$emit('on-success', emitData, this.driverId)
       this.$message.success('操作成功')
     } else {
-      this.$message.error(res.errorMsg)
+      this.$message.error(res.errorMsg ? res.errorMsg : '数据保存失败')
     }
   }
   mounted() {
