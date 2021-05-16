@@ -85,17 +85,17 @@
               v-text="row.carTypeName"
             />/
             <span
-              :class="addClass(obj.oilElectricityRequirementValue,row.isNewEnergy ? '电车' : '油车','均可')"
-              v-text="row.isNewEnergy ? '电车' : '油车'"
+              :class="addClass(obj.oilElectricityRequirementValue,row.oilElectricityRequirement === 1 ? '油车' : '电车','均可')"
+              v-text="row.oilElectricityRequirement === 1 ? '油车' : '电车'"
             />
           </p>
           <p class="text">
             <span :class="addClass(obj.isBehavior === 1,row.canBreakingNodriving,true)">
-              {{ row.canBreakingNodriving?'能闯禁行':'不能闯禁行' }}
+              {{ row.canBreakingNodriving === null ? '暂无数据' : (row.canBreakingNodriving?'能闯禁行':'不能闯禁行') }}
             </span>
             /
             <span :class="addClass(obj.isRestriction === 1,row.canBreakingTrafficRestriction,true)">
-              {{ row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行' }}
+              {{ row.canBreakingTrafficRestriction === null ? '暂无数据' : (row.canBreakingTrafficRestriction?'能闯限行':'不能闯限行') }}
             </span>
             /
             <span :class="hitClass(row.busiTypeHit)">
@@ -162,11 +162,11 @@
         <template slot-scope="{row}">
           <p class="text">
             运费趟:
-            <span>{{ row.expectedFreightMonth }}元</span>
+            <span>{{ row.expectedFreightTrip }}元</span>
           </p>
           <p class="text">
             期望月:
-            <span>{{ row.expectedFreightTrip }}元</span>
+            <span>{{ row.expectedFreightMonth }}元</span>
           </p>
           <p class="text">
             期望账期:
@@ -484,8 +484,17 @@ interface IState {
     },
     showWorkHours(val:string) {
       if (val) {
-        let arr = val.split('-')
-        return arr.length > 0 ? `${arr[0]}:00-${arr[1]}:00` : ''
+        let timeArr
+        if (val.includes(',')) {
+          timeArr = val.split(',')
+        } else {
+          timeArr = [val]
+        }
+        let arr = timeArr.map((item) => {
+          let itemArr = item.split('-')
+          return itemArr.length > 1 ? `${itemArr[0]}:00-${itemArr[1]}:00` : ''
+        })
+        return arr.toString()
       } else {
         return ''
       }
@@ -555,7 +564,6 @@ export default class extends Vue {
       let params = { driverId: row.driverId }
       let { data: res } = await getDriverInfoByDriverId(params)
       this.$set(row, 'unfoldData', res.data || {})
-      console.log(row, 'row')
       this.listLoading = false
     } catch (err) {
       this.listLoading = false
