@@ -703,6 +703,7 @@ export default class extends Vue {
     } else {
       params.breakingTrafficRestrictionProvince = null
       params.breakingTrafficRestrictionCity = null
+      params.breakingTrafficRestrictionCounty = null
     }
     if (this.listQuery.hasIncomeOutside) {
       params.startPointCounty = this.listQuery.start[2]
