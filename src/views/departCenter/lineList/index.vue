@@ -550,7 +550,7 @@ export default class extends Vue {
   handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
     const { lineId, matchId, matchStatus, runTestId, status } = row
-    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 1, remark: '', cancelRunTestOrigin: 1 }
     this.cancelData = cancelData
   }
   private checkOff(id:any) {
