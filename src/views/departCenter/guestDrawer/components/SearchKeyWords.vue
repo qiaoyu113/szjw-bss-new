@@ -407,10 +407,10 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'intent_cargo_type']
+      let params = ['match_heavy_lifting', 'settlement_cycle', 'Intentional_compartment', 'intent_cargo_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.expectOptions.push(...mapDictData(res.data.intent_cargo_type || []))
@@ -723,7 +723,6 @@ export default class SearchKeyWords extends Vue {
       }
     }
     .formList{
-        width:100%;
       display: flex;
       align-items: flex-start;
       flex-wrap: wrap;
