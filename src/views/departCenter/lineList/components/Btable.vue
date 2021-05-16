@@ -127,7 +127,7 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty||'全部' }}
+              装卸难度:{{ row.handlingDifficulty||'均可' }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
