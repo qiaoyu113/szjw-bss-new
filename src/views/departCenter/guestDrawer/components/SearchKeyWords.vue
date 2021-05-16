@@ -723,6 +723,7 @@ export default class SearchKeyWords extends Vue {
       }
     }
     .formList{
+        width:100%;
       display: flex;
       align-items: flex-start;
       flex-wrap: wrap;
