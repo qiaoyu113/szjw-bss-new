@@ -166,7 +166,7 @@
               v-if="row.inviteCityNames&&row.inviteCityNames.length===1"
               class="text"
             >
-              {{ row.inviteCityNames[0] }}已客邀
+              {{ row.inviteCityNames[0]!== null ?row.inviteCityNames[0]+'已客邀':'' }}
             </p>
             <p
               v-if="row.inviteCityNames&&row.inviteCityNames.length===2"
