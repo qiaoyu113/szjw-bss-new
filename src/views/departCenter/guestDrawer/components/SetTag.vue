@@ -481,11 +481,11 @@ export default class extends Vue {
       options: [
         { label: '着急试跑', value: 1 },
         { label: '想跟车', value: 2 },
-        { label: '考虑退费', value: 3 },
-        { label: '威胁司撮要退费', value: 4 },
-        { label: '铁了心要退费', value: 5 },
-        { label: '不要再给我打电话', value: 6 },
-        { label: '想请假', value: 7 }
+        { label: '吓唬司撮退费', value: 3 },
+        { label: '不想续费', value: 4 },
+        { label: '想请假', value: 5 },
+        { label: '铁了心要退费', value: 6 },
+        { label: '别给我打点电话', value: 7 }
       ]
     },
     {
@@ -601,6 +601,8 @@ export default class extends Vue {
     (this.$refs.setTagFrom as any).resetForm()
     this.listQuery.prohibitionAddress = null
     this.listQuery.prohibitionRegion = null
+    this.listQuery.breakingNodrivingCounty = []
+    this.listQuery.breakingTrafficRestrictionCounty = []
     this.listQuery.start = ''
     this.listQuery.delivery = ''
     this.listQuery.driverSituation = null
@@ -670,9 +672,9 @@ export default class extends Vue {
       canBreakingNodriving: this.listQuery.canBreakingNodriving,
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
       expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
-      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
+      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? ([this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')]) : null,
       deliveryDifficulty: this.listQuery.deliveryDifficulty,
-      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? ([this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')]) : null,
       expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
       expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
         return item.value === this.listQuery.expectAccountingPeriod
