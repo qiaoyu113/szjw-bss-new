@@ -361,7 +361,6 @@ export default class extends Vue {
   private _calcDay(row:IState) {
     if (row.waitDirveValidity) {
       let time:number = (new Date(row.waitDirveValidity).getTime() - Date.now()) / (3600 * 24 * 1000)
-      console.log(time, Math.ceil(time))
       return Math.ceil(time)
     } else {
       return 0
