@@ -51,6 +51,7 @@
       :dialog-visible.sync="allotDialog"
       :allot-title="allotTitle"
       :driver-id-list="driverIdList"
+      :city-code="checkOne.workCity"
       @close="closeAllot"
     />
     <chooseCity

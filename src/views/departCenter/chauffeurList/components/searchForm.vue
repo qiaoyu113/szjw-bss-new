@@ -3,7 +3,7 @@
     <self-form
       ref="searchForm"
       :list-query="listQuery"
-      :form-item="formItem"
+      :form-item="items"
       size="small"
       label-width="130px"
       class="p15 SuggestForm"
@@ -103,6 +103,8 @@ import doubleInput from './doubleInput.vue'
 import timeSelect from './timeSelect.vue'
 import { GetDictionaryList, GetSpecifiedLowerUserListByCondition } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../../js'
+import { render } from 'node_modules/@types/nprogress'
+import store from '@/store'
 interface PageObj {
   page: number;
   limit: number;
@@ -309,6 +311,16 @@ export default class extends Vue {
   // 判断是否是PC
   get isPC() {
     return SettingsModule.isPC
+  }
+
+  get items() {
+    if (this.$store.state.user.roles.includes('/v2/driver/updateDriverDmBatch')) {
+      return this.formItem
+    } else {
+      return this.formItem.filter((item) => {
+        return (item.key !== 'driverMatchManagerId' && item.key !== 'hasDriverMatchManager')
+      })
+    }
   }
 
   handleStatusChange(val: string | number) {
