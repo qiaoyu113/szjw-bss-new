@@ -105,7 +105,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="地址信息"
+        label="配送信息"
         min-width="220"
         align="center"
       >
@@ -468,13 +468,8 @@
               class="content"
             >
               <span
-                v-if="row.unfoldData.driverLabelRemarksVO.remarksName"
-                v-text="row.unfoldData.driverLabelRemarksVO.remarksName"
+                v-text="remarkText([row.unfoldData.driverLabelRemarksVO.remarksName,row.unfoldData.driverLabelRemarksVO.manuallyRemarks])"
               />
-              <template v-if="row.unfoldData.driverLabelRemarksVO.manuallyRemarks">
-                ,&#8197;
-                <span v-text="row.unfoldData.driverLabelRemarksVO.manuallyRemarks" />
-              </template>
             </div>
           </div>
         </template>
@@ -564,6 +559,9 @@ export default class extends Vue {
     } else {
       return ''
     }
+  }
+  remarkText(remarkArr:string[]) {
+    return remarkArr.filter(ele => ele).join(',')
   }
   // 展开
   async toogleExpand(row: IState) {
