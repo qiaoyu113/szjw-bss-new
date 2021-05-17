@@ -91,7 +91,7 @@ export default class extends Vue {
         }
         let { data: res } = await cancelMatchCustInvite(params)
         if (res.success) {
-          this.$message.success('操作成功')
+          this.$message.success('取消客邀成功')
           this.$emit('success')
         } else {
           console.log('err')
@@ -114,7 +114,7 @@ export default class extends Vue {
         }
         let { data: res } = await cancelMatchCustInviteBatch(params)
         if (res.data.flag) {
-          this.$message.success('操作成功')
+          this.$message.success('取消客邀成功')
           this.$emit('success')
         } else {
           let arr = res.data.msg

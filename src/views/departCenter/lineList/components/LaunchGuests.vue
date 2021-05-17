@@ -121,7 +121,7 @@ export default class extends Vue {
         }
         let { data: res } = await CreateLaunchGuests(params)
         if (res.success) {
-          this.$message.success('操作成功')
+          this.$message.success('发起客邀成功')
           this.$emit('success')
         } else {
           this.$message.error(res.errorMsg)
@@ -145,7 +145,7 @@ export default class extends Vue {
         }
         let { data: res } = await CreateLaunchGuestsBatch(params)
         if (res.data.flag) {
-          this.$message.success('操作成功')
+          this.$message.success('发起客邀成功')
           this.$emit('success')
         } else {
           let arr = res.data.msg
