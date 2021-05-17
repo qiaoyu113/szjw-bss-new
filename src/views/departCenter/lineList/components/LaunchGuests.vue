@@ -14,7 +14,7 @@
         :form-item="formItem"
         :rules="rules"
         size="small"
-        label-width="140px"
+        label-width="80px"
         class="p15 SuggestForm"
         :pc-col="24"
         @onPass="handlePassChange"
@@ -73,11 +73,17 @@ export default class extends Vue {
   // 确定按钮
   private confirm() {
     (this.$refs.tryForm as any).submitForm()
-    this.saveData()
   }
   private rules:IState = {
     city: [
-      { required: true, message: ' ' }
+      { required: true, message: '请选择客邀城市', trigger: 'change' }
+    ],
+    remarks: [
+      {
+        pattern: /^[a-zA-Z0-9\u4e00-\u9fa5,，'":;?!.。“：；（）{}【】]+$/,
+        message: '仅支持中文英文与数字格式',
+        trigger: 'change'
+      }
     ]
   }
   // 弹框关闭
@@ -87,6 +93,7 @@ export default class extends Vue {
   // 验证通过
   handlePassChange() {
     this.showDialog = false
+    this.saveData()
   }
   // 根据大区获取城市列表
   async cityDetail() {
@@ -115,9 +122,6 @@ export default class extends Vue {
           lineId: this.launchArguments.lineId,
           city: this.listQuery.city,
           remarks: this.listQuery.remarks
-        }
-        if (this.listQuery.city === '') {
-          return this.$message.warning('请选择客邀城市')
         }
         let { data: res } = await CreateLaunchGuests(params)
         if (res.success) {
