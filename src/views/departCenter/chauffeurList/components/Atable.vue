@@ -106,13 +106,16 @@
       </el-table-column>
       <el-table-column
         label="地址信息"
-        min-width="200"
+        min-width="220"
         align="center"
       >
         <template slot-scope="{row}">
           <p class="text">
             现居住地址:
-            <span :class="cityClass(row.liveAddressCity)">
+            <span
+              v-if="row.liveAddressProvince && row.liveAddressCity && row.liveAddressCounty"
+              :class="cityClass(row.liveAddressCity)"
+            >
               <span>
                 {{ row.liveAddressProvinceName }}
               </span> -
@@ -126,7 +129,10 @@
           </p>
           <p class="text">
             其他活仓地址:
-            <span :class="cityClass(row.startingPointCity)">
+            <span
+              v-if="row.startingPointProvince && row.startingPointCity && row.startingPointCounty"
+              :class="cityClass(row.startingPointCity)"
+            >
               <span>
                 {{ row.startingPointProvinceName }}
               </span> -
@@ -140,7 +146,10 @@
           </p>
           <p class="text">
             其他活配送点:
-            <span :class="cityClass(row.deliveryPointCity)">
+            <span
+              v-if="row.deliveryPointProvince && row.deliveryPointCity && row.deliveryPointCounty"
+              :class="cityClass(row.deliveryPointCity)"
+            >
               <span>
                 {{ row.deliveryPointProvinceName }}
               </span> -
