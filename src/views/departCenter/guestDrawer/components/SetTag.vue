@@ -682,7 +682,14 @@ export default class extends Vue {
       heavyLifting: this.listQuery.heavyLifting,
       heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
         return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      })[0].label : null,
+      driverLabelRemarksVO: {
+        manuallyRemarks: this.listQuery.manuallyRemarks,
+        remarks: this.listQuery.driverSituation,
+        remarksName: this.listQuery.driverSituation ? this.reasonLists.filter((item:any) => {
+          return item.value === this.listQuery.driverSituation
+        })[0].label : null
+      }
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
