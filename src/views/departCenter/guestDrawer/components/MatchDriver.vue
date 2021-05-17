@@ -173,6 +173,7 @@ export default class DepartLine extends Vue {
   }
   // 打标签成功
   setSuccess(data:any, driverId:string) {
+    this.$emit('on-update', data)
     let index = this.driverTableData.findIndex((item:any) => {
       return item.driverId === driverId
     })
