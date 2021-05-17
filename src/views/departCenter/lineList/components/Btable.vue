@@ -436,7 +436,7 @@ export default class extends Vue {
       this.$set(row, 'remark', '正在加载中....')
       let params:IState = {
         lineId: row.lineId,
-        city: row.currentCity || '276'
+        city: row.currentCity
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {
