@@ -565,11 +565,16 @@ export default class SearchKeyWords extends Vue {
   // 回显货品类型
   getCargoType(data:any) {
     let arr1 = ['快递快运', '家电', '日化', '家具', '服饰鞋帽', '3C数码']
+    let arr2 = ['商超']
+    let arr3 = ['日化', '洗涤', '印刷品', '医药保健']
+    let arr4 = ['食材', '水果', '方便食品', '团餐外卖', '酒水饮料', '鲜花蛋糕']
+    let arr5 = ['家电', '3C数码', '包装', '母婴', '服饰鞋帽']
+    let arr6 = ['建材', '五金', '大包裹/仪器', '家具', '五金', '汽配', '自行车']
     if (data.cargoType) {
       let cargoType:any = {
         key: 'cargoType',
-        optionIds: [data.cargoType],
-        selected: [data.cargoTypeValue],
+        optionIds: [arr1.indexOf(data.cargoTypeValue) > -1 ? 1 : arr2.indexOf(data.cargoTypeValue) > -1 ? 2 : arr3.indexOf(data.cargoTypeValue) > -1 ? 7 : arr4.indexOf(data.cargoTypeValue) > -1 ? 3 : arr5.indexOf(data.cargoTypeValue) > -1 ? 4 : arr6.indexOf(data.cargoTypeValue) > -1 ? 6 : 5],
+        selected: [arr1.indexOf(data.cargoTypeValue) > -1 ? '快递' : arr2.indexOf(data.cargoTypeValue) > -1 ? '商超' : arr3.indexOf(data.cargoTypeValue) > -1 ? '医药' : arr4.indexOf(data.cargoTypeValue) > -1 ? '生鲜' : arr5.indexOf(data.cargoTypeValue) > -1 ? '家电服装' : arr6.indexOf(data.cargoTypeValue) > -1 ? '建材、器械' : '其它'],
         type: '货品类型'
       }
       this.selectedData.push(cargoType)
