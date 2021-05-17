@@ -8,7 +8,7 @@
     top="84px"
     :modal="false"
     :destroy-on-close="true"
-    @close="closeHandle"
+    @close="closeHandle(false)"
     @open="handleOpenClick"
   >
     <div
@@ -21,7 +21,7 @@
     <a
       href="javascript:;"
       class="actionBtn"
-      @click="closeHandle"
+      @click="closeHandle(false)"
     >
       <i class="el-icon-d-arrow-right" />
     </a>
@@ -79,7 +79,6 @@ export default class DrawerModel extends Vue {
       } else {
         this.time += 100
       }
-      console.log(this.time)
     }, 100)
   }
   onMouseMove() {
