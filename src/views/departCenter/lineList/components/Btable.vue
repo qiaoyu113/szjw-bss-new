@@ -253,7 +253,7 @@
               </el-button>
             </p>
             <p
-              v-if="!row.currentCityInvited && row.matchStatus===1"
+              v-if="!row.currentCityInvited && row.matchStatus===1&&row.urgent!==0"
               class="text"
             >
               <el-button
