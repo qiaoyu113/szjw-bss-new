@@ -330,7 +330,11 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: this.hardOptions
+      options: [
+        { label: '不需要装卸', value: 1 },
+        { label: '轻装卸', value: 2 },
+        { label: '重装卸', value: 3 }
+      ]
     },
     {
       type: 5,
@@ -682,7 +686,14 @@ export default class extends Vue {
       heavyLifting: this.listQuery.heavyLifting,
       heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
         return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      })[0].label : null,
+      driverLabelRemarksVO: {
+        manuallyRemarks: this.listQuery.manuallyRemarks,
+        remarks: this.listQuery.driverSituation,
+        remarksName: this.listQuery.driverSituation ? this.reasonLists.filter((item:any) => {
+          return item.value === this.listQuery.driverSituation
+        })[0].label : null
+      }
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId
