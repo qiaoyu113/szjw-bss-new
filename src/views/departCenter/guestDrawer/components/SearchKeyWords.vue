@@ -583,11 +583,14 @@ export default class SearchKeyWords extends Vue {
   }
   // 回显装卸难度
   getHandlingDifficulty(data:any) {
+    let arr1 = ['不装卸']
+    let arr2 = ['只装不卸(轻)', '只卸不装(轻)']
+    let arr3 = ['只装不卸(重)', '只卸不装(重)', '重装卸']
     if (data.handlingDifficulty) {
       let handlingDifficulty:any = {
         key: 'handlingDifficulty',
-        optionIds: [data.handlingDifficulty],
-        selected: [data.handlingDifficultyValue],
+        optionIds: [arr1.indexOf(data.handlingDifficultyValue) > -1 ? 2 : arr2.indexOf(data.handlingDifficultyValue) > -1 ? 1 : 0],
+        selected: [arr1.indexOf(data.handlingDifficultyValue) > -1 ? '不需要装卸' : arr2.indexOf(data.handlingDifficultyValue) > -1 ? '轻装卸' : '重装卸'],
         type: '装卸难度'
       }
       this.selectedData.push(handlingDifficulty)
