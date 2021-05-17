@@ -485,7 +485,7 @@ export default class extends Vue {
     if (res.success) {
       const nodes = res.data.map(function(item: any) {
         return {
-          value: item.id,
+          value: item.areaId,
           label: item.name
         }
       })
