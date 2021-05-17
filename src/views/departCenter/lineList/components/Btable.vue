@@ -127,7 +127,7 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty||'全部' }}
+              装卸难度:{{ row.handlingDifficulty||'均可' }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
@@ -166,7 +166,7 @@
               v-if="row.inviteCityNames&&row.inviteCityNames.length===1"
               class="text"
             >
-              {{ row.inviteCityNames[0] }}已客邀
+              {{ row.inviteCityNames[0]!== null ?row.inviteCityNames[0]+'已客邀':'' }}
             </p>
             <p
               v-if="row.inviteCityNames&&row.inviteCityNames.length===2"
