@@ -107,7 +107,7 @@
               单趟运费:{{ row.everyTripGuaranteed }}元
             </p>
             <p class="text">
-              每日{{ row.dayNum }}趟/{{ row.monthNum }}天(元)
+              每日{{ row.dayNum }}趟/{{ row.monthNum }}天
             </p>
             <p class="text">
               预计月运费:{{ row.shipperOffer }}元
