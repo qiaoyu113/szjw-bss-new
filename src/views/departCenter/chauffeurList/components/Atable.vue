@@ -213,9 +213,18 @@
           </p>
           <p
             class="text"
-            :class="hitClass(row.workHoursHit)"
           >
-            工作时间段:{{ row.workHoursStr | showWorkHours }}
+            工作时间段:
+            <template v-if="row.workHoursArr">
+              <span
+                v-for="(item,index) in row.workHoursArr"
+                :key="index"
+                :class="row.workHoursHitIndex.includes(index) ? 'orange' : ''"
+              >{{ row.workHoursArr[index] | showWorkHours }}&#8197;</span>
+            </template>
+            <template v-else>
+              <span>{{ row.workHoursStr | showWorkHours }}</span>
+            </template>
           </p>
           <p class="text">
             期望稳定/临时:
@@ -412,9 +421,9 @@
               v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
               class="content center"
             >
-              <span>{{ `${row.unfoldData.driverMatchBasicVO.age}岁/${row.unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${row.unfoldData.driverMatchBasicVO.experienceName}/${row.unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
+              <span>{{ `${row.unfoldData.driverMatchBasicVO.age}岁/${row.unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${row.unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
               <span>{{ `成交:${ parseTime(row.unfoldData.driverLabelsVO.dealDate,'{y}-{m}-{d}')}` }}</span>
-              <span>{{ !isShowPercent ? `最后一次出车日期:${ parseTime(row.unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` : '' }}</span>
+              <span v-if="!isShowPercent && row.unfoldData.driverLabelsVO.lastRunDate">{{ `最后一次出车日期:${ parseTime(row.unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` }}</span>
             </div>
           </div>
           <div
@@ -458,7 +467,11 @@
             <div
               class="content"
             >
-              {{ row.unfoldData.driverLabelRemarksVO.manuallyRemarks }}
+              <span v-text="row.unfoldData.driverLabelRemarksVO.remarksName" />
+              <template v-if="row.unfoldData.driverLabelRemarksVO.manuallyRemarks">
+                ,&#8197;
+                <span v-text="row.unfoldData.driverLabelRemarksVO.manuallyRemarks" />
+              </template>
             </div>
           </div>
         </template>
@@ -503,7 +516,7 @@ interface IState {
           let itemArr = item.split('-')
           return itemArr.length > 1 ? `${itemArr[0]}:00-${itemArr[1]}:00` : ''
         })
-        return arr.toString()
+        return arr.join(' ')
       } else {
         return ''
       }
@@ -599,8 +612,16 @@ export default class extends Vue {
   }
   // 撮合
   handleDepart(row: IState) {
-    sessionStorage.setItem(driverKey, JSON.stringify(row))
-    this.$emit('depart', row)
+    if (row.driverStatus === 5) {
+      // 司机已退出
+      (this.$parent as any).getLists()
+      this.$message.warning('司机已退出，请刷新司推列表')
+    } else if (row.driverBalance < 0) {
+      this.$message.warning('司机已欠费，请刷新司推列表')
+    } else {
+      sessionStorage.setItem(driverKey, JSON.stringify(row))
+      this.$emit('depart', row)
+    }
   }
   // 查看详情
   handleDetail(row: IState) {
