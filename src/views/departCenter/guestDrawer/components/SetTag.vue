@@ -585,10 +585,10 @@ export default class extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['match_heavy_lifting', 'settlement_cycle']
+      let params = ['heavy_lifting_type', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
+        this.hardOptions.push(...mapDictData(res.data.heavy_lifting_type || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
       } else {
         this.$message.error(res.errorMsg)

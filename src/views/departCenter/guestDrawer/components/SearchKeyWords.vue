@@ -62,7 +62,7 @@
               clearable
               filterable
               remote
-              style="width:250px"
+              style="width:240px"
               :remote-method="querySearchByKeyword"
               @clear="handleClearQueryDriver"
             >
@@ -407,10 +407,10 @@ export default class SearchKeyWords extends Vue {
   }
   async getOptions() {
     try {
-      let params = ['match_heavy_lifting', 'settlement_cycle', 'Intentional_compartment', 'intent_cargo_type']
+      let params = ['heavy_lifting_type', 'settlement_cycle', 'Intentional_compartment', 'intent_cargo_type']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
+        this.hardOptions.push(...mapDictData(res.data.heavy_lifting_type || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
         this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
         this.expectOptions.push(...mapDictData(res.data.intent_cargo_type || []))
@@ -589,7 +589,7 @@ export default class SearchKeyWords extends Vue {
     if (data.handlingDifficulty) {
       let handlingDifficulty:any = {
         key: 'handlingDifficulty',
-        optionIds: [arr1.indexOf(data.handlingDifficultyValue) > -1 ? 2 : arr2.indexOf(data.handlingDifficultyValue) > -1 ? 1 : 0],
+        optionIds: [arr1.indexOf(data.handlingDifficultyValue) > -1 ? 1 : arr2.indexOf(data.handlingDifficultyValue) > -1 ? 2 : 3],
         selected: [arr1.indexOf(data.handlingDifficultyValue) > -1 ? '不需要装卸' : arr2.indexOf(data.handlingDifficultyValue) > -1 ? '轻装卸' : '重装卸'],
         type: '装卸难度'
       }
