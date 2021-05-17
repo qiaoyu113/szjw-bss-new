@@ -107,7 +107,7 @@
               单趟运费:{{ row.everyTripGuaranteed }}元
             </p>
             <p class="text">
-              每日{{ row.dayNum }}趟/{{ row.monthNum }}天(元)
+              每日{{ row.dayNum }}趟/{{ row.monthNum }}天
             </p>
             <p class="text">
               预计月运费:{{ row.shipperOffer }}元
@@ -436,7 +436,7 @@ export default class extends Vue {
       this.$set(row, 'remark', '正在加载中....')
       let params:IState = {
         lineId: row.lineId,
-        city: row.currentCity || '276'
+        city: row.currentCity
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {

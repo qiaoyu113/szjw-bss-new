@@ -11,7 +11,11 @@
     @close="closeHandle"
     @open="handleOpenClick"
   >
-    <div class="drawerContent">
+    <div
+      class="drawerContent"
+      @mousemove="onMouseMove"
+      @click="onClick"
+    >
       <slot />
     </div>
     <a
@@ -39,18 +43,65 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 export default class DrawerModel extends Vue {
   @Prop({ default: true }) private value !: boolean
   private visible : boolean = false // 抽屉显示隐藏
+  private interval: any = null
+  private timeout: any = null
+  private isTimeout: boolean = false
+  private time = 0
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
     this.visible = val
   }
   // 关闭回调事件
-  closeHandle() {
+  closeHandle(shouldUpdate: boolean) {
     this.visible = false
+    clearInterval(this.interval)
+    clearTimeout(this.timeout)
     this.$emit('input', false)
     this.$emit('on-close')
+    if (shouldUpdate) {
+      this.$router.go(0)
+    }
   }
   handleOpenClick() {
     this.$emit('open')
+    clearInterval(this.interval)
+    clearTimeout(this.timeout)
+    this.isTimeout = false
+    this.startInterval()
+  }
+  startInterval() {
+    this.time = 0
+    this.isTimeout = false
+    this.interval = setInterval(() => {
+      if (this.time > 30 * 60 * 1000) {
+        clearInterval(this.interval)
+        this.isTimeout = true
+      } else {
+        this.time += 100
+      }
+      console.log(this.time)
+    }, 100)
+  }
+  onMouseMove() {
+    clearTimeout(this.timeout)
+    clearInterval(this.interval)
+    if (this.isTimeout) {
+      this.$confirm('此页面已失效，请重新打开', '提示', {
+        type: 'warning',
+        callback: () => {
+          this.isTimeout = true
+          this.closeHandle(true)
+        }
+      })
+    } else {
+      this.timeout = setTimeout(() => {
+        this.time = 0
+        this.startInterval()
+      }, 1000)
+    }
+  }
+  onClick() {
+    this.onMouseMove()
   }
 }
 </script>
