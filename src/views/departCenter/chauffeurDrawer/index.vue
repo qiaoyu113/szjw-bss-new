@@ -59,6 +59,7 @@
         <SetTag
           ref="tagShow"
           :driver-id="driverId"
+          @on-success="tagSuccessHandle"
         />
       </Scroll>
       <CreateTryRun
@@ -269,6 +270,20 @@ export default class GuestDrawer extends Vue {
           this.$message({ type: 'error', message: res.errorMsg })
         }
       })
+    }
+    tagSuccessHandle(data:any, id:any) {
+      console.log(data)
+      this.driverTableData[0].canBreakingNodriving = data.canBreakingNodriving // 司机能否闯禁行
+      this.driverTableData[0].canBreakingTrafficRestriction = data.canBreakingTrafficRestriction // 司机能否闯限行
+      this.driverTableData[0].expectAccountingPeriod = data.expectAccountingPeriod // 结算周期
+      this.driverTableData[0].expectAccountingPeriodName = data.expectAccountingPeriodName // 结算周期
+      this.driverTableData[0].deliveryDifficulty = data.deliveryDifficulty // 配送复杂度
+      this.driverTableData[0].deliveryDifficultyNames = data.deliveryDifficultyNames // 配送复杂度
+      this.driverTableData[0].expectStabilityTemporary = data.expectStabilityTemporary // 稳定/临时
+      this.driverTableData[0].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
+      this.driverTableData[0].heavyLifting = data.heavyLifting // 装卸难度
+      this.driverTableData[0].heavyLiftingName = data.heavyLiftingName // 装卸难度
+      this.driverTableData[0].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
     }
     mounted() {
     }
