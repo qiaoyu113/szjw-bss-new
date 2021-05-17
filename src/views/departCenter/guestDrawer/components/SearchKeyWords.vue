@@ -109,8 +109,9 @@
 </template>
 
 <script lang="ts">
+import { GetDriverListByKerWord, getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { GetDictionaryList } from '@/api/common'
-import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
+
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
@@ -485,9 +486,7 @@ export default class SearchKeyWords extends Vue {
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/v2/wt-driver-account/refund/queryDriverList'
-      })
+      let { data: res } = await GetDriverListByKerWord(params)
       let result:any[] = res.data.map((item:any) => ({
         label: `${item.name}/${item.phone}`,
         value: item.driverId
