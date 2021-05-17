@@ -41,6 +41,7 @@
           <!-- 搜索项 -->
           <SearchKeyWords
             ref="searchKeyWords"
+            :driver="driver"
             @query="onQuery"
           />
           <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
@@ -178,7 +179,7 @@ export default class GuestDrawer extends Vue {
         this.driverId = this.driver.driverId || ''
         ;(this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
-        ;(this.$refs.searchKeyWords as any).initQuery()
+        ;(this.$refs.searchKeyWords as any).initOptions()
       }, 20)
     }
     onCreateTryRun(data:any) {

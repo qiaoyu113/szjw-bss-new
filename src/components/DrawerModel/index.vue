@@ -73,7 +73,7 @@ export default class DrawerModel extends Vue {
     this.time = 0
     this.isTimeout = false
     this.interval = setInterval(() => {
-      if (this.time > 30 * 60 * 1000) {
+      if (this.time > 10 * 60 * 1000) {
         clearInterval(this.interval)
         this.isTimeout = true
       } else {
