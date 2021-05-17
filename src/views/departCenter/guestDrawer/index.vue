@@ -26,7 +26,6 @@
           @on-end="disabled=true"
           @on-lock="isLock=true"
           @on-reset="resetScroll"
-          @on-update="handleUpdate"
         />
       </Scroll>
     </div>
@@ -92,9 +91,6 @@ export default class GuestDrawer extends Vue {
   resetScroll() {
     this.isLock = false
     this.disabled = false
-  }
-  handleUpdate(data:any) {
-    this.$set(this.lineTableData[0], 'driverLabelRemarksVO', data.driverLabelRemarksVO)
   }
   mounted() {
 
