@@ -467,7 +467,10 @@
             <div
               class="content"
             >
-              <span v-text="row.unfoldData.driverLabelRemarksVO.remarksName" />
+              <span
+                v-if="row.unfoldData.driverLabelRemarksVO.remarksName"
+                v-text="row.unfoldData.driverLabelRemarksVO.remarksName"
+              />
               <template v-if="row.unfoldData.driverLabelRemarksVO.manuallyRemarks">
                 ,&#8197;
                 <span v-text="row.unfoldData.driverLabelRemarksVO.manuallyRemarks" />
