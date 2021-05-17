@@ -2,8 +2,8 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-28 17:48:58
- * @LastEditors: D.C.base
+ * @LastEditTime: 2021-05-17 20:56:04
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <DrawerModel
@@ -88,7 +88,7 @@ import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
-import { MatchLineListForDriver } from '@/api/departCenter'
+import { MatchLineListForDriver, queryMatchDriverForMatchLine } from '@/api/departCenter'
 
 const pageInfo = {
   limit: 10,
@@ -273,18 +273,26 @@ export default class GuestDrawer extends Vue {
       })
     }
     tagSuccessHandle(data:any, id:any) {
-      console.log(data)
-      this.driverTableData[0].canBreakingNodriving = data.canBreakingNodriving // 司机能否闯禁行
-      this.driverTableData[0].canBreakingTrafficRestriction = data.canBreakingTrafficRestriction // 司机能否闯限行
-      this.driverTableData[0].expectAccountingPeriod = data.expectAccountingPeriod // 结算周期
-      this.driverTableData[0].expectAccountingPeriodName = data.expectAccountingPeriodName // 结算周期
-      this.driverTableData[0].deliveryDifficulty = data.deliveryDifficulty // 配送复杂度
-      this.driverTableData[0].deliveryDifficultyNames = data.deliveryDifficultyNames // 配送复杂度
-      this.driverTableData[0].expectStabilityTemporary = data.expectStabilityTemporary // 稳定/临时
-      this.driverTableData[0].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
-      this.driverTableData[0].heavyLifting = data.heavyLifting // 装卸难度
-      this.driverTableData[0].heavyLiftingName = data.heavyLiftingName // 装卸难度
-      this.driverTableData[0].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
+      let index = this.driverTableData.findIndex((item:any) => {
+        return item.driverId === id
+      })
+      // this.getItemData(id, index, data)
+    }
+    async getItemData(driverId:string, index:number, labelInfo:IState) {
+      try {
+        const params = { driverInfo: driverId }
+        const { data: res } = await queryMatchDriverForMatchLine(params)
+        if (res.success) {
+          this.driverTableData[index] = {
+            ...res.data,
+            ...labelInfo.driverLabelRemarksVO
+          }
+        } else {
+          this.$message.warning(res.errorMsg)
+        }
+      } catch (err) {
+        console.log('err:', err)
+      }
     }
     mounted() {
     }

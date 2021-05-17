@@ -158,6 +158,22 @@ export default class DepartLine extends Vue {
       console.log('')
     }
   }
+  async getItemData(driverId:string, index:number, labelInfo:IState) {
+    try {
+      const params = { driverInfo: driverId, lineId: this.rowData.lineId }
+      const { data: res } = await queryMatchDriverForMatchLine(params)
+      if (res.success) {
+        this.driverTableData[index] = {
+          ...res.data,
+          ...labelInfo.driverLabelRemarksVO
+        }
+      } else {
+        this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
+  }
   // 从缓存获取线路信息
   getLineInfoFromStorage() {
     let str = sessionStorage.getItem(lineKey) || ''
@@ -176,23 +192,10 @@ export default class DepartLine extends Vue {
   }
   // 打标签成功
   setSuccess(data:any, driverId:string) {
-    console.log(this.driverTableData)
     let index = this.driverTableData.findIndex((item:any) => {
       return item.driverId === driverId
     })
-    this.driverTableData[index].canBreakingNodriving = data.canBreakingNodriving // 司机能否闯禁行
-    this.driverTableData[index].canBreakingTrafficRestriction = data.canBreakingTrafficRestriction // 司机能否闯限行
-    this.driverTableData[index].expectAccountingPeriod = data.expectAccountingPeriod // 结算周期
-    this.driverTableData[index].expectAccountingPeriodName = data.expectAccountingPeriodName // 结算周期
-    this.driverTableData[index].deliveryDifficulty = data.deliveryDifficulty // 配送复杂度
-    this.driverTableData[index].deliveryDifficultyNames = data.deliveryDifficultyNames // 配送复杂度
-    this.driverTableData[index].expectStabilityTemporary = data.expectStabilityTemporary // 稳定/临时
-    this.driverTableData[index].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
-    this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
-    this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
-    if (this.driverTableData[index].unfoldData) {
-      this.driverTableData[index].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
-    }
+    this.getItemData(driverId, index, data)
   }
   // 创建试跑意向成功
   createTryRunSuccess() {
