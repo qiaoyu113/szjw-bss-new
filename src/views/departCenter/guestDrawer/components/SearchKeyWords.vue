@@ -564,6 +564,7 @@ export default class SearchKeyWords extends Vue {
   }
   // 回显货品类型
   getCargoType(data:any) {
+    let arr1 = ['快递快运', '家电', '日化', '家具', '服饰鞋帽', '3C数码']
     if (data.cargoType) {
       let cargoType:any = {
         key: 'cargoType',
