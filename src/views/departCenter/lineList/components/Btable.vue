@@ -240,7 +240,7 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.matchStatus===1 && row.currentCityInvited"
+              v-if="row.matchStatus===1 && row.currentCityInvited&&row.urgent!==0"
               class="text"
             >
               <el-button
