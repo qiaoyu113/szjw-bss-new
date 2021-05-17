@@ -171,6 +171,15 @@ export default class extends Vue {
       value: 5
     }
   ]
+  private situation:IState[] = [
+    { label: '着急试跑', value: 1 },
+    { label: '想跟车', value: 2 },
+    { label: '吓唬司撮退费', value: 3 },
+    { label: '不想续费', value: 4 },
+    { label: '想请假', value: 5 },
+    { label: '铁了心要退费', value: 6 },
+    { label: '别给我打点电话', value: 7 }
+  ]
   private hardOptions: IState[] = [];// 装卸接受度
   private cycleOptions: IState[] = []; // 期望结算周期
   private timeLists:IState[] = []
@@ -330,7 +339,11 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: this.hardOptions
+      options: [
+        { label: '不需要装卸', value: 1 },
+        { label: '轻装卸', value: 2 },
+        { label: '重装卸', value: 3 }
+      ]
     },
     {
       type: 5,
@@ -478,15 +491,7 @@ export default class extends Vue {
       key: 'driverSituation',
       label: '司机情况',
       col: 24,
-      options: [
-        { label: '着急试跑', value: 1 },
-        { label: '想跟车', value: 2 },
-        { label: '吓唬司撮退费', value: 3 },
-        { label: '不想续费', value: 4 },
-        { label: '想请假', value: 5 },
-        { label: '铁了心要退费', value: 6 },
-        { label: '别给我打点电话', value: 7 }
-      ]
+      options: this.situation
     },
     {
       slot: true,
@@ -682,7 +687,20 @@ export default class extends Vue {
       heavyLifting: this.listQuery.heavyLifting,
       heavyLiftingName: this.listQuery.heavyLifting ? this.hardOptions.filter((item) => {
         return item.value === this.listQuery.heavyLifting
-      })[0].label : null
+      })[0].label : null,
+      driverLabelsVO: {
+        driverSituation: this.listQuery.driverSituation,
+        driverSituationName: this.listQuery.driverSituation ? this.situation.filter((item:any) => {
+          return item.value === this.listQuery.driverSituation
+        })[0].label : null
+      },
+      driverLabelRemarksVO: {
+        manuallyRemarks: this.listQuery.manuallyRemarks,
+        remarks: this.listQuery.remarks ? this.listQuery.remarks[0] : null,
+        remarksName: this.listQuery.remarks ? this.reasonLists.filter((item:any) => {
+          return item.value === this.listQuery.remarks[0]
+        })[0].label : null
+      }
     }
     let params:IState = { ...this.listQuery }
     params.driverId = this.driverId

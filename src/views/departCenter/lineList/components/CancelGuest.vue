@@ -13,7 +13,7 @@
       :form-item="formItem"
       :rules="rules"
       size="small"
-      label-width="150px"
+      label-width="130px"
       class="p15 SuggestForm"
       :pc-col="24"
       @onPass="handlePassChange"
