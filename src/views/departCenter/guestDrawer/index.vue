@@ -26,7 +26,6 @@
           @on-end="disabled=true"
           @on-lock="isLock=true"
           @on-reset="resetScroll"
-          @on-update="handleUpdate"
         />
       </Scroll>
     </div>
@@ -63,7 +62,6 @@ export default class GuestDrawer extends Vue {
   $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
-    console.log('works', val)
     this.visible = val
     this.$eventBus.$emit('setIndex', val)
   }
@@ -92,9 +90,6 @@ export default class GuestDrawer extends Vue {
   resetScroll() {
     this.isLock = false
     this.disabled = false
-  }
-  handleUpdate(data:any) {
-    this.lineTableData[0].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
   }
   mounted() {
 

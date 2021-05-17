@@ -149,6 +149,7 @@ interface IState {
   }
 })
 export default class SearchKeyWords extends Vue {
+  private driver: any = {}
   private carLists:IState[] = [
     {
       value: '',
@@ -404,21 +405,26 @@ export default class SearchKeyWords extends Vue {
   onClearInput() {
     this.lineList = []
   }
-  async getOptions() {
-    try {
-      let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'line_label', 'type_of_goods']
-      let { data: res } = await GetDictionaryList(params)
-      if (res.success) {
-        this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
-        this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
-        this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.lineQualities.push(...mapDictData(res.data.line_label || []))
-        this.goodsTypes.push(...mapDictData(res.data.type_of_goods || []))
-      } else {
-        this.$message.error(res.errorMsg)
+  async initOptions() {
+    if (this.hardOptions.length > 1) {
+      this.initQuery()
+    } else {
+      try {
+        let params = ['line_handling_difficulty', 'settlement_cycle', 'Intentional_compartment', 'line_label', 'type_of_goods']
+        let { data: res } = await GetDictionaryList(params)
+        if (res.success) {
+          this.hardOptions.push(...mapDictData(res.data.line_handling_difficulty || []))
+          this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
+          this.carLists.push(...mapDictData(res.data.Intentional_compartment || []))
+          this.lineQualities.push(...mapDictData(res.data.line_label || []))
+          this.goodsTypes.push(...mapDictData(res.data.type_of_goods || []))
+          this.initQuery()
+        } else {
+          this.$message.error(res.errorMsg)
+        }
+      } catch (err) {
+        console.log(`get base info fail:${err}`)
       }
-    } catch (err) {
-      console.log(`get base info fail:${err}`)
     }
   }
   searchHandle() {
@@ -430,28 +436,88 @@ export default class SearchKeyWords extends Vue {
   initQuery() {
     this.reset()
     const driver = JSON.parse(sessionStorage.getItem('driver_row') || '{}')
+    this.driver = driver
     this.listQuery.driverId = driver.driverId || driver.id
     if ((driver.workHours || []).length) {
       this.initSelectItem(driver.workHoursStr, driver.workHoursStr, true)
     }
-    if (driver.heavyLifting && driver.heavyLiftingName) {
-      this.key = 'loadDifficulty'
-      this.initSelectItem(driver.heavyLifting, driver.heavyLiftingName)
-    }
     if (driver.carType && driver.carTypeName) {
       this.key = 'model'
       this.initSelectItem(driver.carType, driver.carTypeName)
-    }
-    if (driver.intentCargoType && driver.intentCargoTypeName) {
-      this.key = 'cargoType'
-      this.initSelectItem(driver.intentCargoType, driver.intentCargoTypeName)
     }
     if (driver.liveAddressCity && driver.liveAddressProvince) {
       const county = driver.liveAddressCounty
       this.listQuery.repoLoc = [driver.liveAddressProvince, driver.liveAddressCity].concat(county ? [county] : [])
       this.listQuery.distLoc = [driver.liveAddressProvince, driver.liveAddressCity].concat(county ? [county] : [])
     }
+    this.initLineLabels()
+    this.initLoadDifficulty()
+    this.initCargoType()
     this.$emit('query', this.listQuery)
+  }
+  initLoadDifficulty() {
+    const driver = this.driver
+    if (driver.heavyLifting && driver.heavyLiftingName) {
+      const loadMap: any = {
+        '不需要装卸': ['不装卸'],
+        '轻装卸': ['不装卸', '只装不卸(轻)', '只卸不装(轻)']
+        // '重装卸': ['全部']
+      }
+      const labels = loadMap[driver.heavyLiftingName] || []
+      const values = labels.map((v: any) => {
+        return (this.hardOptions.find((vv: any) => vv.label === v) || {}).value
+      }).filter((vv: any) => !!vv)
+      if (labels.length && values.length) {
+        this.key = 'loadDifficulty'
+        this.initSelectItem(values, labels)
+      }
+    }
+  }
+  initLineLabels() {
+    const driver = this.driver
+    if (driver.busiType !== null && driver.busiTypeName) {
+      let labels: string[] = []
+      let values = [];
+      /专车/.test(driver.busiTypeName) && (labels = ['超肥', '单肥', '次肥', '中瘦', '极瘦']);
+      /共享/.test(driver.busiTypeName) && (labels = ['次肥', '中瘦', '极瘦'])
+      values = labels.map((v: any) => {
+        return (this.lineQualities.find((vv: any) => vv.label === v) || {}).value
+      }).filter(v => !!v)
+      if (values.length && labels.length) {
+        this.key = 'lineQuality'
+        this.initSelectItem(values, labels)
+      }
+    }
+  }
+  initCargoType() {
+    const driver = this.driver
+    if ((driver.intentCargoType || []).length && (driver.intentCargoTypeName || []).length) {
+      let labels: string[] = []
+      let values = []
+      const labelMap: any = {
+        '快递': ['快递快运', '家电', '日化', '家具', '服饰鞋帽', '3C数码'],
+        '医药': ['日化', '洗涤', '印刷品', '医药保健'],
+        '生鲜': ['食材', '水果', '方便食品', '团餐外卖', '酒水饮料', '鲜花蛋糕'],
+        '家电服装': ['家电', '3C数码', '包装', '母婴', '服饰鞋帽'],
+        '建材、器械': ['建材', '五金', '大包裹/仪器', '家具', '五金', '汽配', '自行车']
+      }
+      driver.intentCargoTypeName.map((v: any) => {
+        if (labelMap[v]) {
+          labelMap[v].forEach((vv: any) => {
+            !labels.includes(vv) && labels.push(vv)
+          })
+        } else {
+          !labels.includes('其它') && labels.push('其它')
+        }
+      })
+      values = labels.map((v: any) => {
+        return (this.goodsTypes.find((vv: any) => vv.label === v) || {}).value
+      }).filter(v => !!v)
+      if (labels.length && values.length) {
+        this.key = 'cargoType'
+        this.initSelectItem(values, labels)
+      }
+    }
   }
   getLineListForSearch(input: string) {
     if (input) {
@@ -471,7 +537,6 @@ export default class SearchKeyWords extends Vue {
     }
   }
   mounted() {
-    this.getOptions()
     for (let i = 0; i < 24; i++) {
       let count = i < 9 ? `0${i}:00` : `${i}:00`
       this.timeLists.push({

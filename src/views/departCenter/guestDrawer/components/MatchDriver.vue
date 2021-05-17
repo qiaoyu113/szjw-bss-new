@@ -151,6 +151,9 @@ export default class DepartLine extends Vue {
       }
     } catch (err) {
       console.log(`get list fail fail:${err}`)
+      if (this.driverTableData.length < 10 && this.pageSize === 1) {
+        this.$emit('on-lock')
+      }
     } finally {
       console.log('')
     }
@@ -173,7 +176,7 @@ export default class DepartLine extends Vue {
   }
   // 打标签成功
   setSuccess(data:any, driverId:string) {
-    this.$emit('on-update', data)
+    console.log(this.driverTableData)
     let index = this.driverTableData.findIndex((item:any) => {
       return item.driverId === driverId
     })
@@ -187,6 +190,9 @@ export default class DepartLine extends Vue {
     this.driverTableData[index].expectStabilityTemporaryNames = data.expectStabilityTemporaryNames // 稳定/临时
     this.driverTableData[index].heavyLifting = data.heavyLifting // 装卸难度
     this.driverTableData[index].heavyLiftingName = data.heavyLiftingName // 装卸难度
+    if (this.driverTableData[index].unfoldData) {
+      this.driverTableData[index].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
+    }
   }
   // 创建试跑意向成功
   createTryRunSuccess() {
