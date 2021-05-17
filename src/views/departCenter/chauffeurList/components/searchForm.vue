@@ -435,11 +435,11 @@ export default class extends Vue {
       // if (contactsLen > 0) {
       //   this.contactsOption.splice(0, contactsLen)
       // }
-      let params = ['Intentional_compartment', 'heavy_lifting_type', 'settlement_cycle']
+      let params = ['Intentional_compartment', 'match_heavy_lifting', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.driverOptions.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.hardOptions.push(...mapDictData(res.data.heavy_lifting_type || []))
+        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
       } else {
         this.$message.error(res.errorMsg)

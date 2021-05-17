@@ -383,7 +383,7 @@ export default class SearchKeyWords extends Vue {
       let obj = {
         type: isWorkRange ? '工作时间段' : (this.selectTitle || title),
         key: isWorkRange ? 'workRange' : this.key,
-        optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : [id],
+        optionIds: isWorkRange ? (this.key === 'start' ? [id, ''] : ['', id]) : (Array.isArray(id) ? id : [id]),
         selected: isWorkRange ? (this.key === 'start' ? [command, '请选择结束时间'] : ['请选择开始时间', command]) : [command]
       }
       this.listQuery[this.key] = this.multiple ? obj.optionIds : id
@@ -444,7 +444,7 @@ export default class SearchKeyWords extends Vue {
     }
     if (driver.intentCargoType && driver.intentCargoTypeName) {
       this.key = 'cargoType'
-      this.initSelectItem(driver.intentCargoType.join(','), driver.intentCargoTypeName.join(','))
+      this.initSelectItem(driver.intentCargoType, driver.intentCargoTypeName)
     }
     if (driver.liveAddressCity && driver.liveAddressProvince) {
       const county = driver.liveAddressCounty

@@ -33,6 +33,7 @@
               <p class="text">
                 {{ row.lineName }}
                 <el-popover
+                  v-show="row.inviteCities && row.inviteCities.length>0"
                   placement="right"
                   min-width="200"
                   trigger="hover"
@@ -106,7 +107,7 @@
               单趟运费:{{ row.everyTripGuaranteed }}元
             </p>
             <p class="text">
-              每日{{ row.dayNum }}趟/{{ row.monthNum }}天(元)
+              每日{{ row.dayNum }}趟/{{ row.monthNum }}天
             </p>
             <p class="text">
               预计月运费:{{ row.shipperOffer }}元
@@ -126,7 +127,7 @@
               货品:{{ row.cargoType }}
             </p>
             <p class="text">
-              装卸难度:{{ row.handlingDifficulty||'全部' }}
+              装卸难度:{{ row.handlingDifficulty||'均可' }}
             </p>
             <p class="text">
               配送复杂度:{{ row.distributionWay }}
@@ -162,19 +163,19 @@
         >
           <template slot-scope="{row}">
             <p
-              v-if="row.inviteCities&&row.inviteCities.length===1"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length===1"
               class="text"
             >
-              {{ row.inviteCities[0] }}已客邀
+              {{ row.inviteCityNames[0]!== null ?row.inviteCityNames[0]+'已客邀':'' }}
             </p>
             <p
-              v-if="row.inviteCities&&row.inviteCities.length===2"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length===2"
               class="text"
             >
-              {{ row.inviteCities[0]+'、'+row.inviteCities[1] }}已客邀
+              {{ row.inviteCityNames[0]+'、'+row.inviteCityNames[1] }}已客邀
             </p>
             <p
-              v-if="row.inviteCities&&row.inviteCities.length>2"
+              v-if="row.inviteCityNames&&row.inviteCityNames.length>2"
               class="text"
             >
               <el-popover
@@ -183,12 +184,12 @@
                 trigger="hover"
               >
                 <div class="text1">
-                  {{ row.inviteCities | cityListFilter }}
+                  {{ row.inviteCityNames | cityListFilter }}
                 </div>
                 <span
                   slot="reference"
                   style="color:orange"
-                >{{ row.inviteCities.length }}<span style="color:#444">个城市已客邀</span></span>
+                >{{ row.inviteCityNames.length }}<span style="color:#444">个城市已客邀</span></span>
               </el-popover>
             </p>
 
@@ -252,7 +253,7 @@
               </el-button>
             </p>
             <p
-              v-if="!row.currentCityInvited && row.matchStatus===1"
+              v-if="!row.currentCityInvited && row.matchStatus===1&&row.urgent!==0"
               class="text"
             >
               <el-button
@@ -348,7 +349,6 @@ export default class extends Vue {
   // 调用接口获取表单数据
   // 获取列表数据
   async getLists() {
-    console.log('this.listQuery', this.listQuery)
     try {
     // 调用查询接口
       const { workCity, carType, lineFineness, handlingDifficulty, freightSection, time,
@@ -376,7 +376,6 @@ export default class extends Vue {
       }
       let { page, limit } = this.pageobj
       let params = { ...queryParams, page, limit }
-      console.log('params', queryParams, params)
       let { data: res } = await getLineInfo(params)
       this.tableData = res.data;
       (this.$parent as any).total = res.page.total
@@ -437,7 +436,7 @@ export default class extends Vue {
       this.$set(row, 'remark', '正在加载中....')
       let params:IState = {
         lineId: row.lineId,
-        city: row.currentCity || '276'
+        city: row.currentCity
       }
       let { data: res } = await getLineRemarks(params)
       if (res.success) {

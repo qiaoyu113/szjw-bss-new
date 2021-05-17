@@ -446,6 +446,7 @@ export default class extends Vue {
       lineCode: '',
       customerStatus: ''
     }
+    if (this.formItem[4].key === 'guestCity') { this.formItem.splice(4, 1) }
   }
   // 获取列表
   private async getList() {
@@ -484,7 +485,7 @@ export default class extends Vue {
     if (res.success) {
       const nodes = res.data.map(function(item: any) {
         return {
-          value: item.id,
+          value: item.areaId,
           label: item.name
         }
       })
@@ -549,7 +550,7 @@ export default class extends Vue {
   handleCancelTryRun(row:any) {
     (this.$refs.cancelTryRun as any).showDialog = true
     const { lineId, matchId, matchStatus, runTestId, status } = row
-    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 'CANCEL', remark: '' }
+    const cancelData = { lineId, matchId, matchStatus, runTestId, status, ancelRunTestOrigin: 1, type: 1, remark: '', cancelRunTestOrigin: 1 }
     this.cancelData = cancelData
   }
   private checkOff(id:any) {
@@ -590,7 +591,7 @@ export default class extends Vue {
         (this.$refs.linebox as any)['scrollTop'] = this.hashScrollTop
         this.listLoading = false
       })
-    }, 100)
+    }, 2000)
   }
   handleScroll() {
     (this.$refs.linebox as any)['addEventListener']('scroll', () => {

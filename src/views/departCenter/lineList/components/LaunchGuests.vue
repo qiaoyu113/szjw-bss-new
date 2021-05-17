@@ -77,7 +77,7 @@ export default class extends Vue {
   }
   private rules:IState = {
     city: [
-      { required: true, message: '请选择客邀城市', trigger: 'blur' }
+      { required: true, message: ' ' }
     ]
   }
   // 弹框关闭
@@ -121,7 +121,7 @@ export default class extends Vue {
         }
         let { data: res } = await CreateLaunchGuests(params)
         if (res.success) {
-          this.$message.success('操作成功')
+          this.$message.success('发起客邀成功')
           this.$emit('success')
         } else {
           this.$message.error(res.errorMsg)
@@ -145,7 +145,7 @@ export default class extends Vue {
         }
         let { data: res } = await CreateLaunchGuestsBatch(params)
         if (res.data.flag) {
-          this.$message.success('操作成功')
+          this.$message.success('发起客邀成功')
           this.$emit('success')
         } else {
           let arr = res.data.msg
