@@ -201,22 +201,22 @@
           <p
             class="text"
           >
-            <template v-if="row.inviteCitys && row.inviteCitys.length > 2">
+            <template v-if="row.inviteCities && row.inviteCities.length > 2">
               <el-popover
                 placement="top-start"
                 width="200"
                 trigger="hover"
               >
                 <div class="text">
-                  {{ (row.inviteCitys || []).join('、') }}
+                  {{ (row.inviteCities || []).join('、') }}
                 </div>
                 <template slot="reference">
-                  <span class="orange">{{ row.inviteCitys.length }}</span>个城市已客邀
+                  <span class="orange">{{ row.inviteCities.length }}</span>个城市已客邀
                 </template>
               </el-popover>
             </template>
-            <template v-else-if="row.inviteCitys && row.inviteCitys.length > 0">
-              {{ (row.inviteCitys || []).join('、') }}已客邀
+            <template v-else-if="row.inviteCities && row.inviteCities.length > 0">
+              {{ (row.inviteCities || []).join('、') }}已客邀
             </template>
           </p>
           <p
