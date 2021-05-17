@@ -330,7 +330,11 @@ export default class extends Vue {
       key: 'heavyLifting',
       label: '装卸接受度',
       col: 24,
-      options: this.hardOptions
+      options: [
+        { label: '不需要装卸', value: 1 },
+        { label: '轻装卸', value: 2 },
+        { label: '重装卸', value: 3 }
+      ]
     },
     {
       type: 5,
