@@ -672,9 +672,9 @@ export default class extends Vue {
       canBreakingNodriving: this.listQuery.canBreakingNodriving,
       canBreakingTrafficRestriction: this.listQuery.canBreakingTrafficRestriction,
       expectStabilityTemporary: this.listQuery.expectStabilityTemporary,
-      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? (this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')) : null,
+      expectStabilityTemporaryNames: this.listQuery.expectStabilityTemporary && this.listQuery.expectStabilityTemporary.length > 0 ? ([this.listQuery.expectStabilityTemporary.join().replace('1', '稳定').replace('2', '临时')]) : null,
       deliveryDifficulty: this.listQuery.deliveryDifficulty,
-      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? (this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')) : null,
+      deliveryDifficultyNames: this.listQuery.deliveryDifficulty && this.listQuery.deliveryDifficulty.length > 0 ? ([this.listQuery.deliveryDifficulty.join().replace('1', '整车').replace('2', '多点配')]) : null,
       expectAccountingPeriod: this.listQuery.expectAccountingPeriod,
       expectAccountingPeriodName: this.listQuery.expectAccountingPeriod ? this.cycleOptions.filter((item) => {
         return item.value === this.listQuery.expectAccountingPeriod
