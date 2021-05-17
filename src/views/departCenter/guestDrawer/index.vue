@@ -94,7 +94,7 @@ export default class GuestDrawer extends Vue {
     this.disabled = false
   }
   handleUpdate(data:any) {
-    this.$set(this.lineTableData[0], 'driverLabelRemarksVO', data.driverLabelRemarksVO)
+    this.lineTableData[0].unfoldData.driverLabelRemarksVO = data.driverLabelRemarksVO
   }
   mounted() {
 
