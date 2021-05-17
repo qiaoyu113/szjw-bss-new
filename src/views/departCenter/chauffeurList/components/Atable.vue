@@ -487,6 +487,7 @@
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { getDriverInfoByDriverId } from '@/api/departCenter'
+import { selectDriverDetail } from '@/api/driver'
 import { parseTime } from '@/utils'
 const driverKey = 'driver_row'
 const lineKey = 'line_row'
@@ -612,16 +613,24 @@ export default class extends Vue {
     this.$emit('tag', row)
   }
   // 撮合
-  handleDepart(row: IState) {
-    if (row.driverStatus === 5) {
-      // 司机已退出
-      (this.$parent as any).getLists()
-      this.$message.warning('司机已退出，请刷新司推列表')
-    } else if (row.driverBalance < 0) {
-      this.$message.warning('司机已欠费，请刷新司推列表')
-    } else {
-      sessionStorage.setItem(driverKey, JSON.stringify(row))
-      this.$emit('depart', row)
+  async handleDepart(row: IState) {
+    try {
+      const { data: res } = await selectDriverDetail(row.driverId)
+      if (res.success) {
+        if (res.data.status === 5) {
+          this.$message.warning('司机已退出，请刷新司推列表');
+          (this.$parent as any).getLists()
+        } else if (row.driverBalance < 0) {
+          this.$message.warning('司机已欠费，请刷新司推列表')
+        } else {
+          sessionStorage.setItem(driverKey, JSON.stringify(row))
+          this.$emit('depart', row)
+        }
+      } else {
+        return this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
     }
   }
   // 查看详情

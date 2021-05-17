@@ -92,9 +92,7 @@ export default class GuestDrawer extends Vue {
     this.isLock = false
     this.disabled = false
   }
-  mounted() {
-
-  }
+  mounted() {}
 }
 </script>
 <style lang="scss" scoped>

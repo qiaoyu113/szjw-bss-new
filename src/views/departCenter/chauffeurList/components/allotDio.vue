@@ -43,6 +43,7 @@ interface IState {
 export default class extends Vue {
   @Prop({ default: false }) dialogVisible!: boolean; // 弹框显示
   @Prop({ default: '分配司撮' }) allotTitle?: string; // 标题
+  @Prop({ default: '' }) cityCode!: number;
   @Prop({ default: [] }) driverIdList!: string[];
   @PropSync('dialogVisible', { type: Boolean }) show!: Boolean;
   private managerList: IState[] = []; // 取消原因
@@ -76,6 +77,7 @@ export default class extends Vue {
     try {
       let params = {
         roleTypes: [15],
+        cityCode: String(this.cityCode),
         uri: '/v2/driver/updateDriverDmBatch'
       }
       let { data: res } = await GetSpecifiedLowerUserListByCondition(params)
