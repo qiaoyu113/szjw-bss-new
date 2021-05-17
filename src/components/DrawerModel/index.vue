@@ -59,7 +59,7 @@ export default class DrawerModel extends Vue {
     this.$emit('input', false)
     this.$emit('on-close')
     if (shouldUpdate) {
-      this.$emit('close-and-update')
+      this.$router.go(0)
     }
   }
   handleOpenClick() {
@@ -76,22 +76,24 @@ export default class DrawerModel extends Vue {
       if (this.time > 30 * 60 * 1000) {
         clearInterval(this.interval)
         this.isTimeout = true
-        this.$confirm('此页面已失效，请重新打开', '提示', {
-          type: 'warning',
-          callback: () => {
-            this.isTimeout = true
-            this.closeHandle(true)
-          }
-        })
       } else {
         this.time += 100
       }
+      console.log(this.time)
     }, 100)
   }
   onMouseMove() {
     clearTimeout(this.timeout)
     clearInterval(this.interval)
-    if (!this.isTimeout) {
+    if (this.isTimeout) {
+      this.$confirm('此页面已失效，请重新打开', '提示', {
+        type: 'warning',
+        callback: () => {
+          this.isTimeout = true
+          this.closeHandle(true)
+        }
+      })
+    } else {
       this.timeout = setTimeout(() => {
         this.time = 0
         this.startInterval()

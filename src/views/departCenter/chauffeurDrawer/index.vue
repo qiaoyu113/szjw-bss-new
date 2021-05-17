@@ -10,7 +10,6 @@
     v-model="visible"
     @on-close="closeHandle"
     @open="handleOpenClick"
-    @close-and-update="onCloseAndUpdate"
   >
     <div class="drawerModel">
       <Scroll
@@ -193,10 +192,6 @@ export default class GuestDrawer extends Vue {
       }
       ;(this.$refs.tryRunShow as any).showDialog = true
       this.rowData = params
-    }
-    onCloseAndUpdate() {
-      this.closeHandle()
-      this.$emit('close')
     }
     onCreateTryRunSucc() {
       (this.$refs.tryRunShow as any).showDialog = false
