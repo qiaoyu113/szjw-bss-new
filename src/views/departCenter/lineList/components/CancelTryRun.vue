@@ -61,7 +61,7 @@ export default class extends Vue {
   ]
   private rules:IState = {
     dictValue: [
-      { required: true, message: '请选择取消创建试跑意向的原因', trigger: 'blur' }
+      { required: true, message: '请选择取消创建试跑意向的原因', trigger: 'change' }
     ]
   }
   // 确定按钮
