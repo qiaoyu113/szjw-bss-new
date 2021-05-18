@@ -80,7 +80,7 @@ export default class extends Vue {
     ],
     remarks: [
       {
-        pattern: /^[a-zA-Z0-9\u4e00-\u9fa5,，'":;?!.。“：；（）{}【】]+$/,
+        pattern: /^[a-zA-Z0-9\u4e00-\u9fa5,，'":;?!.。“”‘’：；（）{}【】]+$/,
         message: '仅支持中文英文与数字格式',
         trigger: 'change'
       }
