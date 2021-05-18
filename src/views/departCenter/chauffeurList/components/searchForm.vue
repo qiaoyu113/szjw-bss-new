@@ -3,7 +3,7 @@
     <self-form
       ref="searchForm"
       :list-query="listQuery"
-      :form-item="formItem"
+      :form-item="items"
       size="small"
       label-width="130px"
       class="p15 SuggestForm"
@@ -98,11 +98,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { SettingsModule } from '@/store/modules/settings'
-import { getDriverNoAndNameList } from '@/api/driver'
+import { GetDriverListByKerWord } from '@/api/driver'
 import doubleInput from './doubleInput.vue'
 import timeSelect from './timeSelect.vue'
 import { GetDictionaryList, GetSpecifiedLowerUserListByCondition } from '@/api/common'
 import { mapDictData, getProviceCityCountryData } from '../../js'
+import { render } from 'node_modules/@types/nprogress'
+import store from '@/store'
 interface PageObj {
   page: number;
   limit: number;
@@ -311,6 +313,16 @@ export default class extends Vue {
     return SettingsModule.isPC
   }
 
+  get items() {
+    if (this.$store.state.user.roles.includes('/v2/driver/updateDriverDmBatch')) {
+      return this.formItem
+    } else {
+      return this.formItem.filter((item) => {
+        return (item.key !== 'driverMatchManagerId' && item.key !== 'hasDriverMatchManager')
+      })
+    }
+  }
+
   handleStatusChange(val: string | number) {
     this.$emit('status', val)
   }
@@ -361,9 +373,7 @@ export default class extends Vue {
       if (this.driverOver) {
         return
       }
-      let { data: res } = await getDriverNoAndNameList(params, {
-        url: ''
-      })
+      let { data: res } = await GetDriverListByKerWord(params)
       if (res.success) {
         if (
           res.data.length &&
@@ -427,19 +437,11 @@ export default class extends Vue {
   }
   async getOptions() {
     try {
-      // let carLen:number = this.carOptions.length
-      // if (carLen > 0) {
-      //   this.carOptions.splice(0, carLen)
-      // }
-      // let contactsLen:number = this.contactsOption.length
-      // if (contactsLen > 0) {
-      //   this.contactsOption.splice(0, contactsLen)
-      // }
-      let params = ['Intentional_compartment', 'match_heavy_lifting', 'settlement_cycle']
+      let params = ['Intentional_compartment', 'heavy_lifting_type', 'settlement_cycle']
       let { data: res } = await GetDictionaryList(params)
       if (res.success) {
         this.driverOptions.push(...mapDictData(res.data.Intentional_compartment || []))
-        this.hardOptions.push(...mapDictData(res.data.match_heavy_lifting || []))
+        this.hardOptions.push(...mapDictData(res.data.heavy_lifting_type || []))
         this.cycleOptions.push(...mapDictData(res.data.settlement_cycle || []))
       } else {
         this.$message.error(res.errorMsg)

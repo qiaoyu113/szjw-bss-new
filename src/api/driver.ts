@@ -301,3 +301,11 @@ export const getDriverNameByNo = (params: any) =>
     method: 'get',
     params
   })
+
+// 获取司机详情
+export const selectDriverDetail = (params: any) =>
+  request({
+    url: `${prefix}/v2/driver/selectDriverDetail`,
+    method: 'get',
+    params
+  })

@@ -2,8 +2,8 @@
  * @Description:
  * @Author: 听雨
  * @Date: 2021-04-13 14:34:13
- * @LastEditTime: 2021-04-28 17:48:58
- * @LastEditors: D.C.base
+ * @LastEditTime: 2021-05-17 20:56:04
+ * @LastEditors: Please set LastEditors
 -->
 <template>
   <DrawerModel
@@ -41,6 +41,7 @@
           <!-- 搜索项 -->
           <SearchKeyWords
             ref="searchKeyWords"
+            :driver="driver"
             @query="onQuery"
           />
           <div style="font-size: 16px; font-weight: bold; margin: 16px 30px;">
@@ -59,6 +60,7 @@
         <SetTag
           ref="tagShow"
           :driver-id="driverId"
+          @on-success="tagSuccessHandle"
         />
       </Scroll>
       <CreateTryRun
@@ -86,7 +88,7 @@ import AtableDriver from '../chauffeurList/components/Atable.vue'
 import DetailDialog from '../chauffeurList/components/DetailDialog.vue'
 import SetTag from '../guestDrawer/components/SetTag.vue'
 import { AppModule } from '@/store/modules/app'
-import { MatchLineListForDriver } from '@/api/departCenter'
+import { MatchLineListForDriver, queryMatchDriverForMatchLine } from '@/api/departCenter'
 
 const pageInfo = {
   limit: 10,
@@ -178,7 +180,7 @@ export default class GuestDrawer extends Vue {
         this.driverId = this.driver.driverId || ''
         ;(this.$refs.driverDrawer as any).getStorage();
         (this.$refs.lineTableDrawer as any).getDriverInfoFromStorage()
-        ;(this.$refs.searchKeyWords as any).initQuery()
+        ;(this.$refs.searchKeyWords as any).initOptions()
       }, 20)
     }
     onCreateTryRun(data:any) {
@@ -269,6 +271,28 @@ export default class GuestDrawer extends Vue {
           this.$message({ type: 'error', message: res.errorMsg })
         }
       })
+    }
+    tagSuccessHandle(data:any, id:any) {
+      let index = this.driverTableData.findIndex((item:any) => {
+        return item.driverId === id
+      })
+      // this.getItemData(id, index, data)
+    }
+    async getItemData(driverId:string, index:number, labelInfo:IState) {
+      try {
+        const params = { driverInfo: driverId }
+        const { data: res } = await queryMatchDriverForMatchLine(params)
+        if (res.success) {
+          this.driverTableData[index] = {
+            ...res.data,
+            ...labelInfo.driverLabelRemarksVO
+          }
+        } else {
+          this.$message.warning(res.errorMsg)
+        }
+      } catch (err) {
+        console.log('err:', err)
+      }
     }
     mounted() {
     }

@@ -105,7 +105,7 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="地址信息"
+        label="配送信息"
         min-width="220"
         align="center"
       >
@@ -213,9 +213,18 @@
           </p>
           <p
             class="text"
-            :class="hitClass(row.workHoursHit)"
           >
-            工作时间段:{{ row.workHoursStr | showWorkHours }}
+            工作时间段:
+            <template v-if="row.workHoursArr">
+              <span
+                v-for="(item,index) in row.workHoursArr"
+                :key="index"
+                :class="row.workHoursHitIndex.includes(index) ? 'orange' : ''"
+              >{{ row.workHoursArr[index] | showWorkHours }}&#8197;</span>
+            </template>
+            <template v-else>
+              <span>{{ row.workHoursStr | showWorkHours }}</span>
+            </template>
           </p>
           <p class="text">
             期望稳定/临时:
@@ -412,9 +421,9 @@
               v-if="row.unfoldData && Object.keys(row.unfoldData).length > 0"
               class="content center"
             >
-              <span>{{ `${row.unfoldData.driverMatchBasicVO.age}岁/${row.unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${row.unfoldData.driverMatchBasicVO.experienceName}/${row.unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
+              <span>{{ `${row.unfoldData.driverMatchBasicVO.age}岁/${row.unfoldData.driverMatchBasicVO.drivingLicenceTypeName}本/${row.unfoldData.driverMatchBasicVO.sourceChannelName}` }}</span>
               <span>{{ `成交:${ parseTime(row.unfoldData.driverLabelsVO.dealDate,'{y}-{m}-{d}')}` }}</span>
-              <span>{{ !isShowPercent ? `最后一次出车日期:${ parseTime(row.unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` : '' }}</span>
+              <span v-if="!isShowPercent && row.unfoldData.driverLabelsVO.lastRunDate">{{ `最后一次出车日期:${ parseTime(row.unfoldData.driverLabelsVO.lastRunDate,'{y}-{m}-{d}')}` }}</span>
             </div>
           </div>
           <div
@@ -458,7 +467,9 @@
             <div
               class="content"
             >
-              {{ row.unfoldData.driverLabelRemarksVO.manuallyRemarks }}
+              <span
+                v-text="remarkText([row.unfoldData.driverLabelRemarksVO.remarksName,row.unfoldData.driverLabelRemarksVO.manuallyRemarks])"
+              />
             </div>
           </div>
         </template>
@@ -476,6 +487,7 @@
 import { Vue, Component, Prop, PropSync } from 'vue-property-decorator'
 import MakeCall from '@/components/OutboundDialog/makeCall.vue'
 import { getDriverInfoByDriverId } from '@/api/departCenter'
+import { selectDriverDetail } from '@/api/driver'
 import { parseTime } from '@/utils'
 const driverKey = 'driver_row'
 const lineKey = 'line_row'
@@ -503,7 +515,7 @@ interface IState {
           let itemArr = item.split('-')
           return itemArr.length > 1 ? `${itemArr[0]}:00-${itemArr[1]}:00` : ''
         })
-        return arr.toString()
+        return arr.join(' ')
       } else {
         return ''
       }
@@ -548,6 +560,9 @@ export default class extends Vue {
     } else {
       return ''
     }
+  }
+  remarkText(remarkArr:string[]) {
+    return remarkArr.filter(ele => ele).join(',')
   }
   // 展开
   async toogleExpand(row: IState) {
@@ -598,9 +613,25 @@ export default class extends Vue {
     this.$emit('tag', row)
   }
   // 撮合
-  handleDepart(row: IState) {
-    sessionStorage.setItem(driverKey, JSON.stringify(row))
-    this.$emit('depart', row)
+  async handleDepart(row: IState) {
+    try {
+      const { data: res } = await selectDriverDetail({ driverId: row.driverId })
+      if (res.success) {
+        if (res.data.status === 5) {
+          this.$message.warning('司机已退出，请刷新司推列表');
+          (this.$parent as any).getLists()
+        } else if (row.driverBalance < 0) {
+          this.$message.warning('司机已欠费，请刷新司推列表')
+        } else {
+          sessionStorage.setItem(driverKey, JSON.stringify(row))
+          this.$emit('depart', row)
+        }
+      } else {
+        return this.$message.warning(res.errorMsg)
+      }
+    } catch (err) {
+      console.log('err:', err)
+    }
   }
   // 查看详情
   handleDetail(row: IState) {

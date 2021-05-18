@@ -62,7 +62,6 @@ export default class GuestDrawer extends Vue {
   $eventBus: any
   @Watch('value')
   onValueChanged(val: boolean, oldVal: boolean) {
-    console.log('works', val)
     this.visible = val
     this.$eventBus.$emit('setIndex', val)
   }
@@ -92,9 +91,7 @@ export default class GuestDrawer extends Vue {
     this.isLock = false
     this.disabled = false
   }
-  mounted() {
-
-  }
+  mounted() {}
 }
 </script>
 <style lang="scss" scoped>

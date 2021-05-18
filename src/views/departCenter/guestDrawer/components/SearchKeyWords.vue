@@ -109,8 +109,9 @@
 </template>
 
 <script lang="ts">
+import { GetDriverListByKerWord, getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
 import { GetDictionaryList } from '@/api/common'
-import { getDriverNoAndNameList, getDriverNameByNo } from '@/api/driver'
+
 import SelfForm from '@/components/Base/SelfForm.vue'
 import { mapDictData, getProviceCityCountryData } from '../../js/index'
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
@@ -485,9 +486,7 @@ export default class SearchKeyWords extends Vue {
   // 获取司机列表接口
   async loadDriverByKeyword(params:IState) {
     try {
-      let { data: res } = await getDriverNoAndNameList(params, {
-        url: '/v2/wt-driver-account/refund/queryDriverList'
-      })
+      let { data: res } = await GetDriverListByKerWord(params)
       let result:any[] = res.data.map((item:any) => ({
         label: `${item.name}/${item.phone}`,
         value: item.driverId
@@ -549,17 +548,14 @@ export default class SearchKeyWords extends Vue {
       type: '业务线'
     }
     if (shareArr.indexOf(data.labelTypeValue) > -1) {
-      this.selectedData = []
       busiType.optionIds.push(0)
       busiType.selected.push('共享')
-      this.selectedData.push(busiType)
     }
     if (specialArr.indexOf(data.labelTypeValue) > -1) {
       busiType.optionIds.push(1)
       busiType.selected.push('专车')
-      this.selectedData = []
-      this.selectedData.push(busiType)
     }
+    this.selectedData.push(busiType)
     this.listQuery['busiType'] = busiType.optionIds
   }
   // 回显货品类型
@@ -573,9 +569,37 @@ export default class SearchKeyWords extends Vue {
     if (data.cargoType) {
       let cargoType:any = {
         key: 'cargoType',
-        optionIds: [arr1.indexOf(data.cargoTypeValue) > -1 ? 1 : arr2.indexOf(data.cargoTypeValue) > -1 ? 2 : arr3.indexOf(data.cargoTypeValue) > -1 ? 7 : arr4.indexOf(data.cargoTypeValue) > -1 ? 3 : arr5.indexOf(data.cargoTypeValue) > -1 ? 4 : arr6.indexOf(data.cargoTypeValue) > -1 ? 6 : 5],
-        selected: [arr1.indexOf(data.cargoTypeValue) > -1 ? '快递' : arr2.indexOf(data.cargoTypeValue) > -1 ? '商超' : arr3.indexOf(data.cargoTypeValue) > -1 ? '医药' : arr4.indexOf(data.cargoTypeValue) > -1 ? '生鲜' : arr5.indexOf(data.cargoTypeValue) > -1 ? '家电服装' : arr6.indexOf(data.cargoTypeValue) > -1 ? '建材、器械' : '其它'],
+        optionIds: [],
+        selected: [],
         type: '货品类型'
+      }
+      if (arr1.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(1)
+        cargoType.selected.push('快递')
+      }
+      if (arr2.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(2)
+        cargoType.selected.push('商超')
+      }
+      if (arr3.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(7)
+        cargoType.selected.push('医药')
+      }
+      if (arr4.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(3)
+        cargoType.selected.push('生鲜')
+      }
+      if (arr5.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(4)
+        cargoType.selected.push('家电服装')
+      }
+      if (arr6.indexOf(data.cargoTypeValue) > -1) {
+        cargoType.optionIds.push(6)
+        cargoType.selected.push('建材、器械')
+      }
+      if (arr1.indexOf(data.cargoTypeValue) === -1 && arr2.indexOf(data.cargoTypeValue) === -1 && arr3.indexOf(data.cargoTypeValue) === -1 && arr4.indexOf(data.cargoTypeValue) === -1 && arr5.indexOf(data.cargoTypeValue) === -1 && arr6.indexOf(data.cargoTypeValue) === -1) {
+        cargoType.optionIds.push(5)
+        cargoType.selected.push('其它')
       }
       this.selectedData.push(cargoType)
       this.listQuery['cargoType'] = cargoType.optionIds
@@ -621,6 +645,7 @@ export default class SearchKeyWords extends Vue {
   }
   // 初始化筛选项数据
   initData() {
+    this.selectedData = []
     this.getLineInfoFromStorage()
     this.getBusiType(this.rowData)
     this.getCarType(this.rowData)
