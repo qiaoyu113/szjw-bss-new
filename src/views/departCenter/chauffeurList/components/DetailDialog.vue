@@ -71,12 +71,7 @@
               :operation-list="[]"
               :page="page"
               @onPageSize="handlePageSize"
-            >
-              <template v-slot:distributionTime="scope">
-                <span v-if="scope.row.deliveryStartDate"> {{ scope.row.deliveryStartDate }}-{{ scope.row.deliveryEndDate }}</span>
-                <span v-else>暂无数据</span>
-              </template>
-            </SelfTable>
+            />
           </el-tab-pane>
           <el-tab-pane
             v-permission="['/v1/outboundCall/getListByBusinessId']"
@@ -371,10 +366,9 @@ export default class extends Vue {
       label: '主要配送区域'
     },
     {
-      key: 'distributionTime',
+      key: 'deliveryDateStr',
       label: '配送时间',
-      'width': '245px',
-      slot: true
+      'width': '245px'
     },
     {
       key: 'deliveryCount',
