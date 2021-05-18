@@ -190,7 +190,7 @@ export default class extends Vue {
     canBreakingTrafficRestriction: '', // 能否闯限行
     prohibitionRegion: '', // 限行省市
     breakingTrafficRestrictionCounty: [], // 可跑限行区域-区县
-    heavyLifting: null, // 装卸接受度
+    heavyLifting: [], // 装卸接受度
     deliveryDifficulty: [], // 配送难度
     expectAccountingPeriod: null, // 期望账期
     expectIncomeTrip: '', // 期望运费（趟）
@@ -610,6 +610,7 @@ export default class extends Vue {
     this.listQuery.breakingTrafficRestrictionCounty = []
     this.listQuery.start = ''
     this.listQuery.delivery = ''
+    this.listQuery.heavyLifting = []
     this.listQuery.driverSituation = null
     this.listQuery.remarks = [] // 司机备注
     this.listQuery.manuallyRemarks = ''
