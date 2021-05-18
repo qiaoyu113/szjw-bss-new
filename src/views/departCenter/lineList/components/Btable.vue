@@ -279,9 +279,7 @@
                 取消试跑意向
               </el-button>
             </p>
-            <!-- 只有当本城客邀撮合成功时不展示 -->
             <p
-              v-if="!row.currentCitySuccess"
               class="text"
             >
               <el-button
