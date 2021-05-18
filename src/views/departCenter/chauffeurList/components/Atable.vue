@@ -615,7 +615,7 @@ export default class extends Vue {
   // 撮合
   async handleDepart(row: IState) {
     try {
-      const { data: res } = await selectDriverDetail(row.driverId)
+      const { data: res } = await selectDriverDetail({ driverId: row.driverId })
       if (res.success) {
         if (res.data.status === 5) {
           this.$message.warning('司机已退出，请刷新司推列表');
