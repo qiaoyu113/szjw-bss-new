@@ -698,7 +698,7 @@ export default class extends Vue {
       driverLabelRemarksVO: {
         manuallyRemarks: this.listQuery.manuallyRemarks,
         remarks: this.listQuery.remarks ? this.listQuery.remarks[0] : null,
-        remarksName: this.listQuery.remarks ? this.reasonLists.filter((item:any) => {
+        remarksName: this.listQuery.remarks && this.listQuery.remarks.length > 0 ? this.reasonLists.filter((item:any) => {
           return item.value === this.listQuery.remarks[0]
         })[0].label : null
       }
